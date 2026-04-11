@@ -4,7 +4,28 @@ import { useState } from 'react'
 import Link from 'next/link'
 import VideoModal from '@/components/ui/VideoModal'
 
-const onboardingSteps = [
+interface Instruction {
+  text: string
+  warning?: string
+  tip?: string
+}
+
+interface OnboardingStep {
+  id: number
+  symbol: string
+  title: string
+  subtitle: string
+  status: 'current' | 'locked'
+  why?: string
+  warning?: string
+  videoLabel?: string
+  videoNote?: string
+  videoUrl?: string
+  link?: { label: string; href: string }
+  instructions: Instruction[]
+}
+
+const onboardingSteps: OnboardingStep[] = [
   {
     id: 1,
     symbol: '💼',
