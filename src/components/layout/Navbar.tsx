@@ -1,63 +1,112 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { brand, navItems } from '@/content/shared'
+
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Product Suite', href: '#product-suite' },
+  { label: 'Blog', href: '/media' },
+  { label: 'FAQs', href: '/faqs' },
+  { label: 'Contact', href: '/resources' },
+]
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false)
   const pathname = usePathname()
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#08205b]/55 backdrop-blur-xl">
+      <div className="mx-auto flex h-[4.8rem] max-w-7xl items-center justify-between gap-8 px-6 lg:px-10">
 
-          {/* Logo */}
-          <Link href={brand.logoHref} className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M9 2L14 7H10V12H8V7H4L9 2Z" fill="white"/>
-                <path d="M4 12H14V14H4V12Z" fill="white" opacity="0.7"/>
-              </svg>
-            </div>
-            <div>
-              <div className="font-bold text-gray-900 text-sm leading-tight">{brand.name}</div>
-              <div className="text-blue-500 text-xs uppercase tracking-widest leading-tight">{brand.tagline}</div>
-            </div>
-          </Link>
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3 text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[linear-gradient(135deg,#dbeafe_0%,#60a5fa_55%,#1d4ed8_100%)] shadow-[0_0_20px_rgba(96,165,250,0.35)]">
+            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none text-slate-950" aria-hidden="true">
+              <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" />
+              <path
+                d="M7.5 13.5c1.6-2.8 4.2-4.2 7.8-4.2 1.1 0 2.1.1 3.2.4"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.8"
+              />
+              <path
+                d="m14.8 7.8 3.9 1.9-2.2 3.7"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.8"
+              />
+            </svg>
+          </div>
+          <span className="font-[var(--font-sora)] text-[1.7rem] font-semibold tracking-[-0.06em]">
+            <span className="text-white">Autopilot</span>
+            <span className="text-blue-300">ROI</span>
+          </span>
+        </Link>
 
-          {/* Nav links */}
-          <div className="hidden md:flex items-center gap-6">
+        {/* Desktop Nav */}
+        <nav className="hidden items-center justify-center gap-8 lg:flex">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className={`text-base font-medium transition hover:text-white ${
+                pathname === item.href ? 'text-white' : 'text-blue-50/80'
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Mobile hamburger */}
+        <button
+          className="flex lg:hidden items-center justify-center h-10 w-10 rounded-xl border border-white/15 bg-white/8 text-white"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle navigation"
+        >
+          {menuOpen ? (
+            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current strokeWidth-2" strokeWidth="2">
+              <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" strokeWidth="2">
+              <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+            </svg>
+          )}
+        </button>
+      </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <nav className="border-t border-white/10 bg-[#08205b]/95 px-6 py-4 backdrop-blur-xl lg:hidden">
+          <div className="flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
-                key={item.href}
+                key={item.label}
                 href={item.href}
-                className={`text-sm font-medium transition-colors ${
+                onClick={() => setMenuOpen(false)}
+                className={`rounded-xl px-4 py-3 text-base font-medium transition ${
                   pathname === item.href
-                    ? 'text-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white/12 text-white'
+                    : 'text-blue-50/80 hover:bg-white/8 hover:text-white'
                 }`}
               >
                 {item.label}
               </Link>
             ))}
-          </div>
-
-          {/* CTAs */}
-          <div className="flex items-center gap-3">
-            <Link href="#" className="hidden sm:block text-sm text-gray-500 hover:text-gray-700 transition-colors">
-              Partner Login
-            </Link>
             <Link
               href="/start"
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              onClick={() => setMenuOpen(false)}
+              className="mt-3 rounded-xl bg-blue-600 px-4 py-3 text-center text-base font-semibold text-white"
             >
-              Find My Spot →
+              Get Started
             </Link>
           </div>
-
-        </div>
-      </div>
-    </nav>
+        </nav>
+      )}
+    </header>
   )
 }

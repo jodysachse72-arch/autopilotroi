@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoPilot ROI — Get Started</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1A6FE8;--blue-deep:#0F52C1;--blue-soft:#EFF5FF;--gold:#F0A500;--gold-light:#FBBF24;--green:#10B981;--green-soft:#ECFDF5;--white:#FFFFFF;--off-white:#F8FAFF;--ink:#0D1B2A;--ink-soft:#3D5066;--ink-muted:#7A8FA6;--border:rgba(26,111,232,0.12);--border-soft:rgba(26,111,232,0.07);--shadow:0 4px 24px rgba(26,111,232,0.08);--shadow-lg:0 16px 48px rgba(13,27,42,0.1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;}
+.topbar{background:var(--blue);color:white;text-align:center;padding:9px 24px;font-size:13px;font-weight:600;}
+.topbar a{color:var(--gold-light);text-decoration:none;margin-left:6px;}
+nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-soft);padding:0 56px;height:72px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 20px rgba(26,111,232,0.06);}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-deep));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,111,232,0.3);}
+.logo-icon svg{width:22px;height:22px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.logo-name{font-size:15px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;display:block;}
+.logo-tagline{font-size:10px;font-weight:600;color:var(--blue);letter-spacing:1.2px;text-transform:uppercase;display:block;}
+.nav-links{display:flex;gap:36px;}
+.nav-links a{text-decoration:none;color:var(--ink-soft);font-size:14px;font-weight:600;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--blue);}
+.nav-cta{background:var(--blue);color:white;padding:11px 24px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;}
+.page-header{background:linear-gradient(160deg,var(--off-white),var(--blue-soft));padding:64px 56px 56px;text-align:center;border-bottom:1px solid var(--border-soft);}
+.eyebrow{font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:14px;display:block;}
+.page-header h1{font-family:'Sora',sans-serif;font-size:44px;font-weight:800;color:var(--ink);line-height:1.1;letter-spacing:-1px;margin-bottom:16px;}
+.page-header p{font-size:17px;color:var(--ink-muted);line-height:1.7;max-width:520px;margin:0 auto 36px;}
+.progress-track{display:flex;align-items:center;justify-content:center;max-width:660px;margin:0 auto;}
+.pt-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;}
+.pt-step:not(:last-child)::after{content:'';position:absolute;top:18px;left:60%;right:-40%;height:2px;background:var(--border);}
+.pt-step.done:not(:last-child)::after{background:var(--green);}
+.pt-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;border:2px solid var(--border);background:white;color:var(--ink-muted);position:relative;z-index:1;font-family:'Sora',sans-serif;}
+.pt-step.done .pt-circle{background:var(--green);border-color:var(--green);color:white;}
+.pt-step.active .pt-circle{background:var(--blue);border-color:var(--blue);color:white;box-shadow:0 0 0 4px rgba(26,111,232,0.15);}
+.pt-label{font-size:11px;font-weight:700;color:var(--ink-muted);text-align:center;}
+.pt-step.active .pt-label{color:var(--blue);}
+.pt-step.done .pt-label{color:var(--green);}
+.main{max-width:1100px;margin:0 auto;padding:64px 56px 96px;display:grid;grid-template-columns:260px 1fr;gap:48px;align-items:start;}
+.sidebar{position:sticky;top:100px;}
+.sidebar-label{font-size:10px;font-weight:800;color:var(--ink-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;}
+.sidebar-steps{display:flex;flex-direction:column;gap:4px;}
+.sb-step{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;text-decoration:none;transition:background 0.2s;}
+.sb-step:hover{background:var(--blue-soft);}
+.sb-step.s-active{background:var(--blue-soft);}
+.sb-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:1.5px solid var(--border);background:white;color:var(--ink-muted);flex-shrink:0;font-family:'Sora',sans-serif;}
+.sb-step.s-done .sb-num{background:var(--green);border-color:var(--green);color:white;font-size:10px;}
+.sb-step.s-active .sb-num{background:var(--blue);border-color:var(--blue);color:white;}
+.sb-title{font-size:13px;font-weight:700;color:var(--ink);}
+.sb-step.s-active .sb-title{color:var(--blue);}
+.sb-sub{font-size:11px;color:var(--ink-muted);margin-top:1px;}
+.sidebar-note{margin-top:20px;background:#FFFBEB;border:1px solid rgba(240,165,0,0.2);border-radius:12px;padding:16px;}
+.sn-title{font-size:12px;font-weight:800;color:var(--gold);margin-bottom:6px;}
+.sn-text{font-size:12px;color:var(--ink-soft);line-height:1.6;}
+.sidebar-partner{margin-top:14px;background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.sp-title{font-size:12px;font-weight:800;color:var(--blue);margin-bottom:6px;}
+.sp-text{font-size:12px;color:var(--ink-soft);line-height:1.6;}
+.sp-btn{display:block;margin-top:10px;background:var(--blue);color:white;text-align:center;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;}
+.steps-content{display:flex;flex-direction:column;gap:20px;}
+.step-block{background:white;border:1px solid var(--border-soft);border-radius:20px;overflow:hidden;transition:box-shadow 0.25s;}
+.step-block:hover{box-shadow:var(--shadow-lg);}
+.step-block.active-block{border-color:var(--border);box-shadow:var(--shadow-lg);}
+.step-head{display:flex;align-items:center;gap:16px;padding:22px 28px;border-bottom:1px solid var(--border-soft);background:var(--off-white);}
+.sh-num{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:16px;font-weight:800;flex-shrink:0;}
+.sh-blue{background:var(--blue);color:white;box-shadow:0 4px 12px rgba(26,111,232,0.25);}
+.sh-green{background:var(--green);color:white;}
+.sh-grey{background:white;border:2px solid var(--border);color:var(--ink-muted);}
+.sh-gold{background:var(--gold);color:white;box-shadow:0 4px 12px rgba(240,165,0,0.25);}
+.sh-info{flex:1;}
+.sh-eyebrow{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;}
+.sh-green-ey{color:var(--green);}
+.sh-gold-ey{color:var(--gold);}
+.sh-title{font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--ink);}
+.sh-sub{font-size:13px;color:var(--ink-muted);margin-top:2px;}
+.sh-badge{padding:5px 14px;border-radius:100px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;}
+.badge-blue{background:var(--blue-soft);color:var(--blue);}
+.badge-green{background:var(--green-soft);color:var(--green);}
+.badge-grey{background:var(--off-white);color:var(--ink-muted);border:1px solid var(--border-soft);}
+.badge-gold{background:#FFFBEB;color:var(--gold);}
+.step-body{padding:28px;}
+.video-area{background:#0D1B2A;border-radius:14px;overflow:hidden;margin-bottom:22px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;text-decoration:none;}
+.video-tag{position:absolute;top:14px;left:14px;background:var(--blue);color:white;font-size:10px;font-weight:800;padding:4px 12px;border-radius:100px;text-transform:uppercase;}
+.video-placeholder{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:32px;}
+.vp-play{width:60px;height:60px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;color:white;box-shadow:0 8px 28px rgba(26,111,232,0.4);transition:transform 0.2s;}
+.video-area:hover .vp-play{transform:scale(1.1);}
+.vp-title{font-size:15px;font-weight:700;color:white;max-width:380px;line-height:1.4;}
+.vp-meta{font-size:12px;color:rgba(255,255,255,0.4);}
+.info-box{background:var(--blue-soft);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;gap:12px;margin-bottom:18px;}
+.warn-box{background:#FFFBEB;border:1px solid rgba(240,165,0,0.25);border-radius:12px;padding:16px 20px;display:flex;gap:12px;margin-bottom:18px;}
+.box-icon{font-size:17px;flex-shrink:0;margin-top:1px;}
+.box-text{font-size:13px;color:var(--ink-soft);line-height:1.65;}
+.box-text strong{color:var(--blue);}
+.warn-box .box-text strong{color:var(--gold);}
+.written-steps{display:flex;flex-direction:column;gap:11px;margin-bottom:20px;}
+.ws-item{display:flex;gap:14px;padding:14px 16px;border:1px solid var(--border-soft);border-radius:12px;transition:border-color 0.2s,background 0.2s;}
+.ws-item:hover{border-color:var(--border);background:var(--off-white);}
+.ws-num{width:26px;height:26px;border-radius:50%;background:var(--blue-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);flex-shrink:0;font-family:'Sora',sans-serif;}
+.ws-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.ws-desc{font-size:13px;color:var(--ink-muted);line-height:1.65;}
+.ws-tip{display:inline-flex;margin-top:7px;background:#FFFBEB;border:1px solid rgba(240,165,0,0.2);padding:4px 11px;border-radius:8px;font-size:11px;font-weight:600;color:var(--gold);}
+.link-list{display:flex;flex-direction:column;gap:9px;margin-bottom:18px;}
+.link-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--border-soft);border-radius:10px;text-decoration:none;transition:border-color 0.2s,box-shadow 0.2s;background:white;}
+.link-item:hover{border-color:var(--border);box-shadow:var(--shadow);}
+.link-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.li-blue{background:var(--blue-soft);}
+.li-gold{background:#FFFBEB;}
+.link-title{font-size:14px;font-weight:700;color:var(--ink);}
+.link-desc{font-size:11px;color:var(--ink-muted);margin-top:1px;}
+.link-arrow{font-size:14px;color:var(--ink-muted);margin-left:auto;}
+.step-action{display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid var(--border-soft);}
+.btn-next{background:var(--blue);color:white;padding:12px 26px;border-radius:10px;font-size:14px;font-weight:700;border:none;cursor:pointer;box-shadow:0 4px 14px rgba(26,111,232,0.25);transition:background 0.2s,transform 0.15s;display:flex;align-items:center;gap:8px;}
+.btn-next:hover{background:var(--blue-deep);transform:translateY(-1px);}
+.btn-next.g{background:var(--green);}
+.btn-next.gld{background:var(--gold);}
+.step-help{font-size:13px;color:var(--ink-muted);}
+.step-help a{color:var(--blue);text-decoration:none;font-weight:600;}
+.congrats-block{background:linear-gradient(135deg,var(--blue),var(--blue-deep));border-radius:18px;padding:44px;text-align:center;color:white;}
+.congrats-icon{font-size:52px;margin-bottom:14px;display:block;}
+.congrats-block h3{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;margin-bottom:10px;}
+.congrats-block p{font-size:15px;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:26px;max-width:380px;margin-left:auto;margin-right:auto;}
+.btn-wh{background:white;color:var(--blue);padding:13px 28px;border-radius:10px;font-size:14px;font-weight:800;text-decoration:none;display:inline-block;margin:5px;box-shadow:0 4px 14px rgba(0,0,0,0.12);transition:transform 0.2s;}
+.btn-wh:hover{transform:translateY(-2px);}
+.btn-wh-ghost{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border:1px solid rgba(255,255,255,0.2);}
+footer{background:#0A1525;padding:40px 56px;display:flex;align-items:center;justify-content:space-between;}
+.foot-logo{font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:white;}
+.foot-logo span{color:var(--blue);}
+.foot-copy{font-size:12px;color:rgba(255,255,255,0.2);}
+.foot-links{display:flex;gap:24px;}
+.foot-links a{color:rgba(255,255,255,0.3);font-size:13px;text-decoration:none;}
+.foot-links a:hover{color:white;}
+</style>
+</head>
+<body>
+
+<div class="topbar">🏅 Aurum Foundation — Gold RWA Trading &amp; Visa Crypto Card now live <a href="#">→ Learn more</a></div>
+
+<nav>
+  <a href="/" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <div><span class="logo-name">AutoPilot ROI</span><span class="logo-tagline">Aurum Onboarding</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="autopilotroi-home.html">Home</a><a href="autopilotroi-start.html" class="active">Get Started</a><a href="autopilotroi-start.html">University</a><a href="autopilotroi-resources.html">Resources</a><a href="autopilotroi-resources.html">FAQ</a>
+  </div>
+  <a href="autopilotroi-start.html" class="nav-cta">Partner Login</a>
+</nav>
+
+<div class="page-header">
+  <span class="eyebrow">Step-by-Step Onboarding</span>
+  <h1>Your path into Aurum starts here.</h1>
+  <p>Follow each step in order. Watch Barry's video, then follow the written steps alongside it. Your partner is with you the whole way.</p>
+  <div class="progress-track">
+    <div class="pt-step done"><div class="pt-circle">✓</div><div class="pt-label">Orientation</div></div>
+    <div class="pt-step done"><div class="pt-circle">✓</div><div class="pt-label">Score</div></div>
+    <div class="pt-step active"><div class="pt-circle">3</div><div class="pt-label">Get Started</div></div>
+    <div class="pt-step"><div class="pt-circle">4</div><div class="pt-label">University</div></div>
+    <div class="pt-step"><div class="pt-circle">5</div><div class="pt-label">Live in Aurum</div></div>
+  </div>
+</div>
+
+<div class="main">
+  <aside class="sidebar">
+    <div class="sidebar-label">Your Steps</div>
+    <div class="sidebar-steps">
+      <a href="#s1" class="sb-step s-done"><div class="sb-num">✓</div><div><div class="sb-title">Trust Wallet</div><div class="sb-sub">Crypto home base</div></div></a>
+      <a href="#s2" class="sb-step s-done"><div class="sb-num">✓</div><div><div class="sb-title">VPN Setup</div><div class="sb-sub">US & Canada access</div></div></a>
+      <a href="#s3" class="sb-step s-active"><div class="sb-num">3</div><div><div class="sb-title">Get USDT</div><div class="sb-sub">Fund your wallet</div></div></a>
+      <a href="#s4" class="sb-step"><div class="sb-num">4</div><div><div class="sb-title">Create Aurum Account</div><div class="sb-sub">With referral code</div></div></a>
+      <a href="#s5" class="sb-step"><div class="sb-num">5</div><div><div class="sb-title">Fund & Activate Bot</div><div class="sb-sub">EX AI Bot goes live</div></div></a>
+      <a href="#s6" class="sb-step"><div class="sb-num" style="background:#FFFBEB;border-color:rgba(240,165,0,0.3);color:var(--gold);">✦</div><div><div class="sb-title">Confirm with Partner</div><div class="sb-sub">Officially in</div></div></a>
+    </div>
+    <div class="sidebar-note">
+      <div class="sn-title">📹 Aurum University</div>
+      <div class="sn-text">Each step links to Barry's exact Aurum University video. Watch first, then follow the written instructions.</div>
+    </div>
+    <div class="sidebar-partner">
+      <div class="sp-title">👋 Need Help?</div>
+      <div class="sp-text">Your partner is here for every step — not just to get you in, but to support you as an active member.</div>
+      <a href="#" class="sp-btn">Contact My Partner →</a>
+    </div>
+  </aside>
+
+  <div class="steps-content">
+
+    <!-- S1 -->
+    <div class="step-block" id="s1">
+      <div class="step-head">
+        <div class="sh-num sh-green">✓</div>
+        <div class="sh-info"><div class="sh-eyebrow sh-green-ey">Step 1 · Complete</div><div class="sh-title">Get Trust Wallet</div><div class="sh-sub">Your non-custodial crypto wallet — you own your keys</div></div>
+        <span class="sh-badge badge-green">✓ Done</span>
+      </div>
+      <div class="step-body">
+        <div class="info-box"><div class="box-icon">ℹ️</div><div class="box-text"><strong>Why Trust Wallet?</strong> Aurum operates in DeFi — you need a self-custody wallet to move USDT into your account. Trust Wallet is free, takes 5 minutes, iOS & Android. You own your funds, nobody else has access.</div></div>
+        <div class="link-list">
+          <a href="https://trustwallet.com" target="_blank" class="link-item"><div class="link-icon li-blue">📱</div><div><div class="link-title">Download Trust Wallet</div><div class="link-desc">trustwallet.com · iOS & Android · Free</div></div><div class="link-arrow">→</div></a>
+        </div>
+        <div class="written-steps">
+          <div class="ws-item"><div class="ws-num">1</div><div><div class="ws-title">Download from App Store or Google Play</div><div class="ws-desc">Blue shield icon. Only from official app stores — never a third-party link.</div></div></div>
+          <div class="ws-item"><div class="ws-num">2</div><div><div class="ws-title">Create wallet & write down your 12-word seed phrase</div><div class="ws-desc">This is your master key. Write it on paper, store safely. Never share with anyone — ever.</div><div class="ws-tip">⚠️ Lose this = lose your funds permanently. No recovery exists.</div></div></div>
+          <div class="ws-item"><div class="ws-num">3</div><div><div class="ws-title">Enable USDT (TRC-20) in your wallet</div><div class="ws-desc">Search USDT in the token list and add TRC-20. This is the version Aurum uses for deposits.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="step-block" id="s2">
+      <div class="step-head">
+        <div class="sh-num sh-green">✓</div>
+        <div class="sh-info"><div class="sh-eyebrow sh-green-ey">Step 2 · Complete</div><div class="sh-title">Set Up Your VPN</div><div class="sh-sub">Required for US & Canada users to access Aurum</div></div>
+        <span class="sh-badge badge-green">✓ Done</span>
+      </div>
+      <div class="step-body">
+        <div class="warn-box"><div class="box-icon">⚠️</div><div class="box-text"><strong>US & Canada users:</strong> Aurum requires a VPN while US regulatory licensing is finalized. Route through UK or Mexico — both work reliably. Legal and widely used. Outside US/Canada? Skip straight to Step 3.</div></div>
+        <div class="written-steps">
+          <div class="ws-item"><div class="ws-num">1</div><div><div class="ws-title">Download NordVPN or ExpressVPN</div><div class="ws-desc">Both work for Aurum. NordVPN has a trial period to test first.</div></div></div>
+          <div class="ws-item"><div class="ws-num">2</div><div><div class="ws-title">Connect to a UK or Mexico server</div><div class="ws-desc">UK servers are most stable for Aurum. Keep VPN on during all setup and transactions.</div><div class="ws-tip">💡 Keep VPN active during account creation and all deposits.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 — ACTIVE -->
+    <div class="step-block active-block" id="s3">
+      <div class="step-head">
+        <div class="sh-num sh-blue">3</div>
+        <div class="sh-info"><div class="sh-eyebrow">Step 3 · You Are Here</div><div class="sh-title">Get USDT into Trust Wallet</div><div class="sh-sub">Fund your wallet before creating your Aurum account</div></div>
+        <span class="sh-badge badge-blue">In Progress</span>
+      </div>
+      <div class="step-body">
+        <div class="info-box"><div class="box-icon">ℹ️</div><div class="box-text"><strong>Why USDT?</strong> Aurum deposits use USDT (Tether) — a stablecoin pegged to USD. It doesn't fluctuate like Bitcoin. Minimum deposit is $100 USDT. Have your amount ready before creating your account.</div></div>
+        <div class="written-steps">
+          <div class="ws-item"><div class="ws-num">1</div><div><div class="ws-title">Buy USDT on Coinbase, Kraken, or Binance</div><div class="ws-desc">Create account, verify identity, purchase your USDT amount. Minimum $100.</div></div></div>
+          <div class="ws-item"><div class="ws-num">2</div><div><div class="ws-title">Send USDT to your Trust Wallet (TRC-20 address)</div><div class="ws-desc">Copy your Trust Wallet TRC-20 address. Paste it in the exchange withdrawal. Double-check before confirming.</div><div class="ws-tip">⚠️ Always send a $1–$5 test transaction first to confirm the address.</div></div></div>
+          <div class="ws-item"><div class="ws-num">3</div><div><div class="ws-title">Wait for confirmation (5–15 minutes)</div><div class="ws-desc">TRC-20 is fast. USDT appears in Trust Wallet once confirmed. Ready for Step 4.</div></div></div>
+        </div>
+        <div class="step-action">
+          <div class="step-help">Questions? <a href="#">Message your partner →</a></div>
+          <button class="btn-next" onclick="this.textContent='✓ USDT Ready';this.classList.add('g');">My USDT is Ready ✓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="step-block" id="s4">
+      <div class="step-head">
+        <div class="sh-num sh-grey">4</div>
+        <div class="sh-info"><div class="sh-eyebrow">Step 4</div><div class="sh-title">Create Your Aurum Account</div><div class="sh-sub">Use your partner's referral link — critical for correct attribution</div></div>
+        <span class="sh-badge badge-grey">🔒 Next</span>
+      </div>
+      <div class="step-body">
+        <a href="https://youtu.be/3ng39ys3PiQ" target="_blank" class="video-area">
+          <div class="video-tag">📹 Aurum University · START HERE</div>
+          <div class="video-placeholder"><div class="vp-play">▶</div><div class="vp-title">Product Overview Presentation — Full Aurum Walkthrough</div><div class="vp-meta">AURUM UNIVERSITY · 40:11 · Watch before signing up</div></div>
+        </a>
+        <div class="warn-box"><div class="box-icon">⚠️</div><div class="box-text"><strong>Do NOT sign up without your referral code.</strong> Your partner's referral link must be used at signup — without it you'll be placed under the wrong person and it cannot be changed later. Your partner will give you the exact link.</div></div>
+        <div class="link-list">
+          <a href="https://backoffice.aurum.foundation/auth/log-in" target="_blank" class="link-item"><div class="link-icon li-blue">🔐</div><div><div class="link-title">Aurum Back Office — Create Account</div><div class="link-desc">backoffice.aurum.foundation · Use your partner's referral link</div></div><div class="link-arrow">→</div></a>
+        </div>
+        <div class="written-steps">
+          <div class="ws-item"><div class="ws-num">1</div><div><div class="ws-title">Get your personal referral link from your partner</div><div class="ws-desc">Your partner sends a unique signup URL that automatically tags your account correctly. Use this — don't go to Aurum directly.</div></div></div>
+          <div class="ws-item"><div class="ws-num">2</div><div><div class="ws-title">Sign up with VPN active (US/Canada only)</div><div class="ws-desc">Make sure VPN is connected to UK or Mexico before clicking the referral link and completing signup.</div></div></div>
+          <div class="ws-item"><div class="ws-num">3</div><div><div class="ws-title">Complete KYC / identity verification</div><div class="ws-desc">Have your ID ready. Basic verification — usually takes a few minutes.</div></div></div>
+          <div class="ws-item"><div class="ws-num">4</div><div><div class="ws-title">Explore your back office dashboard</div><div class="ws-desc">Familiarise yourself before depositing. Watch the Back Office Tutorial (14:19) in Resources.</div><div class="ws-tip">💡 Resource: Back Office Tutorial → in your Resource Library</div></div></div>
+        </div>
+        <div class="step-action">
+          <div class="step-help">Need your link? <a href="#">Contact your partner →</a></div>
+          <button class="btn-next" onclick="this.textContent='✓ Account Created';this.classList.add('g');">Account Created ✓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="step-block" id="s5">
+      <div class="step-head">
+        <div class="sh-num sh-grey">5</div>
+        <div class="sh-info"><div class="sh-eyebrow">Step 5</div><div class="sh-title">Fund Your Account & Activate the Bot</div><div class="sh-sub">Deposit USDT and get the EX AI Bot trading — your money starts working</div></div>
+        <span class="sh-badge badge-grey">🔒 Next</span>
+      </div>
+      <div class="step-body">
+        <a href="https://youtu.be/3ng39ys3PiQ" target="_blank" class="video-area">
+          <div class="video-tag">📹 Aurum University · US & Canada Setup</div>
+          <div class="video-placeholder"><div class="vp-play">▶</div><div class="vp-title">Aurum Account Registration + EX AI Bot Activation (U.S. & Canada) — Screencast Tutorial</div><div class="vp-meta">AURUM UNIVERSITY · 12:37 · Step-by-step walkthrough</div></div>
+        </a>
+        <div class="info-box"><div class="box-icon">ℹ️</div><div class="box-text"><strong>Which bot is right for you?</strong> Aurum has EX AI Bot, EX AI Pro, and Zeus Bot. EX AI Bot is the standard starting point. Your partner can advise which tier fits your capital range and goals.</div></div>
+        <div class="written-steps">
+          <div class="ws-item"><div class="ws-num">1</div><div><div class="ws-title">Deposit USDT: Trust Wallet → Aurum back office</div><div class="ws-desc">Find the deposit section in your dashboard, copy the Aurum deposit address, send USDT from Trust Wallet. Minimum $100.</div><div class="ws-tip">⚠️ Test with a small amount first. Always double-check the deposit address.</div></div></div>
+          <div class="ws-item"><div class="ws-num">2</div><div><div class="ws-title">Choose your package / tier</div><div class="ws-desc">Match your deposit amount to a tier. Higher tiers = higher monthly return percentages. See Packages & Percentages guide in Resources.</div></div></div>
+          <div class="ws-item"><div class="ws-num">3</div><div><div class="ws-title">Activate the EX AI Bot</div><div class="ws-desc">Once funded, activate your bot. It begins trading immediately — 24/7, across Binance, Bybit, and KuCoin automatically.</div></div></div>
+          <div class="ws-item"><div class="ws-num">4</div><div><div class="ws-title">Set up Telegram notifications</div><div class="ws-desc">Connect the Aurum Telegram bot for real-time trade notifications and balance updates to your phone.</div><div class="ws-tip">💡 Tutorial: Aurum Telegram Notifications (1:19) → in Resources</div></div></div>
+        </div>
+        <div class="link-list">
+          <a href="https://public.3.basecamp.com/p/j4Mj2bbe1uYGTg7rqQYp4CLZ" target="_blank" class="link-item"><div class="link-icon li-blue">🤖</div><div><div class="link-title">Which Aurum AI Bot is Right For You?</div><div class="link-desc">Guide to choosing EX AI Bot, EX AI Pro & Zeus Bot</div></div><div class="link-arrow">→</div></a>
+          <a href="https://youtu.be/GJEK3wOjlyQ" target="_blank" class="link-item"><div class="link-icon li-blue">📊</div><div><div class="link-title">Packages & Percentages — Back Office Tour (12:49)</div><div class="link-desc">YouTube · AURUM UNIVERSITY</div></div><div class="link-arrow">→</div></a>
+        </div>
+        <div class="step-action">
+          <div class="step-help">Need help? <a href="#">Message your partner →</a></div>
+          <button class="btn-next" onclick="this.textContent='✓ Bot is Live!';this.classList.add('g');">My Bot is Active ✓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6 -->
+    <div class="step-block" id="s6">
+      <div class="step-head">
+        <div class="sh-num sh-gold">✦</div>
+        <div class="sh-info"><div class="sh-eyebrow sh-gold-ey">Final Step</div><div class="sh-title">Confirm with Your Partner</div><div class="sh-sub">Let your partner know you're live — they'll confirm and unlock full Resources access</div></div>
+        <span class="sh-badge badge-gold">Final Step</span>
+      </div>
+      <div class="step-body">
+        <div class="info-box"><div class="box-icon">🤝</div><div class="box-text"><strong>Why this matters:</strong> Your partner confirms you signed up under the correct referral code. This unlocks the full gated Resource Library and places you correctly in the team downline. Your partner also connects you to MASTERY calls and community channels.</div></div>
+        <div class="written-steps">
+          <div class="ws-item"><div class="ws-num">1</div><div><div class="ws-title">Message your partner — "I'm in and my bot is active"</div><div class="ws-desc">Your partner verifies your account in the dashboard. One message is all it takes.</div></div></div>
+          <div class="ws-item"><div class="ws-num">2</div><div><div class="ws-title">Partner confirms — Resource Library unlocks</div><div class="ws-desc">Full access to all gated resources: PDFs, training videos, due diligence docs, and Aurum social links.</div></div></div>
+          <div class="ws-item"><div class="ws-num">3</div><div><div class="ws-title">Join the Aurum community channels</div><div class="ws-desc">Your partner shares Telegram channels and upcoming MASTERY calls with Shane Morand — the real ongoing education.</div></div></div>
+        </div>
+        <div class="link-list">
+          <a href="https://t.me/aurum_eng" target="_blank" class="link-item"><div class="link-icon li-blue">💬</div><div><div class="link-title">Aurum Telegram — English Community</div><div class="link-desc">t.me/aurum_eng · Official channel</div></div><div class="link-arrow">→</div></a>
+          <a href="https://t.me/aurumneobankbot" target="_blank" class="link-item"><div class="link-icon li-blue">🏦</div><div><div class="link-title">Aurum NeoBank Telegram Bot</div><div class="link-desc">t.me/aurumneobankbot · Crypto Visa Card & Zeus Bots</div></div><div class="link-arrow">→</div></a>
+          <a href="https://www.youtube.com/@Aurum_foundation/search?query=mastery" target="_blank" class="link-item"><div class="link-icon li-gold">🎓</div><div><div class="link-title">MASTERY Calls — Shane Morand</div><div class="link-desc">YouTube · Chief Network Development Officer</div></div><div class="link-arrow">→</div></a>
+        </div>
+        <div class="step-action">
+          <div class="step-help"></div>
+          <button class="btn-next gld" onclick="showCongrats(this);">I've Confirmed with My Partner ✦</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONGRATS -->
+    <div id="congrats" style="display:none;">
+      <div class="congrats-block">
+        <span class="congrats-icon">🎉</span>
+        <h3>You're officially in Aurum!</h3>
+        <p>Your bot is live, your referral is correct, and your partner has confirmed you're part of Team AutoPilot ROI. Welcome.</p>
+        <a href="/resources" class="btn-wh">→ Access Resource Library</a>
+        <a href="/university" class="btn-wh btn-wh-ghost">→ Aurum University</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="foot-logo">AutoPilot <span>ROI</span></div>
+  <div class="foot-links"><a href="autopilotroi-home.html">Home</a><a href="autopilotroi-start.html">University</a><a href="autopilotroi-resources.html">Resources</a><a href="autopilotroi-resources.html">FAQ</a><a href="#">Partner Login</a></div>
+  <div class="foot-copy">© 2026 Team AutoPilot ROI · Powered by Aurum Foundation</div>
+</footer>
+
+<script>
+function showCongrats(btn){
+  btn.textContent='✦ Confirmed!';
+  btn.classList.add('g');
+  document.getElementById('congrats').style.display='block';
+  document.getElementById('congrats').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

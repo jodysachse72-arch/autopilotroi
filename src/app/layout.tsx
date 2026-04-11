@@ -1,23 +1,32 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
+import { Manrope, Sora } from 'next/font/google'
 import './globals.css'
 import AnnouncementBanner from '@/components/layout/AnnouncementBanner'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 
-const geist = Geist({ subsets: ['latin'] })
+const sora = Sora({
+  subsets: ['latin'],
+  variable: '--font-sora',
+})
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
+})
 
 export const metadata: Metadata = {
-  title: 'AutoPilot ROI — The Guided Gateway into Aurum',
+  title: 'AutopilotROI | AI-Driven Finance',
   description:
-    "Don't navigate Aurum alone. Team AutoPilot ROI educates you first, places you in an active growing downline, and walks you through every step with personal support.",
-  keywords: 'Aurum, AI trading, crypto, downline, spillover, EX-AI Bot, AutoPilot ROI',
+    'AutopilotROI is building a product-led entry point into AI automation, digital banking, crypto infrastructure, and guided onboarding.',
+  keywords:
+    'AutopilotROI, AI finance, digital banking, crypto infrastructure, automation, neobank, exchange',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={geist.className}>
-      <body className="min-h-screen flex flex-col">
+    <html lang="en" className={`${sora.variable} ${manrope.variable}`}>
+      <body className="flex min-h-screen flex-col font-[var(--font-manrope)]">
         <AnnouncementBanner />
         <Navbar />
         <main className="flex-1">{children}</main>

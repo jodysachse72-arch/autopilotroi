@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoPilot ROI — Resource Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1A6FE8;--blue-deep:#0F52C1;--blue-soft:#EFF5FF;--gold:#F0A500;--gold-light:#FBBF24;--green:#10B981;--green-soft:#ECFDF5;--white:#FFFFFF;--off-white:#F8FAFF;--ink:#0D1B2A;--ink-soft:#3D5066;--ink-muted:#7A8FA6;--border:rgba(26,111,232,0.12);--border-soft:rgba(26,111,232,0.07);--shadow:0 4px 24px rgba(26,111,232,0.08);--shadow-lg:0 16px 48px rgba(13,27,42,0.1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Manrope',sans-serif;background:var(--off-white);color:var(--ink);overflow-x:hidden;}
+.topbar{background:var(--blue);color:white;text-align:center;padding:9px 24px;font-size:13px;font-weight:600;}
+.topbar a{color:var(--gold-light);text-decoration:none;margin-left:6px;}
+nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border-soft);padding:0 56px;height:72px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 20px rgba(26,111,232,0.06);}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--blue-deep));display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(26,111,232,0.3);}
+.logo-icon svg{width:22px;height:22px;fill:none;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.logo-name{font-size:15px;font-weight:800;color:var(--ink);font-family:'Sora',sans-serif;display:block;}
+.logo-tagline{font-size:10px;font-weight:600;color:var(--blue);letter-spacing:1.2px;text-transform:uppercase;display:block;}
+.nav-links{display:flex;gap:36px;}
+.nav-links a{text-decoration:none;color:var(--ink-soft);font-size:14px;font-weight:600;transition:color 0.2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--blue);}
+.nav-cta{background:var(--blue);color:white;padding:11px 24px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;}
+
+/* GATE BANNER */
+.gate-banner{background:linear-gradient(135deg,var(--blue),var(--blue-deep));padding:20px 56px;display:flex;align-items:center;justify-content:space-between;gap:20px;}
+.gb-text{color:white;}
+.gb-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:800;margin-bottom:4px;}
+.gb-sub{font-size:13px;color:rgba(255,255,255,0.65);}
+.gb-badge{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);padding:10px 20px;border-radius:10px;color:white;font-size:13px;font-weight:600;white-space:nowrap;}
+.gb-dot{width:8px;height:8px;border-radius:50%;background:var(--green-soft);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* PAGE HEADER */
+.page-header{background:white;border-bottom:1px solid var(--border-soft);padding:52px 56px 44px;}
+.page-header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:flex-end;justify-content:space-between;gap:32px;}
+.eyebrow{font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px;display:block;}
+.ph-title{font-family:'Sora',sans-serif;font-size:40px;font-weight:800;color:var(--ink);line-height:1.1;letter-spacing:-0.5px;margin-bottom:10px;}
+.ph-sub{font-size:16px;color:var(--ink-muted);line-height:1.7;max-width:520px;}
+.ph-meta{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:13px;color:var(--ink-muted);}
+.ph-meta img{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);}
+.ph-meta strong{color:var(--ink);font-weight:700;}
+.ph-stats{display:flex;gap:20px;flex-shrink:0;}
+.ph-stat{text-align:center;background:var(--off-white);border:1px solid var(--border-soft);border-radius:14px;padding:16px 24px;}
+.ph-stat-num{font-family:'Sora',sans-serif;font-size:28px;font-weight:800;color:var(--blue);line-height:1;}
+.ph-stat-lbl{font-size:11px;color:var(--ink-muted);font-weight:600;margin-top:3px;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* FILTER TABS */
+.filter-bar{background:white;border-bottom:1px solid var(--border-soft);padding:0 56px;position:sticky;top:72px;z-index:100;}
+.filter-inner{max-width:1100px;margin:0 auto;display:flex;gap:4px;overflow-x:auto;}
+.filter-tab{padding:14px 20px;font-size:13px;font-weight:700;color:var(--ink-muted);border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer;transition:color 0.2s,border-color 0.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Manrope',sans-serif;}
+.filter-tab:hover{color:var(--ink);}
+.filter-tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* MAIN */
+.main{max-width:1100px;margin:0 auto;padding:40px 56px 96px;}
+
+/* SECTION */
+.res-section{margin-bottom:48px;}
+.sec-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.sec-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.si-blue{background:var(--blue-soft);}
+.si-gold{background:#FFFBEB;}
+.si-green{background:var(--green-soft);}
+.si-purple{background:#F5F3FF;}
+.sec-title{font-family:'Sora',sans-serif;font-size:20px;font-weight:800;color:var(--ink);}
+.sec-count{font-size:12px;font-weight:700;color:var(--ink-muted);background:var(--off-white);border:1px solid var(--border-soft);padding:3px 10px;border-radius:100px;margin-left:6px;}
+.sec-desc{font-size:13px;color:var(--ink-muted);margin-top:2px;}
+
+/* RESOURCE GRID */
+.res-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.res-grid.wide{grid-template-columns:repeat(3,1fr);}
+.res-card{background:white;border:1px solid var(--border-soft);border-radius:14px;padding:18px 20px;text-decoration:none;display:flex;gap:14px;align-items:flex-start;transition:border-color 0.2s,box-shadow 0.2s,transform 0.2s;}
+.res-card:hover{border-color:var(--border);box-shadow:var(--shadow);transform:translateY(-2px);}
+.rc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.rci-blue{background:var(--blue-soft);}
+.rci-gold{background:#FFFBEB;}
+.rci-green{background:var(--green-soft);}
+.rci-purple{background:#F5F3FF;}
+.rci-red{background:#FFF5F5;}
+.rc-info{flex:1;min-width:0;}
+.rc-type{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.rc-type.gold{color:var(--gold);}
+.rc-type.green{color:var(--green);}
+.rc-type.purple{color:#7C3AED;}
+.rc-type.red{color:#DC2626;}
+.rc-title{font-size:14px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:4px;}
+.rc-meta{font-size:12px;color:var(--ink-muted);}
+.rc-badge{display:inline-block;margin-top:6px;background:var(--blue-soft);color:var(--blue);font-size:10px;font-weight:800;padding:3px 9px;border-radius:100px;text-transform:uppercase;letter-spacing:0.5px;}
+.rc-badge.gold{background:#FFFBEB;color:var(--gold);}
+.rc-badge.new{background:var(--green-soft);color:var(--green);}
+.rc-arrow{color:var(--ink-muted);font-size:14px;margin-left:auto;flex-shrink:0;padding-top:2px;}
+
+/* DIVIDER */
+.sec-divider{height:1px;background:var(--border-soft);margin:16px 0 32px;}
+
+/* SOCIAL GRID */
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.soc-card{background:white;border:1px solid var(--border-soft);border-radius:12px;padding:16px 18px;text-decoration:none;display:flex;align-items:center;gap:12px;transition:border-color 0.2s,box-shadow 0.2s;}
+.soc-card:hover{border-color:var(--border);box-shadow:var(--shadow);}
+.soc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.soc-title{font-size:14px;font-weight:700;color:var(--ink);}
+.soc-handle{font-size:11px;color:var(--ink-muted);margin-top:1px;}
+
+/* BACK-OFFICE BLOCK */
+.backoffice-block{background:linear-gradient(135deg,var(--ink),#1a2a3a);border-radius:18px;padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+.bb-title{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:white;margin-bottom:10px;}
+.bb-desc{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7;margin-bottom:20px;}
+.bb-btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:white;padding:12px 24px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(26,111,232,0.3);}
+.bb-links{display:flex;flex-direction:column;gap:10px;}
+.bb-link{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;text-decoration:none;transition:background 0.2s;}
+.bb-link:hover{background:rgba(255,255,255,0.1);}
+.bb-link-title{font-size:13px;font-weight:700;color:white;}
+.bb-link-url{font-size:11px;color:rgba(255,255,255,0.4);margin-top:1px;}
+.bb-link-arrow{color:rgba(255,255,255,0.3);margin-left:auto;}
+
+/* UPDATED TAG */
+.updated-tag{font-size:10px;font-weight:700;color:var(--ink-muted);margin-left:auto;}
+
+footer{background:#0A1525;padding:40px 56px;display:flex;align-items:center;justify-content:space-between;}
+.foot-logo{font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:white;}
+.foot-logo span{color:var(--blue);}
+.foot-copy{font-size:12px;color:rgba(255,255,255,0.2);}
+.foot-links{display:flex;gap:24px;}
+.foot-links a{color:rgba(255,255,255,0.3);font-size:13px;text-decoration:none;}
+.foot-links a:hover{color:white;}
+</style>
+</head>
+<body>
+
+<div class="topbar">🏅 Gold RWA now live inside Aurum — sourced directly from African suppliers at ~30% below spot <a href="#">→ Details</a></div>
+
+<nav>
+  <a href="/" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <div><span class="logo-name">AutoPilot ROI</span><span class="logo-tagline">Aurum Onboarding</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="autopilotroi-home.html">Home</a><a href="autopilotroi-start.html">Get Started</a><a href="autopilotroi-start.html">University</a><a href="autopilotroi-resources.html" class="active">Resources</a><a href="autopilotroi-resources.html">FAQ</a>
+  </div>
+  <a href="autopilotroi-start.html" class="nav-cta">Partner Login</a>
+</nav>
+
+<!-- GATE BANNER -->
+<div class="gate-banner">
+  <div class="gb-text">
+    <div class="gb-title">🔒 Gated Resource Library — Team AutoPilot Members Only</div>
+    <div class="gb-sub">You have access because your partner confirmed your Aurum signup. Keep this page bookmarked — it's updated regularly by Barry.</div>
+  </div>
+  <div class="gb-badge"><div class="gb-dot"></div>Logged in as Team Member · Full Access</div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <span class="eyebrow">Resource Library</span>
+      <div class="ph-title">Everything you need.<br>All in one place.</div>
+      <div class="ph-sub">Curated by Barry Goss and updated regularly. Presentations, interviews, due diligence, training, partner program — the full Aurum resource stack.</div>
+      <div class="ph-meta">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:white;font-size:12px;font-weight:800;">BG</div>
+        Curated by <strong>Barry Goss</strong> · Last updated March 10, 2026
+      </div>
+    </div>
+    <div class="ph-stats">
+      <div class="ph-stat"><div class="ph-stat-num">6</div><div class="ph-stat-lbl">Sections</div></div>
+      <div class="ph-stat"><div class="ph-stat-num">30+</div><div class="ph-stat-lbl">Resources</div></div>
+      <div class="ph-stat"><div class="ph-stat-num">Live</div><div class="ph-stat-lbl">Always Updated</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-inner">
+    <button class="filter-tab active">All Resources</button>
+    <button class="filter-tab">😲 Intro & Presentations</button>
+    <button class="filter-tab">ℹ️ Product Info</button>
+    <button class="filter-tab">🗣️ Interviews</button>
+    <button class="filter-tab">🔍 Due Diligence</button>
+    <button class="filter-tab">💸 Partner Program</button>
+    <button class="filter-tab">🚀 Onboarding & Training</button>
+    <button class="filter-tab">🤼 Social & Community</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- INTRO / PRESENTATIONS -->
+  <div class="res-section">
+    <div class="sec-header">
+      <div class="sec-icon si-blue">😲</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="sec-title">Intro & Presentations</span><span class="sec-count">6 resources</span></div>
+        <div class="sec-desc">Start here if you're new. Full product overview, business opportunity docs, and the CEO's vision.</div>
+      </div>
+      <span class="updated-tag">Updated 3-9-26</span>
+    </div>
+    <div class="res-grid">
+      <a href="https://youtu.be/3ng39ys3PiQ" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 40:11</div><div class="rc-title">Product Overview Presentation (HP) — Full Aurum Walkthrough</div><div class="rc-meta">YouTube · AURUM UNIVERSITY · START HERE ➡️</div><div class="rc-badge">Start Here</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://bit.ly/aurum-opportunity" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">📄</div>
+        <div class="rc-info"><div class="rc-type">PDF Document</div><div class="rc-title">Business Opportunity — Overview PDF</div><div class="rc-meta">bit.ly/aurum-opportunity</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/KmG-RRVUhis" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 5:41</div><div class="rc-title">5-Minute Aurum Overview</div><div class="rc-meta">YouTube · Quick intro for sharing</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/4wZ48SCivbk" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 4:32</div><div class="rc-title">The 1000 Millionaires Mission — CEO Bryan Benson</div><div class="rc-meta">YouTube · "Tip of the Iceberg" Talk</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1130563329" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 40:55</div><div class="rc-title">Singapore Presentation — Bryan Benson</div><div class="rc-meta">Vimeo · Full keynote presentation</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://bearsbulletins.substack.com/p/aurum-bots" target="_blank" class="res-card">
+        <div class="rc-icon rci-gold">📝</div>
+        <div class="rc-info"><div class="rc-type gold">Article · 15:22</div><div class="rc-title">The ABC's of Printing Money in Your Sleep</div><div class="rc-meta">Barry's Bullets on Substack</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- PRODUCT INFO -->
+  <div class="res-section">
+    <div class="sec-header">
+      <div class="sec-icon si-blue">ℹ️</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="sec-title">Product Info & Updates</span><span class="sec-count">5 resources</span></div>
+        <div class="sec-desc">Bot comparisons, withdrawal mechanics, compounding examples, and latest updates from Bryan Benson.</div>
+      </div>
+    </div>
+    <div class="res-grid">
+      <a href="https://public.3.basecamp.com/p/j4Mj2bbe1uYGTg7rqQYp4CLZ" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">🤖</div>
+        <div class="rc-info"><div class="rc-type">Guide</div><div class="rc-title">Which Aurum AI Bot is Right For You?</div><div class="rc-meta">EX AI Bot vs EX AI Pro vs Zeus Bot comparison</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://public.3.basecamp.com/p/9YiL8VA4LUGwH2KYmxKKceWy" target="_blank" class="res-card">
+        <div class="rc-icon rci-gold">📊</div>
+        <div class="rc-info"><div class="rc-type gold">Guide</div><div class="rc-title">How the -35% Withdrawal Fee Works (EX AI Bot)</div><div class="rc-meta">Important: Read before withdrawing</div><div class="rc-badge gold">Must Read</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/_tRy32ojJik" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 12:06</div><div class="rc-title">Aurum Product Updates — Bryan Benson</div><div class="rc-meta">YouTube · Latest platform updates</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1130544817" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 5:49</div><div class="rc-title">Daily Compound Interest Example</div><div class="rc-meta">Vimeo · How compounding works in practice</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/1BI9_YikUKc" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 6:14</div><div class="rc-title">EX AI Bot Plan A vs Plan B — Compounding Examples</div><div class="rc-meta">YouTube + Vimeo · Side-by-side comparison</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- INTERVIEWS -->
+  <div class="res-section">
+    <div class="sec-header">
+      <div class="sec-icon si-gold">🗣️</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="sec-title">Interviews & Q&As</span><span class="sec-count">4 resources</span></div>
+        <div class="sec-desc">CEO vision, roadmap discussions, and media interviews. Great for due diligence and sharing with prospects.</div>
+      </div>
+    </div>
+    <div class="res-grid">
+      <a href="https://youtu.be/yvqzJvQNSlA" target="_blank" class="res-card">
+        <div class="rc-icon rci-gold">▶️</div>
+        <div class="rc-info"><div class="rc-type gold">Video · 31:39</div><div class="rc-title">Aurum Roadmap, Exchange Launch & Future Vision</div><div class="rc-meta">YouTube + Vimeo · Bryan Benson deep dive</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1146233670" target="_blank" class="res-card">
+        <div class="rc-icon rci-gold">▶️</div>
+        <div class="rc-info"><div class="rc-type gold">Video (Password: aurumgold)</div><div class="rc-title">Aurum CEO Vision and Q&A</div><div class="rc-meta">Vimeo · Password: aurumgold</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://bit.ly/benson-emag" target="_blank" class="res-card">
+        <div class="rc-icon rci-gold">📰</div>
+        <div class="rc-info"><div class="rc-type gold">Media · Article</div><div class="rc-title">Entrepreneur Magazine Interviews Bryan Benson</div><div class="rc-meta">bit.ly/benson-emag · Press coverage</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/mWSpT16LzJo" target="_blank" class="res-card">
+        <div class="rc-icon rci-gold">▶️</div>
+        <div class="rc-info"><div class="rc-type gold">Video · 21:11</div><div class="rc-title">Bryan Benson & Brent Fulfer, VC — In-Depth Interview</div><div class="rc-meta">YouTube · Venture capital perspective on Aurum</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- DUE DILIGENCE -->
+  <div class="res-section">
+    <div class="sec-header">
+      <div class="sec-icon si-green">🔍</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="sec-title">Due Diligence & Proof of Trading</span><span class="sec-count">6 resources</span></div>
+        <div class="sec-desc">Independent verification, proof of trading, and critical analysis. Education precedes allocation.</div>
+      </div>
+    </div>
+    <div class="res-grid">
+      <a href="https://youtu.be/XYaFPdtHBUU" target="_blank" class="res-card">
+        <div class="rc-icon rci-green">🔍</div>
+        <div class="rc-info"><div class="rc-type green">Video · 11:57</div><div class="rc-title">Why Aurum — Due Diligence Briefing</div><div class="rc-meta">YouTube · AURUM UNIVERSITY</div><div class="rc-badge" style="background:var(--green-soft);color:var(--green);">Start Here</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/__fiYVbAtcs" target="_blank" class="res-card">
+        <div class="rc-icon rci-green">✅</div>
+        <div class="rc-info"><div class="rc-type green">Video · 17:03</div><div class="rc-title">Are the EX AI Bot Profits Real?</div><div class="rc-meta">YouTube · AURUM UNIVERSITY</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/-7oJTGVtGn8" target="_blank" class="res-card">
+        <div class="rc-icon rci-green">▶️</div>
+        <div class="rc-info"><div class="rc-type green">Video · 47:08 🆕</div><div class="rc-title">Dubai Launch Debriefing — January 2026</div><div class="rc-meta">YouTube + Vimeo · Full event debrief</div><div class="rc-badge new">New</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/iYZMYLhgXv8" target="_blank" class="res-card">
+        <div class="rc-icon rci-green">📊</div>
+        <div class="rc-info"><div class="rc-type green">Video · 20:01</div><div class="rc-title">Proof of Trading with Ricky, Brad & Dino</div><div class="rc-meta">YouTube + Vimeo · Live trading verification</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/6ZGS7zwEn5Q" target="_blank" class="res-card">
+        <div class="rc-icon rci-green">▶️</div>
+        <div class="rc-info"><div class="rc-type green">Video · 8:22</div><div class="rc-title">Trading Legitimacy Talk</div><div class="rc-meta">YouTube · AURUM UNIVERSITY</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/2rHDxABJQCE" target="_blank" class="res-card">
+        <div class="rc-icon rci-green">▶️</div>
+        <div class="rc-info"><div class="rc-type green">Video · 6:14</div><div class="rc-title">Getting Pitched on AI Trading Bots?</div><div class="rc-meta">YouTube · How to evaluate AI bot claims</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- PARTNER PROGRAM -->
+  <div class="res-section">
+    <div class="sec-header">
+      <div class="sec-icon si-purple">💸</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="sec-title">Partner Program</span><span class="sec-count">5 resources</span></div>
+        <div class="sec-desc">Everything about how the compensation plan works. PDFs, video deep dives, and fast start training.</div>
+      </div>
+    </div>
+    <div class="res-grid">
+      <a href="https://bit.ly/aurum-partner" target="_blank" class="res-card">
+        <div class="rc-icon rci-purple">📄</div>
+        <div class="rc-info"><div class="rc-type purple">PDF · Comprehensive</div><div class="rc-title">Partner Program — Extensive PDF</div><div class="rc-meta">bit.ly/aurum-partner · Full comp plan details</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://bit.ly/aurum-partner-program" target="_blank" class="res-card">
+        <div class="rc-icon rci-purple">📄</div>
+        <div class="rc-info"><div class="rc-type purple">PDF · Quick Reference</div><div class="rc-title">Partner Program — Simplified PDF</div><div class="rc-meta">bit.ly/aurum-partner-program · One-page overview</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1133259778" target="_blank" class="res-card">
+        <div class="rc-icon rci-purple">▶️</div>
+        <div class="rc-info"><div class="rc-type purple">Video · 29:01</div><div class="rc-title">Aurum Compensation Plan Explained (with HP)</div><div class="rc-meta">Vimeo · Full walkthrough of the comp plan</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1165776247" target="_blank" class="res-card">
+        <div class="rc-icon rci-purple">▶️</div>
+        <div class="rc-info"><div class="rc-type purple">Video · 56:28</div><div class="rc-title">Fast Start Training (with HP)</div><div class="rc-meta">Vimeo · New partner onboarding training</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1158220617" target="_blank" class="res-card">
+        <div class="rc-icon rci-purple">▶️</div>
+        <div class="rc-info"><div class="rc-type purple">Video · 58:48</div><div class="rc-title">Comp Plan — Deep Drill Down (with Dino)</div><div class="rc-meta">Vimeo · Advanced compensation deep dive</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- ONBOARDING & TRAINING -->
+  <div class="res-section">
+    <div class="sec-header">
+      <div class="sec-icon si-blue">🚀</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="sec-title">Onboarding & Training</span><span class="sec-count">9 resources</span></div>
+        <div class="sec-desc">Platform tutorials, back office guides, compounding strategies, and MASTERY calls. For active members.</div>
+      </div>
+    </div>
+    <div class="res-grid">
+      <a href="https://bit.ly/aurum-guide" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">📖</div>
+        <div class="rc-info"><div class="rc-type">PDF Guide</div><div class="rc-title">Aurum's Official Guide to Using the Platform</div><div class="rc-meta">bit.ly/aurum-guide · Complete platform walkthrough</div><div class="rc-badge">Start Here</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1136168317" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 14:19</div><div class="rc-title">Back Office Tutorial — Full Walkthrough</div><div class="rc-meta">Vimeo · Dashboard navigation guide</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/GJEK3wOjlyQ" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 12:49</div><div class="rc-title">Packages & Percentages — Back Office Tour</div><div class="rc-meta">YouTube · Which tier fits your investment</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://vimeo.com/1132980446" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 1:33:23</div><div class="rc-title">Team Training — Full Session</div><div class="rc-meta">Vimeo · Complete team onboarding training</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://public.3.basecamp.com/p/qhbtfgzd6p5ydmkPHHdtQjtB" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">🤖</div>
+        <div class="rc-info"><div class="rc-type">Guide</div><div class="rc-title">How to Start the EX AI Pro and Zeus Bot(s)</div><div class="rc-meta">Step-by-step activation guide</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/KQRGX5jVUXY" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 5:13</div><div class="rc-title">Compounding with the Aurum NeoBank Telegram App</div><div class="rc-meta">YouTube · How to use the NeoBank for compounding</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://public.3.basecamp.com/p/yCPPXkF7ryxd5kdGyjZizbYj" target="_blank" class="res-card">
+        <div class="rc-icon rci-gold">💳</div>
+        <div class="rc-info"><div class="rc-type gold">Guide · Article</div><div class="rc-title">How to Purchase & Use The Aurum Infinity Card</div><div class="rc-meta">Visa Crypto Debit Card setup guide</div><div class="rc-badge gold">New Feature</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/iWi1xH9R1so" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 27:45</div><div class="rc-title">To Compound? Or Not to Compound?</div><div class="rc-meta">YouTube · Strategy discussion for active members</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+      <a href="https://youtu.be/DR2ustIYS4M" target="_blank" class="res-card">
+        <div class="rc-icon rci-blue">▶️</div>
+        <div class="rc-info"><div class="rc-type">Video · 1:19</div><div class="rc-title">How to Activate Aurum Telegram Notifications Bot</div><div class="rc-meta">YouTube · Real-time trade alerts setup</div></div>
+        <div class="rc-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- SOCIAL & COMMUNITY -->
+  <div class="res-section">
+    <div class="sec-header">
+      <div class="sec-icon si-green">🤼</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;"><span class="sec-title">Aurum Social & Community</span><span class="sec-count">5 channels</span></div>
+        <div class="sec-desc">Official Aurum channels. Stay connected, get updates, and attend MASTERY calls.</div>
+      </div>
+    </div>
+    <div class="social-grid">
+      <a href="https://t.me/aurum_eng" target="_blank" class="soc-card">
+        <div class="soc-icon" style="background:#EFF9FF;">💬</div>
+        <div><div class="soc-title">Telegram — English</div><div class="soc-handle">t.me/aurum_eng · Official community</div></div>
+      </a>
+      <a href="https://www.youtube.com/@Aurum_foundation/videos" target="_blank" class="soc-card">
+        <div class="soc-icon" style="background:#FFF5F5;">▶️</div>
+        <div><div class="soc-title">YouTube</div><div class="soc-handle">@Aurum_foundation · Official channel</div></div>
+      </a>
+      <a href="https://www.instagram.com/aurum_foundation" target="_blank" class="soc-card">
+        <div class="soc-icon" style="background:#FFF0F9;">📸</div>
+        <div><div class="soc-title">Instagram</div><div class="soc-handle">@aurum_foundation</div></div>
+      </a>
+      <a href="https://x.com/aurum_ecosystem" target="_blank" class="soc-card">
+        <div class="soc-icon" style="background:var(--off-white);">𝕏</div>
+        <div><div class="soc-title">X / Twitter</div><div class="soc-handle">@aurum_ecosystem</div></div>
+      </a>
+      <a href="https://www.linkedin.com/company/aurumofficialeng/" target="_blank" class="soc-card">
+        <div class="soc-icon" style="background:#EFF5FF;">💼</div>
+        <div><div class="soc-title">LinkedIn</div><div class="soc-handle">Aurum Official · Professional network</div></div>
+      </a>
+      <a href="https://www.youtube.com/@Aurum_foundation/search?query=mastery" target="_blank" class="soc-card">
+        <div class="soc-icon" style="background:#FFFBEB;">🎓</div>
+        <div><div class="soc-title">MASTERY Calls</div><div class="soc-handle">Shane Morand · Chief Network Dev Officer</div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="sec-divider"></div>
+
+  <!-- BACK OFFICE -->
+  <div class="res-section">
+    <div class="backoffice-block">
+      <div>
+        <div class="bb-title">🔐 Back Office & Support</div>
+        <div class="bb-desc">Your Aurum dashboard is where everything happens — deposits, withdrawals, bot management, and your portfolio overview.</div>
+        <a href="https://backoffice.aurum.foundation/auth/log-in" target="_blank" class="bb-btn">→ Login to Aurum Back Office</a>
+      </div>
+      <div class="bb-links">
+        <a href="https://backoffice.aurum.foundation/auth/log-in" target="_blank" class="bb-link">
+          <div style="font-size:16px;">🔐</div>
+          <div><div class="bb-link-title">Aurum Dashboard / Back Office Login</div><div class="bb-link-url">backoffice.aurum.foundation/auth/log-in</div></div>
+          <div class="bb-link-arrow">→</div>
+        </a>
+        <a href="https://backoffice.aurum.foundation/faq" target="_blank" class="bb-link">
+          <div style="font-size:16px;">❓</div>
+          <div><div class="bb-link-title">Aurum FAQs — Back Office</div><div class="bb-link-url">backoffice.aurum.foundation/faq</div></div>
+          <div class="bb-link-arrow">→</div>
+        </a>
+        <a href="https://t.me/aurumsupport_team" target="_blank" class="bb-link">
+          <div style="font-size:16px;">🛟</div>
+          <div><div class="bb-link-title">Telegram Support Team</div><div class="bb-link-url">t.me/aurumsupport_team</div></div>
+          <div class="bb-link-arrow">→</div>
+        </a>
+        <a href="https://t.me/aurumneobankbot" target="_blank" class="bb-link">
+          <div style="font-size:16px;">🏦</div>
+          <div><div class="bb-link-title">NeoBank Telegram Bot — Crypto Visa Card & Zeus</div><div class="bb-link-url">t.me/aurumneobankbot</div></div>
+          <div class="bb-link-arrow">→</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="foot-logo">AutoPilot <span>ROI</span></div>
+  <div class="foot-links"><a href="autopilotroi-home.html">Home</a><a href="autopilotroi-start.html">Get Started</a><a href="autopilotroi-start.html">University</a><a href="autopilotroi-resources.html">FAQ</a><a href="#">Partner Login</a></div>
+  <div class="foot-copy">© 2026 Team AutoPilot ROI · Powered by Aurum Foundation</div>
+</footer>
+
+<script>
+document.querySelectorAll('.filter-tab').forEach(tab=>{
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
