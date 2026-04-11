@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -8,12 +7,9 @@ import VideoModal from "@/components/ui/VideoModal";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Spotlight } from "@/components/ui/spotlight";
 import { ThreeDCard } from "@/components/ui/three-d-card";
-import { ContainerScroll } from "@/components/ui/container-scroll-animation";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { MagicCard } from "@/components/ui/magic-card";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Meteors } from "@/components/ui/meteors";
-import { AnimatedBeam } from "@/components/ui/animated-beam";
 
 const VIDEO_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
 
@@ -28,13 +24,6 @@ const fadeUp = {
 };
 
 export default function HomePage() {
-  // Refs for Animated Beam connectors between the 4 Action Steps
-  const stepsContainerRef = useRef<HTMLDivElement>(null);
-  const step1Ref = useRef<HTMLDivElement>(null);
-  const step2Ref = useRef<HTMLDivElement>(null);
-  const step3Ref = useRef<HTMLDivElement>(null);
-  const step4Ref = useRef<HTMLDivElement>(null);
-  const stepRefs = [step1Ref, step2Ref, step3Ref, step4Ref];
 
   return (
     <div className="overflow-hidden bg-white text-slate-900 font-sans">
@@ -273,180 +262,50 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════
-          SCROLL-DRIVEN DASHBOARD PREVIEW (Aceternity ContainerScroll)
-      ═══════════════════════════════════════════════ */}
-      <section className="relative bg-gradient-to-b from-[#061238] via-[#0a1b4f] to-[#061238] text-white">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(96,165,250,0.18),transparent_55%)]" />
-        <ContainerScroll
-          titleComponent={
-            <>
-              <span className="mb-3 inline-block rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-200">
-                Live Dashboard
-              </span>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Your Portfolio,{" "}
-                <span className="bg-gradient-to-r from-blue-300 via-cyan-200 to-white bg-clip-text text-transparent">
-                  Always in View
-                </span>
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-sm text-blue-100/70 sm:text-base">
-                Real-time performance, holdings, and AI bot signals — one clean, unified surface.
-              </p>
-            </>
-          }
-        >
-          <div className="flex h-full w-full flex-col overflow-hidden bg-white">
-            {/* Browser chrome */}
-            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
-              <div className="ml-3 flex-1 rounded bg-white px-3 py-1 text-center text-[11px] font-medium text-slate-500 shadow-inner">
-                app.autopilotroi.com/dashboard
-              </div>
-            </div>
-            {/* Full-size dashboard */}
-            <div className="flex flex-1 bg-slate-50">
-              {/* Sidebar */}
-              <div className="hidden w-[180px] flex-shrink-0 bg-[#081b54] py-5 text-white sm:flex sm:flex-col">
-                <div className="mb-4 px-5 text-[10px] font-bold uppercase tracking-widest text-blue-300/60">
-                  Navigation
-                </div>
-                {[
-                  { label: "Dashboard", icon: "⊞", active: true },
-                  { label: "Bots", icon: "◍" },
-                  { label: "Exchange", icon: "⇄" },
-                  { label: "Crypto Card", icon: "▣" },
-                  { label: "Neo Bank", icon: "⊚" },
-                  { label: "Holdings", icon: "◈" },
-                  { label: "Settings", icon: "⚙" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className={`mx-3 mb-1 flex items-center gap-2.5 rounded-md px-3 py-2 text-[12px] font-medium transition-colors ${
-                      item.active
-                        ? "bg-blue-600/80 text-white shadow"
-                        : "text-blue-200/60 hover:bg-blue-700/30 hover:text-blue-100"
-                    }`}
-                  >
-                    <span className="w-4 text-center">{item.icon}</span>
-                    {item.label}
-                  </div>
-                ))}
-              </div>
-              {/* Main */}
-              <div className="flex-1 overflow-hidden p-6">
-                <div className="mb-5 flex items-start justify-between">
-                  <div>
-                    <div className="mb-1 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                      Portfolio Value
-                    </div>
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-4xl font-bold text-slate-800">$24,529.00</span>
-                      <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600">
-                        +12.48%
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="rounded-md bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow">
-                      Deposit
-                    </button>
-                    <button className="rounded-md border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600">
-                      Withdraw
-                    </button>
-                  </div>
-                </div>
-                <div className="relative h-[60%] overflow-hidden rounded-xl border border-slate-100 bg-white shadow-inner">
-                  <svg viewBox="0 0 400 160" className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
-                    {[40, 80, 120].map((y) => (
-                      <line key={y} x1="0" x2="400" y1={y} y2={y} stroke="#f1f5f9" strokeWidth="1" />
-                    ))}
-                    <defs>
-                      <linearGradient id="bigAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.22" />
-                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0 130 C50 115, 90 90, 130 100 S200 60, 250 65 S310 30, 360 25 L400 15 L400 160 L0 160 Z" fill="url(#bigAreaGrad)" />
-                    <path d="M0 130 C50 115, 90 90, 130 100 S200 60, 250 65 S310 30, 360 25 L400 15" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div className="mt-5 grid grid-cols-3 gap-3">
-                  {[
-                    { label: "BTC", value: "$1.2k", trend: "+4.2%", color: "text-emerald-500" },
-                    { label: "ETH", value: "$920", trend: "+2.8%", color: "text-emerald-500" },
-                    { label: "SOL", value: "$410", trend: "-1.1%", color: "text-rose-500" },
-                  ].map((a) => (
-                    <div key={a.label} className="rounded-lg border border-slate-100 bg-white p-3 shadow-sm">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{a.label}</div>
-                      <div className="mt-1 flex items-baseline gap-2">
-                        <span className="text-sm font-bold text-slate-800">{a.value}</span>
-                        <span className={`text-[10px] font-semibold ${a.color}`}>{a.trend}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </ContainerScroll>
-      </section>
-
-      {/* ═══════════════════════════════════════════════
           FEATURE STRIP
       ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 -mt-6 bg-white px-6 pb-6 pt-12 lg:px-10 rounded-t-[2.5rem] shadow-[0_-8px_30px_rgba(6,18,56,0.15)]">
-        <div className="mx-auto grid max-w-7xl gap-4 md:grid-cols-3">
+      <section className="relative z-10 bg-white px-6 py-16 lg:px-10">
+        <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
           {[
             {
               title: "AI Automation",
-              desc: "Automated trading strategies that work 24/7, driven by advanced AI algorithms.",
+              desc: "Automated performance, with advanced crypto-fintech tools.",
               icon: <BotFeatureIcon />,
-              gradientColor: "#3b82f6",
               iconBg: "bg-blue-600",
+              borderColor: "border-blue-100",
             },
             {
               title: "Digital Banking",
-              desc: "Full control of your funds with modern neo-banking features built for crypto natives.",
+              desc: "Full control of your funds with modern banking features.",
               icon: <CardFeatureIcon />,
-              gradientColor: "#8b5cf6",
               iconBg: "bg-violet-600",
+              borderColor: "border-violet-100",
             },
             {
               title: "Crypto Infrastructure",
-              desc: "Exchange, hold, and spend digital assets seamlessly from a single unified dashboard.",
+              desc: "Access and manage the tools of the new financial system.",
               icon: <GlobeFeatureIcon />,
-              gradientColor: "#06b6d4",
               iconBg: "bg-cyan-600",
+              borderColor: "border-cyan-100",
             },
           ].map((f, i) => (
-            <motion.div
+            <motion.article
               key={f.title}
               variants={fadeUp}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true }}
-              custom={i * 0.2}
+              custom={i * 0.15}
+              className={`flex items-start gap-4 rounded-2xl border ${f.borderColor} bg-white p-6 shadow-[0_4px_24px_rgba(30,50,110,0.06)] transition-shadow hover:shadow-[0_8px_32px_rgba(30,50,110,0.1)]`}
             >
-              <MagicCard
-                className="h-full bg-white shadow-[0_4px_20px_rgba(30,50,110,0.05)]"
-                gradientColor={f.gradientColor}
-                gradientFrom={f.gradientColor}
-                gradientTo="#a78bfa"
-                gradientOpacity={0.12}
-              >
-                <article className="flex items-start gap-4 p-6">
-                  <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${f.iconBg} text-white shadow-lg`}>
-                    {f.icon}
-                  </div>
-                  <div>
-                    <h2 className="mb-1 text-[1.05rem] font-bold text-slate-900">{f.title}</h2>
-                    <p className="text-[0.8rem] leading-relaxed text-slate-500">{f.desc}</p>
-                  </div>
-                </article>
-              </MagicCard>
-            </motion.div>
+              <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${f.iconBg} text-white shadow-lg`}>
+                {f.icon}
+              </div>
+              <div>
+                <h2 className="mb-1 text-[1.05rem] font-bold text-slate-900">{f.title}</h2>
+                <p className="text-[0.82rem] leading-relaxed text-slate-500">{f.desc}</p>
+              </div>
+            </motion.article>
           ))}
         </div>
       </section>
@@ -548,8 +407,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           ACTION STEPS
       ═══════════════════════════════════════════════ */}
-      <section id="how-it-works" className="relative bg-[#f4f7fc] px-6 py-24 lg:px-10">
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white/80 to-transparent pointer-events-none" />
+      <section id="how-it-works" className="relative bg-gradient-to-b from-[#eef2fa] to-[#dce5f4] px-6 py-24 lg:px-10">
         <div className="relative mx-auto max-w-7xl">
           <motion.div
             variants={fadeUp}
@@ -558,28 +416,22 @@ export default function HomePage() {
             viewport={{ once: true }}
             className="mb-14 text-center"
           >
-            <span className="mb-3 inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-blue-600">
-              Get Started
-            </span>
-            <h2 className="text-[2rem] font-bold tracking-tight text-slate-900 sm:text-[2.4rem]">
-              Register Your AutopilotROI Account
+            <h2 className="text-[1.8rem] font-extrabold uppercase tracking-tight text-slate-900 sm:text-[2.2rem]">
+              <span className="text-blue-600">Action Steps:</span> Register Your AutopilotROI Account
             </h2>
             <p className="mt-3 text-slate-500">
-              Four simple steps to unlock your AI-powered financial dashboard.
+              Follow these steps to unlock access to the onboarding system and begin your setup.
             </p>
           </motion.div>
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
-            {/* Steps */}
-            <div
-              ref={stepsContainerRef}
-              className="relative flex flex-1 flex-col sm:flex-row rounded-[1.5rem] border border-white bg-white/70 p-2 shadow-[0_20px_40px_rgba(15,23,42,0.05)] backdrop-blur-md"
-            >
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-stretch">
+            {/* Steps grid */}
+            <div className="grid flex-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 { num: 1, title: 'Click "Get Started"', desc: "Press the button below to begin your free registration.", icon: <CursorIcon /> },
-                { num: 2, title: "Create Free Account", desc: "Enter your details and create a secure account in seconds.", icon: <UserPlusIcon /> },
-                { num: 3, title: "Verify & Log In", desc: "Check your email, verify your account, then log in.", icon: <VerifyIcon /> },
-                { num: 4, title: "Access Dashboard", desc: "Start your onboarding and unlock all your tools.", icon: <DashboardIcon /> },
+                { num: 2, title: "Create Your Free Account", desc: "Enter your details and create a secure account.", icon: <UserPlusIcon /> },
+                { num: 3, title: "Verify & Log In", desc: "Check your email to verify, then log in to your account.", icon: <VerifyIcon /> },
+                { num: 4, title: "Access Your Dashboard", desc: "Start your onboarding and unlock all your tools.", icon: <DashboardIcon /> },
               ].map((step, i) => (
                 <motion.div
                   key={step.num}
@@ -587,51 +439,20 @@ export default function HomePage() {
                   initial="hidden"
                   whileInView="show"
                   viewport={{ once: true }}
-                  custom={i * 0.15}
-                  className="relative flex-1 border-b border-slate-100 p-5 last:border-0 sm:border-b-0 sm:border-r"
+                  custom={i * 0.12}
+                  className="flex flex-col rounded-2xl border border-white bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,0.06)] transition-shadow hover:shadow-[0_12px_40px_rgba(15,23,42,0.1)]"
                 >
-                  <div className="mb-3 flex items-center gap-2">
-                    <div
-                      ref={stepRefs[i]}
-                      className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#1d4ed8] text-xs font-bold text-white shadow-[0_4px_12px_rgba(29,78,216,0.45)] ring-4 ring-white"
-                    >
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1d4ed8] text-sm font-bold text-white shadow-[0_4px_12px_rgba(29,78,216,0.4)]">
                       {step.num}
-                    </div>
-                    <span className="text-[0.7rem] font-bold uppercase tracking-wider text-slate-400">Step {step.num}</span>
+                    </span>
+                    <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Step {step.num}</span>
                   </div>
-                  <h3 className="mb-1.5 text-sm font-bold text-slate-800">{step.title}</h3>
-                  <p className="text-[0.72rem] leading-relaxed text-slate-500">{step.desc}</p>
-                  <div className="mt-4 text-blue-500">{step.icon}</div>
+                  <h3 className="mb-2 text-[0.95rem] font-bold text-slate-800">{step.title}</h3>
+                  <p className="mb-4 flex-1 text-[0.78rem] leading-relaxed text-slate-500">{step.desc}</p>
+                  <div className="text-blue-500">{step.icon}</div>
                 </motion.div>
               ))}
-
-              {/* Animated beam connectors (traveling light between step nodes) */}
-              <AnimatedBeam
-                containerRef={stepsContainerRef}
-                fromRef={step1Ref}
-                toRef={step2Ref}
-                duration={4}
-                pathColor="#cbd5e1"
-                pathOpacity={0.3}
-              />
-              <AnimatedBeam
-                containerRef={stepsContainerRef}
-                fromRef={step2Ref}
-                toRef={step3Ref}
-                duration={4}
-                delay={0.5}
-                pathColor="#cbd5e1"
-                pathOpacity={0.3}
-              />
-              <AnimatedBeam
-                containerRef={stepsContainerRef}
-                fromRef={step3Ref}
-                toRef={step4Ref}
-                duration={4}
-                delay={1}
-                pathColor="#cbd5e1"
-                pathOpacity={0.3}
-              />
             </div>
 
             {/* Device mockups */}
@@ -641,11 +462,11 @@ export default function HomePage() {
               whileInView="show"
               viewport={{ once: true }}
               custom={0.5}
-              className="relative flex w-full items-end justify-center lg:w-[320px] lg:flex-shrink-0"
+              className="relative flex w-full items-end justify-center lg:w-[340px] lg:flex-shrink-0"
             >
               <div className="absolute inset-0 bg-blue-400/10 blur-3xl rounded-full" />
               {/* Laptop */}
-              <div className="relative z-10 w-[300px] overflow-hidden rounded-t-xl border-b-4 border-slate-300 bg-[#1e293b] px-2 pt-2 shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
+              <div className="relative z-10 w-[310px] overflow-hidden rounded-t-xl border-b-4 border-slate-300 bg-[#1e293b] px-2 pt-2 shadow-[0_20px_50px_rgba(0,0,0,0.2)]">
                 <div className="flex h-52 flex-col overflow-hidden rounded-t-sm bg-white">
                   <div className="flex h-4 items-center gap-1 border-b border-slate-100 bg-slate-50 px-2">
                     <div className="h-1.5 w-1.5 rounded-full bg-slate-300" />
@@ -671,7 +492,7 @@ export default function HomePage() {
                 </div>
               </div>
               {/* Phone */}
-              <div className="absolute -left-4 bottom-0 z-20 w-[100px] overflow-hidden rounded-2xl border-4 border-[#0f172a] bg-white shadow-[10px_10px_30px_rgba(0,0,0,0.2)]">
+              <div className="absolute -left-4 bottom-0 z-20 w-[105px] overflow-hidden rounded-2xl border-4 border-[#0f172a] bg-white shadow-[10px_10px_30px_rgba(0,0,0,0.2)]">
                 <div className="flex justify-center bg-white pb-1 pt-2">
                   <div className="h-1 w-8 rounded-full bg-slate-200" />
                 </div>
@@ -689,7 +510,7 @@ export default function HomePage() {
 
           {/* Trust row */}
           <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold text-slate-600">
-            {["✓ Quick & Easy", "✓ Bank-Grade Security", "✓ Get Started in Minutes"].map((item) => (
+            {["✓ Quick & Easy", "✓ Secure", "✓ Get Started in Minutes"].map((item) => (
               <span key={item} className="text-slate-600">{item}</span>
             ))}
           </div>
