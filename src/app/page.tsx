@@ -1,13 +1,19 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import VideoModal from "@/components/ui/VideoModal";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { Spotlight } from "@/components/ui/spotlight";
-import { WobbleCard } from "@/components/ui/wobble-card";
 import { ThreeDCard } from "@/components/ui/three-d-card";
+import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { MagicCard } from "@/components/ui/magic-card";
+import { BorderBeam } from "@/components/ui/border-beam";
+import { Meteors } from "@/components/ui/meteors";
+import { AnimatedBeam } from "@/components/ui/animated-beam";
 
 const VIDEO_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
 
@@ -22,6 +28,14 @@ const fadeUp = {
 };
 
 export default function HomePage() {
+  // Refs for Animated Beam connectors between the 4 Action Steps
+  const stepsContainerRef = useRef<HTMLDivElement>(null);
+  const step1Ref = useRef<HTMLDivElement>(null);
+  const step2Ref = useRef<HTMLDivElement>(null);
+  const step3Ref = useRef<HTMLDivElement>(null);
+  const step4Ref = useRef<HTMLDivElement>(null);
+  const stepRefs = [step1Ref, step2Ref, step3Ref, step4Ref];
+
   return (
     <div className="overflow-hidden bg-white text-slate-900 font-sans">
 
@@ -96,18 +110,15 @@ export default function HomePage() {
               className="mt-10 flex flex-wrap items-center gap-5"
             >
               <VideoModal videoUrl={VIDEO_URL}>
-                <button
+                <ShimmerButton
                   id="hero-watch-overview"
-                  className="group relative overflow-hidden rounded-lg bg-[#3b82f6] px-8 py-3.5 text-[1.05rem] font-semibold text-white shadow-[0_8px_20px_rgba(59,130,246,0.4)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(59,130,246,0.55)]"
+                  className="text-[1.05rem]"
                 >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <svg className="h-4 w-4 fill-white" viewBox="0 0 24 24">
-                      <path d="M8 5.14v14l11-7-11-7z" />
-                    </svg>
-                    Watch Overview
-                  </span>
-                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                </button>
+                  <svg className="h-4 w-4 fill-white" viewBox="0 0 24 24">
+                    <path d="M8 5.14v14l11-7-11-7z" />
+                  </svg>
+                  Watch Overview
+                </ShimmerButton>
               </VideoModal>
 
               <Link
@@ -262,6 +273,127 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════
+          SCROLL-DRIVEN DASHBOARD PREVIEW (Aceternity ContainerScroll)
+      ═══════════════════════════════════════════════ */}
+      <section className="relative bg-gradient-to-b from-[#061238] via-[#0a1b4f] to-[#061238] text-white">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(96,165,250,0.18),transparent_55%)]" />
+        <ContainerScroll
+          titleComponent={
+            <>
+              <span className="mb-3 inline-block rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-200">
+                Live Dashboard
+              </span>
+              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                Your Portfolio,{" "}
+                <span className="bg-gradient-to-r from-blue-300 via-cyan-200 to-white bg-clip-text text-transparent">
+                  Always in View
+                </span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-sm text-blue-100/70 sm:text-base">
+                Real-time performance, holdings, and AI bot signals — one clean, unified surface.
+              </p>
+            </>
+          }
+        >
+          <div className="flex h-full w-full flex-col overflow-hidden bg-white">
+            {/* Browser chrome */}
+            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
+              <div className="ml-3 flex-1 rounded bg-white px-3 py-1 text-center text-[11px] font-medium text-slate-500 shadow-inner">
+                app.autopilotroi.com/dashboard
+              </div>
+            </div>
+            {/* Full-size dashboard */}
+            <div className="flex flex-1 bg-slate-50">
+              {/* Sidebar */}
+              <div className="hidden w-[180px] flex-shrink-0 bg-[#081b54] py-5 text-white sm:flex sm:flex-col">
+                <div className="mb-4 px-5 text-[10px] font-bold uppercase tracking-widest text-blue-300/60">
+                  Navigation
+                </div>
+                {[
+                  { label: "Dashboard", icon: "⊞", active: true },
+                  { label: "Bots", icon: "◍" },
+                  { label: "Exchange", icon: "⇄" },
+                  { label: "Crypto Card", icon: "▣" },
+                  { label: "Neo Bank", icon: "⊚" },
+                  { label: "Holdings", icon: "◈" },
+                  { label: "Settings", icon: "⚙" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className={`mx-3 mb-1 flex items-center gap-2.5 rounded-md px-3 py-2 text-[12px] font-medium transition-colors ${
+                      item.active
+                        ? "bg-blue-600/80 text-white shadow"
+                        : "text-blue-200/60 hover:bg-blue-700/30 hover:text-blue-100"
+                    }`}
+                  >
+                    <span className="w-4 text-center">{item.icon}</span>
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+              {/* Main */}
+              <div className="flex-1 overflow-hidden p-6">
+                <div className="mb-5 flex items-start justify-between">
+                  <div>
+                    <div className="mb-1 text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                      Portfolio Value
+                    </div>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-4xl font-bold text-slate-800">$24,529.00</span>
+                      <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-600">
+                        +12.48%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="rounded-md bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow">
+                      Deposit
+                    </button>
+                    <button className="rounded-md border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-600">
+                      Withdraw
+                    </button>
+                  </div>
+                </div>
+                <div className="relative h-[60%] overflow-hidden rounded-xl border border-slate-100 bg-white shadow-inner">
+                  <svg viewBox="0 0 400 160" className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+                    {[40, 80, 120].map((y) => (
+                      <line key={y} x1="0" x2="400" y1={y} y2={y} stroke="#f1f5f9" strokeWidth="1" />
+                    ))}
+                    <defs>
+                      <linearGradient id="bigAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.22" />
+                        <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0 130 C50 115, 90 90, 130 100 S200 60, 250 65 S310 30, 360 25 L400 15 L400 160 L0 160 Z" fill="url(#bigAreaGrad)" />
+                    <path d="M0 130 C50 115, 90 90, 130 100 S200 60, 250 65 S310 30, 360 25 L400 15" fill="none" stroke="#3b82f6" strokeWidth="2.5" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div className="mt-5 grid grid-cols-3 gap-3">
+                  {[
+                    { label: "BTC", value: "$1.2k", trend: "+4.2%", color: "text-emerald-500" },
+                    { label: "ETH", value: "$920", trend: "+2.8%", color: "text-emerald-500" },
+                    { label: "SOL", value: "$410", trend: "-1.1%", color: "text-rose-500" },
+                  ].map((a) => (
+                    <div key={a.label} className="rounded-lg border border-slate-100 bg-white p-3 shadow-sm">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{a.label}</div>
+                      <div className="mt-1 flex items-baseline gap-2">
+                        <span className="text-sm font-bold text-slate-800">{a.value}</span>
+                        <span className={`text-[10px] font-semibold ${a.color}`}>{a.trend}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </ContainerScroll>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
           FEATURE STRIP
       ═══════════════════════════════════════════════ */}
       <section className="relative z-10 -mt-6 bg-white px-6 pb-6 pt-12 lg:px-10 rounded-t-[2.5rem] shadow-[0_-8px_30px_rgba(6,18,56,0.15)]">
@@ -271,45 +403,50 @@ export default function HomePage() {
               title: "AI Automation",
               desc: "Automated trading strategies that work 24/7, driven by advanced AI algorithms.",
               icon: <BotFeatureIcon />,
-              color: "from-blue-50 to-indigo-50",
+              gradientColor: "#3b82f6",
               iconBg: "bg-blue-600",
             },
             {
               title: "Digital Banking",
               desc: "Full control of your funds with modern neo-banking features built for crypto natives.",
               icon: <CardFeatureIcon />,
-              color: "from-violet-50 to-purple-50",
+              gradientColor: "#8b5cf6",
               iconBg: "bg-violet-600",
             },
             {
               title: "Crypto Infrastructure",
               desc: "Exchange, hold, and spend digital assets seamlessly from a single unified dashboard.",
               icon: <GlobeFeatureIcon />,
-              color: "from-cyan-50 to-blue-50",
+              gradientColor: "#06b6d4",
               iconBg: "bg-cyan-600",
             },
           ].map((f, i) => (
-            <WobbleCard
+            <motion.div
               key={f.title}
-              containerClassName={`bg-gradient-to-br ${f.color} border border-slate-100 shadow-[0_4px_20px_rgba(30,50,110,0.05)]`}
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              custom={i * 0.2}
             >
-              <motion.article
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true }}
-                custom={i * 0.2}
-                className="flex items-start gap-4 p-6"
+              <MagicCard
+                className="h-full bg-white shadow-[0_4px_20px_rgba(30,50,110,0.05)]"
+                gradientColor={f.gradientColor}
+                gradientFrom={f.gradientColor}
+                gradientTo="#a78bfa"
+                gradientOpacity={0.12}
               >
-                <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${f.iconBg} text-white shadow-lg`}>
-                  {f.icon}
-                </div>
-                <div>
-                  <h2 className="mb-1 text-[1.05rem] font-bold text-slate-900">{f.title}</h2>
-                  <p className="text-[0.8rem] leading-relaxed text-slate-500">{f.desc}</p>
-                </div>
-              </motion.article>
-            </WobbleCard>
+                <article className="flex items-start gap-4 p-6">
+                  <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${f.iconBg} text-white shadow-lg`}>
+                    {f.icon}
+                  </div>
+                  <div>
+                    <h2 className="mb-1 text-[1.05rem] font-bold text-slate-900">{f.title}</h2>
+                    <p className="text-[0.8rem] leading-relaxed text-slate-500">{f.desc}</p>
+                  </div>
+                </article>
+              </MagicCard>
+            </motion.div>
           ))}
         </div>
       </section>
@@ -365,7 +502,14 @@ export default function HomePage() {
                 custom={i * 0.15}
               >
                 <ThreeDCard containerClassName="h-full">
-                  <article className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,0,0,0.35)] transition-shadow hover:shadow-[0_24px_50px_rgba(0,0,0,0.45)]">
+                  <article className="relative flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,0,0,0.35)] transition-shadow hover:shadow-[0_24px_50px_rgba(0,0,0,0.45)]">
+                    <BorderBeam
+                      size={180}
+                      duration={10 + i}
+                      delay={i * 0.5}
+                      colorFrom="#60a5fa"
+                      colorTo="#a78bfa"
+                    />
                     <div className="relative h-44 overflow-hidden">
                       {card.badge && (
                         <div className="absolute right-3 top-3 z-10 rounded-full bg-blue-600 px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-white shadow">
@@ -427,7 +571,10 @@ export default function HomePage() {
 
           <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
             {/* Steps */}
-            <div className="flex flex-1 flex-col sm:flex-row rounded-[1.5rem] border border-white bg-white/70 p-2 shadow-[0_20px_40px_rgba(15,23,42,0.05)] backdrop-blur-md">
+            <div
+              ref={stepsContainerRef}
+              className="relative flex flex-1 flex-col sm:flex-row rounded-[1.5rem] border border-white bg-white/70 p-2 shadow-[0_20px_40px_rgba(15,23,42,0.05)] backdrop-blur-md"
+            >
               {[
                 { num: 1, title: 'Click "Get Started"', desc: "Press the button below to begin your free registration.", icon: <CursorIcon /> },
                 { num: 2, title: "Create Free Account", desc: "Enter your details and create a secure account in seconds.", icon: <UserPlusIcon /> },
@@ -441,12 +588,15 @@ export default function HomePage() {
                   whileInView="show"
                   viewport={{ once: true }}
                   custom={i * 0.15}
-                  className="flex-1 border-b border-slate-100 p-5 last:border-0 sm:border-b-0 sm:border-r"
+                  className="relative flex-1 border-b border-slate-100 p-5 last:border-0 sm:border-b-0 sm:border-r"
                 >
                   <div className="mb-3 flex items-center gap-2">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1d4ed8] text-xs font-bold text-white shadow">
+                    <div
+                      ref={stepRefs[i]}
+                      className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#1d4ed8] text-xs font-bold text-white shadow-[0_4px_12px_rgba(29,78,216,0.45)] ring-4 ring-white"
+                    >
                       {step.num}
-                    </span>
+                    </div>
                     <span className="text-[0.7rem] font-bold uppercase tracking-wider text-slate-400">Step {step.num}</span>
                   </div>
                   <h3 className="mb-1.5 text-sm font-bold text-slate-800">{step.title}</h3>
@@ -454,6 +604,34 @@ export default function HomePage() {
                   <div className="mt-4 text-blue-500">{step.icon}</div>
                 </motion.div>
               ))}
+
+              {/* Animated beam connectors (traveling light between step nodes) */}
+              <AnimatedBeam
+                containerRef={stepsContainerRef}
+                fromRef={step1Ref}
+                toRef={step2Ref}
+                duration={4}
+                pathColor="#cbd5e1"
+                pathOpacity={0.3}
+              />
+              <AnimatedBeam
+                containerRef={stepsContainerRef}
+                fromRef={step2Ref}
+                toRef={step3Ref}
+                duration={4}
+                delay={0.5}
+                pathColor="#cbd5e1"
+                pathOpacity={0.3}
+              />
+              <AnimatedBeam
+                containerRef={stepsContainerRef}
+                fromRef={step3Ref}
+                toRef={step4Ref}
+                duration={4}
+                delay={1}
+                pathColor="#cbd5e1"
+                pathOpacity={0.3}
+              />
             </div>
 
             {/* Device mockups */}
@@ -524,6 +702,8 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-[#061238] px-6 py-24 text-center lg:px-10">
         <BackgroundBeams className="opacity-40" />
         <Spotlight className="-top-20 left-1/2 -translate-x-1/2" fill="#60a5fa" />
+        {/* Magic UI Meteors — falling starfield */}
+        <Meteors number={22} />
         <div className="relative z-10 mx-auto max-w-3xl">
           <motion.div
             variants={fadeUp}
@@ -544,6 +724,12 @@ export default function HomePage() {
               >
                 <span className="relative z-10">Get Started Free →</span>
                 <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <BorderBeam
+                  size={120}
+                  duration={8}
+                  colorFrom="#ffffff"
+                  colorTo="#60a5fa"
+                />
               </Link>
               <VideoModal videoUrl={VIDEO_URL}>
                 <button className="flex items-center gap-2 rounded-lg border border-blue-300/40 bg-white/5 px-8 py-4 text-[1.05rem] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10">
