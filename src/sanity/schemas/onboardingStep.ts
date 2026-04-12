@@ -98,8 +98,8 @@ export const onboardingStep = {
       title: 'title',
       subtitle: 'stepNumber',
     },
-    prepare({ title, subtitle }: { title: string; subtitle: number }) {
-      return { title: `Step ${subtitle}: ${title}` }
+    prepare(selection: Record<string, unknown>) {
+      return { title: `Step ${selection.subtitle}: ${selection.title}` }
     },
   },
 }

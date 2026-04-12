@@ -3,92 +3,112 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import VideoModal from '@/components/ui/VideoModal'
+import YouTubeThumbnail from '@/components/ui/YouTubeThumbnail'
+import { motion } from 'framer-motion'
 
 const mediaContent = {
   headline: 'Media & Social Proof',
   description:
-    'Interviews, presentations, community videos, and external coverage of the Aurum ecosystem. See what real members say.',
+    'Interviews, presentations, community videos, and coverage of the Aurum ecosystem. See what real members and leaders say.',
   categories: [
     { id: 'all', label: 'All Media' },
-    { id: 'interviews', label: '🎙️ Interviews' },
-    { id: 'presentations', label: '📊 Presentations' },
-    { id: 'community', label: '🤝 Community' },
-    { id: 'external', label: '📰 External' },
+    { id: 'presentations', label: 'Presentations' },
+    { id: 'interviews', label: 'Interviews' },
+    { id: 'community', label: 'Community' },
+    { id: 'updates', label: 'Updates' },
   ],
   items: [
     {
       id: '1',
       category: 'presentations',
-      title: 'Aurum Foundation — Full Product Overview',
-      description:
-        'A comprehensive walkthrough of the entire Aurum ecosystem: AI trading bot, crypto card, exchange, and neobank explained.',
-      thumbnailBg: 'from-blue-700 to-blue-900',
-      emoji: '📊',
-      duration: '45 min',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      title: 'Aurum Explained — AI Finance Meets Real-World Assets',
+      description: 'Complete overview of the full ecosystem: AI trading bots, crypto cards, exchange, neobank, and the opportunity.',
+      youtubeId: 'MmAnR4YAPv4',
+      duration: '15:22',
       badge: 'Must Watch',
     },
     {
       id: '2',
-      category: 'interviews',
-      title: 'Member Interview — Maria T., New Zealand',
-      description:
-        '"AutoPilot ROI walked me through everything step by step. I actually understood what I was getting into before I invested a cent."',
-      thumbnailBg: 'from-cyan-600 to-blue-800',
-      emoji: '🎙️',
-      duration: '12 min',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      badge: null,
+      category: 'presentations',
+      title: 'Why Aurum — Due Diligence Briefing',
+      description: 'Independent analysis and fact-based overview for anyone considering the platform.',
+      youtubeId: 'kbGSa11bBHc',
+      duration: '11:57',
+      badge: 'Featured',
     },
     {
       id: '3',
-      category: 'interviews',
-      title: 'Partner Spotlight — James O., United Kingdom',
-      description:
-        '"I\'ve had 3 people placed in my downline from spillover I didn\'t personally generate. The team is genuinely building around me."',
-      thumbnailBg: 'from-indigo-600 to-slate-900',
-      emoji: '🎙️',
-      duration: '18 min',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      category: 'presentations',
+      title: '5-Minute Aurum Overview',
+      description: 'Quick intro — perfect for sharing with friends and family who want the highlights.',
+      youtubeId: 'yTb2rAJhU7w',
+      duration: '5:41',
       badge: null,
     },
     {
       id: '4',
-      category: 'presentations',
-      title: 'Aurum EX-AI Bot — How It Works Deep Dive',
-      description:
-        'Technical walkthrough of the AI trading algorithm, exchange integrations, return distribution, and risk management.',
-      thumbnailBg: 'from-sky-600 to-blue-900',
-      emoji: '🤖',
-      duration: '32 min',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      badge: 'Featured',
+      category: 'interviews',
+      title: 'The 1000 Millionaires Mission — CEO Bryan Benson',
+      description: "Bryan Benson's 'Tip of the Iceberg' talk on the company's vision and roadmap.",
+      youtubeId: 'SXpfGOUfEKg',
+      duration: '4:32',
+      badge: null,
     },
     {
       id: '5',
       category: 'community',
-      title: 'AutoPilot ROI Team Call — April 2026',
-      description:
-        'Monthly community call. Updates on platform performance, new member Q&A, and onboarding tips from senior partners.',
-      thumbnailBg: 'from-violet-600 to-blue-900',
-      emoji: '🤝',
-      duration: '1 hr 10 min',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-      badge: 'New',
+      title: 'Are the EX AI Bot Profits Real?',
+      description: 'Verification and proof of real trading results from actual members.',
+      youtubeId: '4GNo8E1yj7g',
+      duration: '17:03',
+      badge: null,
     },
     {
       id: '6',
-      category: 'external',
-      title: "Aurum Foundation — 'The Future of AI Finance'",
-      description:
-        'Third-party coverage of the Aurum Foundation ecosystem and its position in the AI-managed decentralised finance sector.',
-      thumbnailBg: 'from-slate-600 to-slate-900',
-      emoji: '📰',
-      duration: '8 min',
-      videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+      category: 'updates',
+      title: 'Product Updates — Bryan Benson',
+      description: 'Latest platform updates, new features, and roadmap announcements from the CEO.',
+      youtubeId: '7LNl58JwgSc',
+      duration: '12:06',
+      badge: 'New',
+    },
+    {
+      id: '7',
+      category: 'community',
+      title: 'Dubai Launch Event — January 2026 Recap',
+      description: 'Full event recap from the global launch in Dubai. Key announcements and partner highlights.',
+      youtubeId: 'Fw6LoJ0afR4',
+      duration: '47:08',
+      badge: null,
+    },
+    {
+      id: '8',
+      category: 'interviews',
+      title: 'Proof of Trading — Ricky, Brad & Dino',
+      description: 'Live trading verification session showing real bot performance and results.',
+      youtubeId: 'jGXH8BhyJbY',
+      duration: '20:01',
+      badge: null,
+    },
+    {
+      id: '9',
+      category: 'updates',
+      title: 'Compensation Plan Explained',
+      description: 'Full walkthrough of the partner compensation plan and earning structure.',
+      youtubeId: 'f2CA_eDL0Eo',
+      duration: '29:01',
       badge: null,
     },
   ],
+}
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  show: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.06, duration: 0.45, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+  }),
 }
 
 export default function MediaPage() {
@@ -104,16 +124,20 @@ export default function MediaPage() {
       {/* Header */}
       <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(59,130,246,0.15),transparent_60%)]" />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '50px 50px' }} />
         <div className="relative mx-auto max-w-4xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-2 text-sm font-medium text-blue-200">
-            🎬 Media & Social Proof
-          </div>
-          <h1 className="font-[var(--font-sora)] text-5xl font-semibold tracking-[-0.055em] text-white sm:text-6xl">
-            {mediaContent.headline}
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-blue-100/80">
-            {mediaContent.description}
-          </p>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+              Media Library
+            </div>
+            <h1 className="font-[var(--font-sora)] text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              {mediaContent.headline}
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-blue-100/60">
+              {mediaContent.description}
+            </p>
+          </motion.div>
         </div>
       </div>
 
@@ -124,10 +148,10 @@ export default function MediaPage() {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                 activeCategory === cat.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white/10 text-blue-100/80 hover:bg-white/15 hover:text-white'
+                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                  : 'bg-white/[0.06] text-blue-100/70 border border-white/10 hover:bg-white/10 hover:text-white'
               }`}
             >
               {cat.label}
@@ -136,36 +160,43 @@ export default function MediaPage() {
         </div>
 
         {/* Video grid */}
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {visible.map((item) => (
-            <article
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {visible.map((item, i) => (
+            <motion.article
               key={item.id}
-              className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-white/6 backdrop-blur-sm transition hover:-translate-y-1 hover:border-white/20"
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true }}
+              custom={i}
+              className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]"
             >
               {/* Thumbnail */}
-              <VideoModal videoUrl={item.videoUrl}>
-                <div
-                  className={`relative h-48 cursor-pointer bg-gradient-to-br ${item.thumbnailBg} flex items-center justify-center`}
-                >
-                  <div className="text-6xl opacity-30">{item.emoji}</div>
-                  {/* Play button */}
-                  <div className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-[1.2rem] bg-red-500 text-white shadow-[0_8px_25px_rgba(239,68,68,0.45)] transition hover:scale-110">
-                    <span className="ml-1 text-2xl">▶</span>
+              <VideoModal videoUrl={`https://www.youtube.com/watch?v=${item.youtubeId}`} ctaLabel="Ready to Get Started?" ctaHref="/signup">
+                <div className="relative aspect-video cursor-pointer overflow-hidden bg-slate-900">
+                  <YouTubeThumbnail
+                    videoId={item.youtubeId}
+                    title={item.title}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {/* Play overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 shadow-lg">
+                      <svg viewBox="0 0 24 24" className="h-6 w-6 ml-0.5 text-[#061238]" fill="currentColor">
+                        <path d="M8 5.14v14l11-7-11-7z" />
+                      </svg>
+                    </div>
                   </div>
                   {item.badge && (
-                    <span
-                      className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        item.badge === 'New'
-                          ? 'bg-green-500/90 text-white'
-                          : item.badge === 'Must Watch'
-                            ? 'bg-red-500/90 text-white'
-                            : 'bg-blue-500/90 text-white'
-                      }`}
-                    >
+                    <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-bold shadow-lg ${
+                      item.badge === 'New' ? 'bg-emerald-500 text-white'
+                      : item.badge === 'Must Watch' ? 'bg-red-500 text-white'
+                      : 'bg-blue-500 text-white'
+                    }`}>
                       {item.badge}
                     </span>
                   )}
-                  <span className="absolute bottom-3 right-3 rounded-lg bg-slate-900/80 px-2 py-1 text-xs text-white/80">
+                  <span className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 text-xs font-medium text-white/90 backdrop-blur-sm">
                     {item.duration}
                   </span>
                 </div>
@@ -173,28 +204,27 @@ export default function MediaPage() {
 
               {/* Content */}
               <div className="p-5">
-                <h3 className="font-[var(--font-sora)] text-lg font-semibold leading-snug text-white">
+                <h3 className="font-[var(--font-sora)] text-sm font-bold leading-snug text-white line-clamp-2 group-hover:text-blue-300 transition-colors">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-sm leading-7 text-blue-100/70">{item.description}</p>
+                <p className="mt-2 text-xs leading-relaxed text-blue-100/50 line-clamp-2">{item.description}</p>
               </div>
-            </article>
+            </motion.article>
           ))}
         </div>
 
         {/* CTA */}
-        <div className="mt-14 rounded-[2rem] border border-white/15 bg-white/6 p-10 text-center backdrop-blur-sm">
-          <div className="text-4xl">🚀</div>
-          <h2 className="mt-4 font-[var(--font-sora)] text-3xl font-semibold text-white">
+        <div className="mt-16 rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-sm">
+          <h2 className="font-[var(--font-sora)] text-2xl font-bold text-white">
             Ready to Start Your Journey?
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-base leading-7 text-blue-100/80">
-            The best way to understand Aurum is to work through the guided onboarding with your
+          <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-blue-100/60">
+            The best way to understand the platform is to work through the guided onboarding with your
             AutoPilot ROI partner.
           </p>
           <Link
-            href="/start"
-            className="mt-6 inline-flex items-center rounded-xl border border-blue-300/40 bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-7 py-3 text-base font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:brightness-110"
+            href="/signup"
+            className="mt-6 inline-flex items-center rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-7 py-3 text-base font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40"
           >
             Begin Onboarding →
           </Link>

@@ -1,9 +1,100 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   THEME TOKENS — CSS Variables
+   Default = dark. data-theme="light" overrides below.
+   ═══════════════════════════════════════════════════════════════ */
+
 :root {
-  --background: #06122f;
+  /* ── Dark theme (default) ── */
+  --bg-primary: #06122f;
+  --bg-secondary: #0b1f57;
+  --bg-card: rgba(255, 255, 255, 0.06);
+  --bg-card-hover: rgba(255, 255, 255, 0.10);
+  --bg-card-solid: #0a1a3f;
+  --bg-hero: #061238;
+  --bg-body-gradient: radial-gradient(circle at top, rgba(70, 131, 255, 0.25), transparent 32%),
+    linear-gradient(180deg, #0b1f57 0%, #06173f 38%, #04112d 100%);
+  --bg-section: linear-gradient(180deg, #0b1f57 0%, #06122f 100%);
+  --bg-navbar: rgba(8, 32, 91, 0.55);
+  --bg-footer: rgba(6, 18, 47, 0.8);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(191, 219, 254, 0.8);
+  --text-tertiary: rgba(191, 219, 254, 0.6);
+  --text-muted: rgba(191, 219, 254, 0.4);
+
+  --border-primary: rgba(255, 255, 255, 0.10);
+  --border-secondary: rgba(255, 255, 255, 0.15);
+  --border-accent: rgba(59, 130, 246, 0.30);
+
+  --accent-primary: #3b82f6;
+  --accent-gradient: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  --accent-shadow: rgba(37, 99, 235, 0.35);
+  --accent-glow: rgba(59, 130, 246, 0.15);
+
+  --badge-bg: rgba(59, 130, 246, 0.15);
+  --badge-text: #93c5fd;
+  --badge-border: rgba(96, 165, 250, 0.30);
+
+  --selection-bg: rgba(147, 197, 253, 0.35);
+  --selection-text: #ffffff;
+
   --foreground: #f8fbff;
+  --background: #06122f;
 }
+
+/* ── Light theme ── */
+[data-theme="light"] {
+  --bg-primary: #f0f4ff;
+  --bg-secondary: #e8eeff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8faff;
+  --bg-card-solid: #ffffff;
+  --bg-hero: #edf2ff;
+  --bg-body-gradient: linear-gradient(180deg, #f0f4ff 0%, #e8eeff 40%, #f5f7ff 100%);
+  --bg-section: linear-gradient(180deg, #edf2ff 0%, #f0f4ff 100%);
+  --bg-navbar: rgba(255, 255, 255, 0.85);
+  --bg-footer: rgba(240, 244, 255, 0.95);
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary: #64748b;
+  --text-muted: #94a3b8;
+
+  --border-primary: rgba(15, 23, 42, 0.08);
+  --border-secondary: rgba(15, 23, 42, 0.12);
+  --border-accent: rgba(59, 130, 246, 0.25);
+
+  --accent-primary: #2563eb;
+  --accent-gradient: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  --accent-shadow: rgba(37, 99, 235, 0.20);
+  --accent-glow: rgba(59, 130, 246, 0.08);
+
+  --badge-bg: rgba(59, 130, 246, 0.10);
+  --badge-text: #2563eb;
+  --badge-border: rgba(59, 130, 246, 0.20);
+
+  --selection-bg: rgba(59, 130, 246, 0.25);
+  --selection-text: #0f172a;
+
+  --foreground: #0f172a;
+  --background: #f0f4ff;
+}
+
+/* ── Force white text on colored buttons in light mode ── */
+[data-theme="light"] a[class*="bg-blue-"],
+[data-theme="light"] button[class*="bg-blue-"],
+[data-theme="light"] a[class*="bg-emerald"],
+[data-theme="light"] button[class*="bg-emerald"],
+[data-theme="light"] a[class*="bg-gradient"],
+[data-theme="light"] button[class*="bg-gradient"] {
+  color: #ffffff !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════ */
 
 html {
   scroll-behavior: smooth;
@@ -11,12 +102,12 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top, rgba(70, 131, 255, 0.25), transparent 32%),
-    linear-gradient(180deg, #0b1f57 0%, #06173f 38%, #04112d 100%);
+  background: var(--bg-body-gradient);
+  background-color: var(--bg-primary);
   color: var(--foreground);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -24,11 +115,353 @@ a {
 }
 
 ::selection {
-  background: rgba(147, 197, 253, 0.35);
-  color: #ffffff;
+  background: var(--selection-bg);
+  color: var(--selection-text);
 }
 
-/* ── Native <dialog> modal styling ── */
+/* ═══════════════════════════════════════════════════════════════
+   THEME TOGGLE SWITCH
+   ═══════════════════════════════════════════════════════════════ */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.theme-toggle__track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 48px;
+  height: 26px;
+  border-radius: 13px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="light"] .theme-toggle__track {
+  background: #dbeafe;
+  border-color: #bfdbfe;
+}
+
+.theme-toggle__thumb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 2px 8px var(--accent-shadow);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.theme-toggle__icon--moon {
+  left: 5px;
+}
+
+.theme-toggle__icon--sun {
+  right: 5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — LAYOUT COMPONENT OVERRIDES
+   Navbar, Footer, and common page sections
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Navbar */
+[data-theme="light"] header.sticky {
+  background: var(--bg-navbar) !important;
+  border-bottom-color: var(--border-primary) !important;
+  backdrop-filter: blur(20px) saturate(1.2);
+}
+[data-theme="light"] header.sticky a,
+[data-theme="light"] header.sticky span {
+  color: var(--text-primary);
+}
+[data-theme="light"] header.sticky nav a {
+  color: var(--text-tertiary);
+}
+[data-theme="light"] header.sticky nav a:hover,
+[data-theme="light"] header.sticky nav a[class*="text-white"] {
+  color: var(--text-primary);
+}
+/* Mobile menu */
+[data-theme="light"] header nav[class*="border-t"] {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-top-color: var(--border-primary) !important;
+}
+[data-theme="light"] header nav[class*="border-t"] a {
+  color: var(--text-secondary) !important;
+}
+[data-theme="light"] header nav[class*="border-t"] a:hover,
+[data-theme="light"] header nav[class*="border-t"] a[class*="bg-white"] {
+  background: rgba(59, 130, 246, 0.08) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] header nav[class*="border-t"] a[class*="bg-blue-600"] {
+  color: white !important;
+}
+/* Hamburger */
+[data-theme="light"] header button[aria-label] {
+  border-color: var(--border-primary) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Footer */
+[data-theme="light"] footer {
+  background: var(--bg-footer) !important;
+  border-top-color: var(--border-primary) !important;
+  color: var(--text-tertiary) !important;
+}
+[data-theme="light"] footer div[class*="text-white"],
+[data-theme="light"] footer span[class*="text-white"] {
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] footer span[class*="text-blue-300"] {
+  color: var(--accent-primary) !important;
+}
+[data-theme="light"] footer a {
+  color: var(--text-tertiary) !important;
+}
+[data-theme="light"] footer a:hover {
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] footer p {
+  color: var(--text-muted) !important;
+}
+[data-theme="light"] footer div[class*="border-t"] {
+  border-top-color: var(--border-primary) !important;
+  color: var(--text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — PAGE OVERRIDES
+   These selectors target the dark backgrounds used across pages
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Any element with explicit dark bg classes */
+[data-theme="light"] [class*="bg-[#06122f]"],
+[data-theme="light"] [class*="bg-[#061238]"] {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Hero gradient sections */
+[data-theme="light"] [style*="linear-gradient"][style*="#0b1f57"],
+[data-theme="light"] div[class*="bg-[linear-gradient(180deg,#0b1f57"] {
+  background: var(--bg-section) !important;
+}
+
+/* Glassmorphism cards */
+[data-theme="light"] [class*="bg-white/6"],
+[data-theme="light"] [class*="bg-white/4"],
+[data-theme="light"] [class*="bg-white/8"],
+[data-theme="light"] [class*="bg-white/10"],
+[data-theme="light"] [class*="bg-white/12"] {
+  background: var(--bg-card) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Card borders */
+[data-theme="light"] [class*="border-white/10"],
+[data-theme="light"] [class*="border-white/15"],
+[data-theme="light"] [class*="border-white/20"],
+[data-theme="light"] [class*="border-white/8"] {
+  border-color: var(--border-primary) !important;
+}
+
+/* Text overrides — scoped to avoid washing out headings */
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] [class*="text-white"]:not(header *):not(footer *):not([class*="bg-blue-600"] *):not([class*="bg-[linear-gradient"] *):not(.theme-toggle *):not(h1):not(h2):not(h3) {
+  color: var(--text-primary) !important;
+}
+
+/* Stats / bold text */
+[data-theme="light"] span[class*="text-2xl"][class*="font-bold"],
+[data-theme="light"] span[class*="text-4xl"][class*="font-bold"],
+[data-theme="light"] div[class*="text-2xl"][class*="font-bold"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] [class*="text-blue-100/80"],
+[data-theme="light"] [class*="text-blue-50/80"],
+[data-theme="light"] [class*="text-blue-100/70"] {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="light"] [class*="text-blue-100/60"],
+[data-theme="light"] [class*="text-blue-50/60"],
+[data-theme="light"] [class*="text-blue-200/60"],
+[data-theme="light"] [class*="text-blue-200/70"],
+[data-theme="light"] [class*="text-blue-200/80"] {
+  color: var(--text-tertiary) !important;
+}
+
+[data-theme="light"] [class*="text-blue-50/40"],
+[data-theme="light"] [class*="text-blue-50/35"],
+[data-theme="light"] [class*="text-blue-200/40"] {
+  color: var(--text-muted) !important;
+}
+
+/* Badge overrides */
+[data-theme="light"] [class*="bg-blue-500/15"],
+[data-theme="light"] [class*="bg-blue-500/10"] {
+  background: var(--badge-bg) !important;
+}
+[data-theme="light"] [class*="text-blue-200"],
+[data-theme="light"] [class*="text-blue-300"] {
+  color: var(--badge-text) !important;
+}
+[data-theme="light"] [class*="border-blue-400/30"],
+[data-theme="light"] [class*="border-blue-400/20"] {
+  border-color: var(--badge-border) !important;
+}
+
+/* Radial gradient overlays — reduce opacity for light mode */
+[data-theme="light"] [class*="bg-[radial-gradient"] {
+  opacity: 0.3;
+}
+
+/* Input fields */
+[data-theme="light"] input[class*="bg-white/10"],
+[data-theme="light"] input[class*="bg-white/12"] {
+  background: white !important;
+  border-color: #d1d5db !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* Font mono (referral code display) */
+[data-theme="light"] [class*="font-mono"] {
+  color: var(--text-primary) !important;
+}
+
+/* Emerald badges — keep them green in light mode too */
+[data-theme="light"] [class*="bg-emerald-500/15"],
+[data-theme="light"] [class*="bg-emerald-400/30"] {
+  background: rgba(16, 185, 129, 0.10) !important;
+}
+[data-theme="light"] [class*="text-emerald-200"],
+[data-theme="light"] [class*="text-emerald-300"] {
+  color: #059669 !important;
+}
+[data-theme="light"] [class*="border-emerald-400/30"] {
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Amber badges — keep warm in light mode */
+[data-theme="light"] [class*="bg-amber-500/8"],
+[data-theme="light"] [class*="bg-amber-500/5"],
+[data-theme="light"] [class*="bg-amber-500/20"] {
+  background: rgba(245, 158, 11, 0.08) !important;
+}
+[data-theme="light"] [class*="text-amber-200"],
+[data-theme="light"] [class*="text-amber-300"],
+[data-theme="light"] [class*="text-amber-400"] {
+  color: #d97706 !important;
+}
+[data-theme="light"] [class*="border-amber-400/30"],
+[data-theme="light"] [class*="border-amber-400/20"],
+[data-theme="light"] [class*="border-amber-400/50"] {
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HOMEPAGE LIGHT MODE — Specific sections
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Hero section — use light gradient */
+[data-theme="light"] section[class*="bg-[#061238]"] {
+  background: linear-gradient(180deg, #edf2ff 0%, #dbeafe 50%, #f0f4ff 100%) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] section[class*="bg-[#061238]"] h1,
+[data-theme="light"] section[class*="bg-[#061238]"] h2,
+[data-theme="light"] section[class*="bg-[#061238]"] p,
+[data-theme="light"] section[class*="bg-[#061238]"] span {
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] section[class*="bg-[#061238]"] p {
+  color: var(--text-secondary) !important;
+}
+
+/* Pillar cards on homepage — light elevated cards */
+[data-theme="light"] [class*="bg-[#0e2460]"] {
+  background: white !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Dark section backgrounds */
+[data-theme="light"] [class*="bg-[#0a1a3f]"] {
+  background: var(--bg-hero) !important;
+}
+
+/* Stats bar background */
+[data-theme="light"] [class*="bg-[#0b1f57]"],
+[data-theme="light"] [class*="bg-[#08205b]"] {
+  background: #e0e7ff !important;
+}
+
+/* Backdrop blur panels */
+[data-theme="light"] [class*="backdrop-blur"] {
+  backdrop-filter: blur(12px) saturate(1.1);
+}
+
+/* CTA buttons — keep them blue with white text */
+[data-theme="light"] a[class*="bg-[linear-gradient(180deg,#3b82f6"],
+[data-theme="light"] button[class*="bg-[linear-gradient(180deg,#3b82f6"],
+[data-theme="light"] a[class*="bg-blue-600"],
+[data-theme="light"] button[class*="bg-blue-600"] {
+  color: white !important;
+}
+[data-theme="light"] a[class*="bg-[linear-gradient(180deg,#3b82f6"] *,
+[data-theme="light"] button[class*="bg-[linear-gradient(180deg,#3b82f6"] *,
+[data-theme="light"] a[class*="bg-blue-600"] *,
+[data-theme="light"] button[class*="bg-blue-600"] * {
+  color: white !important;
+}
+
+/* Secondary outline buttons in light mode */
+[data-theme="light"] a[class*="bg-white/10"],
+[data-theme="light"] button[class*="bg-white/10"] {
+  background: white !important;
+  border-color: #d1d5db !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] a[class*="bg-white/10"]:hover,
+[data-theme="light"] button[class*="bg-white/10"]:hover {
+  background: #f8faff !important;
+}
+
+/* Hide Aceternity effects in light mode for clean look */
+[data-theme="light"] .animate-meteor,
+[data-theme="light"] [class*="BackgroundBeams"],
+[data-theme="light"] [class*="background-beams"] {
+  opacity: 0.15 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Native <dialog> modal styling */
 dialog {
   padding: 0;
   border: none;
@@ -42,7 +475,7 @@ dialog::backdrop {
   backdrop-filter: blur(6px);
 }
 
-/* ── Hide scrollbar on filter strips ── */
+/* Hide scrollbar on filter strips */
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -51,7 +484,7 @@ dialog::backdrop {
   display: none;
 }
 
-/* ── Smooth step expand/collapse ── */
+/* Smooth step expand/collapse */
 @keyframes slide-down {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -61,9 +494,9 @@ dialog::backdrop {
   animation: slide-down 0.18s ease-out;
 }
 
-/* ═════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
    Magic UI / Aceternity polish keyframes
-   ───────────────────────────────────────────────────────────── */
+   ═══════════════════════════════════════════════════════════════ */
 
 /* ShimmerButton — sweeping conic highlight */
 @keyframes shimmer-slide {

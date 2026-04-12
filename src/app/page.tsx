@@ -10,8 +10,12 @@ import { ThreeDCard } from "@/components/ui/three-d-card";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Meteors } from "@/components/ui/meteors";
+import YouTubeThumbnail from "@/components/ui/YouTubeThumbnail";
+import SocialProof from "@/components/sections/SocialProof";
+import ExitIntentPopup from "@/components/ui/ExitIntentPopup";
+import { useFeatureFlags } from "@/lib/feature-flags";
 
-const VIDEO_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ";
+const VIDEO_URL = "https://youtu.be/MmAnR4YAPv4";
 
 // ─── Fade-up animation variant ─────────────────────────────────────────────
 const fadeUp = {
@@ -24,6 +28,7 @@ const fadeUp = {
 };
 
 export default function HomePage() {
+  const { isEnabled } = useFeatureFlags();
 
   return (
     <div className="overflow-hidden bg-white text-slate-900 font-sans">
@@ -98,7 +103,7 @@ export default function HomePage() {
               custom={3}
               className="mt-10 flex flex-wrap items-center gap-5"
             >
-              <VideoModal videoUrl={VIDEO_URL}>
+              <VideoModal videoUrl={VIDEO_URL} ctaLabel="Ready to Get Started? →" ctaHref="/signup">
                 <ShimmerButton
                   id="hero-watch-overview"
                   className="text-[1.05rem]"
@@ -159,102 +164,38 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* App content */}
-              <div className="flex bg-white" style={{ height: 310 }}>
-                {/* Sidebar */}
-                <div className="hidden w-[130px] flex-shrink-0 bg-[#081b54] py-3 text-white sm:flex flex-col gap-0.5">
-                  <div className="mb-2 px-4 text-[0.45rem] uppercase tracking-widest text-blue-300/50 font-bold">Navigation</div>
-                  {[
-                    { label: "Dashboard", icon: "⊞", active: true },
-                    { label: "Bots", icon: "◍" },
-                    { label: "Exchange", icon: "⇄" },
-                    { label: "Crypto Card", icon: "▣" },
-                    { label: "Neo Bank", icon: "⊚" },
-                    { label: "Holdings", icon: "◈" },
-                    { label: "Settings", icon: "⚙" },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className={`mx-2 flex items-center gap-1.5 rounded px-2 py-1.5 text-[0.55rem] font-medium transition-colors ${
-                        item.active
-                          ? "bg-blue-600/80 text-white"
-                          : "text-blue-200/50 hover:bg-blue-700/30 hover:text-blue-100"
-                      }`}
-                    >
-                      <span className="w-3 text-center">{item.icon}</span>
-                      {item.label}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Main dashboard */}
-                <div className="relative flex-1 overflow-hidden p-4 bg-[#f8fafc]">
-                  {/* Stats row */}
-                  <div className="mb-3 flex items-start justify-between">
-                    <div>
-                      <div className="text-[0.5rem] uppercase tracking-widest text-slate-400 font-bold mb-0.5">Portfolio Value</div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-slate-800">$24,529.00</span>
-                        <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[0.6rem] font-bold text-emerald-600">+12.48%</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-1.5">
-                      <button className="rounded bg-blue-600 px-2.5 py-1 text-[0.55rem] font-bold text-white">Deposit</button>
-                      <button className="rounded border border-slate-200 px-2.5 py-1 text-[0.55rem] font-bold text-slate-600 bg-white">Withdraw</button>
-                    </div>
-                  </div>
-
-                  {/* Chart */}
-                  <div className="relative rounded-lg border border-slate-100 bg-white overflow-hidden" style={{ height: 180 }}>
-                    <svg viewBox="0 0 400 160" className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
-                      {[40, 80, 120].map((y) => (
-                        <line key={y} x1="0" x2="400" y1={y} y2={y} stroke="#f1f5f9" strokeWidth="1" />
-                      ))}
-                      <defs>
-                        <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.15" />
-                          <stop offset="100%" stopColor="#3b82f6" stopOpacity="0" />
-                        </linearGradient>
-                      </defs>
-                      <path d="M0 130 C50 115, 90 90, 130 100 S200 60, 250 65 S310 30, 360 25 L400 15 L400 160 L0 160 Z" fill="url(#areaGrad)" />
-                      <path d="M0 130 C50 115, 90 90, 130 100 S200 60, 250 65 S310 30, 360 25 L400 15" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
-                      {[20, 50, 80, 110, 140, 170, 200, 230, 260, 290, 320, 350, 380].map((x, i) => {
-                        const isGreen = i % 3 !== 0;
-                        const color = isGreen ? "#22c55e" : "#ef4444";
-                        const h = 90 - Math.sin(i * 0.7) * 35;
-                        return (
-                          <g key={x}>
-                            <line x1={x} x2={x} y1={h - 8} y2={h + 12} stroke={color} strokeWidth="0.8" />
-                            <rect x={x - 2} y={h} width="5" height="10" fill={color} rx="0.5" />
-                          </g>
-                        );
-                      })}
-                    </svg>
-
-                    {/* Video play button overlay */}
-                    <VideoModal videoUrl={VIDEO_URL}>
-                      <button className="absolute inset-0 m-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e12a2b] shadow-[0_8px_24px_rgba(225,42,43,0.5)] transition-all hover:scale-110 hover:shadow-[0_12px_32px_rgba(225,42,43,0.65)]">
-                        <svg viewBox="0 0 24 24" className="h-6 w-6 ml-0.5 fill-white">
+              {/* Video thumbnail content */}
+              <div className="relative" style={{ height: 310 }}>
+                <VideoModal videoUrl={VIDEO_URL} ctaLabel="Ready to Get Started? →" ctaHref="/signup">
+                  <button className="relative block h-full w-full cursor-pointer overflow-hidden">
+                    {/* YouTube thumbnail */}
+                    <YouTubeThumbnail
+                      videoId="MmAnR4YAPv4"
+                      title="Aurum Platform Overview"
+                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                    />
+                    {/* Dark overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/10 transition-colors hover:from-black/50 hover:via-black/10 hover:to-transparent" />
+                    {/* Play button */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#e12a2b] shadow-[0_8px_24px_rgba(225,42,43,0.5)] transition-all hover:scale-110 hover:shadow-[0_12px_32px_rgba(225,42,43,0.65)]">
+                        <svg viewBox="0 0 24 24" className="h-7 w-7 ml-1 fill-white">
                           <path d="M8 5.14v14l11-7-11-7z" />
                         </svg>
-                      </button>
-                    </VideoModal>
-                  </div>
-
-                  {/* Video bar */}
-                  <div className="mt-0.5 flex h-5 items-center justify-between rounded bg-[#080d1e] px-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[0.55rem] text-white">▶</span>
-                      <span className="text-[0.5rem] text-white/70">0:00 / 3:46</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="h-0.5 w-24 rounded-full bg-white/20">
-                        <div className="h-full w-0 rounded-full bg-blue-400" />
                       </div>
-                      <span className="text-[0.5rem] text-white/70">HD</span>
                     </div>
-                  </div>
-                </div>
+                    {/* Bottom label */}
+                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                          <svg viewBox="0 0 24 24" className="h-3 w-3 fill-white"><path d="M8 5.14v14l11-7-11-7z" /></svg>
+                        </div>
+                        <span className="text-xs font-semibold text-white/90">Watch Overview</span>
+                      </div>
+                      <span className="rounded bg-black/40 px-2 py-0.5 text-[0.6rem] font-medium text-white/80 backdrop-blur-sm">15:22</span>
+                    </div>
+                  </button>
+                </VideoModal>
               </div>
             </div>
           </motion.div>
@@ -347,10 +288,10 @@ export default function HomePage() {
 
           <div className="relative mx-auto grid max-w-7xl gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { title: "BOTS", desc: "AI-powered trading bots that work 24/7 to grow your portfolio.", img: "/product-bots.png", icon: <BotIcon />, badge: "Most Popular" },
-              { title: "CRYPTO CARD", desc: "Spend digital assets anywhere with our next-gen crypto card.", img: "/product-card.png", icon: <CardIcon />, badge: null },
-              { title: "EXCHANGE", desc: "Buy, sell and trade 200+ crypto pairs with ultra-low fees.", img: "/product-exchange.png", icon: <ExchangeIcon />, badge: null },
-              { title: "NEO BANK", desc: "Seamless fiat banking and crypto, fully integrated.", img: "/product-neobank.png", icon: <BankIcon />, badge: "Coming Soon" },
+              { title: "BOTS", desc: "AI-powered trading bots that work 24/7 to grow your portfolio.", img: "/product-bots.png", icon: <BotIcon />, badge: "Most Popular", href: "/products#bots" },
+              { title: "CRYPTO CARD", desc: "Spend digital assets anywhere with our next-gen crypto card.", img: "/product-card.png", icon: <CardIcon />, badge: null, href: "/products#cards" },
+              { title: "EXCHANGE", desc: "Buy, sell and trade 200+ crypto pairs with ultra-low fees.", img: "/product-exchange.png", icon: <ExchangeIcon />, badge: null, href: "/products#exchange" },
+              { title: "NEO BANK", desc: "Seamless fiat banking and crypto, fully integrated.", img: "/product-neobank.png", icon: <BankIcon />, badge: "Coming Soon", href: "/products#neobank" },
             ].map((card, i) => (
               <motion.div
                 key={card.title}
@@ -390,7 +331,7 @@ export default function HomePage() {
                       </div>
                       <p className="mb-5 flex-1 text-[0.78rem] leading-relaxed text-slate-500">{card.desc}</p>
                       <Link
-                        href="/summary"
+                        href={card.href}
                         className="w-4/5 rounded-lg bg-[#3b82f6] py-2.5 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(59,130,246,0.3)] transition-all hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-[0_6px_16px_rgba(59,130,246,0.4)]"
                       >
                         Learn More →
@@ -520,6 +461,12 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           FINAL CTA
       ═══════════════════════════════════════════════ */}
+      {/* SOCIAL PROOF — Testimonials + Trust Badges */}
+      {isEnabled('socialProof') && <SocialProof />}
+
+      {/* ═══════════════════════════════════════════════
+          BOTTOM CTA
+      ═══════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-[#061238] px-6 py-24 text-center lg:px-10">
         <BackgroundBeams className="opacity-40" />
         <Spotlight className="-top-20 left-1/2 -translate-x-1/2" fill="#60a5fa" />
@@ -540,7 +487,7 @@ export default function HomePage() {
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
-                href="/start"
+                href="/signup"
                 className="group relative overflow-hidden rounded-lg bg-[#3b82f6] px-10 py-4 text-[1.05rem] font-semibold text-white shadow-[0_8px_20px_rgba(59,130,246,0.4)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(59,130,246,0.55)]"
               >
                 <span className="relative z-10">Get Started Free →</span>
@@ -552,7 +499,7 @@ export default function HomePage() {
                   colorTo="#60a5fa"
                 />
               </Link>
-              <VideoModal videoUrl={VIDEO_URL}>
+              <VideoModal videoUrl={VIDEO_URL} ctaLabel="Ready to Get Started? →" ctaHref="/signup">
                 <button className="flex items-center gap-2 rounded-lg border border-blue-300/40 bg-white/5 px-8 py-4 text-[1.05rem] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10">
                   <svg className="h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" /></svg>
                   Watch Demo
@@ -562,6 +509,9 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* EXIT INTENT POPUP */}
+      {isEnabled('exitIntentPopup') && <ExitIntentPopup />}
     </div>
   );
 }

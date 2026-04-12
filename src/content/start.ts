@@ -78,7 +78,7 @@ export const onboardingSteps: OnboardingStep[] = [
     warning: "Do NOT sign up without your referral code. Your partner's referral link must be used at signup — without it you'll be placed under the wrong person and it cannot be changed later. Your partner will give you the exact link.",
     videoLabel: 'Aurum University · START HERE',
     videoNote: 'Product Overview Presentation — Full Aurum Walkthrough · 40:11 · Watch before signing up',
-    link: { label: 'Aurum Back Office — Create Account · backoffice.aurum.foundation', href: 'https://backoffice.aurum.foundation' },
+    link: { label: 'Aurum Back Office — Create Account', href: 'https://app.aurfrn.com/register' },
     instructions: [
       { text: 'Get your personal referral link from your partner — Your partner sends a unique signup URL that automatically tags your account correctly. Use this — don\'t go to Aurum directly.' },
       { text: 'Sign up with VPN active (US/Canada only) — Make sure VPN is connected to UK or Mexico before clicking the referral link and completing signup.' },

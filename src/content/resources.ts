@@ -129,8 +129,8 @@ export const socialChannels: SocialChannel[] = [
 ]
 
 export const backOfficeLinks: BackOfficeLink[] = [
-  { icon: '🔐', title: 'Aurum Dashboard / Back Office Login', href: 'https://backoffice.aurum.foundation/auth/log-in' },
-  { icon: '❓', title: 'Aurum FAQs — Back Office', href: 'https://backoffice.aurum.foundation/faq' },
+  { icon: '🔐', title: 'Aurum Dashboard / Back Office Login', href: 'https://app.aurfrn.com/auth/log-in' },
+  { icon: '❓', title: 'Aurum FAQs — Back Office', href: 'https://app.aurfrn.com/faq' },
   { icon: '🛟', title: 'Telegram Support Team', href: 'https://t.me/aurumsupport_team' },
   { icon: '🏦', title: 'NeoBank Telegram Bot — Crypto Visa Card & Zeus', href: 'https://t.me/aurumneobankbot' },
 ]
