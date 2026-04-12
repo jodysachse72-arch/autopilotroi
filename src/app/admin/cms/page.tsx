@@ -154,7 +154,7 @@ export default function CMSHubPage() {
                 className="relative block aspect-video bg-slate-900 overflow-hidden"
               >
                 <img
-                  src={`https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`}
+                  src={`https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`}
                   alt={video.title}
                   className="h-full w-full object-cover opacity-80 transition group-hover:opacity-100 group-hover:scale-105"
                   loading="lazy"

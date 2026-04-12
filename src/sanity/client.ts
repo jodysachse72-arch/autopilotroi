@@ -2,7 +2,7 @@ import { createClient } from 'next-sanity'
 
 // ─── Sanity Client ──────────────────────────────────────────────────────────
 export const client = createClient({
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? 'placeholder',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? 'gnd0za31',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production',
   apiVersion: '2024-01-01',
   useCdn: true,
@@ -17,8 +17,8 @@ export async function sanityFetch<T>({
   fallback: T
 }): Promise<T> {
   try {
-    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
-    if (!projectId || projectId === 'placeholder') {
+    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'gnd0za31'
+    if (!projectId) {
       return fallback
     }
     const result = await client.fetch<T>(query)

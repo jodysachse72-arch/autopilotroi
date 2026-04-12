@@ -4,8 +4,10 @@ import { useState } from 'react'
 
 /**
  * YouTube thumbnail with multi-quality fallback chain.
- * YouTube returns a grey placeholder (valid 200 image) for missing resolutions.
- * We try hqdefault → 0.jpg (always exists). If all fail, gradient fallback.
+ * Uses mqdefault.jpg as primary (most reliable across all videos).
+ * Falls back to 0.jpg, then a styled gradient placeholder.
+ * Always renders with a dark gradient background behind the image
+ * so gray/missing thumbnails are masked.
  */
 export default function YouTubeThumbnail({
   videoId,
@@ -16,14 +18,16 @@ export default function YouTubeThumbnail({
   title: string
   className?: string
 }) {
-  // 0.jpg is the most reliable — every YouTube video has it
+  // mqdefault is the most reliable — 320x180, always generated
+  // hqdefault can return gray for some videos
   const sources = [
-    `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+    `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`,
     `https://img.youtube.com/vi/${videoId}/0.jpg`,
   ]
 
   const [sourceIdx, setSourceIdx] = useState(0)
   const [failed, setFailed] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   function handleError() {
     if (sourceIdx < sources.length - 1) {
@@ -33,9 +37,12 @@ export default function YouTubeThumbnail({
     }
   }
 
+  // Gradient fallback — always visible behind the image
+  const gradientBg = 'bg-gradient-to-br from-[#0c1e4a] via-[#162d6b] to-[#0a1535]'
+
   if (failed) {
     return (
-      <div className={`flex items-center justify-center bg-gradient-to-br from-[#0c1e4a] via-[#162d6b] to-[#0a1535] ${className}`}>
+      <div className={`flex items-center justify-center ${gradientBg} ${className}`}>
         <div className="flex flex-col items-center gap-3 px-6 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20 border border-blue-400/20">
             <svg viewBox="0 0 24 24" className="h-6 w-6 fill-blue-400">
@@ -49,12 +56,17 @@ export default function YouTubeThumbnail({
   }
 
   return (
-    <img
-      src={sources[sourceIdx]}
-      alt={title}
-      onError={handleError}
-      loading="lazy"
-      className={className}
-    />
+    <div className={`relative ${gradientBg} ${className}`}>
+      <img
+        src={sources[sourceIdx]}
+        alt={title}
+        onError={handleError}
+        onLoad={() => setLoaded(true)}
+        loading="lazy"
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
+    </div>
   )
 }

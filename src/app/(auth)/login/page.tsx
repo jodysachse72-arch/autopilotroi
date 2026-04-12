@@ -19,27 +19,21 @@ function LoginForm() {
   const isConfigured =
     process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
 
+  // ── Demo accounts always available (even when Supabase is configured) ──
+  const DEMO_ACCOUNTS: Record<string, { password: string; role: string; name: string }> = {
+    'admin@autopilotroi.com': { password: 'Admin2026!', role: 'admin', name: 'Admin User' },
+    'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    if (!isConfigured) {
-      // ── Demo mode: validate against test accounts ──
-      const DEMO_ACCOUNTS: Record<string, { password: string; role: string; name: string }> = {
-        'admin@autopilotroi.com': { password: 'Admin2026!', role: 'admin', name: 'Admin User' },
-        'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
-      }
-
-      const account = DEMO_ACCOUNTS[email.toLowerCase()]
-
-      if (!account) {
-        setError('No account found with that email. Try admin@autopilotroi.com or partner@autopilotroi.com')
-        setLoading(false)
-        return
-      }
-
-      if (account.password !== password) {
+    // ── Step 1: Try demo accounts first (always available) ──
+    const demoAccount = DEMO_ACCOUNTS[email.toLowerCase()]
+    if (demoAccount) {
+      if (demoAccount.password !== password) {
         setError('Invalid password. Please try again.')
         setLoading(false)
         return
@@ -47,14 +41,21 @@ function LoginForm() {
 
       localStorage.setItem(
         'autopilotroi-demo-user',
-        JSON.stringify({ email, role: account.role, name: account.name })
+        JSON.stringify({ email, role: demoAccount.role, name: demoAccount.name })
       )
 
-      if (account.role === 'admin') {
+      if (demoAccount.role === 'admin') {
         router.push('/admin')
       } else {
         router.push('/dashboard')
       }
+      return
+    }
+
+    // ── Step 2: Try Supabase auth (if configured) ──
+    if (!isConfigured) {
+      setError('No account found with that email. Try admin@autopilotroi.com or partner@autopilotroi.com')
+      setLoading(false)
       return
     }
 
@@ -114,8 +115,7 @@ function LoginForm() {
           Log in to your AutoPilot ROI account
         </p>
 
-        {!isConfigured && (
-          <div className="mb-6 rounded-lg border border-blue-400/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
+        <div className="mb-6 rounded-lg border border-blue-400/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
             <strong className="text-blue-300">📋 Test Accounts</strong>
             <div className="mt-2 space-y-1.5 text-xs font-mono">
               <div className="flex items-center justify-between rounded bg-white/5 px-2 py-1">
@@ -128,7 +128,6 @@ function LoginForm() {
               </div>
             </div>
           </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
