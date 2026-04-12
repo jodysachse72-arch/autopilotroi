@@ -103,12 +103,13 @@ export default function HomePage() {
               custom={3}
               className="mt-10 flex flex-wrap items-center gap-5"
             >
-              <Link
-                href="/signup"
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-blue-600 px-8 py-4 text-[1.05rem] font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-0.5 hover:shadow-blue-600/50"
-              >
-                Start Here →
-                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              <Link href="/signup">
+                <ShimmerButton
+                  id="hero-start-here"
+                  className="text-[1.05rem]"
+                >
+                  Start Here →
+                </ShimmerButton>
               </Link>
 
               <VideoModal videoUrl={VIDEO_URL} ctaLabel="Ready to Get Started? →" ctaHref="/signup">

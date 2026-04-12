@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -15,22 +16,22 @@ const isConfigured = SANITY_PROJECT_ID !== 'placeholder' && SANITY_PROJECT_ID.le
 
 const tutorialVideos = [
   {
-    title: 'What is Sanity CMS?',
-    desc: 'Official introduction to Sanity — what it is, why developers love it, and how it powers modern content.',
-    videoId: 'Rx6IABKJH0I',
-    duration: '10 min',
+    title: 'Sanity.io Crash Course | Headless CMS',
+    desc: 'Complete crash course covering setup, schemas, GROQ queries, and deploying your first Sanity project.',
+    videoId: '32RP-sG1njE',
+    duration: '60 min',
   },
   {
-    title: 'Sanity Studio Walkthrough',
+    title: 'Getting Started with Sanity',
     desc: 'How to navigate the Studio, create content, manage schemas, and publish changes.',
     videoId: '2ceM_tSus_M',
     duration: '28 min',
   },
   {
-    title: 'Content Operations Deep Dive',
+    title: 'Sanity Crash Course: Learn The Basics in 20 Minutes',
     desc: 'Day-to-day content editing workflows — creating posts, managing media, scheduling, and collaboration.',
     videoId: 'bDVAQZVeebw',
-    duration: '45 min',
+    duration: '20 min',
   },
 ]
 
@@ -62,6 +63,8 @@ const quickStartSteps = [
 ]
 
 export default function CMSHubPage() {
+  const [playingId, setPlayingId] = useState<string | null>(null)
+
   return (
     <div className="mx-auto max-w-6xl space-y-8">
       {/* Status Banner */}
@@ -146,32 +149,42 @@ export default function CMSHubPage() {
               transition={{ delay: 0.3 + i * 0.1 }}
               className="group overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] transition hover:border-blue-500/30"
             >
-              {/* YouTube Thumbnail */}
-              <a
-                href={`https://www.youtube.com/watch?v=${video.videoId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative block aspect-video bg-slate-900 overflow-hidden"
-              >
-                <img
-                  src={`https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`}
-                  alt={video.title}
-                  className="h-full w-full object-cover opacity-80 transition group-hover:opacity-100 group-hover:scale-105"
-                  loading="lazy"
-                />
-                {/* Play overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-600/90 shadow-lg transition group-hover:scale-110">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 ml-0.5 fill-white">
-                      <path d="M8 5.14v14l11-7-11-7z" />
-                    </svg>
-                  </div>
-                </div>
-                {/* Duration badge */}
-                <span className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-semibold text-white">
-                  {video.duration}
-                </span>
-              </a>
+              {/* YouTube Player / Thumbnail */}
+              <div className="relative aspect-video bg-slate-900 overflow-hidden">
+                {playingId === video.videoId ? (
+                  <>
+                    <iframe
+                      src={`https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`}
+                      title={video.title}
+                      className="absolute inset-0 h-full w-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                    <button
+                      onClick={() => setPlayingId(null)}
+                      className="absolute right-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white text-xs hover:bg-black/90 transition"
+                    >
+                      ✕
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={() => setPlayingId(video.videoId)} className="relative h-full w-full cursor-pointer">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`}
+                      alt={video.title}
+                      className="h-full w-full object-cover opacity-80 transition group-hover:opacity-100 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-600/90 shadow-lg transition group-hover:scale-110">
+                        <svg viewBox="0 0 24 24" className="h-6 w-6 ml-0.5 fill-white"><path d="M8 5.14v14l11-7-11-7z" /></svg>
+                      </div>
+                    </div>
+                    <span className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-semibold text-white">{video.duration}</span>
+                  </button>
+                )}
+              </div>
               {/* Info */}
               <div className="p-4">
                 <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">{video.title}</h3>

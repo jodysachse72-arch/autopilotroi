@@ -16,7 +16,8 @@ const sidebarLinks = [
   { id: 'admin-features', label: 'Features', href: '/admin/features', icon: '🎛️' },
   { id: 'admin-guide', label: 'Guide', href: '/admin/guide', icon: '📖' },
   { id: 'admin-cms', label: 'CMS Studio', href: '/admin/cms', icon: '🎨' },
-  { id: 'admin-settings', label: 'Settings', href: '/admin/settings', icon: '⚙️' },
+  { id: 'admin-emails', label: 'Emails', href: '/admin/emails', icon: '✉️' },
+  { id: 'admin-settings', label: 'Integrations', href: '/admin/settings', icon: '⚙️' },
 ]
 
 /* ── Admin Panel Tour Steps ── */
