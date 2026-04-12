@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit'
 
 // Use service-level client for public lead creation (bypasses RLS)
 function getServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key || url === 'placeholder' || key === 'placeholder') {
+    return null // Supabase not configured
+  }
+
+  // Dynamic import to avoid build errors when supabase isn't installed
+  const { createClient } = require('@supabase/supabase-js')
   return createClient(url, key)
 }
 
@@ -68,6 +74,19 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceClient()
 
+    // ── Fallback: Supabase not configured → demo/local mode ──
+    if (!supabase) {
+      console.log('[Leads] Supabase not configured — using demo mode for:', email)
+      const demoId = `demo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+      return NextResponse.json({
+        success: true,
+        leadId: demoId,
+        alreadyAssessed: false,
+        demo: true,
+      })
+    }
+
+    // ── Production: Use Supabase ──
     // Check if lead already exists
     const { data: existing } = await supabase
       .from('leads')

@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { getPartnerByReferralCode } from '@/lib/partners'
 
 function getServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !key || url === 'placeholder' || key === 'placeholder') {
+    return null
+  }
+
+  const { createClient } = require('@supabase/supabase-js')
   return createClient(url, key)
 }
 
@@ -22,6 +27,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceClient()
 
+    // ── Fallback: Supabase not configured → demo mode ──
+    if (!supabase) {
+      console.log('[Leads/Assess] Demo mode — score:', readinessScore, 'tier:', readinessTier)
+      return NextResponse.json({ success: true, demo: true })
+    }
+
+    // ── Production: Use Supabase ──
     // Update the lead record with assessment results
     const { error } = await supabase
       .from('leads')

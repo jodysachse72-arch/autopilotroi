@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 
 function getServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key || url === 'placeholder' || key === 'placeholder') return null
+  const { createClient } = require('@supabase/supabase-js')
   return createClient(url, key)
 }
+
+const DB_UNAVAILABLE = NextResponse.json(
+  { error: 'Database not configured. Partners require Supabase.' },
+  { status: 503 }
+)
 
 // GET — list all partners
 export async function GET() {
   try {
     const supabase = getServiceClient()
+    if (!supabase) return DB_UNAVAILABLE
     const { data, error } = await supabase
       .from('partners')
       .select('*')
@@ -40,6 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getServiceClient()
+    if (!supabase) return DB_UNAVAILABLE
 
     const { data, error } = await supabase
       .from('partners')
@@ -80,6 +88,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const supabase = getServiceClient()
+    if (!supabase) return DB_UNAVAILABLE
 
     const { error } = await supabase
       .from('partners')
