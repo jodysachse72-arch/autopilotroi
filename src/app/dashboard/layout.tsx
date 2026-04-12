@@ -1,16 +1,89 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { LogoIcon } from '@/components/ui/Logo'
+import GuidedTour, { type TourStep } from '@/components/ui/GuidedTour'
 
 const sidebarLinks = [
-  { label: 'Overview', href: '/dashboard', icon: '📊' },
-  { label: 'Prospects', href: '/dashboard/prospects', icon: '👥' },
-  { label: 'Performance', href: '/dashboard/performance', icon: '📈' },
-  { label: 'Leaderboard', href: '/dashboard/leaderboard', icon: '🏆' },
-  { label: 'Referral Links', href: '/dashboard/links', icon: '🔗' },
-  { label: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
+  { id: 'nav-overview', label: 'Overview', href: '/dashboard', icon: '📊' },
+  { id: 'nav-prospects', label: 'Prospects', href: '/dashboard/prospects', icon: '👥' },
+  { id: 'nav-performance', label: 'Performance', href: '/dashboard/performance', icon: '📈' },
+  { id: 'nav-leaderboard', label: 'Leaderboard', href: '/dashboard/leaderboard', icon: '🏆' },
+  { id: 'nav-links', label: 'Referral Links', href: '/dashboard/links', icon: '🔗' },
+  { id: 'nav-settings', label: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
+]
+
+/* ── Partner Dashboard Tour Steps ── */
+const PARTNER_TOUR: TourStep[] = [
+  {
+    target: null,
+    title: 'Welcome to Partner Hub',
+    content: 'This is your command center for tracking referrals, monitoring performance, and growing your team.\n\nLet\'s take a quick look around — it\'ll take less than 60 seconds.',
+    icon: '🚀',
+    position: 'center',
+  },
+  {
+    target: '#nav-overview',
+    title: 'Dashboard Overview',
+    content: 'Your home base. See total prospects, conversion rates, and recent activity at a glance.',
+    icon: '📊',
+    position: 'right',
+    actionHint: 'This is where you\'ll spend most of your time',
+  },
+  {
+    target: '#nav-prospects',
+    title: 'Your Prospects',
+    content: 'Everyone who signed up through your referral link appears here. Track their readiness score, tier, and onboarding status.',
+    icon: '👥',
+    position: 'right',
+    actionHint: 'Follow up with prospects who scored high on readiness',
+  },
+  {
+    target: '#nav-performance',
+    title: 'Performance Analytics',
+    content: 'Deep-dive into your referral performance — click-through rates, conversion funnels, and which content drives the most signups.',
+    icon: '📈',
+    position: 'right',
+  },
+  {
+    target: '#nav-leaderboard',
+    title: 'Team Leaderboard',
+    content: 'See how you rank among other partners. Top performers get featured prominently and earn bonus rewards.',
+    icon: '🏆',
+    position: 'right',
+    actionHint: 'Gamification drives healthy competition',
+  },
+  {
+    target: '#nav-links',
+    title: 'Your Referral Links',
+    content: 'Generate, copy, and manage your unique referral links. Each link is tracked — share them on social media, email, or direct messages.',
+    icon: '🔗',
+    position: 'right',
+    actionHint: 'Pro tip: Use different links for different platforms to track what works best',
+  },
+  {
+    target: '#nav-settings',
+    title: 'Account Settings',
+    content: 'Update your profile, notification preferences, and payout information here.',
+    icon: '⚙️',
+    position: 'right',
+  },
+  {
+    target: '#partner-badge',
+    title: 'Your Role Badge',
+    content: 'This badge shows your current role and access level. As you grow, you\'ll unlock additional features and tools.',
+    icon: '🏅',
+    position: 'bottom',
+  },
+  {
+    target: null,
+    title: 'You\'re All Set!',
+    content: 'That\'s the full tour. You can replay this anytime from the dashboard header.\n\nNow go share your referral link and start building! 💪',
+    icon: '🎯',
+    position: 'center',
+  },
 ]
 
 export default function DashboardLayout({
@@ -19,6 +92,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const [showTour, setShowTour] = useState(false)
 
   return (
     <div className="min-h-screen flex">
@@ -42,6 +116,7 @@ export default function DashboardLayout({
             return (
               <Link
                 key={link.href}
+                id={link.id}
                 href={link.href}
                 className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
                   isActive
@@ -80,8 +155,15 @@ export default function DashboardLayout({
               Partner Dashboard
             </h1>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold text-blue-400">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowTour(true)}
+              className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+              title="Take a guided tour of the dashboard"
+            >
+              🗺️ Tour
+            </button>
+            <span id="partner-badge" className="rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold text-blue-400">
               Partner
             </span>
           </div>
@@ -111,6 +193,15 @@ export default function DashboardLayout({
         {/* Page content */}
         <main className="flex-1 p-6 lg:p-8">{children}</main>
       </div>
+
+      {/* Partner Tour */}
+      <GuidedTour
+        tourId="partner-dashboard"
+        steps={PARTNER_TOUR}
+        autoStart={true}
+        forceShow={showTour}
+        onComplete={() => setShowTour(false)}
+      />
     </div>
   )
 }

@@ -1,19 +1,109 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { LogoIcon } from '@/components/ui/Logo'
+import GuidedTour, { type TourStep } from '@/components/ui/GuidedTour'
 
 const sidebarLinks = [
-  { label: 'Dashboard', href: '/admin', icon: '📊' },
-  { label: 'Partners', href: '/admin/partners', icon: '🤝' },
-  { label: 'Prospects', href: '/admin/prospects', icon: '👥' },
-  { label: 'Strategy', href: '/admin/roadmap', icon: '🗺️' },
-  { label: 'Changelog', href: '/admin/changelog', icon: '📝' },
-  { label: 'Checklist', href: '/admin/checklist', icon: '✅' },
-  { label: 'Features', href: '/admin/features', icon: '🎛️' },
-  { label: 'Guide', href: '/admin/guide', icon: '📖' },
-  { label: 'CMS Studio', href: '/studio', icon: '🎨' },
-  { label: 'Settings', href: '/admin/settings', icon: '⚙️' },
+  { id: 'admin-dashboard', label: 'Dashboard', href: '/admin', icon: '📊' },
+  { id: 'admin-partners', label: 'Partners', href: '/admin/partners', icon: '🤝' },
+  { id: 'admin-prospects', label: 'Prospects', href: '/admin/prospects', icon: '👥' },
+  { id: 'admin-strategy', label: 'Strategy', href: '/admin/roadmap', icon: '🗺️' },
+  { id: 'admin-changelog', label: 'Changelog', href: '/admin/changelog', icon: '📝' },
+  { id: 'admin-checklist', label: 'Checklist', href: '/admin/checklist', icon: '✅' },
+  { id: 'admin-features', label: 'Features', href: '/admin/features', icon: '🎛️' },
+  { id: 'admin-guide', label: 'Guide', href: '/admin/guide', icon: '📖' },
+  { id: 'admin-cms', label: 'CMS Studio', href: '/studio', icon: '🎨' },
+  { id: 'admin-settings', label: 'Settings', href: '/admin/settings', icon: '⚙️' },
+]
+
+/* ── Admin Panel Tour Steps ── */
+const ADMIN_TOUR: TourStep[] = [
+  {
+    target: null,
+    title: 'Welcome to the Admin Panel',
+    content: 'This is the nerve center of AutopilotROI. From here you control every feature, manage partners, track prospects, and monitor system health.\n\nLet me show you around.',
+    icon: '🛡️',
+    position: 'center',
+  },
+  {
+    target: '#admin-dashboard',
+    title: 'Admin Dashboard',
+    content: 'High-level overview of key metrics — total signups, active partners, conversion rates, and system health at a glance.',
+    icon: '📊',
+    position: 'right',
+    actionHint: 'Start your day here to catch anything that needs attention',
+  },
+  {
+    target: '#admin-partners',
+    title: 'Partner Management',
+    content: 'Add, edit, activate, or deactivate partners. Each partner gets a unique referral code. You can view their prospect pipeline and performance.',
+    icon: '🤝',
+    position: 'right',
+    actionHint: 'This is where you onboard new team leaders',
+  },
+  {
+    target: '#admin-prospects',
+    title: 'Prospect Pipeline',
+    content: 'Every person who enters the funnel appears here with their readiness score and tier (🌱 Guided, ⚡ Ready, 🚀 Advanced). Filter, search, and follow up.',
+    icon: '👥',
+    position: 'right',
+  },
+  {
+    target: '#admin-features',
+    title: 'Feature Flags (Kill Switches)',
+    content: 'This is one of the most powerful tools. Turn any feature ON or OFF instantly — no code deploy needed.\n\nExit intent popups too aggressive? Turn them off. Want to test social proof? Toggle it on.\n\nEach flag has a tooltip explaining what it does and when to use it.',
+    icon: '🎛️',
+    position: 'right',
+    actionHint: 'Every toggle takes effect immediately across the entire site',
+  },
+  {
+    target: '#admin-strategy',
+    title: 'Strategy & Roadmap',
+    content: 'See the competitive analysis, cost savings breakdown, and the full phase roadmap. Shows what\'s been built, what\'s next, and estimated costs.',
+    icon: '🗺️',
+    position: 'right',
+  },
+  {
+    target: '#admin-changelog',
+    title: 'Changelog',
+    content: 'A living document of every feature, fix, and improvement that\'s been shipped. Organized by date with categorized entries (feature, fix, enhancement, security).',
+    icon: '📝',
+    position: 'right',
+    actionHint: 'Share this with stakeholders to show progress',
+  },
+  {
+    target: '#admin-checklist',
+    title: 'Launch Checklist',
+    content: 'Pre-launch readiness checklist. Go through each item before going live — DNS, SSL, Supabase, Sentry, analytics, legal pages, and more.',
+    icon: '✅',
+    position: 'right',
+    actionHint: 'Check items off as you complete them',
+  },
+  {
+    target: '#admin-guide',
+    title: 'Platform Guide',
+    content: 'Interactive documentation for non-technical users. Explains every feature in plain English with expandable sections. Share this with team members who need to understand the platform.',
+    icon: '📖',
+    position: 'right',
+  },
+  {
+    target: '#admin-cms',
+    title: 'CMS Studio (Sanity)',
+    content: 'Opens the content management system where you can create blog posts, manage university videos, and edit page content — all without touching code.',
+    icon: '🎨',
+    position: 'right',
+    actionHint: 'Opens in a new tab — that\'s normal',
+  },
+  {
+    target: null,
+    title: 'You\'re in Control',
+    content: 'That\'s the full admin tour. Remember:\n\n• Feature Flags = instant ON/OFF for any feature\n• Checklist = make sure nothing is missed\n• Guide = share with anyone who needs to learn the platform\n\nYou can replay this tour anytime from the header. 🎯',
+    icon: '🏆',
+    position: 'center',
+  },
 ]
 
 export default function AdminLayout({
@@ -22,6 +112,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const [showTour, setShowTour] = useState(false)
 
   return (
     <div className="min-h-screen flex">
@@ -29,9 +120,7 @@ export default function AdminLayout({
       <aside className="hidden lg:flex w-64 flex-col border-r border-[var(--border-primary)] bg-[var(--bg-card)]">
         <div className="flex h-[4.8rem] items-center px-6 border-b border-[var(--border-primary)]">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20">
-              <span className="text-sm">🛡️</span>
-            </div>
+            <LogoIcon size={32} />
             <span className="font-[var(--font-sora)] text-lg font-semibold">
               <span className="text-[var(--text-primary)]">Admin</span>
               <span className="text-red-400"> Panel</span>
@@ -48,6 +137,7 @@ export default function AdminLayout({
             return (
               <Link
                 key={link.href}
+                id={link.id}
                 href={link.href}
                 className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
                   isActive
@@ -85,14 +175,23 @@ export default function AdminLayout({
               System Administration
             </h1>
           </div>
-          <span className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-400">
-            Admin
-          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowTour(true)}
+              className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+              title="Take a guided tour of the admin panel"
+            >
+              🗺️ Tour
+            </button>
+            <span id="admin-badge" className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-400">
+              Admin
+            </span>
+          </div>
         </header>
 
         {/* Mobile nav */}
         <nav className="flex lg:hidden overflow-x-auto border-b border-[var(--border-primary)] bg-[var(--bg-card)] px-4 scrollbar-hide">
-          {sidebarLinks.slice(0, 4).map((link) => {
+          {sidebarLinks.slice(0, 5).map((link) => {
             const isActive =
               link.href === '/admin' ? pathname === '/admin' : pathname.startsWith(link.href)
             return (
@@ -114,6 +213,15 @@ export default function AdminLayout({
 
         <main className="flex-1 p-6 lg:p-8">{children}</main>
       </div>
+
+      {/* Admin Tour */}
+      <GuidedTour
+        tourId="admin-panel"
+        steps={ADMIN_TOUR}
+        autoStart={true}
+        forceShow={showTour}
+        onComplete={() => setShowTour(false)}
+      />
     </div>
   )
 }
