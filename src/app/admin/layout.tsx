@@ -15,7 +15,7 @@ const sidebarLinks = [
   { id: 'admin-checklist', label: 'Checklist', href: '/admin/checklist', icon: '✅' },
   { id: 'admin-features', label: 'Features', href: '/admin/features', icon: '🎛️' },
   { id: 'admin-guide', label: 'Guide', href: '/admin/guide', icon: '📖' },
-  { id: 'admin-cms', label: 'CMS Studio', href: '/studio', icon: '🎨' },
+  { id: 'admin-cms', label: 'CMS Studio', href: '/admin/cms', icon: '🎨' },
   { id: 'admin-settings', label: 'Settings', href: '/admin/settings', icon: '⚙️' },
 ]
 

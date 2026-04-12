@@ -610,6 +610,146 @@ export default function EvaluatePage() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* ═══════════════════════════════════════════════
+          WHY AUTOPILOTROI CHOSE AURUM
+      ═══════════════════════════════════════════════ */}
+      <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="text-center mb-12">
+            <span className="inline-block rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-emerald-300 mb-4">
+              Our Due Diligence
+            </span>
+            <h2 className="font-[var(--font-sora)] text-3xl font-bold text-white sm:text-4xl lg:text-5xl tracking-tight">
+              Why We Chose <span className="text-emerald-400">Aurum</span>
+            </h2>
+            <p className="mt-4 mx-auto max-w-2xl text-lg leading-relaxed text-blue-100/60">
+              We evaluated dozens of opportunities using the same Trust Check framework above.
+              Aurum Foundation wasn&apos;t just a good score — it was the best we found. Here&apos;s why.
+            </p>
+          </div>
+
+          {/* Verification grid */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: '💰',
+                title: 'Real Revenue Model',
+                desc: 'Aurum earns through exchange fees, AI bot subscriptions, Neo-Bank services, and card transactions — not through recruitment.',
+                color: 'emerald',
+              },
+              {
+                icon: '🔍',
+                title: 'Fully Transparent',
+                desc: 'Named CEO (Bryan Benson, ex-Binance), registered in Hong Kong (Cert #77289699), public team with verifiable LinkedIn profiles.',
+                color: 'blue',
+              },
+              {
+                icon: '🛡️',
+                title: '3 International Licenses',
+                desc: 'Regulated across multiple jurisdictions. Contracts with leading exchanges for secure, compliant custodial services.',
+                color: 'blue',
+              },
+              {
+                icon: '🤖',
+                title: '5 Real Tech Products',
+                desc: 'Ex-AI Bot, Zeus AI Bot, NeoBank, Exchange, and Crypto Cards — all functional, all generating real value.',
+                color: 'emerald',
+              },
+              {
+                icon: '📰',
+                title: 'Global Media Coverage',
+                desc: 'Featured in Forbes, Entrepreneur, Cointelegraph, Benzinga, Bitcoin.com, Crypto.news, and Hackernoon.',
+                color: 'blue',
+              },
+              {
+                icon: '🌍',
+                title: '18,000+ Active Partners',
+                desc: '$30M+ assets under management. A growing global ecosystem — not a promise, but measurable traction.',
+                color: 'emerald',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className={`rounded-2xl border p-6 transition hover:scale-[1.02] ${
+                  item.color === 'emerald'
+                    ? 'border-emerald-500/20 bg-emerald-500/5'
+                    : 'border-blue-500/20 bg-blue-500/5'
+                }`}
+              >
+                <div className="text-2xl mb-3">{item.icon}</div>
+                <h3 className="font-[var(--font-sora)] text-base font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-blue-100/60">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════
+          TEAM CREDIBILITY
+      ═══════════════════════════════════════════════ */}
+      <div className="mx-auto max-w-5xl px-6 pb-20 lg:px-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="text-center mb-10">
+            <h3 className="font-[var(--font-sora)] text-2xl font-bold text-white sm:text-3xl tracking-tight">
+              Built by Industry Veterans
+            </h3>
+            <p className="mt-3 text-blue-100/50 text-base">
+              The team behind Aurum brings decades of leadership from Binance, global network development, and fintech.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              {
+                name: 'Bryan Benson',
+                role: 'Chief Executive Officer',
+                bio: 'Web3 expert with 27 years of experience. Previously led Binance\'s expansion in Latin America. Responsible for strategic growth and bridging traditional and decentralized finance.',
+                icon: '👤',
+              },
+              {
+                name: 'Shane Morand',
+                role: 'Chief Network Dev Officer',
+                bio: 'Global business leader with decades of experience in network development and large-scale growth systems. Leads scalable systems and long-term ecosystem growth strategy.',
+                icon: '👤',
+              },
+              {
+                name: 'Ahmad Zen',
+                role: 'Co-Founder & Marketing Director',
+                bio: '15+ years of expertise in network marketing and cryptocurrency. Proven track record driving campaigns across fintech and blockchain sectors, boosting Aurum\'s global growth.',
+                icon: '👤',
+              },
+            ].map((person) => (
+              <div
+                key={person.name}
+                className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-center transition hover:border-blue-500/30 hover:bg-white/[0.04]"
+              >
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 text-3xl">
+                  {person.icon}
+                </div>
+                <h4 className="font-[var(--font-sora)] text-lg font-bold text-white">{person.name}</h4>
+                <p className="text-xs font-semibold uppercase tracking-widest text-blue-400/70 mt-1">{person.role}</p>
+                <p className="mt-3 text-sm leading-relaxed text-blue-100/50">{person.bio}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-8 text-center text-xs text-white/20">
+            Full team details available at <a href="https://aurum.foundation/en#team" target="_blank" rel="noopener noreferrer" className="text-blue-400/40 hover:text-blue-400/60 transition underline">aurum.foundation</a>
+          </p>
+        </motion.div>
+      </div>
     </div>
   )
 }

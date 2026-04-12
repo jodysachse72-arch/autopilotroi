@@ -24,14 +24,23 @@ export default function Navbar() {
 
   // Check for demo user (replaced by real Supabase auth when configured)
   useEffect(() => {
-    try {
-      const demo = localStorage.getItem('autopilotroi-demo-user')
-      if (demo) {
-        const parsed = JSON.parse(demo)
-        setUserRole(parsed.role || 'prospect')
-        setUserName(parsed.name || parsed.email || '')
-      }
-    } catch {}
+    const loadUser = () => {
+      try {
+        const demo = localStorage.getItem('autopilotroi-demo-user')
+        if (demo) {
+          const parsed = JSON.parse(demo)
+          setUserRole(parsed.role || 'prospect')
+          setUserName(parsed.name || parsed.email || '')
+        } else {
+          setUserRole(null)
+          setUserName('')
+        }
+      } catch {}
+    }
+    loadUser()
+    // Sync across tabs when another tab logs in/out
+    window.addEventListener('storage', loadUser)
+    return () => window.removeEventListener('storage', loadUser)
   }, [])
 
   // Don't show navbar on dashboard/admin/auth routes
@@ -183,6 +192,15 @@ export default function Navbar() {
                       className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block"
                     >
                       📊 Dashboard
+                    </Link>
+                  )}
+                  {userRole === 'admin' && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setMenuOpen(false)}
+                      className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block"
+                    >
+                      🛡️ Admin Panel
                     </Link>
                   )}
                   <button

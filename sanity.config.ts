@@ -9,7 +9,7 @@ export default defineConfig({
   name: 'autopilotroi',
   title: 'AutoPilot ROI CMS',
 
-  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? 'placeholder',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? 'gnd0za31',
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production',
 
   plugins: [structureTool(), visionTool()],

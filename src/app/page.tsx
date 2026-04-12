@@ -78,10 +78,10 @@ export default function HomePage() {
               custom={1}
               className="text-[2.8rem] font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-[3.8rem]"
             >
-              A Smarter Entry Point
+              Automated Wealth Building
               <br />
               <span className="bg-gradient-to-r from-blue-300 via-blue-200 to-white bg-clip-text text-transparent">
-                Into AI-Driven Finance
+                Starts Here
               </span>
             </motion.h1>
 
@@ -134,7 +134,7 @@ export default function HomePage() {
               custom={4}
               className="mt-10 flex items-center gap-6 text-xs text-blue-300/60 font-medium"
             >
-              {["No Credit Card Required", "Free to Get Started", "Trusted by 10,000+ Users"].map((t) => (
+              {["No Credit Card Required", "Free to Get Started", "18,000+ Active Partners Worldwide"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <svg className="h-3 w-3 text-blue-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -199,6 +199,57 @@ export default function HomePage() {
               </div>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          AURUM METRICS BAR + CTA
+      ═══════════════════════════════════════════════ */}
+      <section className="relative z-10 border-t border-blue-500/10 bg-[#040e2d] px-6 py-10 lg:px-10">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col items-center gap-8 lg:flex-row lg:justify-between">
+            {/* Metrics */}
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+              {[
+                { value: '18,000+', label: 'Active Partners' },
+                { value: '$30M+', label: 'Assets Managed' },
+                { value: '5', label: 'Tech Products' },
+                { value: '3', label: 'Int\'l Licenses' },
+              ].map((m) => (
+                <div key={m.label} className="text-center">
+                  <div className="font-[var(--font-sora)] text-2xl font-bold text-white">{m.value}</div>
+                  <div className="text-xs font-medium uppercase tracking-widest text-blue-300/50">{m.label}</div>
+                </div>
+              ))}
+            </div>
+            {/* CTA */}
+            <Link
+              href="/signup"
+              className="group relative overflow-hidden rounded-lg bg-blue-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-0.5 hover:shadow-blue-600/50"
+            >
+              Get Started Free →
+              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          AS SEEN IN — Media Logos
+      ═══════════════════════════════════════════════ */}
+      <section className="relative z-10 border-b border-white/5 bg-[#061238] px-6 py-8 lg:px-10">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.25em] text-blue-300/40">As Seen In</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+            {['Forbes', 'Cointelegraph', 'Benzinga', 'Bitcoin.com', 'Entrepreneur', 'Hackernoon', 'Crypto.news'].map((name) => (
+              <span
+                key={name}
+                className="font-[var(--font-sora)] text-sm font-bold tracking-wide text-white/20 transition hover:text-white/40"
+              >
+                {name}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
