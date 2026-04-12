@@ -10,6 +10,11 @@ import { ThreeDCard } from "@/components/ui/three-d-card";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { Meteors } from "@/components/ui/meteors";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+import { NumberTicker } from "@/components/ui/number-ticker";
+import { Marquee } from "@/components/ui/marquee";
+import { MagicCard } from "@/components/ui/magic-card";
+import { ShineBorder } from "@/components/ui/shine-border";
 import YouTubeThumbnail from "@/components/ui/YouTubeThumbnail";
 import SocialProof from "@/components/sections/SocialProof";
 import ExitIntentPopup from "@/components/ui/ExitIntentPopup";
@@ -65,10 +70,12 @@ export default function HomePage() {
               initial="hidden"
               animate="show"
               custom={0}
-              className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-300"
+              className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
-              AI-Powered Finance Platform
+              <AnimatedShinyText className="text-blue-300">
+                AI-Powered Finance Platform
+              </AnimatedShinyText>
             </motion.div>
 
             <motion.h1
@@ -207,10 +214,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {[
-              { value: '18,000+', label: 'Active Partners' },
-              { value: '$30M+', label: 'Assets Managed' },
-              { value: '5', label: 'Tech Products' },
-              { value: '3', label: "Int'l Licenses" },
+              { value: 18000, label: 'Active Partners', suffix: '+', prefix: '' },
+              { value: 30, label: 'Assets Managed', suffix: 'M+', prefix: '$' },
+              { value: 5, label: 'Tech Products', suffix: '', prefix: '' },
+              { value: 3, label: "Int'l Licenses", suffix: '', prefix: '' },
             ].map((m, i) => (
               <motion.div
                 key={m.label}
@@ -222,7 +229,7 @@ export default function HomePage() {
                 className="text-center"
               >
                 <div className="font-[var(--font-sora)] text-3xl font-extrabold sm:text-4xl lg:text-5xl bg-gradient-to-b from-white via-blue-100 to-blue-300/60 bg-clip-text text-transparent">
-                  {m.value}
+                  <NumberTicker value={m.value} prefix={m.prefix} suffix={m.suffix} delay={0.2 + i * 0.15} />
                 </div>
                 <div className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/40">{m.label}</div>
               </motion.div>
@@ -237,32 +244,26 @@ export default function HomePage() {
       <section className="relative z-10 bg-[#f8fafc] dark:bg-[#050f2e] border-t border-b border-slate-200 dark:border-white/5 px-6 py-10 lg:px-10">
         <div className="mx-auto max-w-5xl">
           <p className="mb-6 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-blue-300/40">As Seen In</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
-            {/* Forbes */}
-            <svg className="h-6 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 40" fill="currentColor">
+          <Marquee pauseOnHover gap="3rem" duration="30s" className="[--marquee-gap:3rem]">
+            <svg className="h-6 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 40" fill="currentColor">
               <text x="0" y="32" fontFamily="Georgia, serif" fontWeight="700" fontSize="36" letterSpacing="-1">Forbes</text>
             </svg>
-            {/* Cointelegraph */}
-            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 200 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 200 30" fill="currentColor">
               <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="22" letterSpacing="0">Cointelegraph</text>
             </svg>
-            {/* Benzinga */}
-            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 30" fill="currentColor">
               <text x="0" y="24" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="24" letterSpacing="-0.5">BENZINGA</text>
             </svg>
-            {/* Bitcoin.com */}
-            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 160 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 160 30" fill="currentColor">
               <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="22">Bitcoin.com</text>
             </svg>
-            {/* GlobeNewswire */}
-            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 210 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 210 30" fill="currentColor">
               <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="20" letterSpacing="0">GlobeNewswire</text>
             </svg>
-            {/* Hackernoon */}
-            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 180 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 180 30" fill="currentColor">
               <text x="0" y="23" fontFamily="monospace" fontWeight="700" fontSize="22">Hackernoon</text>
             </svg>
-          </div>
+          </Marquee>
         </div>
       </section>
 
@@ -293,19 +294,23 @@ export default function HomePage() {
                 whileInView="show"
                 viewport={{ once: true }}
                 custom={i * 0.08}
-                className={`group relative rounded-2xl border ${p.color} p-6 transition-all hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-1`}
+                className={`group relative rounded-2xl border ${p.color} p-0 transition-all hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-1`}
               >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${p.iconBg} text-lg text-white shadow-md`}>
-                    {p.icon}
+                <MagicCard className="rounded-2xl border-0 bg-transparent" gradientColor="#3b82f6" gradientOpacity={0.08}>
+                  <div className="p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${p.iconBg} text-lg text-white shadow-md`}>
+                        {p.icon}
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-900">{p.title}</h3>
+                    </div>
+                    <p className="text-sm leading-relaxed text-slate-500 mb-4">{p.desc}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{p.stat}</span>
+                      <Link href="/products" className="text-xs font-semibold text-blue-600 opacity-0 transition group-hover:opacity-100">Learn More →</Link>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900">{p.title}</h3>
-                </div>
-                <p className="text-sm leading-relaxed text-slate-500 mb-4">{p.desc}</p>
-                <div className="flex items-center justify-between">
-                  <span className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{p.stat}</span>
-                  <Link href="/products" className="text-xs font-semibold text-blue-600 opacity-0 transition group-hover:opacity-100">Learn More →</Link>
-                </div>
+                </MagicCard>
               </motion.div>
             ))}
           </div>
@@ -567,19 +572,21 @@ export default function HomePage() {
               Join thousands of members already building their financial future through the Aurum AI ecosystem — guided every step of the way.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-              <Link
-                href="/signup"
-                className="group relative overflow-hidden rounded-lg bg-[#3b82f6] px-10 py-4 text-[1.05rem] font-semibold text-white shadow-[0_8px_20px_rgba(59,130,246,0.4)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(59,130,246,0.55)]"
+              <ShineBorder
+                borderRadius={12}
+                borderWidth={2}
+                duration={10}
+                color={["#60a5fa", "#a78bfa", "#818cf8"]}
+                className="bg-transparent p-0"
               >
-                <span className="relative z-10">Get Started Free →</span>
-                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-                <BorderBeam
-                  size={120}
-                  duration={8}
-                  colorFrom="#ffffff"
-                  colorTo="#60a5fa"
-                />
-              </Link>
+                <Link
+                  href="/signup"
+                  className="group relative block overflow-hidden rounded-[10px] bg-[#3b82f6] px-10 py-4 text-[1.05rem] font-semibold text-white shadow-[0_8px_20px_rgba(59,130,246,0.4)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_30px_rgba(59,130,246,0.55)]"
+                >
+                  <span className="relative z-10">Get Started Free →</span>
+                  <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                </Link>
+              </ShineBorder>
               <VideoModal videoUrl={VIDEO_URL} ctaLabel="Ready to Get Started? →" ctaHref="/signup">
                 <button className="flex items-center gap-2 rounded-lg border border-blue-300/40 bg-white/5 px-8 py-4 text-[1.05rem] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/10">
                   <svg className="h-4 w-4 fill-white" viewBox="0 0 24 24"><path d="M8 5.14v14l11-7-11-7z" /></svg>

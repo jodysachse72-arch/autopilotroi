@@ -551,3 +551,30 @@ dialog::backdrop {
 .animate-beam-glow {
   animation: beam-glow 2.5s ease-in-out infinite;
 }
+
+/* AnimatedShinyText — light glare sweep */
+@keyframes shiny-text {
+  0%, 90%, 100% { background-position: calc(-100% - var(--shimmer-width)) 0; }
+  30%, 60% { background-position: calc(100% + var(--shimmer-width)) 0; }
+}
+.animate-shiny-text {
+  animation: shiny-text 8s ease-in-out infinite;
+}
+
+/* Marquee — infinite horizontal scroll */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-100% - var(--marquee-gap, 1rem))); }
+}
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+/* Marquee vertical */
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to   { transform: translateY(calc(-100% - var(--marquee-gap, 1rem))); }
+}
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--marquee-duration, 40s) linear infinite;
+}
