@@ -10,6 +10,7 @@ import Logo from '@/components/ui/Logo'
 const publicNav = [
   { label: 'Home', href: '/' },
   { label: 'Products', href: '/products' },
+  { label: 'Calculator', href: '/calculator' },
   { label: 'Trust Check', href: '/evaluate' },
   { label: 'University', href: '/university' },
   { label: 'Blog', href: '/blog' },

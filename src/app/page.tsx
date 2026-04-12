@@ -203,102 +203,134 @@ export default function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════
-          AURUM METRICS BAR + CTA
+          AURUM METRICS BAR
       ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 border-t border-blue-500/10 bg-[#040e2d] px-6 py-10 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col items-center gap-8 lg:flex-row lg:justify-between">
-            {/* Metrics */}
-            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-              {[
-                { value: '18,000+', label: 'Active Partners' },
-                { value: '$30M+', label: 'Assets Managed' },
-                { value: '5', label: 'Tech Products' },
-                { value: '3', label: 'Int\'l Licenses' },
-              ].map((m) => (
-                <div key={m.label} className="text-center">
-                  <div className="font-[var(--font-sora)] text-2xl font-bold text-white">{m.value}</div>
-                  <div className="text-xs font-medium uppercase tracking-widest text-blue-300/50">{m.label}</div>
-                </div>
-              ))}
-            </div>
-            {/* CTA */}
-            <Link
-              href="/signup"
-              className="group relative overflow-hidden rounded-lg bg-blue-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-0.5 hover:shadow-blue-600/50"
-            >
-              Get Started Free →
-              <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════
-          AS SEEN IN — Media Logos
-      ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 border-b border-white/5 bg-[#061238] px-6 py-8 lg:px-10">
-        <div className="mx-auto max-w-5xl text-center">
-          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.25em] text-blue-300/40">As Seen In</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {['Forbes', 'Cointelegraph', 'Benzinga', 'Bitcoin.com', 'Entrepreneur', 'Hackernoon', 'Crypto.news'].map((name) => (
-              <span
-                key={name}
-                className="font-[var(--font-sora)] text-sm font-bold tracking-wide text-white/20 transition hover:text-white/40"
+      <section className="relative z-10 border-t border-blue-500/10 bg-[#040e2d] px-6 py-16 lg:px-10">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+            {[
+              { value: '18,000+', label: 'Active Partners' },
+              { value: '$30M+', label: 'Assets Managed' },
+              { value: '5', label: 'Tech Products' },
+              { value: '3', label: "Int'l Licenses" },
+            ].map((m, i) => (
+              <motion.div
+                key={m.label}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                custom={i * 0.1}
+                className="text-center"
               >
-                {name}
-              </span>
+                <div className="font-[var(--font-sora)] text-3xl font-extrabold sm:text-4xl lg:text-5xl bg-gradient-to-b from-white via-blue-100 to-blue-300/60 bg-clip-text text-transparent">
+                  {m.value}
+                </div>
+                <div className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/40">{m.label}</div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* ═══════════════════════════════════════════════
-          FEATURE STRIP
+          AS SEEN IN — Real SVG Media Logos
       ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 bg-white px-6 py-16 lg:px-10">
-        <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
-          {[
-            {
-              title: "AI Automation",
-              desc: "Automated performance, with advanced crypto-fintech tools.",
-              icon: <BotFeatureIcon />,
-              iconBg: "bg-blue-600",
-              borderColor: "border-blue-100",
-            },
-            {
-              title: "Digital Banking",
-              desc: "Full control of your funds with modern banking features.",
-              icon: <CardFeatureIcon />,
-              iconBg: "bg-violet-600",
-              borderColor: "border-violet-100",
-            },
-            {
-              title: "Crypto Infrastructure",
-              desc: "Access and manage the tools of the new financial system.",
-              icon: <GlobeFeatureIcon />,
-              iconBg: "bg-cyan-600",
-              borderColor: "border-cyan-100",
-            },
-          ].map((f, i) => (
-            <motion.article
-              key={f.title}
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              custom={i * 0.15}
-              className={`flex items-start gap-4 rounded-2xl border ${f.borderColor} bg-white p-6 shadow-[0_4px_24px_rgba(30,50,110,0.06)] transition-shadow hover:shadow-[0_8px_32px_rgba(30,50,110,0.1)]`}
-            >
-              <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${f.iconBg} text-white shadow-lg`}>
-                {f.icon}
+      <section className="relative z-10 bg-[#f8fafc] dark:bg-[#050f2e] border-t border-b border-slate-200 dark:border-white/5 px-6 py-10 lg:px-10">
+        <div className="mx-auto max-w-5xl">
+          <p className="mb-6 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-blue-300/40">As Seen In</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+            {/* Forbes */}
+            <svg className="h-6 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 40" fill="currentColor">
+              <text x="0" y="32" fontFamily="Georgia, serif" fontWeight="700" fontSize="36" letterSpacing="-1">Forbes</text>
+            </svg>
+            {/* Cointelegraph */}
+            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 200 30" fill="currentColor">
+              <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="22" letterSpacing="0">Cointelegraph</text>
+            </svg>
+            {/* Benzinga */}
+            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 30" fill="currentColor">
+              <text x="0" y="24" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="24" letterSpacing="-0.5">BENZINGA</text>
+            </svg>
+            {/* Bitcoin.com */}
+            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 160 30" fill="currentColor">
+              <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="22">Bitcoin.com</text>
+            </svg>
+            {/* GlobeNewswire */}
+            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 210 30" fill="currentColor">
+              <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="20" letterSpacing="0">GlobeNewswire</text>
+            </svg>
+            {/* Hackernoon */}
+            <svg className="h-5 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 180 30" fill="currentColor">
+              <text x="0" y="23" fontFamily="monospace" fontWeight="700" fontSize="22">Hackernoon</text>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
+          PRODUCT ECOSYSTEM
+      ═══════════════════════════════════════════════ */}
+      <section className="relative z-10 bg-white px-6 py-20 lg:px-10">
+        <div className="mx-auto max-w-7xl">
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mb-10 text-center">
+            <span className="inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1 text-xs font-bold uppercase tracking-widest text-blue-600 mb-4">Ecosystem</span>
+            <h2 className="text-[2rem] font-bold tracking-tight text-slate-900 sm:text-[2.6rem]">One Platform. Five Revenue Streams.</h2>
+            <p className="mx-auto mt-3 max-w-xl text-slate-500">Everything you need to build, manage, and grow automated crypto wealth — all in one ecosystem.</p>
+          </motion.div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              { title: 'EX-AI Bot', desc: 'Automated crypto trading with 10.5%–16.6% monthly returns. Set it and let AI do the work.', stat: '~10.5–16.6% /mo', icon: '🤖', color: 'border-blue-200 bg-blue-50/50', iconBg: 'bg-blue-600' },
+              { title: 'Zeus AI Bot',  desc: 'Next-gen trading engine designed for consistent, stable performance across market conditions.', stat: 'Advanced AI', icon: '⚡', color: 'border-violet-200 bg-violet-50/50', iconBg: 'bg-violet-600' },
+              { title: 'NeoBank', desc: 'Seamless fiat-to-crypto banking with instant transactions. Manage your finances in one place.', stat: 'Instant transfers', icon: '🏦', color: 'border-cyan-200 bg-cyan-50/50', iconBg: 'bg-cyan-600' },
+              { title: 'Crypto Card', desc: 'Spend your crypto earnings anywhere. Accepted at 80M+ merchants worldwide via Visa.', stat: 'Visa®', icon: '💳', color: 'border-emerald-200 bg-emerald-50/50', iconBg: 'bg-emerald-600' },
+              { title: 'Exchange', desc: 'Buy, sell, and swap 200+ crypto pairs with ultra-low fees and institutional-grade security.', stat: '200+ pairs', icon: '📊', color: 'border-amber-200 bg-amber-50/50', iconBg: 'bg-amber-600' },
+              { title: 'RWA Gold (XAU)', desc: 'Tokenized gold packages. Own real-world assets with 63–70% annual returns, Swiss vault delivery.', stat: '63–70% /yr', icon: '🥇', color: 'border-yellow-200 bg-yellow-50/50', iconBg: 'bg-yellow-600' },
+            ].map((p, i) => (
+              <motion.div
+                key={p.title}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+                custom={i * 0.08}
+                className={`group relative rounded-2xl border ${p.color} p-6 transition-all hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-1`}
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${p.iconBg} text-lg text-white shadow-md`}>
+                    {p.icon}
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900">{p.title}</h3>
+                </div>
+                <p className="text-sm leading-relaxed text-slate-500 mb-4">{p.desc}</p>
+                <div className="flex items-center justify-between">
+                  <span className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">{p.stat}</span>
+                  <Link href="/products" className="text-xs font-semibold text-blue-600 opacity-0 transition group-hover:opacity-100">Learn More →</Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Calculator Teaser */}
+          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="mt-12">
+            <Link href="/calculator" className="group block overflow-hidden rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-blue-50 p-8 transition-all hover:shadow-xl hover:shadow-blue-100/50 hover:-translate-y-1">
+              <div className="flex flex-col items-center gap-6 sm:flex-row">
+                <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-2xl text-white shadow-lg shadow-blue-600/30">
+                  📈
+                </div>
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">See What Your Investment Could Become</h3>
+                  <p className="mt-1 text-sm text-slate-500">Use our Profit Calculator to model your returns across all 8 tiers — with compound interest.</p>
+                </div>
+                <div className="flex-shrink-0">
+                  <span className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/30 transition group-hover:bg-blue-700">
+                    Open Calculator →
+                  </span>
+                </div>
               </div>
-              <div>
-                <h2 className="mb-1 text-[1.05rem] font-bold text-slate-900">{f.title}</h2>
-                <p className="text-[0.82rem] leading-relaxed text-slate-500">{f.desc}</p>
-              </div>
-            </motion.article>
-          ))}
+            </Link>
+          </motion.div>
         </div>
       </section>
 
