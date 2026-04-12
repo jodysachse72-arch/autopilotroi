@@ -25,12 +25,36 @@ function LoginForm() {
     setLoading(true)
 
     if (!isConfigured) {
-      // Demo mode
+      // ── Demo mode: validate against test accounts ──
+      const DEMO_ACCOUNTS: Record<string, { password: string; role: string; name: string }> = {
+        'admin@autopilotroi.com': { password: 'Admin2026!', role: 'admin', name: 'Admin User' },
+        'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
+      }
+
+      const account = DEMO_ACCOUNTS[email.toLowerCase()]
+
+      if (!account) {
+        setError('No account found with that email. Try admin@autopilotroi.com or partner@autopilotroi.com')
+        setLoading(false)
+        return
+      }
+
+      if (account.password !== password) {
+        setError('Invalid password. Please try again.')
+        setLoading(false)
+        return
+      }
+
       localStorage.setItem(
         'autopilotroi-demo-user',
-        JSON.stringify({ email, role: 'partner' })
+        JSON.stringify({ email, role: account.role, name: account.name })
       )
-      router.push(redirect)
+
+      if (account.role === 'admin') {
+        router.push('/admin')
+      } else {
+        router.push('/dashboard')
+      }
       return
     }
 
@@ -91,9 +115,18 @@ function LoginForm() {
         </p>
 
         {!isConfigured && (
-          <div className="mb-6 rounded-lg border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-            <strong>Demo Mode:</strong> Supabase is not configured. Login will
-            use local demo data.
+          <div className="mb-6 rounded-lg border border-blue-400/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
+            <strong className="text-blue-300">📋 Test Accounts</strong>
+            <div className="mt-2 space-y-1.5 text-xs font-mono">
+              <div className="flex items-center justify-between rounded bg-white/5 px-2 py-1">
+                <span>🛡️ Admin</span>
+                <span className="text-blue-300">admin@autopilotroi.com / Admin2026!</span>
+              </div>
+              <div className="flex items-center justify-between rounded bg-white/5 px-2 py-1">
+                <span>🤝 Partner</span>
+                <span className="text-blue-300">partner@autopilotroi.com / Partner2026!</span>
+              </div>
+            </div>
           </div>
         )}
 
