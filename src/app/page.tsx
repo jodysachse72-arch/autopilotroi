@@ -103,27 +103,24 @@ export default function HomePage() {
               custom={3}
               className="mt-10 flex flex-wrap items-center gap-5"
             >
+              <Link
+                href="/signup"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl bg-blue-600 px-8 py-4 text-[1.05rem] font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-0.5 hover:shadow-blue-600/50"
+              >
+                Start Here →
+                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+              </Link>
+
               <VideoModal videoUrl={VIDEO_URL} ctaLabel="Ready to Get Started? →" ctaHref="/signup">
-                <ShimmerButton
-                  id="hero-watch-overview"
-                  className="text-[1.05rem]"
+                <button
+                  className="flex items-center gap-2 text-[1rem] font-medium text-blue-200 transition hover:text-white"
                 >
-                  <svg className="h-4 w-4 fill-white" viewBox="0 0 24 24">
+                  <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
                     <path d="M8 5.14v14l11-7-11-7z" />
                   </svg>
                   Watch Overview
-                </ShimmerButton>
+                </button>
               </VideoModal>
-
-              <Link
-                href="#how-it-works"
-                className="flex items-center gap-2 text-[1rem] font-medium text-blue-200 transition hover:text-white"
-              >
-                How It Works
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
             </motion.div>
 
             {/* Trust badges */}

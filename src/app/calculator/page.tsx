@@ -137,9 +137,9 @@ export default function CalculatorPage() {
                   onChange={(e) => setTierIndex(parseInt(e.target.value))}
                   className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-5 py-4 text-[var(--text-primary)] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
                 >
-                  <option value="" disabled>— Auto-detect from amount —</option>
+                  <option value="" disabled className="bg-white text-slate-900 dark:bg-slate-800 dark:text-white">— Auto-detect from amount —</option>
                   {TIERS.map((t, i) => (
-                    <option key={t.name} value={i}>
+                    <option key={t.name} value={i} className="bg-white text-slate-900 dark:bg-slate-800 dark:text-white">
                       {t.name} · ~{t.rate.toFixed(2)}% monthly · ${t.min.toLocaleString()}–${t.max.toLocaleString()} USDT
                     </option>
                   ))}
@@ -168,7 +168,7 @@ export default function CalculatorPage() {
                     className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-5 py-4 text-[var(--text-primary)] outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
                   >
                     {TERMS.map((t, i) => (
-                      <option key={t.label} value={i}>{t.label}</option>
+                      <option key={t.label} value={i} className="bg-white text-slate-900 dark:bg-slate-800 dark:text-white">{t.label}</option>
                     ))}
                   </select>
                 </div>
@@ -177,14 +177,14 @@ export default function CalculatorPage() {
                   <label className="mb-2 block text-sm font-semibold text-[var(--text-secondary)]">
                     Compound Interest (%)
                   </label>
-                  <div className="flex h-[58px] items-center gap-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-5">
+                  <div className="flex h-[58px] items-center justify-center gap-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-5">
                     <span className={`text-sm font-medium ${!compound ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>off</span>
                     <button
                       type="button"
                       onClick={() => setCompound(!compound)}
-                      className={`relative h-7 w-12 rounded-full transition-colors duration-200 ${compound ? 'bg-blue-500' : 'bg-white/20'}`}
+                      className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${compound ? 'bg-blue-500' : 'bg-white/20'}`}
                     >
-                      <span className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200 ${compound ? 'translate-x-[22px]' : 'translate-x-0.5'}`} />
+                      <span className={`inline-block h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200 ${compound ? 'translate-x-[22px]' : 'translate-x-[2px]'}`} />
                     </button>
                     <span className={`text-sm font-medium ${compound ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>on</span>
                   </div>
