@@ -84,12 +84,18 @@ const phases = [
 ]
 
 const scorecard = [
-  { category: 'Trust', current: 1, max: 5, grade: 'D' },
-  { category: 'Conversion', current: 3.5, max: 7, grade: 'C+' },
-  { category: 'Partner Tools', current: 1.5, max: 6, grade: 'D' },
-  { category: 'Retention', current: 1, max: 5, grade: 'D' },
-  { category: 'Analytics', current: 1, max: 4, grade: 'D' },
-  { category: 'Infrastructure', current: 5, max: 6, grade: 'A-' },
+  { category: 'Hero Clarity', current: 7, max: 10, grade: 'B' },
+  { category: 'Visual Hierarchy', current: 6, max: 10, grade: 'C+' },
+  { category: 'Typography', current: 7, max: 10, grade: 'B' },
+  { category: 'Color System', current: 7, max: 10, grade: 'B' },
+  { category: 'Social Proof', current: 7, max: 10, grade: 'B' },
+  { category: 'Motion & Animation', current: 8, max: 10, grade: 'A-' },
+  { category: 'Trust & Credibility', current: 7, max: 10, grade: 'B' },
+  { category: 'CTA Strategy', current: 6, max: 10, grade: 'C+' },
+  { category: 'Mobile', current: 6, max: 10, grade: 'C+' },
+  { category: 'Performance', current: 6, max: 10, grade: 'C+' },
+  { category: 'Content Depth', current: 7, max: 10, grade: 'B' },
+  { category: 'Infrastructure', current: 8, max: 10, grade: 'A-' },
 ]
 
 const AI_COST_PER_HOUR = 0 // Antigravity included in subscription
