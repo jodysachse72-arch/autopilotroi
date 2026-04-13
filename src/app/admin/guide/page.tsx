@@ -204,6 +204,60 @@ const guides: Guide[] = [
       'If the page shows a blank screen, try clearing your browser cache (Ctrl+Shift+Delete) or using an incognito window.',
     ],
   },
+  // ── Content Editor ──
+  {
+    id: 'content-editor-basics',
+    title: 'Content Editor: Getting Started',
+    category: 'Content Editor',
+    icon: '✏️',
+    content: [
+      'Go to /admin/cms (or click "Content Editor" in the sidebar).',
+      'You\'ll see 4 tabs: **Homepage**, **Blog**, **FAQs**, and **Videos**.',
+      'Click **Edit** on any field to modify it. Press **Save** when done, or **Cancel** to discard changes.',
+      'For text fields, you can also press **Enter** to save or **Escape** to cancel.',
+      'A first-time walkthrough will appear on your first visit. Click **Help** (❓) in the header to replay it anytime.',
+    ],
+  },
+  {
+    id: 'content-editor-blog',
+    title: 'Content Editor: Managing Blog Posts',
+    category: 'Content Editor',
+    icon: '📝',
+    content: [
+      'Go to the **Blog** tab in the Content Editor.',
+      'Click **+ New Post** to create a post. Fill in the title, excerpt, body, category, and author.',
+      'The slug (URL path) is auto-generated from the title. You can override it.',
+      'Toggle **Featured** to highlight a post at the top of the blog page.',
+      'Click **✏️ Edit** on any existing post to update it, or **🗑️** to delete it.',
+      'Deleted posts can be recovered using **Undo** (Ctrl+Z).',
+    ],
+  },
+  {
+    id: 'content-editor-undo',
+    title: 'Content Editor: Undo & Backup',
+    category: 'Content Editor',
+    icon: '↩️',
+    content: [
+      '**Undo**: Press Ctrl+Z or click the ↩️ Undo button. We keep the last 50 changes.',
+      '**Export**: Click ⬇️ Export to download ALL your content as a JSON file. This is your backup.',
+      '**Import**: Click ⬆️ Import to restore content from a JSON backup file.',
+      '⚠️ Import replaces ALL current content. Always export first as a safety net.',
+      'The undo counter shows how many steps you can go back. After 50 changes, the oldest one is dropped.',
+    ],
+  },
+  {
+    id: 'content-editor-supabase',
+    title: 'Content Editor: Cloud Sync (Supabase)',
+    category: 'Content Editor',
+    icon: '☁️',
+    content: [
+      'By default, content is stored in your browser\'s localStorage. This is great for development and testing.',
+      'To enable cloud sync, run the migration SQL in your Supabase Dashboard → SQL Editor.',
+      'The migration file is at: supabase/migrations/20260413_cms_content.sql',
+      'Once the tables exist, the Content Editor will automatically sync with Supabase.',
+      'Cloud sync means: Barry can edit on his computer, and changes appear on the live site for everyone.',
+    ],
+  },
 ]
 
 const categories = [...new Set(guides.map((g) => g.category))]

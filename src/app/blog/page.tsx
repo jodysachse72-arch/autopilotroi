@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { loadStore, type BlogPost } from '@/lib/content-store'
 
-// Demo posts (managed via Admin → Content Editor)
-const demoPosts = [
+// Fallback posts used when content store is empty (first visit on a clean browser)
+const fallbackPosts = [
   {
     slug: 'getting-started-with-aurum',
     title: 'Getting Started with the Aurum Ecosystem',
@@ -79,13 +80,45 @@ const categoryColors: Record<string, string> = {
   'market-insights': 'bg-cyan-500/15 text-cyan-300',
 }
 
+interface DisplayPost {
+  slug: string
+  title: string
+  excerpt: string
+  author: string
+  category: string
+  publishedAt: string
+  featured: boolean
+}
+
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState('all')
+  const [posts, setPosts] = useState<DisplayPost[]>(fallbackPosts)
+
+  // Load posts from content store (auto-seeds on first visit)
+  useEffect(() => {
+    try {
+      const store = loadStore()
+      if (store.blogs && store.blogs.length > 0) {
+        setPosts(store.blogs.map((b: BlogPost) => ({
+          slug: b.slug,
+          title: b.title,
+          excerpt: b.excerpt,
+          author: b.author,
+          category: b.category,
+          publishedAt: b.publishedAt,
+          featured: b.featured,
+        })))
+      }
+    } catch {
+      // localStorage not available (SSR), use fallbacks
+    }
+  }, [])
+
   const filteredPosts =
     activeCategory === 'all'
-      ? demoPosts
-      : demoPosts.filter((p) => p.category === activeCategory)
-  const featuredPost = demoPosts.find((p) => p.featured)
+      ? posts
+      : posts.filter((p) => p.category === activeCategory)
+  const featuredPost = posts.find((p) => p.featured)
 
   return (
     <div className="overflow-hidden">
@@ -100,7 +133,7 @@ export default function BlogPage() {
               📝 Blog
             </div>
             <h1 className="font-[var(--font-sora)] text-4xl font-bold text-[var(--text-primary)] lg:text-5xl">
-              Insights & Updates
+              Insights &amp; Updates
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-lg text-[var(--text-tertiary)]">
               Education, product updates, and partner resources — curated by the

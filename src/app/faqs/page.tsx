@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { loadStore } from '@/lib/content-store'
 
 export const faqCategories = [
   { id: 'all', label: 'All Questions' },
@@ -9,6 +10,9 @@ export const faqCategories = [
   { id: 'advanced', label: '📗 Advanced' },
   { id: 'technical', label: '🔧 Technical' },
   { id: 'partner', label: '🤝 Partner Program' },
+  { id: 'general', label: '📋 General' },
+  { id: 'products', label: '🤖 Products' },
+  { id: 'getting-started', label: '🚀 Getting Started' },
 ]
 
 export const faqs = [
@@ -112,8 +116,31 @@ export default function FaqsPage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [openId, setOpenId] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [allFaqs, setAllFaqs] = useState(faqs)
 
-  const visible = faqs.filter((faq) => {
+  // Merge in FAQs from the Content Editor
+  useEffect(() => {
+    try {
+      const store = loadStore()
+      if (store.faqs && store.faqs.length > 0) {
+        // Map content store FAQs to page format
+        const editorFaqs = store.faqs.map(f => ({
+          id: f.id,
+          q: f.question,
+          a: f.answer,
+          category: f.category,
+        }))
+        // Merge: hardcoded first, then editor FAQs (avoid duplicates by ID)
+        const hardcodedIds = new Set(faqs.map(f => f.id))
+        const newFaqs = editorFaqs.filter(f => !hardcodedIds.has(f.id))
+        setAllFaqs([...faqs, ...newFaqs])
+      }
+    } catch {
+      // localStorage not available
+    }
+  }, [])
+
+  const visible = allFaqs.filter((faq) => {
     const matchesCategory = activeCategory === 'all' || faq.category === activeCategory
     const matchesSearch =
       search === '' ||

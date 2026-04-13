@@ -151,6 +151,12 @@ export default function ContentEditorPage() {
           <p className="mt-1 text-sm text-[var(--text-muted)]">
             Edit your website content — headlines, blog posts, FAQs, and videos. Changes are saved automatically.
           </p>
+          <div className="mt-2 flex items-center gap-3 text-[10px]">
+            <span className="flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-400/20 px-2.5 py-1 text-amber-400 font-semibold">
+              💾 localStorage
+            </span>
+            <span className="text-[var(--text-muted)]">{store.blogs.length} posts · {store.faqs.length} FAQs · {store.videos.length} videos</span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button
