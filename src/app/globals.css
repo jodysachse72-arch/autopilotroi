@@ -304,10 +304,10 @@ a {
    ALL override rules exclude `[data-dark]` and its descendants.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Background overrides ── */
-[data-theme="light"] [class*="bg-[#06122f]"]:not([data-dark]):not([data-dark] *),
-[data-theme="light"] [class*="bg-[#061238]"]:not([data-dark]):not([data-dark] *),
-[data-theme="light"] [class*="bg-[#040e2d]"]:not([data-dark]):not([data-dark] *) {
+/* ── Background overrides (excludes dark-chrome, header, footer) ── */
+[data-theme="light"] [class*="bg-[#06122f]"]:not([data-dark]):not([data-dark] *):not(header):not(footer),
+[data-theme="light"] [class*="bg-[#061238]"]:not([data-dark]):not([data-dark] *):not(header):not(footer),
+[data-theme="light"] [class*="bg-[#040e2d]"]:not([data-dark]):not([data-dark] *):not(header):not(footer) {
   background-color: var(--bg-primary) !important;
 }
 
@@ -335,18 +335,21 @@ a {
   border-color: var(--border-primary) !important;
 }
 
-/* Text overrides — headings on light content ONLY */
-[data-theme="light"] main h1:not([data-dark] *),
-[data-theme="light"] main h2:not([data-dark] *),
-[data-theme="light"] main h3:not([data-dark] *) {
+/* Text overrides — headings on light content ONLY (not dark-chrome sections) */
+[data-theme="light"] main h1:not([data-dark]):not([data-dark] *),
+[data-theme="light"] main h2:not([data-dark]):not([data-dark] *),
+[data-theme="light"] main h3:not([data-dark]):not([data-dark] *) {
   color: var(--text-primary) !important;
 }
 
 /*
    text-white override — ONLY for body content text.
    Excludes ALL dark-chrome and intentionally-dark sections.
+   ALSO excludes elements that ARE [data-dark] themselves.
 */
 [data-theme="light"] [class*="text-white"]:not(
+  [data-dark]
+):not(
   [data-dark] *
 ):not(
   header *
@@ -480,39 +483,59 @@ a {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   "AS SEEN IN" SECTION — Dark mode overrides
+   The section uses light-first colors (bg-[#f8fafc], text-slate-500)
+   and needs to flip to dark colors when theme is dark.
+   ═══════════════════════════════════════════════════════════════ */
+[data-theme="dark"] section[class*="bg-[#f8fafc]"] {
+  background: #050f2e !important;
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+[data-theme="dark"] section[class*="bg-[#f8fafc]"] p[class*="text-slate-400"] {
+  color: rgba(147, 197, 253, 0.4) !important;
+}
+[data-theme="dark"] section[class*="bg-[#f8fafc]"] svg[class*="text-slate-500"] {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+[data-theme="dark"] section[class*="bg-[#f8fafc]"] svg[class*="text-slate-500"]:hover {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    HOMEPAGE LIGHT MODE — Specific sections
+   All rules MUST exclude [data-dark] to protect dark chrome.
    ═══════════════════════════════════════════════════════════════ */
 
-/* Hero section — subtle warm gradient */
-[data-theme="light"] section[class*="bg-[#061238]"] {
+/* Hero section — subtle warm gradient (only non-dark sections) */
+[data-theme="light"] section[class*="bg-[#061238]"]:not([data-dark]) {
   background: linear-gradient(180deg, #f0f4ff 0%, #e8eeff 50%, #fafbff 100%) !important;
   color: var(--text-primary) !important;
 }
-[data-theme="light"] section[class*="bg-[#061238]"] h1,
-[data-theme="light"] section[class*="bg-[#061238]"] h2,
-[data-theme="light"] section[class*="bg-[#061238]"] p,
-[data-theme="light"] section[class*="bg-[#061238]"] span {
+[data-theme="light"] section[class*="bg-[#061238]"]:not([data-dark]) h1,
+[data-theme="light"] section[class*="bg-[#061238]"]:not([data-dark]) h2,
+[data-theme="light"] section[class*="bg-[#061238]"]:not([data-dark]) p,
+[data-theme="light"] section[class*="bg-[#061238]"]:not([data-dark]) span {
   color: var(--text-primary) !important;
 }
-[data-theme="light"] section[class*="bg-[#061238]"] p {
+[data-theme="light"] section[class*="bg-[#061238]"]:not([data-dark]) p {
   color: var(--text-secondary) !important;
 }
 
 /* Pillar cards on homepage — white elevated cards with soft shadow */
-[data-theme="light"] [class*="bg-[#0e2460]"] {
+[data-theme="light"] [class*="bg-[#0e2460]"]:not([data-dark]):not([data-dark] *) {
   background: white !important;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04) !important;
   border: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Dark section backgrounds → light */
-[data-theme="light"] [class*="bg-[#0a1a3f]"] {
+/* Dark section backgrounds → light (skip data-dark) */
+[data-theme="light"] [class*="bg-[#0a1a3f]"]:not([data-dark]):not([data-dark] *) {
   background: var(--bg-hero) !important;
 }
 
-/* Stats bar background */
-[data-theme="light"] [class*="bg-[#0b1f57]"],
-[data-theme="light"] [class*="bg-[#08205b]"] {
+/* Stats bar background (skip data-dark, header, footer) */
+[data-theme="light"] [class*="bg-[#0b1f57]"]:not([data-dark]):not([data-dark] *):not(header):not(footer),
+[data-theme="light"] [class*="bg-[#08205b]"]:not([data-dark]):not([data-dark] *):not(header):not(footer) {
   background: #eef2ff !important;
 }
 
@@ -535,15 +558,15 @@ a {
   color: white !important;
 }
 
-/* Secondary outline buttons in light mode */
-[data-theme="light"] a[class*="bg-white/10"],
-[data-theme="light"] button[class*="bg-white/10"] {
+/* Secondary outline buttons in light mode (skip data-dark sections) */
+[data-theme="light"] a[class*="bg-white/10"]:not([data-dark] *),
+[data-theme="light"] button[class*="bg-white/10"]:not([data-dark] *) {
   background: white !important;
   border-color: #d1d5db !important;
   color: var(--text-primary) !important;
 }
-[data-theme="light"] a[class*="bg-white/10"]:hover,
-[data-theme="light"] button[class*="bg-white/10"]:hover {
+[data-theme="light"] a[class*="bg-white/10"]:not([data-dark] *):hover,
+[data-theme="light"] button[class*="bg-white/10"]:not([data-dark] *):hover {
   background: #f8faff !important;
 }
 
@@ -552,6 +575,139 @@ a {
 [data-theme="light"] [class*="BackgroundBeams"],
 [data-theme="light"] [class*="background-beams"] {
   opacity: 0.15 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT MODE — Hardcoded dark-theme text overrides
+   Covers text-blue-100/XX, text-blue-200, text-white/XX,
+   text-amber-100, text-cyan-200, etc. used on /start, /resources, etc.
+   ALL exclude [data-dark] descendants.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* text-blue-100 (opaque and with opacity) */
+[data-theme="light"] [class*="text-blue-100"]:not([data-dark] *):not(header *):not(footer *) {
+  color: var(--text-secondary) !important;
+}
+
+/* text-white/80, text-white/90, text-white/40 — readability fix */
+[data-theme="light"] [class*="text-white/80"]:not([data-dark] *):not(header *):not(footer *),
+[data-theme="light"] [class*="text-white/90"]:not([data-dark] *):not(header *):not(footer *) {
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] [class*="text-white/40"]:not([data-dark] *):not(header *):not(footer *) {
+  color: var(--text-muted) !important;
+}
+[data-theme="light"] [class*="text-white/60"]:not([data-dark] *):not(header *):not(footer *) {
+  color: var(--text-tertiary) !important;
+}
+[data-theme="light"] [class*="text-white/50"]:not([data-dark] *):not(header *):not(footer *) {
+  color: var(--text-muted) !important;
+}
+[data-theme="light"] [class*="text-white/20"]:not([data-dark] *):not(header *):not(footer *) {
+  color: var(--text-muted) !important;
+}
+
+/* text-amber-100 → darker amber for light bg */
+[data-theme="light"] [class*="text-amber-100"]:not([data-dark] *) {
+  color: #92400e !important;
+}
+
+/* text-cyan-200 → darker cyan for light bg */
+[data-theme="light"] [class*="text-cyan-200"]:not([data-dark] *) {
+  color: #0e7490 !important;
+}
+
+/* text-red-400 — keep readable */
+[data-theme="light"] [class*="text-red-400"]:not([data-dark] *) {
+  color: #dc2626 !important;
+}
+
+/* bg-white/5, bg-white/12 — light mode panel backgrounds */
+[data-theme="light"] [class*="bg-white/5"]:not([data-dark] *):not(header *) {
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+[data-theme="light"] [class*="bg-white/12"]:not([data-dark] *):not(header *) {
+  background: var(--bg-card) !important;
+}
+[data-theme="light"] [class*="bg-white/20"]:not([data-dark] *):not(header *) {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+/* border-white/10, -white/15, -white/5 — subtle borders for light */
+[data-theme="light"] [class*="border-white/5"]:not([data-dark] *):not(header *):not(footer *) {
+  border-color: var(--border-primary) !important;
+}
+
+/* bg-blue-600/30, bg-blue-600/40 — step circles */
+[data-theme="light"] [class*="bg-blue-600/30"]:not([data-dark] *),
+[data-theme="light"] [class*="bg-blue-600/40"]:not([data-dark] *) {
+  background: rgba(37, 99, 235, 0.15) !important;
+}
+
+/* bg-blue-400/8, bg-blue-400/10 — info panels on /start */
+[data-theme="light"] [class*="bg-blue-400/8"]:not([data-dark] *),
+[data-theme="light"] [class*="bg-blue-400/10"]:not([data-dark] *) {
+  background: rgba(59, 130, 246, 0.06) !important;
+}
+
+/* bg-amber-400/10 — warning panels */
+[data-theme="light"] [class*="bg-amber-400/10"]:not([data-dark] *) {
+  background: rgba(245, 158, 11, 0.08) !important;
+}
+
+/* bg-cyan-400/8 — tip panels */
+[data-theme="light"] [class*="bg-cyan-400/8"]:not([data-dark] *) {
+  background: rgba(6, 182, 212, 0.06) !important;
+}
+
+/* border-amber-400/25, border-cyan-400/25, border-blue-400/20 — panel borders */
+[data-theme="light"] [class*="border-amber-400/25"]:not([data-dark] *) {
+  border-color: rgba(245, 158, 11, 0.20) !important;
+}
+[data-theme="light"] [class*="border-cyan-400/25"]:not([data-dark] *) {
+  border-color: rgba(6, 182, 212, 0.20) !important;
+}
+
+/* text-blue-300/70 — step labels */
+[data-theme="light"] [class*="text-blue-300/70"]:not([data-dark] *) {
+  color: var(--accent-primary) !important;
+}
+
+/* bg-emerald-500/25, bg-emerald-500/15 — completed step badges */
+[data-theme="light"] [class*="bg-emerald-500/25"]:not([data-dark] *) {
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+
+/* bg-white/15 — progress bar backgrounds */
+[data-theme="light"] [class*="bg-white/15"]:not([data-dark] *) {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Disclaimer page — amber warning banner text */
+[data-theme="light"] [class*="text-amber-200/70"]:not([data-dark] *) {
+  color: #92400e !important;
+}
+[data-theme="light"] [class*="text-amber-200/80"]:not([data-dark] *) {
+  color: #92400e !important;
+}
+[data-theme="light"] [class*="text-amber-300/60"]:not([data-dark] *) {
+  color: #b45309 !important;
+}
+[data-theme="light"] [class*="text-amber-400/80"]:not([data-dark] *) {
+  color: #b45309 !important;
+}
+
+/* /start page — text-blue-100/85, text-blue-100/60 */
+[data-theme="light"] [class*="text-blue-100/85"]:not([data-dark] *) {
+  color: var(--text-secondary) !important;
+}
+[data-theme="light"] [class*="text-blue-100/60"]:not([data-dark] *) {
+  color: var(--text-tertiary) !important;
+}
+
+/* Emerald-300/80 — activity feed text */
+[data-theme="light"] [class*="text-emerald-300/80"]:not([data-dark] *) {
+  color: #059669 !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════

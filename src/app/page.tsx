@@ -241,26 +241,26 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           AS SEEN IN — Real SVG Media Logos
       ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 bg-[#f8fafc] dark:bg-[#050f2e] border-t border-b border-slate-200 dark:border-white/5 px-6 py-10 lg:px-10">
+      <section className="relative z-10 bg-[#f8fafc] border-t border-b border-slate-200 px-6 py-10 lg:px-10">
         <div className="mx-auto max-w-5xl">
-          <p className="mb-6 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-blue-300/40">As Seen In</p>
+          <p className="mb-6 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">As Seen In</p>
           <Marquee pauseOnHover gap="3rem" duration="30s" className="[--marquee-gap:3rem]">
-            <svg className="h-6 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 40" fill="currentColor">
+            <svg className="h-6 flex-shrink-0 text-slate-500 transition hover:text-slate-800" viewBox="0 0 150 40" fill="currentColor">
               <text x="0" y="32" fontFamily="Georgia, serif" fontWeight="700" fontSize="36" letterSpacing="-1">Forbes</text>
             </svg>
-            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 200 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 transition hover:text-slate-800" viewBox="0 0 200 30" fill="currentColor">
               <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="22" letterSpacing="0">Cointelegraph</text>
             </svg>
-            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 150 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 transition hover:text-slate-800" viewBox="0 0 150 30" fill="currentColor">
               <text x="0" y="24" fontFamily="Arial, sans-serif" fontWeight="800" fontSize="24" letterSpacing="-0.5">BENZINGA</text>
             </svg>
-            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 160 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 transition hover:text-slate-800" viewBox="0 0 160 30" fill="currentColor">
               <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="22">Bitcoin.com</text>
             </svg>
-            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 210 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 transition hover:text-slate-800" viewBox="0 0 210 30" fill="currentColor">
               <text x="0" y="23" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="20" letterSpacing="0">GlobeNewswire</text>
             </svg>
-            <svg className="h-5 flex-shrink-0 text-slate-500 dark:text-white/30 transition hover:text-slate-800 dark:hover:text-white/60" viewBox="0 0 180 30" fill="currentColor">
+            <svg className="h-5 flex-shrink-0 text-slate-500 transition hover:text-slate-800" viewBox="0 0 180 30" fill="currentColor">
               <text x="0" y="23" fontFamily="monospace" fontWeight="700" fontSize="22">Hackernoon</text>
             </svg>
           </Marquee>
@@ -361,7 +361,7 @@ export default function HomePage() {
         </div>
 
         {/* Dark section for cards */}
-        <div className="relative mt-14 bg-[#061238] px-6 pb-20 pt-16 lg:px-10">
+        <div data-dark className="relative mt-14 bg-[#061238] px-6 pb-20 pt-16 lg:px-10">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.04]"
             style={{
