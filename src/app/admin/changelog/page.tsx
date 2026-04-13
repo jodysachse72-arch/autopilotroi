@@ -22,6 +22,19 @@ const changelog: ChangeEntry[] = [
     date: '2026-04-13',
     phase: 'Phase 3: SCALE',
     items: [
+      { title: 'Mobile-Responsive Admin & Partner Dashboards', description: 'Replaced truncated horizontal mobile nav with full slide-out drawer on both Admin and Partner layouts. Added hamburger button, backdrop overlay, Escape-to-close, auto-close on navigation. Compact mobile headers. All 12 admin pages + 8 partner pages now accessible on any screen size.', type: 'feature', files: ['src/app/admin/layout.tsx', 'src/app/dashboard/layout.tsx'] },
+      { title: 'Mobile Card View for Leads Table', description: 'Partner dashboard leads table now shows as card-style layout on mobile instead of a 7-column table. Search and sort controls stack vertically. Full-width inputs on small screens.', type: 'improvement', files: ['src/app/dashboard/page.tsx'] },
+      { title: 'Leaderboard Mobile Responsive', description: 'Top-3 podium stacks single-column on mobile (was hard grid-cols-3). Fixed hardcoded white text to use theme CSS variables.', type: 'fix', files: ['src/app/dashboard/leaderboard/page.tsx'] },
+      { title: 'Admin Quick Links Grid', description: 'Quick links now go 1-col mobile → 2-col tablet → 3-col desktop instead of hard 3-col.', type: 'improvement', files: ['src/app/admin/page.tsx'] },
+      { title: 'Onboarding Rewrite — Accordion UI', description: 'Replaced wizard-style stepper with clean accordion-based layout grouped into 3 phases: Preparation → Account Setup → Go Live. 8 steps in correct order with 2FA required before funding. Advanced path is a grouped checklist. Progress persists to localStorage. Deprecated separate /onboarding/setup page.', type: 'feature', files: ['src/app/onboarding/page.tsx'] },
+      { title: 'Onboarding Typography Overhaul', description: 'Bumped all text sizes for readability per Barry\'s preference: titles 3xl→4xl, body sm→base, numbered steps larger, container widened from max-w-3xl to max-w-4xl, phase icons enlarged, card padding increased.', type: 'design', files: ['src/app/onboarding/page.tsx'] },
+      { title: 'Dead Video Sweep — 12 IDs Replaced', description: 'Replaced all 12 dead YouTube video IDs across Waiting Room, Onboarding, and Setup pages with verified-live alternatives from Aurum channel.', type: 'fix', files: ['src/app/onboarding/page.tsx', 'src/app/onboarding/setup/page.tsx', 'src/app/waiting-room/page.tsx'] },
+    ],
+  },
+  {
+    date: '2026-04-13',
+    phase: 'Phase 3: SCALE',
+    items: [
       { title: 'User Avatar Dropdown Menu', description: 'Replaced flat avatar+name+logout layout with a single clickable avatar that opens an animated dropdown. Shows user name, role badge (🛡️ Admin / 🤝 Partner), quick links (Partner Dashboard, Admin Panel, Referral Links, Settings), and Log Out. Closes on click outside and on route change.', type: 'improvement', files: ['src/components/layout/Navbar.tsx', 'src/app/globals.css'] },
       { title: 'Forgot / Reset Password Flow', description: 'Two new auth pages: /forgot-password (enter email, sends Supabase reset link, shows success state) and /reset-password (token exchange, new password form, auto-redirect). Added "Forgot password?" link to login page. Demo mode simulates the flow.', type: 'feature', files: ['src/app/(auth)/forgot-password/page.tsx', 'src/app/(auth)/reset-password/page.tsx', 'src/app/(auth)/login/page.tsx'] },
       { title: 'Navigation Rename: Partner Dashboard', description: 'Changed "Dashboard" to "Partner Dashboard" in the user dropdown menu and mobile navigation for clarity.', type: 'improvement', files: ['src/components/layout/Navbar.tsx'] },

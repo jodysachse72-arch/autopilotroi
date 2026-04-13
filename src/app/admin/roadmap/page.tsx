@@ -39,7 +39,7 @@ const phases = [
   {
     id: 'phase2',
     name: 'Phase 2: GROWTH',
-    status: 'active' as const,
+    status: 'complete' as const,
     color: 'emerald',
     items: [
       { feature: 'Social proof / testimonial section', devHours: 12, devRate: 125, aiHours: 1 },
@@ -55,16 +55,22 @@ const phases = [
   {
     id: 'phase3',
     name: 'Phase 3: SCALE',
-    status: 'planned' as const,
+    status: 'active' as const,
     color: 'amber',
     items: [
       { feature: 'Leaderboard + achievement badges', devHours: 24, devRate: 150, aiHours: 2 },
+      { feature: 'AI chatbot (FAQ + lead capture)', devHours: 40, devRate: 175, aiHours: 4 },
+      { feature: 'Trust Check — Opportunity Evaluator', devHours: 24, devRate: 150, aiHours: 2 },
+      { feature: 'Content Editor (replaced Sanity CMS)', devHours: 32, devRate: 175, aiHours: 3 },
+      { feature: 'Profit Calculator (8 Aurum tiers)', devHours: 20, devRate: 150, aiHours: 2 },
+      { feature: 'Beginner/Advanced onboarding (accordion)', devHours: 32, devRate: 150, aiHours: 3 },
+      { feature: 'Mobile-responsive admin + partner dashboards', devHours: 16, devRate: 125, aiHours: 1.5 },
+      { feature: 'Admin guide + platform documentation', devHours: 16, devRate: 125, aiHours: 1 },
       { feature: 'Partner self-registration flow', devHours: 16, devRate: 150, aiHours: 1.5 },
       { feature: 'SMS notifications (Twilio)', devHours: 12, devRate: 150, aiHours: 1 },
       { feature: 'Genealogy tree visualization', devHours: 32, devRate: 175, aiHours: 3 },
       { feature: 'Cohort analytics dashboard', devHours: 20, devRate: 175, aiHours: 2 },
       { feature: 'Push notifications (PWA)', devHours: 16, devRate: 150, aiHours: 1.5 },
-      { feature: 'AI chatbot (FAQ + lead capture)', devHours: 40, devRate: 175, aiHours: 4 },
     ],
   },
   {
@@ -92,7 +98,7 @@ const scorecard = [
   { category: 'Motion & Animation', current: 8, max: 10, grade: 'A-' },
   { category: 'Trust & Credibility', current: 7, max: 10, grade: 'B' },
   { category: 'CTA Strategy', current: 6, max: 10, grade: 'C+' },
-  { category: 'Mobile', current: 6, max: 10, grade: 'C+' },
+  { category: 'Mobile', current: 8, max: 10, grade: 'A-' },
   { category: 'Performance', current: 6, max: 10, grade: 'C+' },
   { category: 'Content Depth', current: 7, max: 10, grade: 'B' },
   { category: 'Infrastructure', current: 8, max: 10, grade: 'A-' },
