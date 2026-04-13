@@ -33,7 +33,7 @@ const SETUP_STEPS = [
       'Wait for the transaction to confirm (usually 2-10 minutes)',
       'Your balance will appear in your Aurum dashboard',
     ],
-    videoId: '4GNo8E1yj7g',
+    videoId: 'ZxTVBeeeJNQ',
   },
   {
     id: 'ex-ai-bot',
@@ -47,7 +47,7 @@ const SETUP_STEPS = [
       'Click "Activate" to start the bot',
       'The bot begins trading immediately — you\'ll see results within 24 hours',
     ],
-    videoId: 'kbGSa11bBHc',
+    videoId: 'CRuZqkc8sh4',
   },
   {
     id: 'reinvest',
@@ -61,7 +61,7 @@ const SETUP_STEPS = [
       'Recommended for beginners: Start with reinvest ON for 90 days, then evaluate',
       'You can switch between modes at any time',
     ],
-    videoId: 'V3XEvrIFHSA',
+    videoId: '1BI9_YikUKc',
   },
   {
     id: 'dashboard-tour',
@@ -75,7 +75,7 @@ const SETUP_STEPS = [
       'Support: Access live support via the Help Center',
       'Mobile App: Download the Aurum app for on-the-go access',
     ],
-    videoId: 'yTb2rAJhU7w',
+    videoId: 'GJEK3wOjlyQ',
   },
 ]
 
