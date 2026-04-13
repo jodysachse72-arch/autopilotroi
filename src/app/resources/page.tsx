@@ -28,10 +28,10 @@ export default function ResourcesPage() {
     : resourceSections.filter((s) => s.id === activeFilter)
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
 
       {/* Hero */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
+      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-16 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(59,130,246,0.15),transparent_60%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '50px 50px' }} />
 
@@ -43,10 +43,10 @@ export default function ResourcesPage() {
                   <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
                   Resource Center
                 </div>
-                <h1 className="font-[var(--font-sora)] text-4xl font-bold text-white lg:text-5xl">
+                <h1 className="font-[var(--font-sora)] text-4xl font-bold text-[var(--text-primary)] lg:text-5xl">
                   {resourcesMeta.headline}
                 </h1>
-                <p className="mt-3 max-w-xl text-blue-100/60 leading-relaxed">{resourcesMeta.description}</p>
+                <p className="mt-3 max-w-xl text-[var(--text-tertiary)] leading-relaxed">{resourcesMeta.description}</p>
                 <div className="mt-4 flex items-center gap-2 text-xs text-blue-200/40">
                   <div className="h-6 w-6 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[0.6rem]">AP</div>
                   <span>Curated by {resourcesMeta.curatorName} · Last updated {resourcesMeta.lastUpdated}</span>
@@ -55,8 +55,8 @@ export default function ResourcesPage() {
               <div className="flex gap-8">
                 {resourcesMeta.stats.map((stat) => (
                   <div key={stat.label} className="text-center">
-                    <div className="font-[var(--font-sora)] text-3xl font-bold text-white">{stat.value}</div>
-                    <div className="text-xs text-blue-200/50">{stat.label}</div>
+                    <div className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">{stat.value}</div>
+                    <div className="text-xs text-[var(--text-muted)]">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -72,7 +72,7 @@ export default function ResourcesPage() {
                 className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all shrink-0 ${
                   activeFilter === tab.id
                     ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                    : 'bg-white/[0.06] text-blue-100/70 border border-white/10 hover:bg-white/10 hover:text-white'
+                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-primary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {tab.label}
@@ -93,23 +93,23 @@ export default function ResourcesPage() {
             whileInView="show"
             viewport={{ once: true }}
             custom={si}
-            className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm"
+            className="overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-[var(--card-shadow,none)]"
           >
-            <div className="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-5">
+            <div className="flex items-start justify-between gap-4 border-b border-[var(--border-primary)] px-6 py-5">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xl">{section.icon}</span>
-                  <h2 className="font-[var(--font-sora)] font-bold text-white text-lg">{section.title}</h2>
+                  <h2 className="font-[var(--font-sora)] font-bold text-[var(--text-primary)] text-lg">{section.title}</h2>
                   <span className="rounded-full bg-blue-500/15 border border-blue-400/20 px-2.5 py-0.5 text-xs font-semibold text-blue-300">{section.count} resources</span>
                 </div>
-                <p className="text-sm text-blue-100/50">{section.description}</p>
+                <p className="text-sm text-[var(--text-muted)]">{section.description}</p>
               </div>
               {section.updatedDate && (
                 <span className="shrink-0 text-xs text-blue-200/40">Updated {section.updatedDate}</span>
               )}
             </div>
 
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-[var(--border-primary)]">
               {section.resources.map((resource) => (
                 <Link
                   key={resource.title}
@@ -121,7 +121,7 @@ export default function ResourcesPage() {
                   <span className="text-xl shrink-0">{resource.icon}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-white text-sm group-hover:text-blue-300 transition-colors">{resource.title}</span>
+                      <span className="font-semibold text-[var(--text-primary)] text-sm group-hover:text-[var(--accent-primary)] transition-colors">{resource.title}</span>
                       {resource.badge && (
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                           resource.badge === 'New' || resource.badge === 'New Feature'
@@ -134,7 +134,7 @@ export default function ResourcesPage() {
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-blue-200/40 mt-0.5">
+                    <div className="text-xs text-[var(--text-muted)] mt-0.5">
                       {resource.type}{resource.duration && ` · ${resource.duration}`} · {resource.source}
                     </div>
                     {resource.note && (
@@ -153,10 +153,10 @@ export default function ResourcesPage() {
         {/* Social & Community */}
         {(activeFilter === 'all' || activeFilter === 'social') && (
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={0}
-            className="overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm">
-            <div className="border-b border-white/10 px-6 py-5">
-              <h2 className="font-[var(--font-sora)] font-bold text-white text-lg">Social & Community</h2>
-              <p className="text-sm text-blue-100/50">Official channels. Stay connected, get updates, and attend community calls.</p>
+            className="overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-[var(--card-shadow,none)]">
+            <div className="border-b border-[var(--border-primary)] px-6 py-5">
+              <h2 className="font-[var(--font-sora)] font-bold text-[var(--text-primary)] text-lg">Social & Community</h2>
+              <p className="text-sm text-[var(--text-muted)]">Official channels. Stay connected, get updates, and attend community calls.</p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 p-6">
               {socialChannels.map((channel) => (
@@ -165,12 +165,12 @@ export default function ResourcesPage() {
                   href={channel.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-all hover:border-blue-500/30 hover:bg-blue-500/5 group"
+                  className="flex items-center gap-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-4 transition-all hover:border-[var(--border-accent)] group"
                 >
                   <span className="text-xl">{channel.icon}</span>
                   <div>
-                    <div className="font-semibold text-white text-sm group-hover:text-blue-300 transition-colors">{channel.platform}</div>
-                    <div className="text-xs text-blue-200/40">{channel.handle}</div>
+                    <div className="font-semibold text-[var(--text-primary)] text-sm group-hover:text-[var(--accent-primary)] transition-colors">{channel.platform}</div>
+                    <div className="text-xs text-[var(--text-muted)]">{channel.handle}</div>
                   </div>
                   <svg className="ml-auto h-4 w-4 text-white/20 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
@@ -184,10 +184,10 @@ export default function ResourcesPage() {
         {/* Back Office */}
         {(activeFilter === 'all' || activeFilter === 'social') && (
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={1}
-            className="overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-blue-900/30 to-transparent backdrop-blur-sm">
-            <div className="border-b border-white/10 px-6 py-5">
-              <h2 className="font-[var(--font-sora)] font-bold text-white text-lg">🔐 Back Office & Support</h2>
-              <p className="text-sm text-blue-100/50">Your dashboard is where everything happens — deposits, withdrawals, bot management, and portfolio overview.</p>
+            className="overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-[var(--card-shadow,none)]">
+            <div className="border-b border-[var(--border-primary)] px-6 py-5">
+              <h2 className="font-[var(--font-sora)] font-bold text-[var(--text-primary)] text-lg">🔐 Back Office & Support</h2>
+              <p className="text-sm text-[var(--text-muted)]">Your dashboard is where everything happens — deposits, withdrawals, bot management, and portfolio overview.</p>
             </div>
             <div className="grid sm:grid-cols-2 gap-3 p-6">
               {backOfficeLinks.map((link) => (
@@ -196,10 +196,10 @@ export default function ResourcesPage() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4 transition-all hover:border-blue-500/30 hover:bg-blue-500/5 group"
+                  className="flex items-center gap-3 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-4 transition-all hover:border-[var(--border-accent)] group"
                 >
                   <span className="text-lg">{link.icon}</span>
-                  <span className="text-sm font-medium text-blue-100/80 group-hover:text-white transition-colors">{link.title}</span>
+                  <span className="text-sm font-medium text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors">{link.title}</span>
                   <svg className="ml-auto h-4 w-4 text-white/20 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
                   </svg>

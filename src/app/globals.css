@@ -92,13 +92,27 @@
   --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
 }
 
-/* ── Force white text on colored buttons in light mode ── */
+/* ── Force white text on colored buttons/links in light mode ── */
 [data-theme="light"] a[class*="bg-blue-"],
+[data-theme="light"] a[class*="bg-blue-"] *,
 [data-theme="light"] button[class*="bg-blue-"],
+[data-theme="light"] button[class*="bg-blue-"] *,
+[data-theme="light"] span[class*="bg-blue-"],
+[data-theme="light"] span[class*="bg-blue-"] *,
 [data-theme="light"] a[class*="bg-emerald"],
+[data-theme="light"] a[class*="bg-emerald"] *,
 [data-theme="light"] button[class*="bg-emerald"],
+[data-theme="light"] button[class*="bg-emerald"] *,
 [data-theme="light"] a[class*="bg-gradient"],
-[data-theme="light"] button[class*="bg-gradient"] {
+[data-theme="light"] a[class*="bg-gradient"] *,
+[data-theme="light"] button[class*="bg-gradient"],
+[data-theme="light"] button[class*="bg-gradient"] *,
+[data-theme="light"] a[class*="bg-[#3b82f6]"],
+[data-theme="light"] a[class*="bg-[#3b82f6]"] *,
+[data-theme="light"] a[class*="bg-[#1d4ed8]"],
+[data-theme="light"] a[class*="bg-[#1d4ed8]"] *,
+[data-theme="light"] span[class*="bg-[#1d4ed8]"],
+[data-theme="light"] span[class*="bg-[#1d4ed8]"] * {
   color: #ffffff !important;
 }
 
@@ -115,16 +129,16 @@ html {
    Everything using rem units (all Tailwind text-* classes)
    will proportionally increase. */
 @media (min-width: 1280px) {
-  html { font-size: 17px; }
-}
-@media (min-width: 1536px) {
-  html { font-size: 18px; }
-}
-@media (min-width: 1920px) {
   html { font-size: 19px; }
 }
-@media (min-width: 2560px) {
+@media (min-width: 1536px) {
   html { font-size: 20px; }
+}
+@media (min-width: 1920px) {
+  html { font-size: 21px; }
+}
+@media (min-width: 2560px) {
+  html { font-size: 22px; }
 }
 
 body {
@@ -317,21 +331,64 @@ a {
   border-color: var(--border-primary) !important;
 }
 
-/* Text overrides — scoped to avoid washing out headings */
-[data-theme="light"] h1,
-[data-theme="light"] h2,
-[data-theme="light"] h3 {
+/* Text overrides — headings on light content */
+[data-theme="light"] main h1,
+[data-theme="light"] main h2,
+[data-theme="light"] main h3 {
   color: var(--text-primary) !important;
 }
 
-[data-theme="light"] [class*="text-white"]:not(header *):not(footer *):not([class*="bg-blue-600"] *):not([class*="bg-[linear-gradient"] *):not(.theme-toggle *):not(h1):not(h2):not(h3) {
+/*
+   text-white override — ONLY for body content text.
+   Must NOT override text inside:
+   - header/footer (dark chrome)
+   - buttons with colored backgrounds
+   - intentionally dark sections (hero, CTA, metrics bar)
+   - modals/popups (they have dark bgs)
+   - badges on colored backgrounds
+*/
+[data-theme="light"] [class*="text-white"]:not(
+  header *
+):not(
+  footer *
+):not(
+  [class*="bg-blue-"] *
+):not(
+  [class*="bg-emerald"] *
+):not(
+  [class*="bg-violet"] *
+):not(
+  [class*="bg-cyan"] *
+):not(
+  [class*="bg-amber"] *
+):not(
+  [class*="bg-yellow"] *
+):not(
+  [class*="bg-red"] *
+):not(
+  [class*="bg-gradient"] *
+):not(
+  [class*="bg-[#0"] *
+):not(
+  [class*="bg-[linear-gradient"] *
+):not(
+  [class*="bg-black"] *
+):not(
+  .theme-toggle *
+):not(
+  [class*="z-[100]"] *
+):not(
+  [class*="z-[101]"] *
+):not(
+  dialog *
+) {
   color: var(--text-primary) !important;
 }
 
-/* Stats / bold text */
-[data-theme="light"] span[class*="text-2xl"][class*="font-bold"],
-[data-theme="light"] span[class*="text-4xl"][class*="font-bold"],
-[data-theme="light"] div[class*="text-2xl"][class*="font-bold"] {
+/* Stats / bold text in content areas */
+[data-theme="light"] main span[class*="text-2xl"][class*="font-bold"],
+[data-theme="light"] main span[class*="text-4xl"][class*="font-bold"],
+[data-theme="light"] main div[class*="text-2xl"][class*="font-bold"] {
   color: var(--text-primary) !important;
 }
 

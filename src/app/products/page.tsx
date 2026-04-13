@@ -161,23 +161,23 @@ const fadeUp = {
 
 export default function ProductSuitePage() {
   return (
-    <div className="min-h-screen bg-[#06122f]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-20 lg:py-28 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(59,130,246,0.2)_0%,transparent_60%)]" />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '50px 50px' }} />
+      <section className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-20 lg:py-28 lg:px-10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(59,130,246,0.15)_0%,transparent_60%)]" />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(128,128,128,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,0.5) 1px,transparent 1px)', backgroundSize: '50px 50px' }} />
 
         <div className="relative mx-auto max-w-4xl text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-5 py-2 text-sm font-semibold text-blue-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+            <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--border-accent)] bg-[var(--badge-bg)] px-5 py-2 text-sm font-semibold text-[var(--accent-primary)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-primary)] animate-pulse" />
               AI-Managed Finance
             </div>
-            <h1 className="mx-auto max-w-3xl font-[var(--font-sora)] text-4xl font-bold leading-tight text-white lg:text-6xl">
+            <h1 className="mx-auto max-w-3xl font-[var(--font-sora)] text-4xl font-bold leading-tight text-[var(--text-primary)] lg:text-6xl">
               The Complete{' '}
               <span className="bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">Product Suite</span>
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg text-blue-100/60 leading-relaxed">
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-[var(--text-tertiary)] leading-relaxed">
               Eight integrated products powering the future of digital finance.
               From AI-driven trading bots to a full Web 3.0 bank — everything
               works together as one ecosystem.
@@ -198,8 +198,8 @@ export default function ProductSuitePage() {
                 transition={{ delay: 0.3 + i * 0.1 }}
                 className="text-center"
               >
-                <div className="font-[var(--font-sora)] text-3xl font-bold text-white">{s.num}</div>
-                <div className="text-sm text-blue-200/50">{s.label}</div>
+                <div className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">{s.num}</div>
+                <div className="text-sm text-[var(--text-muted)]">{s.label}</div>
               </motion.div>
             ))}
           </div>
@@ -219,7 +219,7 @@ export default function ProductSuitePage() {
                 whileInView="show"
                 viewport={{ once: true, margin: '-50px' }}
                 custom={i}
-                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-500 hover:border-white/20 hover:bg-white/[0.06]"
+                className="group relative overflow-hidden rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-card)] shadow-[var(--card-shadow,none)] backdrop-blur-sm transition-all duration-500 hover:border-[var(--border-accent)] hover:shadow-[var(--card-shadow-hover,none)]"
               >
                 {/* Background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${product.gradient} pointer-events-none`} />
@@ -253,20 +253,20 @@ export default function ProductSuitePage() {
                     </svg>
                   </div>
 
-                  <h3 className="font-[var(--font-sora)] text-xl font-bold text-white group-hover:text-blue-300 transition-colors">
+                  <h3 className="font-[var(--font-sora)] text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--accent-primary)] transition-colors">
                     {product.name}
                   </h3>
                   <p className="mt-1 text-sm font-medium bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                     {product.tagline}
                   </p>
-                  <p className="mt-4 text-[0.9rem] leading-relaxed text-blue-100/60">
+                  <p className="mt-4 text-[0.9rem] leading-relaxed text-[var(--text-tertiary)]">
                     {product.description}
                   </p>
 
                   <ul className="mt-6 grid grid-cols-2 gap-2">
                     {product.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-blue-100/70">
-                        <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                      <li key={f} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
+                        <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-[var(--accent-primary)]" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                         {f}
@@ -274,7 +274,7 @@ export default function ProductSuitePage() {
                     ))}
                   </ul>
 
-                  <div className="mt-6 flex items-center gap-1 text-sm font-medium text-blue-400 group-hover:gap-2 transition-all">
+                  <div className="mt-6 flex items-center gap-1 text-sm font-medium text-[var(--accent-primary)] group-hover:gap-2 transition-all">
                     Explore Details
                     <span className="transition-transform group-hover:translate-x-1">→</span>
                   </div>
@@ -286,12 +286,12 @@ export default function ProductSuitePage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-white/10 py-20">
+      <section className="border-t border-[var(--border-primary)] py-20">
         <div className="mx-auto max-w-3xl px-6 text-center">
-          <h2 className="font-[var(--font-sora)] text-3xl font-bold text-white">
+          <h2 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
             Ready to Get Started?
           </h2>
-          <p className="mt-4 text-blue-100/60">
+          <p className="mt-4 text-[var(--text-tertiary)]">
             Complete the onboarding process and start exploring the full
             ecosystem with guided support from your partner.
           </p>
@@ -304,7 +304,7 @@ export default function ProductSuitePage() {
             </Link>
             <Link
               href="/university"
-              className="rounded-xl border border-white/20 bg-white/10 px-8 py-3.5 font-semibold text-white transition hover:bg-white/15"
+              className="rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-8 py-3.5 font-semibold text-[var(--text-primary)] transition hover:bg-[var(--bg-card-hover)]"
             >
               Explore University
             </Link>

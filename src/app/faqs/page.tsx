@@ -150,18 +150,18 @@ export default function FaqsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(59,130,246,0.15),transparent_60%)]" />
+      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-16 lg:px-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(59,130,246,0.12),transparent_60%)]" />
         <div className="relative mx-auto max-w-4xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-2 text-sm font-medium text-blue-200">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--border-accent)] bg-[var(--badge-bg)] px-4 py-2 text-sm font-medium text-[var(--accent-primary)]">
             ❓ Frequently Asked Questions
           </div>
-          <h1 className="font-[var(--font-sora)] text-5xl font-semibold tracking-[-0.055em] text-white sm:text-6xl">
+          <h1 className="font-[var(--font-sora)] text-5xl font-semibold tracking-[-0.055em] text-[var(--text-primary)] sm:text-6xl">
             FAQs
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-blue-100/80">
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-[var(--text-secondary)]">
             Common questions about Aurum, the AI bot, onboarding steps, and the partner program —
             answered clearly.
           </p>
@@ -173,9 +173,9 @@ export default function FaqsPage() {
               placeholder="Search questions..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-2xl border border-white/20 bg-white/10 px-5 py-3 text-base text-white placeholder-blue-200/50 backdrop-blur-md outline-none focus:border-blue-400/60 focus:bg-white/12"
+              className="w-full rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-5 py-3 text-base text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] shadow-[var(--card-shadow,none)]"
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-300">🔍</span>
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--accent-primary)]">🔍</span>
           </div>
         </div>
       </div>
@@ -190,7 +190,7 @@ export default function FaqsPage() {
               className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                 activeCategory === cat.id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-white/10 text-blue-100/80 hover:bg-white/15 hover:text-white'
+                  : 'bg-[var(--bg-card)] border border-[var(--border-primary)] text-[var(--text-secondary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)]'
               }`}
             >
               {cat.label}
@@ -201,7 +201,7 @@ export default function FaqsPage() {
         {/* FAQ Accordion */}
         <div className="space-y-3">
           {visible.length === 0 && (
-            <div className="rounded-2xl border border-white/10 bg-white/6 p-8 text-center text-blue-100/60">
+            <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-8 text-center text-[var(--text-tertiary)] shadow-[var(--card-shadow,none)]">
               No questions found for &quot;{search}&quot;. Try a different search term.
             </div>
           )}
@@ -210,23 +210,23 @@ export default function FaqsPage() {
             return (
               <div
                 key={faq.id}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-white/6 backdrop-blur-sm"
+                className="overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-[var(--card-shadow,none)]"
               >
                 <button
                   onClick={() => setOpenId(isOpen ? null : faq.id)}
                   className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
                 >
-                  <span className="text-base font-semibold text-white">{faq.q}</span>
+                  <span className="text-base font-semibold text-[var(--text-primary)]">{faq.q}</span>
                   <span
-                    className={`shrink-0 text-blue-300 transition-transform ${isOpen ? 'rotate-45' : ''}`}
+                    className={`shrink-0 text-[var(--accent-primary)] transition-transform ${isOpen ? 'rotate-45' : ''}`}
                     aria-hidden="true"
                   >
                     +
                   </span>
                 </button>
                 {isOpen && (
-                  <div className="border-t border-white/8 px-6 pb-6 pt-4">
-                    <p className="text-base leading-8 text-blue-100/80">{faq.a}</p>
+                  <div className="border-t border-[var(--border-primary)] px-6 pb-6 pt-4">
+                    <p className="text-base leading-8 text-[var(--text-secondary)]">{faq.a}</p>
                   </div>
                 )}
               </div>
@@ -235,18 +235,18 @@ export default function FaqsPage() {
         </div>
 
         {/* Still have questions */}
-        <div className="mt-12 rounded-[2rem] border border-white/15 bg-white/6 p-8 text-center backdrop-blur-sm">
+        <div className="mt-12 rounded-[2rem] border border-[var(--border-secondary)] bg-[var(--bg-card)] p-8 text-center shadow-[var(--card-shadow,none)]">
           <div className="text-3xl">💬</div>
-          <h2 className="mt-3 font-[var(--font-sora)] text-2xl font-semibold text-white">
+          <h2 className="mt-3 font-[var(--font-sora)] text-2xl font-semibold text-[var(--text-primary)]">
             Still have questions?
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-base leading-7 text-blue-100/80">
+          <p className="mx-auto mt-3 max-w-lg text-base leading-7 text-[var(--text-secondary)]">
             Your AutoPilot ROI partner is available to answer any specific questions and walk you
             through onboarding personally.
           </p>
           <Link
             href="/signup"
-            className="mt-6 inline-flex items-center rounded-xl border border-blue-300/40 bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-7 py-3 text-base font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:brightness-110"
+            className="mt-6 inline-flex items-center rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-7 py-3 text-base font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:brightness-110"
           >
             Begin Onboarding →
           </Link>

@@ -5,17 +5,17 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#06122f]">
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-16 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(59,130,246,0.15),transparent_60%)]" />
         <div className="relative mx-auto max-w-3xl text-center">
-          <h1 className="font-[var(--font-sora)] text-4xl font-bold text-white">Privacy Policy</h1>
-          <p className="mt-4 text-blue-100/60">Last updated: April 12, 2026</p>
+          <h1 className="font-[var(--font-sora)] text-4xl font-bold text-[var(--text-primary)]">Privacy Policy</h1>
+          <p className="mt-4 text-[var(--text-tertiary)]">Last updated: April 12, 2026</p>
         </div>
       </div>
 
       <div className="mx-auto max-w-3xl px-6 py-16 lg:px-10">
-        <div className="prose prose-invert prose-blue max-w-none space-y-8 text-blue-100/70 [&_h2]:text-white [&_h2]:font-[var(--font-sora)] [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4 [&_strong]:text-white">
+        <div className="prose max-w-none space-y-8 text-[var(--text-secondary)] [&_h2]:text-[var(--text-primary)] [&_h2]:font-[var(--font-sora)] [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4 [&_strong]:text-[var(--text-primary)]">
 
           <h2>1. Information We Collect</h2>
           <p>We collect the following information when you use AutoPilot ROI:</p>

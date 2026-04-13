@@ -412,7 +412,7 @@ export default function EvaluatePage() {
                     }`}>
                       {results.score}
                     </div>
-                    <div className="text-xs text-white/30">/50</div>
+                    <div className="text-xs text-[var(--text-muted)]">/50</div>
                   </div>
                 </div>
 
@@ -441,7 +441,7 @@ export default function EvaluatePage() {
                         <span className="flex items-center gap-2 text-sm text-[var(--text-primary)]">
                           {cat.icon} {cat.category}
                           {cat.weight > 1 && (
-                            <span className="text-[10px] text-white/20">×{cat.weight}</span>
+                            <span className="text-[10px] text-[var(--text-muted)]">×{cat.weight}</span>
                           )}
                         </span>
                         <span className={`text-sm font-bold ${
@@ -452,7 +452,7 @@ export default function EvaluatePage() {
                           {cat.score}/{cat.max}
                         </span>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-white/5">
+                      <div className="h-2 w-full rounded-full bg-[var(--bg-card)]">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${(cat.score / cat.max) * 100}%` }}
@@ -490,10 +490,10 @@ export default function EvaluatePage() {
               <div className="rounded-2xl border border-blue-400/20 bg-blue-500/5 p-6">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="font-[var(--font-sora)] text-base font-bold text-white">
+                    <h3 className="font-[var(--font-sora)] text-base font-bold text-[var(--text-primary)]">
                       See how we evaluated Aurum Foundation
                     </h3>
-                    <p className="mt-1 text-sm text-blue-200/50">
+                    <p className="mt-1 text-sm text-[var(--text-muted)]">
                       AutopilotROI applied this exact framework before choosing to partner with Aurum. Here&apos;s how it scored — transparently, with notes on each category.
                     </p>
                   </div>
@@ -524,23 +524,23 @@ export default function EvaluatePage() {
                           </div>
                           <div>
                             <div className="text-sm font-bold text-emerald-400">Strong Opportunity</div>
-                            <div className="text-xs text-white/30">Aurum Foundation · Evaluated by AutopilotROI</div>
+                            <div className="text-xs text-[var(--text-muted)]">Aurum Foundation · Evaluated by AutopilotROI</div>
                           </div>
                         </div>
 
                         {/* Category breakdown with notes */}
                         {AURUM_EVALUATION.breakdown.map((cat) => (
-                          <div key={cat.category} className="rounded-xl bg-white/[0.02] border border-white/5 p-4">
+                          <div key={cat.category} className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-primary)] p-4">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-semibold text-white">{cat.category}</span>
+                              <span className="text-sm font-semibold text-[var(--text-primary)]">{cat.category}</span>
                               <span className="text-sm font-bold text-emerald-400">{cat.score}/10</span>
                             </div>
-                            <p className="text-xs text-white/40 leading-relaxed">{cat.note}</p>
+                            <p className="text-xs text-[var(--text-muted)] leading-relaxed">{cat.note}</p>
                           </div>
                         ))}
 
-                        <div className="rounded-lg bg-white/[0.02] border border-white/5 p-4">
-                          <p className="text-xs text-white/30 leading-relaxed italic">
+                        <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)] p-4">
+                          <p className="text-xs text-[var(--text-muted)] leading-relaxed italic">
                             {AURUM_EVALUATION.totalNote}
                           </p>
                         </div>
@@ -603,7 +603,7 @@ export default function EvaluatePage() {
               </div>
 
               {/* Disclaimer */}
-              <p className="text-center text-xs text-white/15">
+              <p className="text-center text-xs text-[var(--text-muted)]">
                 This tool is for educational purposes only and does not constitute financial advice. Always conduct your own research before investing in any opportunity. No data from this evaluation is stored or transmitted.
               </p>
             </motion.div>
@@ -625,10 +625,10 @@ export default function EvaluatePage() {
             <span className="inline-block rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-emerald-300 mb-4">
               Our Due Diligence
             </span>
-            <h2 className="font-[var(--font-sora)] text-3xl font-bold text-white sm:text-4xl lg:text-5xl tracking-tight">
+            <h2 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)] sm:text-4xl lg:text-5xl tracking-tight">
               Why We Chose <span className="text-emerald-400">Aurum</span>
             </h2>
-            <p className="mt-4 mx-auto max-w-2xl text-lg leading-relaxed text-blue-100/60">
+            <p className="mt-4 mx-auto max-w-2xl text-lg leading-relaxed text-[var(--text-tertiary)]">
               We evaluated dozens of opportunities using the same Trust Check framework above.
               Aurum Foundation wasn&apos;t just a good score — it was the best we found. Here&apos;s why.
             </p>
@@ -683,8 +683,8 @@ export default function EvaluatePage() {
                 }`}
               >
                 <div className="text-2xl mb-3">{item.icon}</div>
-                <h3 className="font-[var(--font-sora)] text-base font-bold text-white mb-2">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-blue-100/60">{item.desc}</p>
+                <h3 className="font-[var(--font-sora)] text-base font-bold text-[var(--text-primary)] mb-2">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-[var(--text-tertiary)]">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -702,10 +702,10 @@ export default function EvaluatePage() {
           transition={{ duration: 0.5 }}
         >
           <div className="text-center mb-10">
-            <h3 className="font-[var(--font-sora)] text-2xl font-bold text-white sm:text-3xl tracking-tight">
+            <h3 className="font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)] sm:text-3xl tracking-tight">
               Built by Industry Veterans
             </h3>
-            <p className="mt-3 text-blue-100/50 text-base">
+            <p className="mt-3 text-[var(--text-tertiary)] text-base">
               The team behind Aurum brings decades of leadership from Binance, global network development, and fintech.
             </p>
           </div>
@@ -733,19 +733,19 @@ export default function EvaluatePage() {
             ].map((person) => (
               <div
                 key={person.name}
-                className="flex flex-col items-center rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-center transition hover:border-blue-500/30 hover:bg-white/[0.04]"
+                className="flex flex-col items-center rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--card-shadow,none)] transition hover:border-[var(--border-accent)]"
               >
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 text-3xl">
                   {person.icon}
                 </div>
-                <h4 className="font-[var(--font-sora)] text-lg font-bold text-white">{person.name}</h4>
-                <p className="text-xs font-semibold uppercase tracking-widest text-blue-400/70 mt-1">{person.role}</p>
-                <p className="mt-3 text-sm leading-relaxed text-blue-100/50">{person.bio}</p>
+                <h4 className="font-[var(--font-sora)] text-lg font-bold text-[var(--text-primary)]">{person.name}</h4>
+                <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent-primary)] mt-1">{person.role}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[var(--text-tertiary)]">{person.bio}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-8 text-center text-xs text-white/20">
+          <p className="mt-8 text-center text-xs text-[var(--text-muted)]">
             Full team details available at <a href="https://aurum.foundation/en#team" target="_blank" rel="noopener noreferrer" className="text-blue-400/40 hover:text-blue-400/60 transition underline">aurum.foundation</a>
           </p>
         </motion.div>
