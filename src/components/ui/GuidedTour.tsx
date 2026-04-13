@@ -6,15 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 /* ═══════════════════════════════════════════════════════════════
    GUIDED TOUR — Reusable spotlight walkthrough component
    
-   Usage:
-     <GuidedTour
-       tourId="partner-dashboard"
-       steps={[
-         { target: '#overview-card', title: '...', content: '...' },
-         ...
-       ]}
-       onComplete={() => ...}
-     />
+   Mobile-aware: if a target element is hidden (display:none or
+   zero-size), the step automatically falls back to a centered
+   modal — no broken spotlights or off-screen tooltips.
    ═══════════════════════════════════════════════════════════════ */
 
 export interface TourStep {
@@ -73,6 +67,15 @@ export function useTour(tourId: string) {
   return { active, start, stop, hasCompleted, reset }
 }
 
+/** Check if an element is actually visible and has layout */
+function isElementVisible(el: Element): boolean {
+  const style = window.getComputedStyle(el)
+  if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false
+  const rect = el.getBoundingClientRect()
+  if (rect.width === 0 || rect.height === 0) return false
+  return true
+}
+
 export default function GuidedTour({
   tourId,
   steps,
@@ -84,11 +87,20 @@ export default function GuidedTour({
   const [currentStep, setCurrentStep] = useState(0)
   const [targetRect, setTargetRect] = useState<Rect | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
 
   const step = steps[currentStep]
   const progress = ((currentStep + 1) / steps.length) * 100
   const isLast = currentStep === steps.length - 1
+
+  // Detect mobile
+  useEffect(() => {
+    function check() { setIsMobile(window.innerWidth < 1024) }
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   // Auto-start logic
   useEffect(() => {
@@ -112,7 +124,7 @@ export default function GuidedTour({
         return
       }
       const el = document.querySelector(step.target)
-      if (el) {
+      if (el && isElementVisible(el)) {
         const rect = el.getBoundingClientRect()
         setTargetRect({
           top: rect.top + window.scrollY,
@@ -123,6 +135,7 @@ export default function GuidedTour({
         // Scroll element into view
         el.scrollIntoView({ behavior: 'smooth', block: 'center' })
       } else {
+        // Element hidden (e.g. sidebar on mobile) → fall back to centered modal
         setTargetRect(null)
       }
     }
@@ -179,13 +192,14 @@ export default function GuidedTour({
 
   if (!active) return null
 
-  // Calculate tooltip position
+  // Calculate tooltip position — mobile always centers, desktop positions relative to target
   const tooltipStyle: React.CSSProperties = {}
   const pos = step?.position || 'bottom'
+  const useCenter = !targetRect || pos === 'center' || isMobile
+  const tooltipWidth = isMobile ? Math.min(360, window.innerWidth - 32) : 380
 
-  if (targetRect && pos !== 'center') {
+  if (targetRect && !useCenter) {
     const padding = 16
-    const tooltipWidth = 380
 
     switch (pos) {
       case 'bottom':
@@ -202,12 +216,18 @@ export default function GuidedTour({
         tooltipStyle.bottom = window.innerHeight - targetRect.top + padding + window.scrollY
         tooltipStyle.left = Math.max(
           padding,
-          targetRect.left + targetRect.width / 2 - tooltipWidth / 2
+          Math.min(
+            targetRect.left + targetRect.width / 2 - tooltipWidth / 2,
+            window.innerWidth - tooltipWidth - padding
+          )
         )
         break
       case 'right':
         tooltipStyle.top = targetRect.top + targetRect.height / 2 - 60
-        tooltipStyle.left = targetRect.left + targetRect.width + padding
+        tooltipStyle.left = Math.min(
+          targetRect.left + targetRect.width + padding,
+          window.innerWidth - tooltipWidth - padding
+        )
         break
       case 'left':
         tooltipStyle.top = targetRect.top + targetRect.height / 2 - 60
@@ -234,7 +254,7 @@ export default function GuidedTour({
           <defs>
             <mask id={`tour-mask-${tourId}`}>
               <rect x="0" y="0" width="100%" height="100%" fill="white" />
-              {targetRect && (
+              {targetRect && !isMobile && (
                 <rect
                   x={targetRect.left - 8}
                   y={targetRect.top - 8}
@@ -256,8 +276,8 @@ export default function GuidedTour({
           />
         </svg>
 
-        {/* Spotlight ring glow */}
-        {targetRect && (
+        {/* Spotlight ring glow — only on desktop when target is visible */}
+        {targetRect && !isMobile && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -283,12 +303,16 @@ export default function GuidedTour({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.97 }}
           transition={{ duration: 0.25 }}
-          className={`fixed z-[9999] w-[380px] rounded-2xl border border-blue-500/20 bg-[#0c1a3a] shadow-2xl shadow-blue-900/30 ${
-            !targetRect || pos === 'center'
+          className={`fixed z-[9999] rounded-2xl border border-blue-500/20 bg-[#0c1a3a] shadow-2xl shadow-blue-900/30 ${
+            useCenter
               ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
               : ''
           }`}
-          style={targetRect && pos !== 'center' ? { position: 'absolute', ...tooltipStyle } : {}}
+          style={{
+            width: tooltipWidth,
+            maxWidth: 'calc(100vw - 32px)',
+            ...(useCenter ? {} : { position: 'absolute', ...tooltipStyle }),
+          }}
         >
           {/* Progress bar */}
           <div className="h-1 w-full overflow-hidden rounded-t-2xl bg-white/5">
@@ -299,7 +323,7 @@ export default function GuidedTour({
             />
           </div>
 
-          <div className="p-5">
+          <div className="p-4 sm:p-5">
             {/* Header */}
             <div className="mb-3 flex items-start justify-between">
               <div className="flex items-center gap-2.5">
@@ -307,7 +331,7 @@ export default function GuidedTour({
                   <span className="text-2xl">{step.icon}</span>
                 )}
                 <div>
-                  <h4 className="font-[var(--font-sora)] text-base font-bold text-white leading-tight">
+                  <h4 className="font-[var(--font-sora)] text-sm sm:text-base font-bold text-white leading-tight">
                     {step?.title}
                   </h4>
                   <span className="text-[11px] font-semibold uppercase tracking-widest text-blue-400/70">
@@ -317,7 +341,7 @@ export default function GuidedTour({
               </div>
               <button
                 onClick={handleSkip}
-                className="rounded-lg p-1 text-white/30 transition hover:bg-white/5 hover:text-white/60"
+                className="rounded-lg p-1.5 text-white/30 transition hover:bg-white/5 hover:text-white/60"
                 title="Skip tour"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -327,7 +351,7 @@ export default function GuidedTour({
             </div>
 
             {/* Content */}
-            <p className="mb-4 text-sm leading-relaxed text-blue-50/70 whitespace-pre-line">
+            <p className="mb-4 text-xs sm:text-sm leading-relaxed text-blue-50/70 whitespace-pre-line">
               {step?.content}
             </p>
 
@@ -349,7 +373,8 @@ export default function GuidedTour({
                 ← Back
               </button>
 
-              <div className="flex items-center gap-1.5">
+              {/* Step dots — hidden on mobile to save space */}
+              <div className="hidden sm:flex items-center gap-1.5">
                 {steps.map((_, i) => (
                   <div
                     key={i}
@@ -363,6 +388,11 @@ export default function GuidedTour({
                   />
                 ))}
               </div>
+
+              {/* Mobile step counter instead of dots */}
+              <span className="sm:hidden text-[11px] font-semibold text-white/30 tabular-nums">
+                {currentStep + 1}/{steps.length}
+              </span>
 
               <button
                 onClick={handleNext}
@@ -387,13 +417,13 @@ export default function GuidedTour({
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="text-center"
+              className="text-center px-6"
             >
-              <div className="text-7xl mb-4">🎉</div>
-              <h3 className="font-[var(--font-sora)] text-3xl font-bold text-white mb-2">
+              <div className="text-6xl sm:text-7xl mb-4">🎉</div>
+              <h3 className="font-[var(--font-sora)] text-2xl sm:text-3xl font-bold text-white mb-2">
                 Tour Complete!
               </h3>
-              <p className="text-blue-50/60">
+              <p className="text-sm sm:text-base text-blue-50/60">
                 You&apos;re ready to go. You can replay this tour anytime.
               </p>
             </motion.div>
