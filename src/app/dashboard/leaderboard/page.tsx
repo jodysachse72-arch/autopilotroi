@@ -67,7 +67,7 @@ export default function LeaderboardPage() {
       </div>
 
       {/* Top 3 podium */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {demoPartners.slice(0, 3).map((p, i) => {
           const heights = ['h-40', 'h-32', 'h-28']
           const order = [1, 0, 2] // Gold center, Silver left, Bronze right
@@ -86,7 +86,7 @@ export default function LeaderboardPage() {
               <span className="text-3xl mb-2">{partner.badge}</span>
               <div className="text-sm font-bold text-white">{partner.name}</div>
               <div className={`text-xs font-semibold ${t.color}`}>{partner.tier}</div>
-              <div className="text-xs text-white/30 mt-1">{partner.leads} leads · {partner.converted} converted</div>
+              <div className="text-xs text-[var(--text-muted)] mt-1">{partner.leads} leads · {partner.converted} converted</div>
               <div className={`mt-3 w-full rounded-t-xl ${t.bg} ${heights[idx]} flex items-center justify-center`}>
                 <span className="font-[var(--font-sora)] text-3xl font-black text-white/20">
                   #{partner.rank}
@@ -99,7 +99,7 @@ export default function LeaderboardPage() {
 
       {/* Full ranking table */}
       <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden">
-        <div className="border-b border-[var(--border-primary)] px-6 py-4">
+        <div className="border-b border-[var(--border-primary)] px-4 sm:px-6 py-4">
           <h3 className="font-[var(--font-sora)] text-base font-semibold text-[var(--text-primary)]">
             Full Rankings
           </h3>
@@ -174,8 +174,8 @@ export default function LeaderboardPage() {
               }`}
             >
               <div className="text-3xl mb-2">{a.unlocked ? a.icon : '🔒'}</div>
-              <div className="text-xs font-bold text-white">{a.name}</div>
-              <div className="mt-1 text-[10px] text-white/30">{a.description}</div>
+              <div className="text-xs font-bold text-[var(--text-primary)]">{a.name}</div>
+              <div className="mt-1 text-[10px] text-[var(--text-muted)]">{a.description}</div>
             </div>
           ))}
         </div>

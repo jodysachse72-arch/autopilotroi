@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { LogoIcon } from '@/components/ui/Logo'
 import GuidedTour, { type TourStep } from '@/components/ui/GuidedTour'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import CommandPalette from '@/components/ui/CommandPalette'
 import ThemeToggle from '@/components/ui/ThemeToggle'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const sidebarLinks = [
   { id: 'admin-dashboard', label: 'Dashboard', href: '/admin', icon: '📊' },
@@ -117,10 +118,23 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname()
   const [showTour, setShowTour] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Close drawer on route change
+  useEffect(() => { setMobileOpen(false) }, [pathname])
+
+  // Close on escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false) }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
+  const toggleMobile = useCallback(() => setMobileOpen(prev => !prev), [])
 
   return (
     <div className="min-h-screen flex">
-      {/* Sidebar */}
+      {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex w-64 flex-col border-r border-[var(--border-primary)] bg-[var(--bg-card)]">
         <div className="flex h-[4.8rem] items-center px-6 border-b border-[var(--border-primary)]">
           <Link href="/" className="flex items-center gap-2">
@@ -167,20 +181,105 @@ export default function AdminLayout({
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-[4.8rem] items-center justify-between border-b border-[var(--border-primary)] bg-[var(--bg-card)] px-6 lg:px-8">
-          <div className="lg:hidden">
-            <Link href="/admin" className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)]">
-              Admin Panel
-            </Link>
-          </div>
-          <div className="hidden lg:block">
-            <h1 className="font-[var(--font-sora)] text-lg font-semibold text-[var(--text-primary)]">
-              System Administration
-            </h1>
-          </div>
+      {/* ── Mobile Drawer Overlay ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed inset-y-0 left-0 z-50 w-72 flex flex-col border-r border-[var(--border-primary)] bg-[var(--bg-card)] lg:hidden"
+            >
+              <div className="flex h-16 items-center justify-between px-5 border-b border-[var(--border-primary)]">
+                <Link href="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
+                  <LogoIcon size={28} />
+                  <span className="font-[var(--font-sora)] text-base font-semibold">
+                    <span className="text-[var(--text-primary)]">Admin</span>
+                    <span className="text-red-400"> Panel</span>
+                  </span>
+                </Link>
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)]"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+                {sidebarLinks.map((link) => {
+                  const isActive =
+                    link.href === '/admin'
+                      ? pathname === '/admin'
+                      : pathname.startsWith(link.href)
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={`flex items-center gap-3 rounded-xl px-4 py-3.5 text-base font-medium transition ${
+                        isActive
+                          ? 'bg-red-500/15 text-red-400'
+                          : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]'
+                      }`}
+                    >
+                      <span className="text-lg">{link.icon}</span>
+                      {link.label}
+                    </Link>
+                  )
+                })}
+              </nav>
+
+              <div className="border-t border-[var(--border-primary)] p-4 flex items-center justify-between">
+                <Link
+                  href="/"
+                  className="text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition"
+                >
+                  ← Back to site
+                </Link>
+                <ThemeToggle />
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ── Main Content ── */}
+      <div className="flex flex-1 flex-col min-w-0">
+        <header className="flex h-14 sm:h-[4.8rem] items-center justify-between border-b border-[var(--border-primary)] bg-[var(--bg-card)] px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
+            {/* Hamburger */}
+            <button
+              onClick={toggleMobile}
+              className="flex lg:hidden h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] text-[var(--text-secondary)]"
+              aria-label="Toggle navigation"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div className="hidden lg:block">
+              <h1 className="font-[var(--font-sora)] text-lg font-semibold text-[var(--text-primary)]">
+                System Administration
+              </h1>
+            </div>
+            <div className="lg:hidden">
+              <span className="font-[var(--font-sora)] text-sm font-semibold text-[var(--text-primary)]">
+                Admin
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Cmd+K */}
             <button
               onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
@@ -192,40 +291,18 @@ export default function AdminLayout({
             </button>
             <button
               onClick={() => setShowTour(true)}
-              className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+              className="hidden sm:block rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
               title="Take a guided tour of the admin panel"
             >
               🗺️ Tour
             </button>
-            <span id="admin-badge" className="rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-400">
+            <span id="admin-badge" className="rounded-full bg-red-500/15 px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold text-red-400">
               Admin
             </span>
           </div>
         </header>
 
-        {/* Mobile nav */}
-        <nav className="flex lg:hidden overflow-x-auto border-b border-[var(--border-primary)] bg-[var(--bg-card)] px-4 scrollbar-hide">
-          {sidebarLinks.slice(0, 5).map((link) => {
-            const isActive =
-              link.href === '/admin' ? pathname === '/admin' : pathname.startsWith(link.href)
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`flex items-center gap-2 whitespace-nowrap px-4 py-3 text-sm font-medium border-b-2 transition ${
-                  isActive
-                    ? 'border-red-500 text-red-400'
-                    : 'border-transparent text-[var(--text-muted)]'
-                }`}
-              >
-                <span>{link.icon}</span>
-                {link.label}
-              </Link>
-            )
-          })}
-        </nav>
-
-        <main className="flex-1 p-6 lg:p-8">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
           <Breadcrumbs />
           {children}
         </main>

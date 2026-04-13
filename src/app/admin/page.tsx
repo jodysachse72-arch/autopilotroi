@@ -119,7 +119,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick links */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Link
           href="/admin/partners"
           className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 transition hover:border-blue-500/30"
