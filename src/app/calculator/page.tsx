@@ -3,8 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+
 
 /* ═══════════════════════════════════════════════════════════════
    PROFIT CALCULATOR
@@ -79,7 +78,6 @@ export default function CalculatorPage() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-[var(--bg-body)] pt-24 pb-20">
         <div className="mx-auto max-w-6xl px-6 lg:px-10">
 
@@ -297,7 +295,6 @@ export default function CalculatorPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </>
   )
 }
