@@ -7,6 +7,7 @@ import { LogoIcon } from '@/components/ui/Logo'
 import GuidedTour, { type TourStep } from '@/components/ui/GuidedTour'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import CommandPalette from '@/components/ui/CommandPalette'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 
 const sidebarLinks = [
   { id: 'admin-dashboard', label: 'Dashboard', href: '/admin', icon: '📊' },
@@ -155,13 +156,14 @@ export default function AdminLayout({
           })}
         </nav>
 
-        <div className="border-t border-[var(--border-primary)] p-4">
+        <div className="border-t border-[var(--border-primary)] p-4 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition"
           >
             ← Back to site
           </Link>
+          <ThemeToggle />
         </div>
       </aside>
 
