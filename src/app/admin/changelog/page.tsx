@@ -41,6 +41,8 @@ const changelog: ChangeEntry[] = [
       { title: 'Theme Toggle in Sidebars', description: 'Dark/light mode switch added to bottom of both dashboard and admin sidebars.', type: 'improvement', files: ['src/app/dashboard/layout.tsx', 'src/app/admin/layout.tsx'] },
       { title: 'Admin Audit Log', description: 'New /admin/audit page with filterable event timeline, search, category badges. Includes reusable logAuditEvent() helper. Added to sidebar.', type: 'feature', files: ['src/app/admin/audit/page.tsx', 'src/app/admin/layout.tsx'] },
       { title: 'ThriveDesk in Checklist + Integrations', description: 'Added ThriveDesk setup items to launch checklist. Added as 8th integration in credential vault with widget ID field.', type: 'improvement', files: ['src/app/admin/checklist/page.tsx', 'src/app/admin/settings/page.tsx'] },
+      { title: 'Replaced Sanity CMS with In-App Content Editor', description: 'Removed sanity, next-sanity, @sanity/vision packages (~140MB). Deleted Sanity config, schemas, /studio route. Built full in-app Content Editor with 4 tabs (Homepage, Blog, FAQs, Videos), 50-step undo (Ctrl+Z), Export/Import, first-time walkthrough, and toast notifications. Content stored in localStorage, Supabase migration ready.', type: 'feature', files: ['src/lib/content-store.ts', 'src/app/admin/cms/page.tsx'] },
+      { title: 'Supabase Migration: CMS Tables', description: 'Created SQL migration for cms_content and cms_revisions tables with RLS policies, auto-updating timestamps, and revision history for undo.', type: 'infrastructure', files: ['supabase/migrations/20260413_cms_content.sql'] },
     ],
   },
   {
@@ -151,7 +153,7 @@ const changelog: ChangeEntry[] = [
     date: '2026-04-10',
     phase: 'Phase 1: LAUNCH',
     items: [
-      { title: 'Initial site build', description: 'Next.js 15 App Router with Tailwind CSS, Framer Motion, Supabase, and Sanity CMS', type: 'infrastructure' },
+      { title: 'Initial site build', description: 'Next.js 15 App Router with Tailwind CSS, Framer Motion, and Supabase', type: 'infrastructure' },
       { title: 'Onboarding funnel (Signup → Quiz → Waiting Room)', description: 'Multi-step flow with referral code tracking and localStorage persistence', type: 'feature' },
       { title: 'Readiness assessment quiz', description: 'Interactive quiz scoring leads into beginner/intermediate/advanced tiers', type: 'feature' },
       { title: 'Email system (Resend)', description: 'Partner notification + prospect welcome email with rich HTML templates', type: 'feature' },
