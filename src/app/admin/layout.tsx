@@ -96,11 +96,10 @@ const ADMIN_TOUR: TourStep[] = [
   },
   {
     target: '#admin-cms',
-    title: 'CMS Studio (Sanity)',
-    content: 'Opens the content management system where you can create blog posts, manage university videos, and edit page content — all without touching code.',
-    icon: '🎨',
+    title: 'Content Editor',
+    content: 'Edit all website content — headlines, blog posts, FAQs, and videos. Changes are instant with undo support (Ctrl+Z).',
+    icon: '✏️',
     position: 'right',
-    actionHint: 'Opens in a new tab — that\'s normal',
   },
   {
     target: null,
