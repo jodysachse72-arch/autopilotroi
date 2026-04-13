@@ -44,28 +44,34 @@
   --background: #06122f;
 }
 
-/* ── Light theme ── */
+/* ── Light theme (HYBRID: dark chrome + light content) ── */
 [data-theme="light"] {
-  --bg-primary: #f0f4ff;
-  --bg-secondary: #e8eeff;
+  /* Body / content areas — warm white */
+  --bg-primary: #fafbff;
+  --bg-secondary: #f5f7ff;
   --bg-card: #ffffff;
   --bg-card-hover: #f8faff;
   --bg-card-solid: #ffffff;
-  --bg-hero: #edf2ff;
-  --bg-body-gradient: linear-gradient(180deg, #f0f4ff 0%, #e8eeff 40%, #f5f7ff 100%);
-  --bg-section: linear-gradient(180deg, #edf2ff 0%, #f0f4ff 100%);
-  --bg-navbar: rgba(255, 255, 255, 0.85);
-  --bg-footer: rgba(240, 244, 255, 0.95);
+  --bg-hero: #f0f4ff;
+  --bg-body-gradient: linear-gradient(180deg, #f5f7ff 0%, #fafbff 40%, #ffffff 100%);
+  --bg-section: linear-gradient(180deg, #f0f4ff 0%, #fafbff 100%);
 
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
+  /* Header + Footer — STAY DARK (same navy as dark theme) */
+  --bg-navbar: rgba(10, 26, 63, 0.97);
+  --bg-footer: rgba(6, 18, 47, 0.97);
+
+  /* Text — optimised for white backgrounds */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
   --text-tertiary: #64748b;
   --text-muted: #94a3b8;
 
+  /* Borders — visible on white */
   --border-primary: rgba(15, 23, 42, 0.08);
   --border-secondary: rgba(15, 23, 42, 0.12);
   --border-accent: rgba(59, 130, 246, 0.25);
 
+  /* Accent — slightly deeper for contrast on white */
   --accent-primary: #2563eb;
   --accent-gradient: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
   --accent-shadow: rgba(37, 99, 235, 0.20);
@@ -76,10 +82,14 @@
   --badge-border: rgba(59, 130, 246, 0.20);
 
   --selection-bg: rgba(59, 130, 246, 0.25);
-  --selection-text: #0f172a;
+  --selection-text: #1e293b;
 
-  --foreground: #0f172a;
-  --background: #f0f4ff;
+  --foreground: #1e293b;
+  --background: #fafbff;
+
+  /* Card shadows — depth on white bg (replaces glassmorphism) */
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
 }
 
 /* ── Force white text on colored buttons in light mode ── */
@@ -192,74 +202,84 @@ a {
 
 /* ═══════════════════════════════════════════════════════════════
    LIGHT MODE — LAYOUT COMPONENT OVERRIDES
-   Navbar, Footer, and common page sections
+   HYBRID: Header + Footer stay DARK, content goes light
    ═══════════════════════════════════════════════════════════════ */
 
-/* Navbar */
+/* Navbar — STAYS DARK in light mode (dark navy bg, white text) */
 [data-theme="light"] header.sticky {
   background: var(--bg-navbar) !important;
-  border-bottom-color: var(--border-primary) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(20px) saturate(1.2);
 }
 [data-theme="light"] header.sticky a,
 [data-theme="light"] header.sticky span {
-  color: var(--text-primary);
+  color: #ffffff;
 }
 [data-theme="light"] header.sticky nav a {
-  color: var(--text-tertiary);
+  color: rgba(191, 219, 254, 0.7);
 }
 [data-theme="light"] header.sticky nav a:hover,
 [data-theme="light"] header.sticky nav a[class*="text-white"] {
-  color: var(--text-primary);
+  color: #ffffff;
 }
-/* Mobile menu */
+/* Mobile menu — dark to match header */
 [data-theme="light"] header nav[class*="border-t"] {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-top-color: var(--border-primary) !important;
+  background: rgba(10, 26, 63, 0.97) !important;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
 }
 [data-theme="light"] header nav[class*="border-t"] a {
-  color: var(--text-secondary) !important;
+  color: rgba(191, 219, 254, 0.8) !important;
 }
 [data-theme="light"] header nav[class*="border-t"] a:hover,
 [data-theme="light"] header nav[class*="border-t"] a[class*="bg-white"] {
-  background: rgba(59, 130, 246, 0.08) !important;
-  color: var(--text-primary) !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #ffffff !important;
 }
 [data-theme="light"] header nav[class*="border-t"] a[class*="bg-blue-600"] {
   color: white !important;
 }
-/* Hamburger */
+/* Hamburger — light icon on dark bg */
 [data-theme="light"] header button[aria-label] {
-  border-color: var(--border-primary) !important;
-  background: rgba(0, 0, 0, 0.04) !important;
-  color: var(--text-primary) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+/* Nav CTA button — keep white text */
+[data-theme="light"] header a[class*="bg-blue-600"],
+[data-theme="light"] header a[class*="bg-gradient"] {
+  color: #ffffff !important;
 }
 
-/* Footer */
+/* Footer — STAYS DARK in light mode (dark navy bg, muted blue text) */
 [data-theme="light"] footer {
   background: var(--bg-footer) !important;
-  border-top-color: var(--border-primary) !important;
-  color: var(--text-tertiary) !important;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(191, 219, 254, 0.6) !important;
 }
 [data-theme="light"] footer div[class*="text-white"],
 [data-theme="light"] footer span[class*="text-white"] {
-  color: var(--text-primary) !important;
+  color: #ffffff !important;
 }
 [data-theme="light"] footer span[class*="text-blue-300"] {
-  color: var(--accent-primary) !important;
+  color: #93c5fd !important;
 }
 [data-theme="light"] footer a {
-  color: var(--text-tertiary) !important;
+  color: rgba(191, 219, 254, 0.5) !important;
 }
 [data-theme="light"] footer a:hover {
-  color: var(--text-primary) !important;
+  color: #ffffff !important;
 }
 [data-theme="light"] footer p {
-  color: var(--text-muted) !important;
+  color: rgba(191, 219, 254, 0.35) !important;
 }
 [data-theme="light"] footer div[class*="border-t"] {
-  border-top-color: var(--border-primary) !important;
-  color: var(--text-muted) !important;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  color: rgba(191, 219, 254, 0.35) !important;
+}
+/* Footer headings — white */
+[data-theme="light"] footer h4,
+[data-theme="light"] footer h3 {
+  color: #ffffff !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -404,9 +424,9 @@ a {
    HOMEPAGE LIGHT MODE — Specific sections
    ═══════════════════════════════════════════════════════════════ */
 
-/* Hero section — use light gradient */
+/* Hero section — subtle warm gradient */
 [data-theme="light"] section[class*="bg-[#061238]"] {
-  background: linear-gradient(180deg, #edf2ff 0%, #dbeafe 50%, #f0f4ff 100%) !important;
+  background: linear-gradient(180deg, #f0f4ff 0%, #e8eeff 50%, #fafbff 100%) !important;
   color: var(--text-primary) !important;
 }
 [data-theme="light"] section[class*="bg-[#061238]"] h1,
@@ -419,13 +439,14 @@ a {
   color: var(--text-secondary) !important;
 }
 
-/* Pillar cards on homepage — light elevated cards */
+/* Pillar cards on homepage — white elevated cards with soft shadow */
 [data-theme="light"] [class*="bg-[#0e2460]"] {
   background: white !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Dark section backgrounds */
+/* Dark section backgrounds → light */
 [data-theme="light"] [class*="bg-[#0a1a3f]"] {
   background: var(--bg-hero) !important;
 }
@@ -433,7 +454,7 @@ a {
 /* Stats bar background */
 [data-theme="light"] [class*="bg-[#0b1f57]"],
 [data-theme="light"] [class*="bg-[#08205b]"] {
-  background: #e0e7ff !important;
+  background: #eef2ff !important;
 }
 
 /* Backdrop blur panels */
