@@ -28,9 +28,9 @@ export default function PartnerToolsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Hero */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
+      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-16 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_30%,rgba(59,130,246,0.15),transparent_60%)]" />
         <div className="relative mx-auto max-w-3xl text-center">
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}
@@ -38,11 +38,11 @@ export default function PartnerToolsPage() {
             🔗 Partner Tools
           </motion.div>
           <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1}
-            className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+            className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-5xl">
             Referral Link Generator
           </motion.h1>
           <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-            className="mx-auto mt-4 max-w-xl text-lg leading-8 text-blue-100/80">
+            className="mx-auto mt-4 max-w-xl text-lg leading-8 text-[var(--text-secondary)]">
             Enter your Aurum backoffice referral code to generate your personalized
             onboarding URL. Share it with prospects — they&apos;ll be attributed to you automatically.
           </motion.p>
@@ -53,9 +53,9 @@ export default function PartnerToolsPage() {
         {/* Generator Card */}
         <motion.div
           variants={fadeUp} initial="hidden" animate="show" custom={3}
-          className="rounded-[2rem] border border-white/15 bg-white/6 p-8 backdrop-blur-sm"
+          className="rounded-[2rem] border border-[var(--border-secondary)] bg-[var(--bg-card)] p-8 shadow-[var(--card-shadow,none)]"
         >
-          <label className="mb-2 block text-sm font-medium text-blue-200/80">
+          <label className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
             Your Aurum Referral Code
           </label>
           <input
@@ -63,7 +63,7 @@ export default function PartnerToolsPage() {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="e.g. BARRY123 or your Aurum username"
-            className="w-full rounded-xl border border-white/20 bg-white/10 px-5 py-3.5 text-lg text-white placeholder-blue-200/40 backdrop-blur-md outline-none focus:border-blue-400/60 focus:bg-white/12 transition"
+            className="w-full rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-5 py-3.5 text-lg text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--accent-primary)] transition"
           />
 
           {referralUrl && (
@@ -72,7 +72,7 @@ export default function PartnerToolsPage() {
               animate={{ opacity: 1, y: 0 }}
               className="mt-6"
             >
-              <label className="mb-2 block text-sm font-medium text-blue-200/80">
+              <label className="mb-2 block text-sm font-medium text-[var(--text-secondary)]">
                 Your Referral URL
               </label>
               <div className="flex items-stretch gap-2">
@@ -97,9 +97,9 @@ export default function PartnerToolsPage() {
         {/* How it works */}
         <motion.div
           variants={fadeUp} initial="hidden" animate="show" custom={4}
-          className="mt-8 rounded-[2rem] border border-white/10 bg-white/4 p-8 backdrop-blur-sm"
+          className="mt-8 rounded-[2rem] border border-[var(--border-primary)] bg-[var(--bg-card)] p-8 shadow-[var(--card-shadow,none)]"
         >
-          <h2 className="mb-6 font-[var(--font-sora)] text-xl font-semibold text-white">
+          <h2 className="mb-6 font-[var(--font-sora)] text-xl font-semibold text-[var(--text-primary)]">
             How it works
           </h2>
           <div className="space-y-4">
@@ -114,8 +114,8 @@ export default function PartnerToolsPage() {
                   {item.step}
                 </span>
                 <div>
-                  <h3 className="text-sm font-semibold text-white">{item.title}</h3>
-                  <p className="mt-0.5 text-sm leading-relaxed text-blue-100/60">{item.desc}</p>
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)]">{item.title}</h3>
+                  <p className="mt-0.5 text-sm leading-relaxed text-[var(--text-muted)]">{item.desc}</p>
                 </div>
               </div>
             ))}

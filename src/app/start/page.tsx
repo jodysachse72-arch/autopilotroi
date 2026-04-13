@@ -233,18 +233,18 @@ export default function StartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-12 lg:px-10">
+      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-12 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_60%,rgba(59,130,246,0.18),transparent_50%)]" />
         <div className="relative mx-auto max-w-7xl">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-2 text-sm font-medium text-blue-200">
             🚀 Guided Onboarding
           </div>
-          <h1 className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.05em] text-white lg:text-5xl">
+          <h1 className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.05em] text-[var(--text-primary)] lg:text-5xl">
             Start Your Aurum Journey
           </h1>
-          <p className="mt-3 max-w-2xl text-lg text-blue-100/80">
+          <p className="mt-3 max-w-2xl text-lg text-[var(--text-secondary)]">
             Follow these 6 steps to complete your Aurum onboarding. Your partner is available to
             help at any stage.
           </p>
@@ -294,8 +294,8 @@ export default function StartPage() {
                     isComplete
                       ? 'border-emerald-500/30 bg-emerald-500/5'
                       : isExpanded
-                        ? 'border-blue-400/40 bg-white/6'
-                        : 'border-white/10 bg-white/4'
+                        ? 'border-blue-400/40 bg-[var(--bg-card)]'
+                        : 'border-[var(--border-primary)] bg-[var(--bg-card)]'
                   }`}
                 >
                   {/* Step header — always visible, click to expand */}
@@ -318,10 +318,10 @@ export default function StartPage() {
                       <div className="text-xs font-semibold uppercase tracking-widest text-blue-300/70">
                         Step {step.id}
                       </div>
-                      <div className="mt-0.5 font-[var(--font-sora)] text-lg font-semibold text-white">
+                      <div className="mt-0.5 font-[var(--font-sora)] text-lg font-semibold text-[var(--text-primary)]">
                         {step.title}
                       </div>
-                      <div className="text-sm text-blue-100/60">{step.subtitle}</div>
+                      <div className="text-sm text-[var(--text-muted)]">{step.subtitle}</div>
                     </div>
                     {isComplete && (
                       <span className="shrink-0 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300">
@@ -337,15 +337,15 @@ export default function StartPage() {
 
                   {/* Expanded content */}
                   {isExpanded && (
-                    <div className="border-t border-white/8 px-6 pb-6 pt-5 space-y-5">
+                    <div className="border-t border-[var(--border-primary)] px-6 pb-6 pt-5 space-y-5">
                       {/* Video */}
                       {step.videoUrl && (
                         <VideoModal videoUrl={step.videoUrl}>
-                          <div className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/15 bg-slate-900/60 px-4 py-3 transition hover:bg-slate-900/80">
+                          <div className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-4 py-3 transition hover:border-[var(--border-accent)]">
                             <span className="text-2xl">🎬</span>
                             <div>
                               <div className="text-xs font-semibold text-blue-300">{step.videoLabel}</div>
-                              <div className="text-sm font-medium text-white">{step.videoNote}</div>
+                              <div className="text-sm font-medium text-[var(--text-primary)]">{step.videoNote}</div>
                             </div>
                             <span className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-red-500 text-white shadow-[0_4px_12px_rgba(239,68,68,0.4)]">
                               ▶
@@ -464,10 +464,10 @@ export default function StartPage() {
           <div className="space-y-5">
             {/* Progress summary */}
             <div
-              className="sticky top-24 rounded-2xl border border-white/10 bg-white/6 p-5 backdrop-blur-sm"
+              className="sticky top-24 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-[var(--card-shadow,none)]"
               id="partner-contact"
             >
-              <h3 className="font-semibold text-white mb-4 text-sm uppercase tracking-wide">
+              <h3 className="font-semibold text-[var(--text-primary)] mb-4 text-sm uppercase tracking-wide">
                 Your Progress
               </h3>
               <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
@@ -476,7 +476,7 @@ export default function StartPage() {
                   style={{ width: `${(completedSteps.length / 6) * 100}%` }}
                 />
               </div>
-              <div className="mb-4 text-sm text-blue-100/70">
+              <div className="mb-4 text-sm text-[var(--text-secondary)]">
                 {completedSteps.length} of 6 steps complete
               </div>
 
@@ -492,7 +492,7 @@ export default function StartPage() {
                           ? 'bg-emerald-500/15 text-emerald-300'
                           : expandedStep === step.id
                             ? 'bg-blue-600/30 text-white'
-                            : 'text-blue-100/60 hover:bg-white/6 hover:text-white'
+                            : 'text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]'
                       }`}
                     >
                       <span className="shrink-0 font-bold">
@@ -513,7 +513,7 @@ export default function StartPage() {
                 </p>
                 <Link
                   href="/faqs"
-                  className="block w-full rounded-xl border border-white/15 bg-white/8 py-2.5 text-center text-sm font-medium text-white transition hover:bg-white/12"
+                  className="block w-full rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] py-2.5 text-center text-sm font-medium text-[var(--text-primary)] transition hover:border-[var(--border-accent)]"
                 >
                   View FAQs
                 </Link>
@@ -521,16 +521,16 @@ export default function StartPage() {
             </div>
 
             {/* University card */}
-            <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-5">
+            <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-[var(--card-shadow,none)]">
               <div className="text-2xl mb-2">🎓</div>
-              <h3 className="font-bold text-white mb-2">Aurum University</h3>
-              <p className="text-xs text-blue-100/60 leading-relaxed mb-4">
+              <h3 className="font-bold text-[var(--text-primary)] mb-2">Aurum University</h3>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-4">
                 Each step includes embedded Aurum University videos. Watch them in order to fully
                 understand each part of the onboarding process before acting.
               </p>
               <Link
                 href="/university"
-                className="block text-center text-sm font-medium text-blue-300 hover:text-white transition"
+                className="block text-center text-sm font-medium text-[var(--accent-primary)] hover:text-[var(--text-primary)] transition"
               >
                 Browse All Videos →
               </Link>

@@ -32,8 +32,8 @@ function JoinContent() {
   }, [refCode])
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
-      <div className="relative overflow-hidden bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-24 lg:px-10">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      <div className="relative overflow-hidden bg-[var(--bg-section)] px-6 py-24 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.2),transparent_60%)]" />
         <div className="relative mx-auto max-w-2xl text-center">
           {refCode ? (
@@ -44,7 +44,7 @@ function JoinContent() {
               </motion.div>
 
               <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1}
-                className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+                className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-5xl">
                 You&apos;ve been invited to<br />
                 <span className="bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">
                   Team AutoPilot ROI
@@ -52,7 +52,7 @@ function JoinContent() {
               </motion.h1>
 
               <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-                className="mx-auto mt-6 max-w-lg text-lg leading-8 text-blue-100/80">
+                className="mx-auto mt-6 max-w-lg text-lg leading-8 text-[var(--text-secondary)]">
                 A partner from our team shared this link with you. Your referral has been
                 saved — when you complete onboarding, the right partner will be notified
                 and credited.
@@ -60,9 +60,9 @@ function JoinContent() {
 
               {/* Referral confirmation card */}
               <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3}
-                className="mx-auto mt-8 max-w-sm rounded-2xl border border-white/15 bg-white/6 p-6 backdrop-blur-sm">
-                <div className="text-sm text-blue-200/60 mb-1">Referral Code</div>
-                <div className="text-xl font-mono font-bold text-white tracking-wide">{refCode}</div>
+                className="mx-auto mt-8 max-w-sm rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-card)] p-6 shadow-[var(--card-shadow,none)]">
+                <div className="text-sm text-[var(--text-muted)] mb-1">Referral Code</div>
+                <div className="text-xl font-mono font-bold text-[var(--text-primary)] tracking-wide">{refCode}</div>
                 {saved && (
                   <div className="mt-2 text-xs text-emerald-300/80">
                     ✓ Saved to your session
@@ -78,7 +78,7 @@ function JoinContent() {
               </motion.div>
 
               <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1}
-                className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-white sm:text-5xl">
+                className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-5xl">
                 Welcome to<br />
                 <span className="bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">
                   Team AutoPilot ROI
@@ -86,7 +86,7 @@ function JoinContent() {
               </motion.h1>
 
               <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-                className="mx-auto mt-6 max-w-lg text-lg leading-8 text-blue-100/80">
+                className="mx-auto mt-6 max-w-lg text-lg leading-8 text-[var(--text-secondary)]">
                 AutoPilot ROI is the structured onboarding system for the Aurum ecosystem.
                 Start your journey with education, guided setup, and personal partner support.
               </motion.p>
@@ -114,7 +114,7 @@ function JoinContent() {
             </Link>
             <Link
               href="/university"
-              className="rounded-xl border border-white/20 bg-white/10 px-8 py-3.5 text-base font-medium text-white backdrop-blur-md transition hover:bg-white/15"
+              className="rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-8 py-3.5 text-base font-medium text-[var(--text-primary)] transition hover:border-[var(--border-accent)]"
             >
               Explore University
             </Link>
@@ -129,10 +129,10 @@ function JoinContent() {
               { icon: '🔗', title: 'Correct Placement', desc: 'Your referral code ensures you\'re placed in the right team position.' },
               { icon: '📊', title: 'Readiness Score', desc: 'Know exactly where you stand before committing.' },
             ].map((item) => (
-              <div key={item.title} className="rounded-xl border border-white/10 bg-white/4 p-4">
+              <div key={item.title} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-4 shadow-[var(--card-shadow,none)]">
                 <div className="text-2xl">{item.icon}</div>
-                <h3 className="mt-2 text-sm font-semibold text-white">{item.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-blue-100/60">{item.desc}</p>
+                <h3 className="mt-2 text-sm font-semibold text-[var(--text-primary)]">{item.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">{item.desc}</p>
               </div>
             ))}
           </motion.div>
@@ -145,8 +145,8 @@ function JoinContent() {
 export default function JoinPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#06122f] flex items-center justify-center">
-        <div className="text-blue-200/60">Loading...</div>
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <div className="text-[var(--text-muted)]">Loading...</div>
       </div>
     }>
       <JoinContent />

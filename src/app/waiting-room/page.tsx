@@ -196,11 +196,11 @@ export default function WaitingRoomPage() {
             </div>
             <div className="rounded-xl border border-blue-400/20 bg-white/5 p-4 backdrop-blur-sm">
               <div className="text-xs text-blue-300/60 uppercase tracking-widest mb-1">Next Step</div>
-              <div className="text-sm font-semibold text-white">Check Your Email</div>
+              <div className="text-sm font-semibold text-[var(--text-primary)]">Check Your Email</div>
             </div>
             <div className="rounded-xl border border-blue-400/20 bg-white/5 p-4 backdrop-blur-sm">
               <div className="text-xs text-blue-300/60 uppercase tracking-widest mb-1">Videos Watched</div>
-              <div className="text-sm font-semibold text-white">{watchedVideos.size}/{WAITING_ROOM_VIDEOS.length}</div>
+              <div className="text-sm font-semibold text-[var(--text-primary)]">{watchedVideos.size}/{WAITING_ROOM_VIDEOS.length}</div>
             </div>
           </motion.div>
         </div>

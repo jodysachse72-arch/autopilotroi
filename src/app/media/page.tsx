@@ -120,9 +120,9 @@ export default function MediaPage() {
       : mediaContent.items.filter((item) => item.category === activeCategory)
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       {/* Header */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
+      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-16 lg:px-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(59,130,246,0.15),transparent_60%)]" />
         <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '50px 50px' }} />
         <div className="relative mx-auto max-w-4xl text-center">
@@ -131,10 +131,10 @@ export default function MediaPage() {
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
               Media Library
             </div>
-            <h1 className="font-[var(--font-sora)] text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="font-[var(--font-sora)] text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-6xl">
               {mediaContent.headline}
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-blue-100/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-[var(--text-tertiary)]">
               {mediaContent.description}
             </p>
           </motion.div>
@@ -151,7 +151,7 @@ export default function MediaPage() {
               className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                 activeCategory === cat.id
                   ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'bg-white/[0.06] text-blue-100/70 border border-white/10 hover:bg-white/10 hover:text-white'
+                  : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-primary)] hover:border-[var(--border-accent)] hover:text-[var(--text-primary)]'
               }`}
             >
               {cat.label}
@@ -169,7 +169,7 @@ export default function MediaPage() {
               whileInView="show"
               viewport={{ once: true }}
               custom={i}
-              className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]"
+              className="group overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-[var(--card-shadow,none)] transition-all duration-300 hover:border-[var(--border-accent)] hover:shadow-[var(--card-shadow-hover,none)]"
             >
               {/* Thumbnail */}
               <VideoModal videoUrl={`https://www.youtube.com/watch?v=${item.youtubeId}`} ctaLabel="Ready to Get Started?" ctaHref="/signup">
@@ -204,21 +204,21 @@ export default function MediaPage() {
 
               {/* Content */}
               <div className="p-5">
-                <h3 className="font-[var(--font-sora)] text-sm font-bold leading-snug text-white line-clamp-2 group-hover:text-blue-300 transition-colors">
+                <h3 className="font-[var(--font-sora)] text-sm font-bold leading-snug text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--accent-primary)] transition-colors">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-xs leading-relaxed text-blue-100/50 line-clamp-2">{item.description}</p>
+                <p className="mt-2 text-xs leading-relaxed text-[var(--text-muted)] line-clamp-2">{item.description}</p>
               </div>
             </motion.article>
           ))}
         </div>
 
         {/* CTA */}
-        <div className="mt-16 rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-sm">
-          <h2 className="font-[var(--font-sora)] text-2xl font-bold text-white">
+        <div className="mt-16 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-10 text-center shadow-[var(--card-shadow,none)]">
+          <h2 className="font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)]">
             Ready to Start Your Journey?
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-blue-100/60">
+          <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-[var(--text-tertiary)]">
             The best way to understand the platform is to work through the guided onboarding with your
             AutoPilot ROI partner.
           </p>
