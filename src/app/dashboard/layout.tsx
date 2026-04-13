@@ -12,6 +12,8 @@ const sidebarLinks = [
   { id: 'nav-performance', label: 'Performance', href: '/dashboard/performance', icon: '📈' },
   { id: 'nav-leaderboard', label: 'Leaderboard', href: '/dashboard/leaderboard', icon: '🏆' },
   { id: 'nav-links', label: 'Referral Links', href: '/dashboard/links', icon: '🔗' },
+  { id: 'nav-videos', label: 'Partner Videos', href: '/dashboard/videos', icon: '🎬' },
+  { id: 'nav-resources', label: 'Resources', href: '/resources', icon: '📚' },
   { id: 'nav-settings', label: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
 ]
 
@@ -58,15 +60,29 @@ const PARTNER_TOUR: TourStep[] = [
   {
     target: '#nav-links',
     title: 'Your Referral Links',
-    content: 'Generate, copy, and manage your unique referral links. Each link is tracked — share them on social media, email, or direct messages.',
+    content: 'Generate Hot, Cold, and page-specific referral links. Each link is tracked — share them on social media, email, or direct messages.',
     icon: '🔗',
     position: 'right',
-    actionHint: 'Pro tip: Use different links for different platforms to track what works best',
+    actionHint: 'Pro tip: Use Cold links for outreach and Hot links for ready prospects',
+  },
+  {
+    target: '#nav-videos',
+    title: 'Partner Videos',
+    content: 'Training videos covering sales techniques, product knowledge, and social media strategy. New content added regularly.',
+    icon: '🎬',
+    position: 'right',
+  },
+  {
+    target: '#nav-resources',
+    title: 'Gated Resources',
+    content: 'Access marketing materials, downloadable guides, and partner-exclusive content.',
+    icon: '📚',
+    position: 'right',
   },
   {
     target: '#nav-settings',
-    title: 'Account Settings',
-    content: 'Update your profile, notification preferences, and payout information here.',
+    title: 'Profile Settings',
+    content: 'Update your profile, social links, notification preferences, and security settings.',
     icon: '⚙️',
     position: 'right',
   },

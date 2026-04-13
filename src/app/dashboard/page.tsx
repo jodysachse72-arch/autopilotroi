@@ -362,7 +362,7 @@ export default function DashboardOverview() {
       </div>
 
       {/* Quick actions */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href="/dashboard/links"
           className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 transition hover:border-blue-500/30"
@@ -372,31 +372,43 @@ export default function DashboardOverview() {
             Referral Links
           </h3>
           <p className="mt-1 text-xs text-[var(--text-tertiary)]">
-            Generate links, QR codes, and share templates.
+            Generate hot, cold, and page-specific links with QR codes.
           </p>
         </Link>
         <Link
-          href="/partner-tools"
+          href="/dashboard/videos"
           className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 transition hover:border-blue-500/30"
         >
-          <div className="text-2xl mb-2">🛠️</div>
+          <div className="text-2xl mb-2">🎬</div>
           <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-blue-400 transition">
-            Partner Tools
+            Partner Videos
           </h3>
           <p className="mt-1 text-xs text-[var(--text-tertiary)]">
-            Marketing materials, scripts, and resources.
+            Sales training, product deep dives, and social media strategy.
           </p>
         </Link>
         <Link
-          href="/university"
+          href="/resources"
           className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 transition hover:border-blue-500/30"
         >
-          <div className="text-2xl mb-2">🎓</div>
+          <div className="text-2xl mb-2">📚</div>
           <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-blue-400 transition">
-            University
+            Resources
           </h3>
           <p className="mt-1 text-xs text-[var(--text-tertiary)]">
-            Training videos and educational content.
+            Downloadable guides, marketing materials, and partner assets.
+          </p>
+        </Link>
+        <Link
+          href="/dashboard/settings"
+          className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 transition hover:border-blue-500/30"
+        >
+          <div className="text-2xl mb-2">⚙️</div>
+          <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-blue-400 transition">
+            Profile Settings
+          </h3>
+          <p className="mt-1 text-xs text-[var(--text-tertiary)]">
+            Update your profile, social links, and notification preferences.
           </p>
         </Link>
       </div>
