@@ -218,7 +218,7 @@ export default function FaqsPage() {
             through onboarding personally.
           </p>
           <Link
-            href="/start"
+            href="/signup"
             className="mt-6 inline-flex items-center rounded-xl border border-blue-300/40 bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-7 py-3 text-base font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:brightness-110"
           >
             Begin Onboarding →
