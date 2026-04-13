@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { InfoTip } from '@/components/ui/Tooltip'
+import PartnerOnboardingWizard from '@/components/ui/PartnerOnboardingWizard'
 
 /* ═══════════════════════════════════════════════════════════════
    PARTNER DASHBOARD v1 — Live lead tracking with pipeline
@@ -130,6 +131,9 @@ export default function DashboardOverview() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
+      {/* Partner Onboarding Wizard — shows once for new partners */}
+      <PartnerOnboardingWizard />
+
       {/* Welcome banner */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
