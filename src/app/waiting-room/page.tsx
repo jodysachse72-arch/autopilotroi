@@ -165,7 +165,7 @@ export default function WaitingRoomPage() {
       </header>
 
       {/* ── Hero Banner ── */}
-      <section className="relative overflow-hidden bg-[#061238] px-6 py-16 text-center text-white">
+      <section data-dark className="relative overflow-hidden bg-[#061238] px-6 py-16 text-center text-white">
         <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(59,130,246,0.15)_0%,transparent_60%)]" />
 

@@ -298,56 +298,57 @@ a {
 
 /* ═══════════════════════════════════════════════════════════════
    LIGHT MODE — PAGE OVERRIDES
-   These selectors target the dark backgrounds used across pages
+   
+   ARCHITECTURE: Sections that MUST stay dark (hero, metrics bar,
+   social proof, bottom CTA, footer) get a `data-dark` attribute.
+   ALL override rules exclude `[data-dark]` and its descendants.
    ═══════════════════════════════════════════════════════════════ */
 
-/* Any element with explicit dark bg classes */
-[data-theme="light"] [class*="bg-[#06122f]"],
-[data-theme="light"] [class*="bg-[#061238]"] {
+/* ── Background overrides ── */
+[data-theme="light"] [class*="bg-[#06122f]"]:not([data-dark]):not([data-dark] *),
+[data-theme="light"] [class*="bg-[#061238]"]:not([data-dark]):not([data-dark] *),
+[data-theme="light"] [class*="bg-[#040e2d]"]:not([data-dark]):not([data-dark] *) {
   background-color: var(--bg-primary) !important;
 }
 
 /* Hero gradient sections */
-[data-theme="light"] [style*="linear-gradient"][style*="#0b1f57"],
-[data-theme="light"] div[class*="bg-[linear-gradient(180deg,#0b1f57"] {
+[data-theme="light"] [style*="linear-gradient"][style*="#0b1f57"]:not([data-dark]):not([data-dark] *),
+[data-theme="light"] div[class*="bg-[linear-gradient(180deg,#0b1f57"]:not([data-dark]):not([data-dark] *) {
   background: var(--bg-section) !important;
 }
 
 /* Glassmorphism cards */
-[data-theme="light"] [class*="bg-white/6"],
-[data-theme="light"] [class*="bg-white/4"],
-[data-theme="light"] [class*="bg-white/8"],
-[data-theme="light"] [class*="bg-white/10"],
-[data-theme="light"] [class*="bg-white/12"] {
+[data-theme="light"] [class*="bg-white/6"]:not([data-dark] *),
+[data-theme="light"] [class*="bg-white/4"]:not([data-dark] *),
+[data-theme="light"] [class*="bg-white/8"]:not([data-dark] *),
+[data-theme="light"] [class*="bg-white/10"]:not([data-dark] *):not(header *),
+[data-theme="light"] [class*="bg-white/12"]:not([data-dark] *) {
   background: var(--bg-card) !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* Card borders */
-[data-theme="light"] [class*="border-white/10"],
-[data-theme="light"] [class*="border-white/15"],
-[data-theme="light"] [class*="border-white/20"],
-[data-theme="light"] [class*="border-white/8"] {
+[data-theme="light"] [class*="border-white/10"]:not([data-dark] *):not(header *):not(footer *),
+[data-theme="light"] [class*="border-white/15"]:not([data-dark] *):not(footer *),
+[data-theme="light"] [class*="border-white/20"]:not([data-dark] *):not(footer *),
+[data-theme="light"] [class*="border-white/8"]:not([data-dark] *) {
   border-color: var(--border-primary) !important;
 }
 
-/* Text overrides — headings on light content */
-[data-theme="light"] main h1,
-[data-theme="light"] main h2,
-[data-theme="light"] main h3 {
+/* Text overrides — headings on light content ONLY */
+[data-theme="light"] main h1:not([data-dark] *),
+[data-theme="light"] main h2:not([data-dark] *),
+[data-theme="light"] main h3:not([data-dark] *) {
   color: var(--text-primary) !important;
 }
 
 /*
    text-white override — ONLY for body content text.
-   Must NOT override text inside:
-   - header/footer (dark chrome)
-   - buttons with colored backgrounds
-   - intentionally dark sections (hero, CTA, metrics bar)
-   - modals/popups (they have dark bgs)
-   - badges on colored backgrounds
+   Excludes ALL dark-chrome and intentionally-dark sections.
 */
 [data-theme="light"] [class*="text-white"]:not(
+  [data-dark] *
+):not(
   header *
 ):not(
   footer *
@@ -386,54 +387,55 @@ a {
 }
 
 /* Stats / bold text in content areas */
-[data-theme="light"] main span[class*="text-2xl"][class*="font-bold"],
-[data-theme="light"] main span[class*="text-4xl"][class*="font-bold"],
-[data-theme="light"] main div[class*="text-2xl"][class*="font-bold"] {
+[data-theme="light"] main span[class*="text-2xl"][class*="font-bold"]:not([data-dark] *),
+[data-theme="light"] main span[class*="text-4xl"][class*="font-bold"]:not([data-dark] *),
+[data-theme="light"] main div[class*="text-2xl"][class*="font-bold"]:not([data-dark] *) {
   color: var(--text-primary) !important;
 }
 
-[data-theme="light"] [class*="text-blue-100/80"],
-[data-theme="light"] [class*="text-blue-50/80"],
-[data-theme="light"] [class*="text-blue-100/70"] {
+/* ── Subtle text colour overrides ── */
+[data-theme="light"] [class*="text-blue-100/80"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-50/80"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-100/70"]:not([data-dark] *) {
   color: var(--text-secondary) !important;
 }
 
-[data-theme="light"] [class*="text-blue-100/60"],
-[data-theme="light"] [class*="text-blue-50/60"],
-[data-theme="light"] [class*="text-blue-200/60"],
-[data-theme="light"] [class*="text-blue-200/70"],
-[data-theme="light"] [class*="text-blue-200/80"] {
+[data-theme="light"] [class*="text-blue-100/60"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-50/60"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-200/60"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-200/70"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-200/80"]:not([data-dark] *) {
   color: var(--text-tertiary) !important;
 }
 
-[data-theme="light"] [class*="text-blue-50/40"],
-[data-theme="light"] [class*="text-blue-50/35"],
-[data-theme="light"] [class*="text-blue-200/40"] {
+[data-theme="light"] [class*="text-blue-50/40"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-50/35"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-200/40"]:not([data-dark] *) {
   color: var(--text-muted) !important;
 }
 
-/* Badge overrides */
-[data-theme="light"] [class*="bg-blue-500/15"],
-[data-theme="light"] [class*="bg-blue-500/10"] {
+/* ── Badge overrides ── */
+[data-theme="light"] [class*="bg-blue-500/15"]:not([data-dark] *),
+[data-theme="light"] [class*="bg-blue-500/10"]:not([data-dark] *) {
   background: var(--badge-bg) !important;
 }
-[data-theme="light"] [class*="text-blue-200"],
-[data-theme="light"] [class*="text-blue-300"] {
+[data-theme="light"] [class*="text-blue-200"]:not([data-dark] *),
+[data-theme="light"] [class*="text-blue-300"]:not([data-dark] *) {
   color: var(--badge-text) !important;
 }
-[data-theme="light"] [class*="border-blue-400/30"],
-[data-theme="light"] [class*="border-blue-400/20"] {
+[data-theme="light"] [class*="border-blue-400/30"]:not([data-dark] *),
+[data-theme="light"] [class*="border-blue-400/20"]:not([data-dark] *) {
   border-color: var(--badge-border) !important;
 }
 
 /* Radial gradient overlays — reduce opacity for light mode */
-[data-theme="light"] [class*="bg-[radial-gradient"] {
+[data-theme="light"] [class*="bg-[radial-gradient"]:not([data-dark] *) {
   opacity: 0.3;
 }
 
 /* Input fields */
-[data-theme="light"] input[class*="bg-white/10"],
-[data-theme="light"] input[class*="bg-white/12"] {
+[data-theme="light"] input[class*="bg-white/10"]:not([data-dark] *),
+[data-theme="light"] input[class*="bg-white/12"]:not([data-dark] *) {
   background: white !important;
   border-color: #d1d5db !important;
   color: var(--text-primary) !important;

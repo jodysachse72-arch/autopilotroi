@@ -41,7 +41,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           HERO
       ═══════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-[#061238] text-white min-h-[580px]">
+      <section data-dark className="relative overflow-hidden bg-[#061238] text-white min-h-[580px]">
         {/* Aceternity Spotlight — top-right dramatic glow */}
         <Spotlight
           className="-top-40 left-0 md:left-60 md:-top-20"
@@ -210,7 +210,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           AURUM METRICS BAR
       ═══════════════════════════════════════════════ */}
-      <section className="relative z-10 border-t border-blue-500/10 bg-[#040e2d] px-6 py-16 lg:px-10">
+      <section data-dark className="relative z-10 border-t border-blue-500/10 bg-[#040e2d] px-6 py-16 lg:px-10">
         <div className="mx-auto max-w-6xl">
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
             {[
@@ -553,7 +553,7 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════
           BOTTOM CTA
       ═══════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-[#061238] px-6 py-24 text-center lg:px-10">
+      <section data-dark className="relative overflow-hidden bg-[#061238] px-6 py-24 text-center lg:px-10">
         <BackgroundBeams className="opacity-40" />
         <Spotlight className="-top-20 left-1/2 -translate-x-1/2" fill="#60a5fa" />
         {/* Magic UI Meteors — falling starfield */}

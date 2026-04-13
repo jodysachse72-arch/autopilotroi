@@ -88,7 +88,7 @@ export default function SocialProof() {
   }, [])
 
   return (
-    <section className="relative overflow-hidden border-t border-white/5 bg-[#06122f] px-6 py-20 lg:px-10">
+    <section data-dark className="relative overflow-hidden border-t border-white/5 bg-[#06122f] px-6 py-20 lg:px-10">
       {/* Background glow */}
       <div className="absolute left-1/4 top-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-blue-500/5 blur-[100px]" />
 
