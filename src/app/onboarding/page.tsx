@@ -266,11 +266,11 @@ function OnboardingContent() {
     <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-[var(--border-primary)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
           <Link href="/">
             <Logo size={32} showText />
           </Link>
-          <div className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${
+          <div className={`rounded-full px-3.5 py-1.5 text-sm font-semibold uppercase tracking-wider ${
             isAdvanced
               ? 'bg-emerald-500/15 border border-emerald-400/30 text-emerald-400'
               : 'bg-blue-500/15 border border-blue-400/30 text-blue-300'
@@ -321,26 +321,26 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
   const progress = Math.round((completed.size / STEPS.length) * 100)
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
+    <div className="mx-auto max-w-4xl px-6 py-10">
       {/* Title */}
-      <div className="mb-8">
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+      <div className="mb-10">
+        <h1 className="font-[var(--font-sora)] text-4xl font-bold text-[var(--text-primary)] tracking-tight">
           Onboarding Guide
         </h1>
-        <p className="mt-2 text-[var(--text-tertiary)] leading-relaxed">
+        <p className="mt-3 text-lg text-[var(--text-tertiary)] leading-relaxed">
           Follow each step in order. Your progress is saved automatically.
         </p>
 
         {/* Progress bar */}
         <div className="mt-5 flex items-center gap-4">
-          <div className="flex-1 h-1.5 rounded-full bg-[var(--bg-card)] overflow-hidden">
+          <div className="flex-1 h-2 rounded-full bg-[var(--bg-card)] overflow-hidden">
             <motion.div
               className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400"
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
             />
           </div>
-          <span className="text-xs font-semibold text-[var(--text-muted)] tabular-nums w-10 text-right">
+          <span className="text-sm font-bold text-[var(--text-muted)] tabular-nums w-10 text-right">
             {completed.size}/{STEPS.length}
           </span>
         </div>
@@ -354,23 +354,23 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
         return (
           <div key={phase.id} className="mb-8">
             {/* Phase header */}
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-lg">{phase.icon}</span>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-2xl">{phase.icon}</span>
               <div>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
+                <h2 className="text-base font-bold uppercase tracking-wider text-[var(--text-primary)]">
                   {phase.label}
                 </h2>
-                <p className="text-xs text-[var(--text-muted)]">{phase.description}</p>
+                <p className="text-sm text-[var(--text-muted)]">{phase.description}</p>
               </div>
               {phaseComplete && (
-                <span className="ml-auto text-xs font-semibold text-emerald-400 bg-emerald-500/10 rounded-full px-2.5 py-0.5 border border-emerald-500/20">
+                <span className="ml-auto text-sm font-bold text-emerald-400 bg-emerald-500/10 rounded-full px-3 py-1 border border-emerald-500/20">
                   ✓ Complete
                 </span>
               )}
             </div>
 
             {/* Steps */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               {phaseSteps.map((step) => {
                 const isOpen = openStep === step.id
                 const isDone = completed.has(step.id)
@@ -378,7 +378,7 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                 return (
                   <div
                     key={step.id}
-                    className={`rounded-xl border overflow-hidden transition-colors ${
+                    className={`rounded-2xl border overflow-hidden transition-colors ${
                       step.critical
                         ? isDone
                           ? 'border-emerald-500/30 bg-emerald-500/5'
@@ -391,12 +391,12 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                     {/* Accordion trigger */}
                     <button
                       onClick={() => toggleStep(step.id)}
-                      className="flex w-full items-center gap-4 px-5 py-4 text-left group"
+                      className="flex w-full items-center gap-4 px-6 py-5 text-left group"
                     >
                       {/* Checkbox */}
                       <button
                         onClick={(e) => { e.stopPropagation(); markComplete(step.id) }}
-                        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md border-2 transition-all ${
+                        className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg border-2 transition-all ${
                           isDone
                             ? 'border-emerald-500 bg-emerald-500 text-white'
                             : 'border-[var(--text-muted)] hover:border-blue-400'
@@ -410,22 +410,22 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                       </button>
 
                       {/* Icon + title */}
-                      <span className="text-xl flex-shrink-0">{step.icon}</span>
+                      <span className="text-2xl flex-shrink-0">{step.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <span className={`font-semibold text-[15px] ${isDone ? 'text-emerald-400 line-through opacity-70' : 'text-[var(--text-primary)]'}`}>
+                        <span className={`font-bold text-lg ${isDone ? 'text-emerald-400 line-through opacity-70' : 'text-[var(--text-primary)]'}`}>
                           {step.title}
                         </span>
                         {step.critical && !isDone && (
-                          <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-500/10 rounded px-1.5 py-0.5">
+                          <span className="ml-2 text-xs font-bold uppercase tracking-wider text-red-400 bg-red-500/10 rounded px-2 py-0.5">
                             Required
                           </span>
                         )}
                       </div>
 
                       {/* Time + chevron */}
-                      <span className="text-xs text-[var(--text-muted)] flex-shrink-0">{step.time}</span>
+                      <span className="text-sm font-medium text-[var(--text-muted)] flex-shrink-0">{step.time}</span>
                       <svg
-                        className={`h-4 w-4 text-[var(--text-muted)] transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
+                        className={`h-5 w-5 text-[var(--text-muted)] transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -442,59 +442,59 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                           transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
                           className="overflow-hidden"
                         >
-                          <div className="px-5 pb-5 pt-1 border-t border-[var(--border-primary)]">
+                          <div className="px-6 pb-6 pt-2 border-t border-[var(--border-primary)]">
                             {/* What & why */}
-                            <div className="grid gap-3 sm:grid-cols-2 mb-5">
-                              <div className="rounded-lg bg-[var(--bg-card-hover)] p-3">
-                                <div className="text-[10px] font-bold uppercase tracking-wider text-blue-400 mb-1">What</div>
-                                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{step.content.what}</p>
+                            <div className="grid gap-4 sm:grid-cols-2 mb-6">
+                              <div className="rounded-xl bg-[var(--bg-card-hover)] p-4">
+                                <div className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5">What</div>
+                                <p className="text-base text-[var(--text-secondary)] leading-relaxed">{step.content.what}</p>
                               </div>
-                              <div className="rounded-lg bg-[var(--bg-card-hover)] p-3">
-                                <div className="text-[10px] font-bold uppercase tracking-wider text-blue-400 mb-1">Why</div>
-                                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{step.content.why}</p>
+                              <div className="rounded-xl bg-[var(--bg-card-hover)] p-4">
+                                <div className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-1.5">Why</div>
+                                <p className="text-base text-[var(--text-secondary)] leading-relaxed">{step.content.why}</p>
                               </div>
                             </div>
 
                             {/* Numbered steps */}
-                            <div className="space-y-2 mb-4">
+                            <div className="space-y-3 mb-5">
                               {step.content.steps.map((text, i) => (
                                 <div key={i} className="flex items-start gap-3">
-                                  <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-[11px] font-bold text-blue-400 mt-0.5">
+                                  <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-sm font-bold text-blue-400 mt-0.5">
                                     {i + 1}
                                   </span>
-                                  <span className="text-sm text-[var(--text-secondary)] leading-relaxed">{text}</span>
+                                  <span className="text-base text-[var(--text-secondary)] leading-relaxed">{text}</span>
                                 </div>
                               ))}
                             </div>
 
                             {/* Warning */}
                             {step.content.warning && (
-                              <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 mb-3">
-                                <p className="text-sm text-red-300 leading-relaxed">
-                                  <span className="font-semibold">⚠️ Warning:</span> {step.content.warning}
+                              <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-5 py-4 mb-4">
+                                <p className="text-base text-red-300 leading-relaxed">
+                                  <span className="font-bold">⚠️ Warning:</span> {step.content.warning}
                                 </p>
                               </div>
                             )}
 
                             {/* Tip */}
                             {step.content.tip && (
-                              <div className="rounded-lg border border-blue-500/15 bg-blue-500/5 px-4 py-3 mb-3">
-                                <p className="text-sm text-blue-300 leading-relaxed">
-                                  <span className="font-semibold">💡 Tip:</span> {step.content.tip}
+                              <div className="rounded-xl border border-blue-500/15 bg-blue-500/5 px-5 py-4 mb-4">
+                                <p className="text-base text-blue-300 leading-relaxed">
+                                  <span className="font-bold">💡 Tip:</span> {step.content.tip}
                                 </p>
                               </div>
                             )}
 
                             {/* Links */}
                             {step.content.links && step.content.links.length > 0 && (
-                              <div className="flex flex-wrap gap-2 mb-3">
+                              <div className="flex flex-wrap gap-2 mb-4">
                                 {step.content.links.map((link) => (
                                   <a
                                     key={link.url}
                                     href={link.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-3 py-2 text-xs font-medium text-blue-400 transition hover:border-blue-500/40 hover:text-blue-300"
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-4 py-2.5 text-sm font-medium text-blue-400 transition hover:border-blue-500/40 hover:text-blue-300"
                                   >
                                     🔗 {link.label}
                                   </a>
@@ -508,7 +508,7 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                                 href={aurumSignupUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block w-full rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] py-3.5 text-center font-bold text-white shadow-lg shadow-blue-600/20 transition hover:shadow-blue-600/35 mb-3"
+                                className="block w-full rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] py-4 text-center text-lg font-bold text-white shadow-lg shadow-blue-600/20 transition hover:shadow-blue-600/35 mb-4"
                               >
                                 Create Aurum Account →
                               </a>
@@ -516,7 +516,7 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
 
                             {/* Video */}
                             {step.content.videoId && (
-                              <div className="overflow-hidden rounded-lg border border-[var(--border-primary)]">
+                              <div className="overflow-hidden rounded-xl border border-[var(--border-primary)]">
                                 <div className="aspect-video w-full">
                                   <iframe
                                     src={`https://www.youtube.com/embed/${step.content.videoId}?rel=0`}
@@ -530,10 +530,10 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                             )}
 
                             {/* Mark complete button */}
-                            <div className="mt-4 flex items-center justify-between">
+                            <div className="mt-5 flex items-center justify-between">
                               <button
                                 onClick={() => markComplete(step.id)}
-                                className={`text-sm font-medium transition ${
+                                className={`text-base font-semibold transition ${
                                   isDone ? 'text-emerald-400 hover:text-emerald-300' : 'text-[var(--text-muted)] hover:text-blue-400'
                                 }`}
                               >
@@ -548,7 +548,7 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                                     const idx = STEPS.findIndex(s => s.id === step.id)
                                     if (idx < STEPS.length - 1) setOpenStep(STEPS[idx + 1].id)
                                   }}
-                                  className="rounded-lg bg-blue-500/10 border border-blue-500/20 px-4 py-2 text-sm font-semibold text-blue-400 transition hover:bg-blue-500/20"
+                                  className="rounded-xl bg-blue-500/10 border border-blue-500/20 px-5 py-2.5 text-base font-bold text-blue-400 transition hover:bg-blue-500/20"
                                 >
                                   Done → Next Step
                                 </button>
