@@ -133,7 +133,7 @@ export default function RoadmapPage() {
       {/* Header */}
       <div>
         <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
-          Strategy & Roadmap
+          AutopilotROI Strategy Roadmap
         </h1>
         <p className="mt-2 text-[var(--text-muted)]">
           Competitive positioning, phase roadmap, and cost analysis vs. traditional dev teams.

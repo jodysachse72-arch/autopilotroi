@@ -166,7 +166,7 @@ export default function Navbar() {
                     {/* Quick links */}
                     <div className="py-1">
                       {(isPartner || isAdmin) && (
-                        <DropdownLink href="/dashboard" icon="📊" label="Dashboard" onClick={() => setDropdownOpen(false)} />
+                        <DropdownLink href="/dashboard" icon="📊" label="Partner Dashboard" onClick={() => setDropdownOpen(false)} />
                       )}
                       {isAdmin && (
                         <DropdownLink href="/admin" icon="🛡️" label="Admin Panel" onClick={() => setDropdownOpen(false)} />
@@ -262,7 +262,7 @@ export default function Navbar() {
                   </div>
                   {(isPartner || isAdmin) && (
                     <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block">
-                      📊 Dashboard
+                      📊 Partner Dashboard
                     </Link>
                   )}
                   {isAdmin && (

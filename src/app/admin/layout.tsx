@@ -10,7 +10,7 @@ const sidebarLinks = [
   { id: 'admin-dashboard', label: 'Dashboard', href: '/admin', icon: '📊' },
   { id: 'admin-partners', label: 'Partners', href: '/admin/partners', icon: '🤝' },
   { id: 'admin-prospects', label: 'Prospects', href: '/admin/prospects', icon: '👥' },
-  { id: 'admin-strategy', label: 'Strategy', href: '/admin/roadmap', icon: '🗺️' },
+  { id: 'admin-strategy', label: 'Strategy Roadmap', href: '/admin/roadmap', icon: '🗺️' },
   { id: 'admin-changelog', label: 'Changelog', href: '/admin/changelog', icon: '📝' },
   { id: 'admin-checklist', label: 'Checklist', href: '/admin/checklist', icon: '✅' },
   { id: 'admin-features', label: 'Features', href: '/admin/features', icon: '🎛️' },

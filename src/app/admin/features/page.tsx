@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useFeatureFlags, FEATURE_META, type FeatureFlags } from '@/lib/feature-flags'
+import { getAnnouncementMessage, setAnnouncementMessage } from '@/components/layout/AnnouncementBanner'
 
 /* ═══════════════════════════════════════════════════════════════
    ADMIN FEATURE TOGGLES — with built-in documentation
@@ -21,6 +22,13 @@ export default function FeatureTogglesPage() {
   const { flags, setFlag } = useFeatureFlags()
   const [expandedFlag, setExpandedFlag] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [bannerMsg, setBannerMsg] = useState('')
+  const [bannerSaved, setBannerSaved] = useState(false)
+
+  // Load banner message on mount
+  useEffect(() => {
+    setBannerMsg(getAnnouncementMessage())
+  }, [])
 
   const categories = [...new Set(Object.values(FEATURE_META).map((m) => m.category))]
 
@@ -201,6 +209,40 @@ export default function FeatureTogglesPage() {
                                 {meta.whenToUse}
                               </p>
                             </div>
+
+                            {/* ── Announcement Banner Message Editor ── */}
+                            {key === 'announcementBanner' && (
+                              <div className="rounded-lg bg-blue-500/5 border border-blue-400/20 p-4">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">
+                                  ✏️ Edit Banner Message
+                                </h4>
+                                <p className="text-xs text-white/40 mb-3">
+                                  This is the text displayed in the banner at the top of every page when the toggle is ON.
+                                </p>
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={bannerMsg}
+                                    onChange={(e) => { setBannerMsg(e.target.value); setBannerSaved(false) }}
+                                    placeholder="Enter announcement message..."
+                                    className="flex-1 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-blue-500 transition"
+                                  />
+                                  <button
+                                    onClick={() => {
+                                      setAnnouncementMessage(bannerMsg)
+                                      setBannerSaved(true)
+                                      setTimeout(() => setBannerSaved(false), 2000)
+                                    }}
+                                    className="shrink-0 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
+                                  >
+                                    {bannerSaved ? '✓ Saved!' : 'Save'}
+                                  </button>
+                                </div>
+                                <p className="mt-2 text-[10px] text-white/30">
+                                  💡 Tip: Use emojis to make announcements eye-catching. Example: "🎉 New feature: Profit Calculator is now live!"
+                                </p>
+                              </div>
+                            )}
                           </div>
                         </motion.div>
                       )}
