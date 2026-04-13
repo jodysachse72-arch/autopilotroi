@@ -578,3 +578,10 @@ dialog::backdrop {
 .animate-marquee-vertical {
   animation: marquee-vertical var(--marquee-duration, 40s) linear infinite;
 }
+
+/* ── Dropdown fade-in ── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+

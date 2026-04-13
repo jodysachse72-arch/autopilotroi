@@ -91,7 +91,11 @@ export default function ReferralLinksPage() {
     }
   }, [refCode, qrDest, selectedPage])
 
-  const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrTargetUrl)}&bgcolor=06122f&color=ffffff&format=png`
+  /* QR code colors adapt: dark bg + white code in dark mode, white bg + dark code in light mode */
+  const isDark = typeof window !== 'undefined' && document.documentElement.getAttribute('data-theme') !== 'light'
+  const qrBg = isDark ? '06122f' : 'ffffff'
+  const qrFg = isDark ? 'ffffff' : '0f172a'
+  const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrTargetUrl)}&bgcolor=${qrBg}&color=${qrFg}&format=png`
 
   const shareLinks = [
     {
@@ -115,7 +119,7 @@ export default function ReferralLinksPage() {
     {
       name: 'Email',
       url: `mailto:?subject=${encodeURIComponent('Check out AutopilotROI')}&body=${encodeURIComponent(`I wanted to share this with you — AutopilotROI is an AI-managed finance platform:\n\n${referralUrl}`)}`,
-      color: 'bg-white/10 hover:bg-white/20',
+      color: 'bg-[var(--bg-card-hover)] hover:bg-[var(--border-secondary)]',
       icon: '📧',
     },
   ]
@@ -199,16 +203,17 @@ export default function ReferralLinksPage() {
           exit={{ opacity: 0, height: 0 }}
           className="rounded-2xl border border-purple-400/20 bg-purple-500/5 p-6"
         >
-          <label className="block text-sm font-medium text-purple-300/80 mb-2">
+          <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
             Select Destination Page
           </label>
           <select
             value={selectedPage}
             onChange={(e) => setSelectedPage(e.target.value)}
-            className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:border-blue-500"
+            className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card-solid)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:border-blue-500"
+            style={{ colorScheme: 'auto' }}
           >
             {FRONTEND_PAGES.map((page) => (
-              <option key={page.path} value={page.path}>
+              <option key={page.path} value={page.path} className="bg-[var(--bg-card-solid)] text-[var(--text-primary)]">
                 {page.label} — {SITE_URL}{page.path}
               </option>
             ))}
@@ -230,7 +235,7 @@ export default function ReferralLinksPage() {
           </label>
         </div>
         <div className="flex items-center gap-3">
-          <code className="flex-1 rounded-xl bg-black/30 px-4 py-3.5 text-sm text-blue-400 overflow-x-auto scrollbar-hide">
+          <code className="flex-1 rounded-xl bg-[var(--bg-card-solid)] border border-[var(--border-primary)] px-4 py-3.5 text-sm text-[var(--accent-primary)] overflow-x-auto scrollbar-hide">
             {referralUrl}
           </code>
           <button
@@ -263,7 +268,7 @@ export default function ReferralLinksPage() {
             ].map((link) => (
               <div
                 key={link.label}
-                className="group flex items-center gap-3 rounded-xl bg-white/[0.02] px-4 py-3 hover:bg-white/[0.05] transition cursor-pointer"
+                className="group flex items-center gap-3 rounded-xl bg-[var(--bg-card-hover)]/50 px-4 py-3 hover:bg-[var(--bg-card-hover)] transition cursor-pointer"
                 onClick={() => copyToClipboard(link.url, link.label)}
               >
                 <span>{link.icon}</span>
@@ -325,7 +330,7 @@ export default function ReferralLinksPage() {
         </div>
 
         <div className="flex flex-col items-center gap-5 sm:flex-row">
-          <div className="rounded-xl border border-[var(--border-primary)] bg-black/30 p-4 relative overflow-hidden">
+          <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card-solid)] p-4 relative overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={qrCodeApiUrl}
@@ -344,7 +349,7 @@ export default function ReferralLinksPage() {
             />
             {/* Fallback placeholder */}
             <div
-              className="hidden w-[200px] h-[200px] items-center justify-center rounded-lg border border-dashed border-white/20 text-center"
+              className="hidden w-[200px] h-[200px] items-center justify-center rounded-lg border border-dashed border-[var(--border-primary)] text-center"
             >
               <div>
                 <span className="text-3xl">📱</span>
@@ -361,7 +366,7 @@ export default function ReferralLinksPage() {
             <a
               href={qrCodeApiUrl}
               download={`autopilotroi-qr-${refCode || 'default'}-${qrDest}.png`}
-              className="inline-flex items-center gap-2 rounded-xl bg-white/5 px-5 py-2.5 text-sm text-[var(--text-primary)] transition hover:bg-white/10 border border-[var(--border-primary)]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--bg-card-hover)] px-5 py-2.5 text-sm text-[var(--text-primary)] transition hover:bg-[var(--border-secondary)] border border-[var(--border-primary)]"
             >
               ⬇️ Download QR Code
             </a>
@@ -389,7 +394,7 @@ export default function ReferralLinksPage() {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-white transition ${link.color}`}
+              className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition ${link.color} ${link.name === 'Email' ? 'text-[var(--text-primary)]' : 'text-white'}`}
             >
               <span>{link.icon}</span>
               {link.name}
@@ -416,7 +421,7 @@ export default function ReferralLinksPage() {
           ].map((msg, i) => (
             <div
               key={i}
-              className="group flex items-start gap-3 rounded-xl bg-white/[0.02] px-4 py-3 hover:bg-white/[0.04] transition cursor-pointer"
+              className="group flex items-start gap-3 rounded-xl bg-[var(--bg-card-hover)]/50 px-4 py-3 hover:bg-[var(--bg-card-hover)] transition cursor-pointer"
               onClick={() => copyToClipboard(msg, `msg-${i}`)}
             >
               <p className="flex-1 text-sm text-[var(--text-tertiary)]">{msg}</p>

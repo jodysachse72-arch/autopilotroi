@@ -169,8 +169,8 @@ export default function PartnerVideosPage() {
         <div className="flex items-start gap-3">
           <span className="text-2xl">🎬</span>
           <div>
-            <h3 className="font-semibold text-amber-300 text-sm">Videos Coming Soon</h3>
-            <p className="mt-1 text-xs text-amber-200/60">
+            <h3 className="font-semibold text-[var(--text-secondary)] text-sm">Videos Coming Soon</h3>
+            <p className="mt-1 text-xs text-[var(--text-tertiary)]">
               We&apos;re producing professional training content for each topic below. Browse the curriculum
               to see what&apos;s planned, and check back soon for new releases.
             </p>
@@ -200,7 +200,7 @@ export default function PartnerVideosPage() {
               {cat.label}
               <span
                 className={`rounded-full px-1.5 py-0.5 text-xs ${
-                  activeCategory === cat.key ? 'bg-white/20' : 'bg-white/5'
+                  activeCategory === cat.key ? 'bg-white/20' : 'bg-[var(--bg-card-hover)]'
                 }`}
               >
                 {count}
@@ -244,7 +244,7 @@ export default function PartnerVideosPage() {
                 onClick={() => setExpandedVideo(isExpanded ? null : video.id)}
               >
                 {/* Thumbnail area */}
-                <div className="relative h-40 bg-gradient-to-br from-[#0b1f57] to-[#06122f] flex items-center justify-center overflow-hidden">
+                <div className="relative h-40 bg-[var(--bg-card-solid)] flex items-center justify-center overflow-hidden">
                   {/* Decorative background pattern */}
                   <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-1/4 left-1/4 h-32 w-32 rounded-full bg-blue-500 blur-3xl" />
@@ -254,10 +254,10 @@ export default function PartnerVideosPage() {
                   {/* Play button or Coming Soon badge */}
                   {isComingSoon ? (
                     <div className="relative flex flex-col items-center gap-2">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/5 border border-white/10">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--bg-card-hover)] border border-[var(--border-primary)]">
                         <span className="text-2xl">🎬</span>
                       </div>
-                      <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-300">
+                      <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-medium text-amber-600 dark:text-amber-300">
                         Coming Soon
                       </span>
                     </div>
@@ -268,7 +268,7 @@ export default function PartnerVideosPage() {
                   )}
 
                   {/* Duration badge */}
-                  <span className="absolute bottom-3 right-3 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-mono text-white/80 backdrop-blur-sm">
+                  <span className="absolute bottom-3 right-3 rounded-lg bg-[var(--bg-card-solid)] border border-[var(--border-primary)] px-2.5 py-1 text-xs font-mono text-[var(--text-secondary)] backdrop-blur-sm">
                     {video.duration}
                   </span>
                 </div>
@@ -300,7 +300,7 @@ export default function PartnerVideosPage() {
                         />
                       </div>
                     ) : (
-                      <div className="flex items-center gap-3 rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-4">
+                      <div className="flex items-center gap-3 rounded-xl border border-dashed border-[var(--border-primary)] bg-[var(--bg-card-hover)] p-4">
                         <span className="text-xl">🎥</span>
                         <div>
                           <p className="text-sm font-medium text-[var(--text-secondary)]">

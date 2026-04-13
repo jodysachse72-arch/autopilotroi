@@ -99,7 +99,7 @@ function SectionCard({
       transition={{ delay }}
       className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden"
     >
-      <div className="border-b border-[var(--border-primary)] bg-white/[0.02] px-6 py-4">
+      <div className="border-b border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-6 py-4">
         <h2 className="flex items-center gap-2 font-[var(--font-sora)] text-base font-semibold text-[var(--text-primary)]">
           <span>{icon}</span> {title}
         </h2>
@@ -450,10 +450,11 @@ export default function SettingsPage() {
             <select
               value={profile.timezone}
               onChange={(e) => updateProfile('timezone', e.target.value)}
-              className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:border-blue-500"
+              className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card-solid)] px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:border-blue-500"
+              style={{ colorScheme: 'auto' }}
             >
               {TIMEZONES.map((tz) => (
-                <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
+                <option key={tz} value={tz} className="bg-[var(--bg-card-solid)] text-[var(--text-primary)]">{tz.replace(/_/g, ' ')}</option>
               ))}
             </select>
           </div>
@@ -565,7 +566,7 @@ export default function SettingsPage() {
           ).map((pref) => (
             <div
               key={pref.key}
-              className="flex items-center justify-between rounded-xl bg-white/[0.02] px-4 py-3"
+              className="flex items-center justify-between rounded-xl bg-[var(--bg-card-hover)] px-4 py-3"
             >
               <div>
                 <div className="text-sm font-medium text-[var(--text-primary)]">{pref.label}</div>
@@ -574,7 +575,7 @@ export default function SettingsPage() {
               <button
                 onClick={() => updateNotification(pref.key, !profile.notifications[pref.key])}
                 className={`relative h-7 w-12 rounded-full transition-colors ${
-                  profile.notifications[pref.key] ? 'bg-blue-600' : 'bg-white/10'
+                  profile.notifications[pref.key] ? 'bg-blue-600' : 'bg-[var(--border-secondary)]'
                 }`}
               >
                 <span
