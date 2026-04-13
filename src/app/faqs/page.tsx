@@ -103,7 +103,7 @@ export const faqs = [
   {
     id: '15',
     q: 'What is the Partner Dashboard?',
-    a: 'The partner dashboard is a Phase 2 feature currently in development. It will allow partners to see every prospect they have referred, their onboarding progress, readiness stage, and contact them directly. For now, partner communication happens through your AutoPilot ROI team channel.',
+    a: 'The Partner Dashboard is live at /dashboard. Partners can see every prospect referred through their link, track readiness scores, tiers, and onboarding status. It includes performance analytics, a team leaderboard, a multi-type referral link generator with QR codes, training videos, and profile settings.',
     category: 'partner',
   },
 ]

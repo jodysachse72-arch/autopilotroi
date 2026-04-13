@@ -62,7 +62,7 @@ const ADMIN_TOUR: TourStep[] = [
   },
   {
     target: '#admin-strategy',
-    title: 'Strategy & Roadmap',
+    title: 'Strategy Roadmap',
     content: 'See the competitive analysis, cost savings breakdown, and the full phase roadmap. Shows what\'s been built, what\'s next, and estimated costs.',
     icon: '🗺️',
     position: 'right',

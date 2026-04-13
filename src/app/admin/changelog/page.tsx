@@ -19,6 +19,18 @@ interface ChangeEntry {
 
 const changelog: ChangeEntry[] = [
   {
+    date: '2026-04-13',
+    phase: 'Phase 3: SCALE',
+    items: [
+      { title: 'User Avatar Dropdown Menu', description: 'Replaced flat avatar+name+logout layout with a single clickable avatar that opens an animated dropdown. Shows user name, role badge (🛡️ Admin / 🤝 Partner), quick links (Partner Dashboard, Admin Panel, Referral Links, Settings), and Log Out. Closes on click outside and on route change.', type: 'improvement', files: ['src/components/layout/Navbar.tsx', 'src/app/globals.css'] },
+      { title: 'Forgot / Reset Password Flow', description: 'Two new auth pages: /forgot-password (enter email, sends Supabase reset link, shows success state) and /reset-password (token exchange, new password form, auto-redirect). Added "Forgot password?" link to login page. Demo mode simulates the flow.', type: 'feature', files: ['src/app/(auth)/forgot-password/page.tsx', 'src/app/(auth)/reset-password/page.tsx', 'src/app/(auth)/login/page.tsx'] },
+      { title: 'Navigation Rename: Partner Dashboard', description: 'Changed "Dashboard" to "Partner Dashboard" in the user dropdown menu and mobile navigation for clarity.', type: 'improvement', files: ['src/components/layout/Navbar.tsx'] },
+      { title: 'Admin Sidebar: Strategy Roadmap', description: 'Renamed "Strategy" to "Strategy Roadmap" in admin sidebar. Changed roadmap page title to "AutopilotROI Strategy Roadmap".', type: 'improvement', files: ['src/app/admin/layout.tsx', 'src/app/admin/roadmap/page.tsx'] },
+      { title: 'Announcement Banner — Fully Functional', description: 'Rebuilt from stub into a working gradient banner at the top of every page. Message is stored in localStorage, editable from Admin → Features → Announcement Banner. Controlled by feature flag toggle. Dismissable with × button. Auto-syncs across tabs.', type: 'feature', files: ['src/components/layout/AnnouncementBanner.tsx', 'src/app/admin/features/page.tsx'] },
+      { title: 'Partner Import & Management Checklist', description: 'Added 10-item checklist section (🤝 Priority) covering CSV import, manual add, ref code migration, dedup, role assignment, welcome emails, upline mapping, validation reports, admin edit, and deactivation.', type: 'feature', files: ['src/app/admin/checklist/page.tsx'] },
+    ],
+  },
+  {
     date: '2026-04-12',
     phase: 'Phase 3: SCALE',
     items: [

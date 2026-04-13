@@ -126,6 +126,18 @@ const INTEGRATIONS: Integration[] = [
       { key: 'TURNSTILE_SECRET_KEY', label: 'Secret Key', placeholder: '0x4AAAAAAA...', required: true, sensitive: true, hint: 'Cloudflare Dashboard → Turnstile → Secret Key' },
     ],
   },
+  {
+    id: 'thrivedesk',
+    name: 'ThriveDesk',
+    icon: '💬',
+    description: 'Live chat widget for visitor support. Routes conversations to your helpdesk team.',
+    docsUrl: 'https://docs.thrivedesk.com/',
+    dashboardUrl: 'https://app.thrivedesk.com/',
+    category: 'support' as Integration['category'],
+    envFields: [
+      { key: 'NEXT_PUBLIC_THRIVEDESK_WIDGET_ID', label: 'Widget ID', placeholder: 'wp_xxxxxxxxxx', required: true, hint: 'ThriveDesk → Settings → Assistant → Installation → Widget ID' },
+    ],
+  },
 ]
 
 const STORAGE_KEY = 'autopilot-integrations-vault'
@@ -150,9 +162,10 @@ const categoryLabels: Record<string, string> = {
   cms: '🎨 Content Management',
   analytics: '📈 Analytics & Monitoring',
   security: '🔒 Security',
+  support: '💬 Support & Helpdesk',
 }
 
-const categoryOrder = ['hosting', 'database', 'email', 'cms', 'analytics', 'security']
+const categoryOrder = ['hosting', 'database', 'email', 'cms', 'analytics', 'security', 'support']
 
 export default function SettingsPage() {
   const [vault, setVault] = useState<Record<string, string>>({})
