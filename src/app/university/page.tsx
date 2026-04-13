@@ -1,4 +1,3 @@
-import { getUniversityVideos } from '@/sanity/client'
 import UniversityContent from '@/components/UniversityContent'
 
 export const metadata = {
@@ -8,6 +7,7 @@ export const metadata = {
 }
 
 export default async function UniversityPage() {
-  const videos = await getUniversityVideos()
-  return <UniversityContent videos={videos} />
+  // Videos now come from the in-app Content Editor (localStorage/Supabase)
+  // UniversityContent handles loading them client-side
+  return <UniversityContent videos={null} />
 }

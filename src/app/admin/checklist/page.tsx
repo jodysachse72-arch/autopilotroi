@@ -127,8 +127,8 @@ const sections: CheckSection[] = [
       { id: 'pl-audit-logs', label: 'Enable Supabase audit logs', detail: 'Track data access patterns' },
       { id: 'pl-rotate-keys', label: 'Rotate any exposed credentials', detail: 'Check git history for leaked keys' },
       { id: 'pl-backup', label: 'Enable database backups', detail: 'Supabase PITR or pg_dump cron' },
-      { id: 'pl-sanity-cms', label: 'Connect University/Blog to Sanity', detail: 'Dynamic content management' },
-      { id: 'pl-sanity-webhook', label: 'Set up Sanity ISR webhook', detail: 'Auto-revalidate on content changes' },
+      { id: 'pl-content-editor', label: 'Set up Content Editor with Supabase', detail: 'Migrate from localStorage to cms_content table' },
+      { id: 'pl-content-backup', label: 'Export initial content backup', detail: 'Admin → Content Editor → Export' },
     ],
   },
 ]

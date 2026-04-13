@@ -75,20 +75,6 @@ const INTEGRATIONS: Integration[] = [
     ],
   },
   {
-    id: 'sanity',
-    name: 'Sanity CMS',
-    icon: '🎨',
-    description: 'Headless CMS for blog posts, pages, and university video content.',
-    docsUrl: 'https://www.sanity.io/docs',
-    dashboardUrl: 'https://www.sanity.io/manage',
-    category: 'cms',
-    envFields: [
-      { key: 'NEXT_PUBLIC_SANITY_PROJECT_ID', label: 'Project ID', placeholder: 'gnd0za31', required: true, hint: 'Sanity → Manage → Project ID' },
-      { key: 'NEXT_PUBLIC_SANITY_DATASET', label: 'Dataset', placeholder: 'production', required: false, hint: 'Usually "production"' },
-      { key: 'SANITY_API_TOKEN', label: 'API Token', placeholder: 'skxxxxxxxxxx', required: false, sensitive: true, hint: 'Only needed for server-side writes' },
-    ],
-  },
-  {
     id: 'plausible',
     name: 'Plausible Analytics',
     icon: '📊',

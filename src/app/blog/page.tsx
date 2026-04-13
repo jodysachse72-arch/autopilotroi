@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 
-// Fallback demo posts (replaced by Sanity when connected)
+// Demo posts (managed via Admin → Content Editor)
 const demoPosts = [
   {
     slug: 'getting-started-with-aurum',
