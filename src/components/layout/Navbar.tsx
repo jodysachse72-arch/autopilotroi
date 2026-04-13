@@ -172,6 +172,7 @@ export default function Navbar() {
                         <DropdownLink href="/admin" icon="🛡️" label="Admin Panel" onClick={() => setDropdownOpen(false)} />
                       )}
                       <DropdownLink href="/dashboard/links" icon="🔗" label="Referral Links" onClick={() => setDropdownOpen(false)} />
+                      <DropdownLink href="/dashboard/links" icon="➕" label="Invite a Partner" onClick={() => setDropdownOpen(false)} />
                       <DropdownLink href="/dashboard/settings" icon="⚙️" label="Settings" onClick={() => setDropdownOpen(false)} />
                     </div>
 

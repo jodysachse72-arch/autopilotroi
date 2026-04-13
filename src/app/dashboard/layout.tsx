@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { LogoIcon } from '@/components/ui/Logo'
 import GuidedTour, { type TourStep } from '@/components/ui/GuidedTour'
+import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import CommandPalette from '@/components/ui/CommandPalette'
 
 const sidebarLinks = [
   { id: 'nav-overview', label: 'Overview', href: '/dashboard', icon: '📊' },
@@ -109,6 +111,15 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const [showTour, setShowTour] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
+
+  const notifications = [
+    { id: 1, text: 'Sarah Chen completed assessment (Score: 28)', time: '2h ago', read: false },
+    { id: 2, text: 'James Wilson moved to Invited stage', time: '5h ago', read: false },
+    { id: 3, text: 'New prospect from your referral link', time: '1d ago', read: true },
+    { id: 4, text: 'Maria Garcia started onboarding', time: '2d ago', read: true },
+  ]
+  const unreadCount = notifications.filter(n => !n.read).length
 
   return (
     <div className="min-h-screen flex">
@@ -172,6 +183,53 @@ export default function DashboardLayout({
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            {/* Cmd+K hint */}
+            <button
+              onClick={() => {
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
+              }}
+              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-2.5 py-1.5 text-[10px] text-[var(--text-muted)] transition hover:text-[var(--text-secondary)]"
+              title="Quick search (Cmd+K)"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <kbd className="font-mono">⌘K</kbd>
+            </button>
+
+            {/* Notification bell */}
+            <div className="relative">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] p-2 text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
+                title="Notifications"
+              >
+                🔔
+                {unreadCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 top-12 w-80 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-2xl z-50 overflow-hidden">
+                  <div className="border-b border-[var(--border-primary)] px-4 py-3">
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Notifications</h3>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.map((n) => (
+                      <div key={n.id} className={`flex items-start gap-3 px-4 py-3 border-b border-[var(--border-primary)] last:border-0 ${!n.read ? 'bg-blue-500/5' : ''}`}>
+                        <span className="mt-0.5 text-xs">{!n.read ? '🔵' : '⚪'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-[var(--text-secondary)]">{n.text}</p>
+                          <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">{n.time}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
               onClick={() => setShowTour(true)}
               className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
@@ -207,8 +265,14 @@ export default function DashboardLayout({
         </nav>
 
         {/* Page content */}
-        <main className="flex-1 p-6 lg:p-8">{children}</main>
+        <main className="flex-1 p-6 lg:p-8">
+          <Breadcrumbs />
+          {children}
+        </main>
       </div>
+
+      {/* Command Palette */}
+      <CommandPalette />
 
       {/* Partner Tour */}
       <GuidedTour

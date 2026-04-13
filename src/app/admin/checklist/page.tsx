@@ -43,6 +43,8 @@ const sections: CheckSection[] = [
       { id: 'email-test-prospect', label: 'Test prospect welcome email', detail: 'Submit test lead and check inbox' },
       { id: 'email-test-partner', label: 'Test partner notification email', detail: 'Verify score + tier shows correctly' },
       { id: 'email-unsubscribe', label: 'Verify unsubscribe link works', detail: 'Click unsubscribe in test email' },
+      { id: 'thrivedesk-widget', label: 'Install ThriveDesk live chat widget', detail: 'Get embed script from ThriveDesk → Settings → Assistant → Installation' },
+      { id: 'thrivedesk-env', label: 'Set NEXT_PUBLIC_THRIVEDESK_WIDGET_ID in Vercel', detail: 'Widget ID from ThriveDesk dashboard' },
     ],
   },
   {

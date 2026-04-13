@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import PasswordStrengthMeter from '@/components/ui/PasswordStrengthMeter'
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
@@ -178,6 +179,7 @@ export default function ResetPasswordPage() {
                   placeholder="Minimum 8 characters"
                   className="w-full rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                 />
+                <PasswordStrengthMeter password={password} />
               </div>
 
               <div>

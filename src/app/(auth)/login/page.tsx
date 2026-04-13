@@ -172,7 +172,15 @@ function LoginForm() {
             </p>
           )}
 
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                defaultChecked
+                className="h-4 w-4 rounded border-white/20 bg-white/5 accent-blue-500"
+              />
+              <span className="text-xs text-[var(--text-muted)]">Remember me</span>
+            </label>
             <Link
               href="/forgot-password"
               className="text-xs font-medium text-blue-400 hover:text-blue-300 transition"

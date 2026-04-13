@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { LogoIcon } from '@/components/ui/Logo'
 import GuidedTour, { type TourStep } from '@/components/ui/GuidedTour'
+import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import CommandPalette from '@/components/ui/CommandPalette'
 
 const sidebarLinks = [
   { id: 'admin-dashboard', label: 'Dashboard', href: '/admin', icon: '📊' },
@@ -177,6 +179,15 @@ export default function AdminLayout({
             </h1>
           </div>
           <div className="flex items-center gap-3">
+            {/* Cmd+K */}
+            <button
+              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-2.5 py-1.5 text-[10px] text-[var(--text-muted)] transition hover:text-[var(--text-secondary)]"
+              title="Quick search (Cmd+K)"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <kbd className="font-mono">⌘K</kbd>
+            </button>
             <button
               onClick={() => setShowTour(true)}
               className="rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-3 py-1.5 text-xs font-semibold text-[var(--text-secondary)] transition hover:text-[var(--text-primary)]"
@@ -212,8 +223,13 @@ export default function AdminLayout({
           })}
         </nav>
 
-        <main className="flex-1 p-6 lg:p-8">{children}</main>
+        <main className="flex-1 p-6 lg:p-8">
+          <Breadcrumbs />
+          {children}
+        </main>
       </div>
+
+      <CommandPalette />
 
       {/* Admin Tour */}
       <GuidedTour
