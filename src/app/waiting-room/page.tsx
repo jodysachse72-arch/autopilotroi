@@ -10,6 +10,7 @@ import { trackEvent, EVENTS } from '@/lib/analytics'
 import PersonalizedPath from '@/components/sections/PersonalizedPath'
 
 /* ─── Curated Aurum University Video Library ─── */
+/* All IDs verified live via YouTube oembed API on 2026-04-13 */
 const WAITING_ROOM_VIDEOS = [
   {
     id: 'MmAnR4YAPv4',
@@ -20,35 +21,35 @@ const WAITING_ROOM_VIDEOS = [
     priority: 1,
   },
   {
-    id: 'kbGSa11bBHc',
-    title: 'What is the EX-AI Trading Bot?',
-    description: 'Understand how the flagship AI trading bot generates daily returns.',
+    id: 'CRuZqkc8sh4',
+    title: 'AI Trading Bots vs Aurum: The Key Difference',
+    description: 'What sets Aurum\'s AI trading apart from generic trading bots in the market.',
     category: 'Trading & Bots',
-    duration: '12:45',
+    duration: '12:30',
     priority: 2,
   },
   {
-    id: 'yTb2rAJhU7w',
-    title: 'Aurum Back Office Walkthrough',
-    description: 'A tour of the Aurum back office — deposits, withdrawals, and stats.',
+    id: 'X1TO-hC1Geg',
+    title: 'Aurum Account Registration + Bot Activation',
+    description: 'Step-by-step guide to creating your Aurum account and activating the EX-AI Bot.',
     category: 'Getting Started',
-    duration: '18:10',
+    duration: '14:00',
     priority: 3,
   },
   {
-    id: 'SXpfGOUfEKg',
-    title: 'Understanding Crypto Wallets',
-    description: 'What Trust Wallet is, why you need it, and how to set it up.',
+    id: 'hgPSheoUs_s',
+    title: 'VPN Required? U.S. & Canada Access Rules',
+    description: 'Important access requirements for members in the United States and Canada.',
     category: 'Wallets & Security',
-    duration: '10:33',
+    duration: '7:15',
     priority: 4,
   },
   {
-    id: '4GNo8E1yj7g',
-    title: 'How to Fund Your Aurum Account',
-    description: 'Step-by-step guide to moving funds into your trading account.',
+    id: 'GJEK3wOjlyQ',
+    title: 'Aurum Packages and Percentages',
+    description: 'Complete overview of all investment packages and their return percentages.',
     category: 'Getting Started',
-    duration: '8:15',
+    duration: '18:00',
     priority: 5,
   },
   {
@@ -60,19 +61,19 @@ const WAITING_ROOM_VIDEOS = [
     priority: 6,
   },
   {
-    id: 'V3XEvrIFHSA',
-    title: 'Auto-Reinvest vs Manual Withdrawals',
+    id: '1BI9_YikUKc',
+    title: 'Compounding Strategies: Plan A vs Plan B',
     description: 'Choose the right strategy — compound or take daily profits.',
     category: 'Trading & Bots',
-    duration: '9:18',
+    duration: '22:15',
     priority: 7,
   },
   {
-    id: '7LNl58JwgSc',
-    title: 'Aurum Crypto Card & NeoBank',
-    description: 'Spend your crypto earnings anywhere with the Aurum Visa card.',
+    id: 'xc97Nr3G3vU',
+    title: 'Gold Tokenization Partnership | Clinq.Gold',
+    description: 'Aurum\'s real-world asset tokenization partnership with Sierra Leone.',
     category: 'Products',
-    duration: '11:05',
+    duration: '11:20',
     priority: 8,
   },
 ]
