@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import YouTubeThumbnail from '@/components/ui/YouTubeThumbnail'
+import { createClient } from '@/lib/supabase/client'
+import type { CmsPost } from '@/lib/cms/types'
 
 // ─── Fallback video data — ALL IDs verified live via YouTube oembed API ──────
 const fallbackVideos = [
@@ -64,8 +66,40 @@ interface UniversityVideo {
 }
 
 export default function UniversityContent({ videos: cmsVideos }: { videos: UniversityVideo[] | null }) {
-  const videos = cmsVideos && cmsVideos.length > 0 ? cmsVideos : fallbackVideos
+  const [liveVideos, setLiveVideos] = useState<UniversityVideo[]>(fallbackVideos)
   const [activeCategory, setActiveCategory] = useState('all')
+
+  useEffect(() => {
+    async function fetchVideos() {
+      try {
+        const db = createClient()
+        const { data, error } = await db
+          .from('cms_posts')
+          .select('*')
+          .eq('type', 'video')
+          .eq('status', 'published')
+          .order('sort_order', { ascending: true })
+        if (error || !data || data.length === 0) return
+        const sectionVideos = (data as CmsPost[]).filter(v => v.meta?.section === 'university')
+        if (sectionVideos.length === 0) return // keep fallback
+        const mapped: UniversityVideo[] = sectionVideos.map(v => ({
+          _id: v.id,
+          title: v.title ?? 'Untitled',
+          youtubeId: (v.meta?.youtubeId as string) ?? '',
+          description: v.meta?.excerpt as string | undefined,
+          category: (v.meta?.category as string) ?? 'beginner',
+          duration: v.meta?.duration as string | undefined,
+          order: v.sort_order ?? 99,
+          featured: (v.meta?.featured as boolean) ?? false,
+        }))
+        setLiveVideos(mapped)
+      } catch (e) {
+        console.error('[University] Supabase fetch error:', e)
+      }
+    }
+    fetchVideos()
+  }, [])
+
   const [playingId, setPlayingId] = useState<string | null>(null)
   const [watched, setWatched] = useState<Set<string>>(() => {
     if (typeof window === 'undefined') return new Set()
@@ -76,6 +110,8 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
       return new Set()
     }
   })
+
+  const videos = (cmsVideos && cmsVideos.length > 0) ? cmsVideos : liveVideos
 
   const featured = videos.filter((v) => v.featured)
   const filtered = videos.filter(
