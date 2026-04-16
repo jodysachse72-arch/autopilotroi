@@ -303,7 +303,7 @@ export default function GuidedTour({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -8, scale: 0.97 }}
           transition={{ duration: 0.25 }}
-          className={`fixed z-[9999] rounded-2xl border border-blue-500/20 bg-[#0c1a3a] shadow-2xl shadow-blue-900/30 ${
+          className={`fixed z-[9999] rounded-2xl shadow-2xl ${
             useCenter
               ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'
               : ''
@@ -311,11 +311,14 @@ export default function GuidedTour({
           style={{
             width: tooltipWidth,
             maxWidth: 'calc(100vw - 32px)',
+            background: '#fff',
+            border: '1px solid #e0e2e6',
+            boxShadow: '0 8px 30px rgba(27,97,201,0.12)',
             ...(useCenter ? {} : { position: 'absolute', ...tooltipStyle }),
           }}
         >
           {/* Progress bar */}
-          <div className="h-1 w-full overflow-hidden rounded-t-2xl bg-white/5">
+          <div className="h-1 w-full overflow-hidden rounded-t-2xl" style={{ background: '#e0e2e6' }}>
             <motion.div
               className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
               animate={{ width: `${progress}%` }}
@@ -331,17 +334,18 @@ export default function GuidedTour({
                   <span className="text-2xl">{step.icon}</span>
                 )}
                 <div>
-                  <h4 className="font-[var(--font-sora)] text-sm sm:text-base font-bold text-white leading-tight">
+                  <h4 className="font-[var(--font-sora)] text-sm sm:text-base font-bold leading-tight" style={{ color: '#181d26' }}>
                     {step?.title}
                   </h4>
-                  <span className="text-[11px] font-semibold uppercase tracking-widest text-blue-400/70">
+                  <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#1b61c9' }}>
                     Step {currentStep + 1} of {steps.length}
                   </span>
                 </div>
               </div>
               <button
                 onClick={handleSkip}
-                className="rounded-lg p-1.5 text-white/30 transition hover:bg-white/5 hover:text-white/60"
+                className="rounded-lg p-1.5 transition"
+                style={{ color: 'rgba(4,14,32,0.35)' }}
                 title="Skip tour"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -351,7 +355,7 @@ export default function GuidedTour({
             </div>
 
             {/* Content */}
-            <p className="mb-4 text-xs sm:text-sm leading-relaxed text-blue-50/70 whitespace-pre-line">
+            <p className="mb-4 text-xs sm:text-sm leading-relaxed whitespace-pre-line" style={{ color: 'rgba(4,14,32,0.55)' }}>
               {step?.content}
             </p>
 
@@ -368,7 +372,8 @@ export default function GuidedTour({
               <button
                 onClick={handlePrev}
                 disabled={currentStep === 0}
-                className="text-sm font-medium text-white/40 transition hover:text-white/70 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="text-sm font-medium transition disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{ color: 'rgba(4,14,32,0.45)' }}
               >
                 ← Back
               </button>
@@ -378,19 +383,19 @@ export default function GuidedTour({
                 {steps.map((_, i) => (
                   <div
                     key={i}
-                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                      i === currentStep
-                        ? 'w-6 bg-blue-500'
-                        : i < currentStep
-                        ? 'w-1.5 bg-blue-500/50'
-                        : 'w-1.5 bg-white/10'
-                    }`}
+                    style={{
+                      height: '6px',
+                      borderRadius: '3px',
+                      transition: 'all 0.3s',
+                      width: i === currentStep ? '24px' : '6px',
+                      background: i === currentStep ? '#1b61c9' : i < currentStep ? 'rgba(27,97,201,0.4)' : '#e0e2e6',
+                    }}
                   />
                 ))}
               </div>
 
               {/* Mobile step counter instead of dots */}
-              <span className="sm:hidden text-[11px] font-semibold text-white/30 tabular-nums">
+              <span className="sm:hidden text-[11px] font-semibold tabular-nums" style={{ color: 'rgba(4,14,32,0.35)' }}>
                 {currentStep + 1}/{steps.length}
               </span>
 

@@ -40,15 +40,15 @@ export default function Breadcrumbs() {
   }))
 
   return (
-    <nav className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] mb-4" aria-label="Breadcrumb">
-      <Link href="/" className="hover:text-[var(--text-secondary)] transition">Home</Link>
+    <nav className="flex items-center gap-1.5 text-xs mb-4" style={{ color: 'rgba(4,14,32,0.45)' }} aria-label="Breadcrumb">
+      <Link href="/" className="transition hover:text-[#1b61c9]">Home</Link>
       {crumbs.map((crumb) => (
         <span key={crumb.href} className="flex items-center gap-1.5">
-          <span className="text-white/20">/</span>
+          <span style={{ color: '#e0e2e6' }}>/</span>
           {crumb.isLast ? (
-            <span className="text-[var(--text-secondary)] font-medium">{crumb.label}</span>
+            <span className="font-medium" style={{ color: 'rgba(4,14,32,0.69)' }}>{crumb.label}</span>
           ) : (
-            <Link href={crumb.href} className="hover:text-[var(--text-secondary)] transition">
+            <Link href={crumb.href} className="transition hover:text-[#1b61c9]">
               {crumb.label}
             </Link>
           )}

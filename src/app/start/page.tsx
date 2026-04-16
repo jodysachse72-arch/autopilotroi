@@ -233,44 +233,38 @@ export default function StartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
+    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
       {/* Header */}
-      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-12 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_60%,rgba(59,130,246,0.18),transparent_50%)]" />
-        <div className="relative mx-auto max-w-7xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-2 text-sm font-medium text-blue-200">
+      <div className="px-6 py-12 lg:px-10" style={{ background: '#fff', borderBottom: '1px solid #e0e2e6' }}>
+        <div className="mx-auto max-w-7xl">
+          <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] mb-4"
+            style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9', border: '1px solid rgba(27,97,201,0.15)' }}>
             🚀 Guided Onboarding
-          </div>
-          <h1 className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.05em] text-[var(--text-primary)] lg:text-5xl">
+          </span>
+          <h1 className="text-4xl font-bold mb-3 lg:text-5xl" style={{ color: '#181d26', letterSpacing: '-0.03em' }}>
             Start Your Aurum Journey
           </h1>
-          <p className="mt-3 max-w-2xl text-lg text-[var(--text-secondary)]">
-            Follow these 6 steps to complete your Aurum onboarding. Your partner is available to
-            help at any stage.
+          <p className="max-w-2xl text-lg mb-8" style={{ color: 'rgba(4,14,32,0.55)', lineHeight: 1.7 }}>
+            Follow these 6 steps to complete your Aurum onboarding. Your partner is available to help at any stage.
           </p>
 
           {/* Progress strip */}
-          <div className="mt-8 flex items-center gap-2 overflow-x-auto pb-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2">
             {progressSteps.map((step, i) => {
               const done = completedSteps.includes(i + 1)
               return (
                 <div key={step.label} className="flex items-center gap-2">
-                  <div
-                    className={`flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${
-                      done
-                        ? 'bg-emerald-500/25 text-emerald-300'
-                        : i + 1 === expandedStep
-                          ? 'bg-blue-600/80 text-white'
-                          : 'bg-white/10 text-blue-100/60'
-                    }`}
-                  >
+                  <div className="flex items-center gap-2 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition"
+                    style={{
+                      background: done ? 'rgba(16,185,129,0.1)' : i + 1 === expandedStep ? '#1b61c9' : '#f0f2f7',
+                      color: done ? '#059669' : i + 1 === expandedStep ? '#fff' : 'rgba(4,14,32,0.45)',
+                      border: done ? '1px solid rgba(16,185,129,0.3)' : 'none',
+                    }}>
                     {done && <span>✓</span>}
                     {step.label}
                   </div>
                   {i < progressSteps.length - 1 && (
-                    <div
-                      className={`h-px w-6 shrink-0 ${done ? 'bg-emerald-500/50' : 'bg-white/15'}`}
-                    />
+                    <div className="h-px w-6 shrink-0" style={{ background: done ? '#10b981' : '#e0e2e6' }} />
                   )}
                 </div>
               )
@@ -290,113 +284,95 @@ export default function StartPage() {
               return (
                 <div
                   key={step.id}
-                  className={`overflow-hidden rounded-2xl border transition-all ${
-                    isComplete
-                      ? 'border-emerald-500/30 bg-emerald-500/5'
-                      : isExpanded
-                        ? 'border-blue-400/40 bg-[var(--bg-card)]'
-                        : 'border-[var(--border-primary)] bg-[var(--bg-card)]'
-                  }`}
+                  className="overflow-hidden rounded-2xl transition-shadow"
+                  style={{
+                    background: isComplete ? 'rgba(16,185,129,0.05)' : '#fff',
+                    border: isComplete ? '1px solid rgba(16,185,129,0.25)' : isExpanded ? '1px solid rgba(27,97,201,0.4)' : '1px solid #e0e2e6',
+                  }}
                 >
-                  {/* Step header — always visible, click to expand */}
                   <button
                     onClick={() => setExpandedStep(isExpanded ? 0 : step.id)}
                     className="flex w-full items-center gap-4 px-6 py-5 text-left"
                   >
-                    <div
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-[var(--font-sora)] text-sm font-bold ${
-                        isComplete
-                          ? 'bg-emerald-500 text-white'
-                          : isExpanded
-                            ? 'bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] text-white shadow-[0_6px_16px_rgba(37,99,235,0.35)]'
-                            : 'bg-white/12 text-white/60'
-                      }`}
-                    >
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                      style={{
+                        background: isComplete ? '#10b981' : isExpanded ? '#1b61c9' : '#f0f2f7',
+                        color: isComplete || isExpanded ? '#fff' : 'rgba(4,14,32,0.4)',
+                      }}>
                       {isComplete ? '✓' : step.id}
                     </div>
                     <div className="flex-1">
-                      <div className="text-xs font-semibold uppercase tracking-widest text-blue-300/70">
+                      <div className="text-xs font-bold uppercase tracking-[0.12em] mb-0.5" style={{ color: '#1b61c9' }}>
                         Step {step.id}
                       </div>
-                      <div className="mt-0.5 font-[var(--font-sora)] text-lg font-semibold text-[var(--text-primary)]">
+                      <div className="text-lg font-bold" style={{ color: '#181d26' }}>
                         {step.title}
                       </div>
-                      <div className="text-sm text-[var(--text-muted)]">{step.subtitle}</div>
+                      <div className="text-sm" style={{ color: 'rgba(4,14,32,0.5)' }}>{step.subtitle}</div>
                     </div>
                     {isComplete && (
-                      <span className="shrink-0 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-300">
+                      <span className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold" style={{ background: 'rgba(16,185,129,0.1)', color: '#059669' }}>
                         ✓ Complete
                       </span>
                     )}
-                    <span
-                      className={`shrink-0 text-blue-300 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                    >
+                    <span className="shrink-0 transition-transform" style={{ color: '#1b61c9', transform: isExpanded ? 'rotate(180deg)' : 'none' }}>
                       ▾
                     </span>
                   </button>
 
-                  {/* Expanded content */}
                   {isExpanded && (
-                    <div className="border-t border-[var(--border-primary)] px-6 pb-6 pt-5 space-y-5">
-                      {/* Video */}
+                    <div className="px-6 pb-6 pt-5 space-y-5" style={{ borderTop: '1px solid #f0f2f7' }}>
                       {step.videoUrl && (
                         <VideoModal videoUrl={step.videoUrl}>
-                          <div className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-4 py-3 transition hover:border-[var(--border-accent)]">
+                          <div className="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition hover:shadow" style={{ background: '#f8fafc', border: '1px solid #e0e2e6' }}>
                             <span className="text-2xl">🎬</span>
                             <div>
-                              <div className="text-xs font-semibold text-blue-300">{step.videoLabel}</div>
-                              <div className="text-sm font-medium text-[var(--text-primary)]">{step.videoNote}</div>
+                              <div className="text-xs font-bold" style={{ color: '#1b61c9' }}>{step.videoLabel}</div>
+                              <div className="text-sm font-medium" style={{ color: '#181d26' }}>{step.videoNote}</div>
                             </div>
-                            <span className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-red-500 text-white shadow-[0_4px_12px_rgba(239,68,68,0.4)]">
+                            <span className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-red-500 text-white">
                               ▶
                             </span>
                           </div>
                         </VideoModal>
                       )}
 
-                      {/* Warning */}
                       {step.warning && (
-                        <div className="rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-7 text-amber-100">
+                        <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }}>
                           ⚠️ {step.warning}
                         </div>
                       )}
 
-                      {/* Why info */}
                       {step.why && (
-                        <div className="rounded-2xl border border-blue-400/20 bg-blue-400/8 p-4 text-sm leading-7 text-blue-100">
-                          <span className="font-semibold">ℹ️ Why this step? </span>
+                        <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ background: 'rgba(27,97,201,0.05)', border: '1px solid rgba(27,97,201,0.15)', color: '#1b61c9' }}>
+                          <strong>ℹ️ Why this step? </strong>
                           {step.why}
                         </div>
                       )}
 
-                      {/* External link */}
                       {step.link && (
-                        <a
-                          href={step.link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 rounded-2xl border border-blue-400/30 bg-blue-500/10 px-4 py-3 text-sm font-medium text-blue-200 transition hover:bg-blue-500/18"
-                        >
+                        <a href={step.link.href} target="_blank" rel="noopener noreferrer"
+                          className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-80"
+                          style={{ background: 'rgba(27,97,201,0.06)', border: '1px solid rgba(27,97,201,0.2)', color: '#1b61c9' }}>
                           🔗 {step.link.label} →
                         </a>
                       )}
 
-                      {/* Instructions */}
                       <ol className="space-y-4">
                         {step.instructions.map((instruction, i) => (
                           <li key={i} className="flex gap-3">
-                            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600/40 text-xs font-bold text-blue-200">
+                            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white" style={{ background: '#1b61c9' }}>
                               {i + 1}
                             </span>
-                            <div className="text-sm leading-7 text-blue-100/85">
+                            <div className="text-sm leading-relaxed" style={{ color: 'rgba(4,14,32,0.7)' }}>
                               {instruction.text}
                               {instruction.warning && (
-                                <div className="mt-2 rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+                                <div className="mt-2 rounded-lg px-3 py-2 text-xs" style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', color: '#b45309' }}>
                                   ⚠️ {instruction.warning}
                                 </div>
                               )}
                               {instruction.tip && (
-                                <div className="mt-2 rounded-xl border border-cyan-400/25 bg-cyan-400/8 px-3 py-2 text-xs text-cyan-200">
+                                <div className="mt-2 rounded-lg px-3 py-2 text-xs" style={{ background: 'rgba(6,182,212,0.06)', border: '1px solid rgba(6,182,212,0.2)', color: '#0891b2' }}>
                                   💡 {instruction.tip}
                                 </div>
                               )}
@@ -405,25 +381,14 @@ export default function StartPage() {
                         ))}
                       </ol>
 
-                      {/* Complete button */}
                       <button
-                        onClick={() => {
-                          toggleStep(step.id)
-                          if (!completedSteps.includes(step.id)) {
-                            setExpandedStep(step.id < 6 ? step.id + 1 : 0)
-                          }
-                        }}
-                        className={`w-full rounded-2xl py-3.5 text-base font-semibold transition ${
-                          isComplete
-                            ? 'bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'
-                            : 'bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] text-white shadow-[0_10px_24px_rgba(37,99,235,0.32)] hover:brightness-110'
-                        }`}
+                        onClick={() => { toggleStep(step.id); if (!completedSteps.includes(step.id)) setExpandedStep(step.id < 6 ? step.id + 1 : 0) }}
+                        className="w-full rounded-xl py-3.5 text-base font-bold text-white transition"
+                        style={{ background: isComplete ? '#10b981' : '#1b61c9' }}
+                        onMouseEnter={e => !isComplete && ((e.currentTarget as HTMLButtonElement).style.background = '#254fad')}
+                        onMouseLeave={e => !isComplete && ((e.currentTarget as HTMLButtonElement).style.background = '#1b61c9')}
                       >
-                        {isComplete
-                          ? `✓ ${step.id === 6 ? 'All Steps Complete!' : 'Mark Incomplete'}`
-                          : step.id === 6
-                            ? "I've Confirmed with My Partner ✦"
-                            : `${step.title} — Mark Complete ✓`}
+                        {isComplete ? `✓ ${step.id === 6 ? 'All Steps Complete!' : 'Mark Incomplete'}` : step.id === 6 ? "I've Confirmed with My Partner ✦" : `${step.title} — Mark Complete ✓`}
                       </button>
                     </div>
                   )}
@@ -431,30 +396,18 @@ export default function StartPage() {
               )
             })}
 
-            {/* Congrats */}
             {showCongrats && (
-              <div className="rounded-[1.8rem] bg-[linear-gradient(135deg,#1d4ed8_0%,#0f172a_100%)] p-8 text-center border border-blue-400/30">
+              <div className="rounded-2xl p-8 text-center" style={{ background: '#1b61c9', border: '1px solid rgba(27,97,201,0.3)' }}>
                 <div className="text-4xl">🎉</div>
-                <h2 className="mt-4 font-[var(--font-sora)] text-3xl font-semibold text-white">
+                <h2 className="mt-4 text-3xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
                   You&apos;re Fully Onboarded!
                 </h2>
-                <p className="mt-3 text-blue-100/80">
+                <p className="mt-3 text-white/75">
                   Your AI trading bot is active and you are now part of the AutoPilot ROI team.
-                  Head to Resources to keep learning.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                  <Link
-                    href="/resources"
-                    className="rounded-xl bg-white px-6 py-3 text-base font-bold text-blue-700 shadow-[0_8px_20px_rgba(255,255,255,0.2)] transition hover:bg-blue-50"
-                  >
-                    Go to Resources →
-                  </Link>
-                  <Link
-                    href="/university"
-                    className="text-sm font-medium text-blue-200 underline underline-offset-2 hover:text-white"
-                  >
-                    Visit Aurum University
-                  </Link>
+                  <Link href="/resources" className="rounded-xl bg-white px-6 py-3 text-base font-bold transition hover:bg-blue-50" style={{ color: '#1b61c9' }}>Go to Resources →</Link>
+                  <Link href="/university" className="text-sm font-semibold text-white/80 underline underline-offset-2 hover:text-white">Visit Aurum University</Link>
                 </div>
               </div>
             )}
@@ -462,42 +415,25 @@ export default function StartPage() {
 
           {/* Sidebar */}
           <div className="space-y-5">
-            {/* Progress summary */}
-            <div
-              className="sticky top-24 rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-[var(--card-shadow,none)]"
-              id="partner-contact"
-            >
-              <h3 className="font-semibold text-[var(--text-primary)] mb-4 text-sm uppercase tracking-wide">
-                Your Progress
-              </h3>
-              <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-[linear-gradient(90deg,#3b82f6,#22c55e)] transition-all"
-                  style={{ width: `${(completedSteps.length / 6) * 100}%` }}
-                />
+            <div className="sticky top-24 rounded-2xl p-5" id="partner-contact"
+              style={{ background: '#fff', border: '1px solid #e0e2e6', boxShadow: '0 2px 12px rgba(27,97,201,0.07)' }}>
+              <h3 className="font-bold mb-4 text-sm uppercase tracking-[0.12em]" style={{ color: '#181d26' }}>Your Progress</h3>
+              <div className="mb-3 h-2 w-full overflow-hidden rounded-full" style={{ background: '#f0f2f7' }}>
+                <div className="h-full rounded-full transition-all" style={{ width: `${(completedSteps.length / 6) * 100}%`, background: 'linear-gradient(90deg, #1b61c9, #10b981)' }} />
               </div>
-              <div className="mb-4 text-sm text-[var(--text-secondary)]">
-                {completedSteps.length} of 6 steps complete
-              </div>
+              <div className="mb-4 text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>{completedSteps.length} of 6 steps complete</div>
 
-              <div className="space-y-2">
-                {onboardingSteps.map((step) => {
+              <div className="space-y-1">
+                {onboardingSteps.map(step => {
                   const done = completedSteps.includes(step.id)
                   return (
-                    <button
-                      key={step.id}
-                      onClick={() => setExpandedStep(step.id)}
-                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-left transition ${
-                        done
-                          ? 'bg-emerald-500/15 text-emerald-300'
-                          : expandedStep === step.id
-                            ? 'bg-blue-600/30 text-white'
-                            : 'text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)] hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      <span className="shrink-0 font-bold">
-                        {done ? '✓' : step.symbol}
-                      </span>
+                    <button key={step.id} onClick={() => setExpandedStep(step.id)}
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-left transition"
+                      style={{
+                        background: done ? 'rgba(16,185,129,0.08)' : expandedStep === step.id ? 'rgba(27,97,201,0.08)' : 'transparent',
+                        color: done ? '#059669' : expandedStep === step.id ? '#1b61c9' : 'rgba(4,14,32,0.55)',
+                      }}>
+                      <span className="shrink-0 font-bold">{done ? '✓' : step.symbol}</span>
                       <div>
                         <div className="font-semibold">{step.title}</div>
                         <div className="text-xs opacity-70">{step.subtitle}</div>
@@ -507,31 +443,21 @@ export default function StartPage() {
                 })}
               </div>
 
-              <div className="mt-5 border-t border-white/10 pt-4">
-                <p className="text-xs text-blue-100/60 mb-3">
-                  Need help? Your AutoPilot ROI partner is here to guide you through every step.
-                </p>
-                <Link
-                  href="/faqs"
-                  className="block w-full rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] py-2.5 text-center text-sm font-medium text-[var(--text-primary)] transition hover:border-[var(--border-accent)]"
-                >
+              <div className="mt-4 pt-4" style={{ borderTop: '1px solid #e0e2e6' }}>
+                <p className="text-xs mb-3" style={{ color: 'rgba(4,14,32,0.45)' }}>Need help? Your AutoPilot ROI partner is here to guide you through every step.</p>
+                <Link href="/faqs" className="block w-full rounded-xl py-2.5 text-center text-sm font-semibold transition" style={{ background: '#f8fafc', border: '1px solid #e0e2e6', color: '#181d26' }}>
                   View FAQs
                 </Link>
               </div>
             </div>
 
-            {/* University card */}
-            <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 shadow-[var(--card-shadow,none)]">
+            <div className="rounded-2xl p-5" style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
               <div className="text-2xl mb-2">🎓</div>
-              <h3 className="font-bold text-[var(--text-primary)] mb-2">Aurum University</h3>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed mb-4">
-                Each step includes embedded Aurum University videos. Watch them in order to fully
-                understand each part of the onboarding process before acting.
+              <h3 className="font-bold mb-2" style={{ color: '#181d26' }}>Aurum University</h3>
+              <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(4,14,32,0.5)' }}>
+                Each step includes embedded Aurum University videos. Watch them in order to fully understand each part of the onboarding process before acting.
               </p>
-              <Link
-                href="/university"
-                className="block text-center text-sm font-medium text-[var(--accent-primary)] hover:text-[var(--text-primary)] transition"
-              >
+              <Link href="/university" className="block text-center text-sm font-semibold transition" style={{ color: '#1b61c9' }}>
                 Browse All Videos →
               </Link>
             </div>

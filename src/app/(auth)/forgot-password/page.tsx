@@ -2,156 +2,81 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', borderRadius: '10px', border: '1.5px solid #e0e2e6',
+  padding: '0.75rem 1rem', fontSize: '0.95rem', color: '#181d26',
+  background: '#fff', outline: 'none', transition: 'border-color 0.15s',
+}
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('')
+  const [email, setEmail]   = useState('')
   const [loading, setLoading] = useState(false)
-  const [sent, setSent] = useState(false)
-  const [error, setError] = useState('')
+  const [sent, setSent]     = useState(false)
+  const [error, setError]   = useState('')
 
-  const isConfigured =
-    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
+  const isConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    if (!isConfigured) {
-      // Demo mode — just pretend we sent it
-      await new Promise((r) => setTimeout(r, 1200))
-      setSent(true)
-      setLoading(false)
-      return
-    }
-
+    e.preventDefault(); setError(''); setLoading(true)
+    if (!isConfigured) { await new Promise(r => setTimeout(r, 1200)); setSent(true); setLoading(false); return }
     try {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
-
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      })
-
-      if (resetError) {
-        setError(resetError.message)
-      } else {
-        setSent(true)
-      }
-    } catch {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
-    }
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` })
+      if (resetError) setError(resetError.message); else setSent(true)
+    } catch { setError('Something went wrong. Please try again.') }
+    finally { setLoading(false) }
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-md"
-    >
-      <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-8 shadow-xl backdrop-blur-xl">
+    <div className="w-full max-w-md">
+      <div className="rounded-2xl p-8 sm:p-10" style={{ background: '#fff', border: '1px solid #e0e2e6', boxShadow: '0 4px 24px rgba(27,97,201,0.08)' }}>
         {sent ? (
-          /* ── Success State ── */
           <div className="text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 border border-emerald-400/20">
-              <span className="text-3xl">✉️</span>
-            </div>
-            <h1 className="mb-2 font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)]">
-              Check Your Email
-            </h1>
-            <p className="mb-6 text-sm text-[var(--text-tertiary)] leading-relaxed">
-              We sent a password reset link to{' '}
-              <span className="font-medium text-blue-400">{email}</span>.
-              Click the link in the email to set a new password.
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full text-3xl" style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)' }}>✉️</div>
+            <h1 className="text-2xl font-bold mb-3" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>Check Your Email</h1>
+            <p className="text-sm mb-6 leading-relaxed" style={{ color: 'rgba(4,14,32,0.55)' }}>
+              We sent a password reset link to <strong style={{ color: '#1b61c9' }}>{email}</strong>. Click the link in the email to set a new password.
             </p>
-            <div className="space-y-3">
-              <p className="text-xs text-[var(--text-muted)]">
-                Didn&apos;t get it? Check your spam folder, or try again.
-              </p>
-              <button
-                onClick={() => {
-                  setSent(false)
-                  setEmail('')
-                }}
-                className="text-sm font-medium text-blue-400 hover:text-blue-300 transition"
-              >
-                Send again
-              </button>
-            </div>
-            <div className="mt-8 pt-6 border-t border-[var(--border-primary)]">
-              <Link
-                href="/login"
-                className="text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition"
-              >
-                ← Back to Login
-              </Link>
+            <p className="text-xs mb-3" style={{ color: 'rgba(4,14,32,0.4)' }}>Didn&apos;t get it? Check your spam folder, or try again.</p>
+            <button onClick={() => { setSent(false); setEmail('') }} className="text-sm font-semibold" style={{ color: '#1b61c9' }}>Send again</button>
+            <div className="mt-6 pt-5" style={{ borderTop: '1px solid #e0e2e6' }}>
+              <Link href="/login" className="text-sm" style={{ color: 'rgba(4,14,32,0.5)' }}>← Back to Login</Link>
             </div>
           </div>
         ) : (
-          /* ── Form State ── */
           <>
-            <div className="mb-6 text-center">
-              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/10 border border-blue-400/20">
-                <span className="text-2xl">🔑</span>
-              </div>
-              <h1 className="mb-2 font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)]">
-                Reset Your Password
-              </h1>
-              <p className="text-sm text-[var(--text-tertiary)]">
-                Enter your email and we&apos;ll send you a reset link.
-              </p>
+            <div className="text-center mb-6">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full text-2xl" style={{ background: 'rgba(27,97,201,0.08)', border: '1px solid rgba(27,97,201,0.15)' }}>🔑</div>
+              <h1 className="text-2xl font-bold mb-2" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>Reset Your Password</h1>
+              <p className="text-sm" style={{ color: 'rgba(4,14,32,0.5)' }}>Enter your email and we&apos;ll send you a reset link.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label
-                  htmlFor="reset-email"
-                  className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]"
-                >
-                  Email Address
-                </label>
-                <input
-                  id="reset-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                />
+                <label htmlFor="reset-email" className="block text-sm font-semibold mb-1.5" style={{ color: '#181d26' }}>Email Address</label>
+                <input id="reset-email" type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" style={inputStyle}
+                  onFocus={e => (e.target.style.borderColor = '#1b61c9')} onBlur={e => (e.target.style.borderColor = '#e0e2e6')} />
               </div>
 
-              {error && (
-                <p className="rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-400">
-                  {error}
-                </p>
-              )}
+              {error && <div className="rounded-lg px-4 py-3 text-sm" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c' }}>{error}</div>}
 
-              <button
-                type="submit"
-                disabled={loading || !email}
-                className="w-full rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-6 py-3.5 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40 disabled:opacity-50"
-              >
-                {loading ? 'Sending...' : 'Send Reset Link'}
+              <button type="submit" disabled={loading || !email}
+                className="w-full rounded-xl py-3.5 font-bold text-white transition disabled:opacity-50"
+                style={{ background: '#1b61c9' }}
+                onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#254fad')}
+                onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1b61c9')}>
+                {loading ? 'Sending…' : 'Send Reset Link'}
               </button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-              Remember your password?{' '}
-              <Link
-                href="/login"
-                className="text-blue-400 hover:text-blue-300 transition"
-              >
-                Log In
-              </Link>
+            <p className="mt-6 text-center text-sm" style={{ color: 'rgba(4,14,32,0.5)' }}>
+              Remember your password?{' '}<Link href="/login" className="font-semibold" style={{ color: '#1b61c9' }}>Log In</Link>
             </p>
           </>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }

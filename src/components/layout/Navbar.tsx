@@ -3,15 +3,13 @@
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import ThemeToggle from '@/components/ui/ThemeToggle'
 import Logo from '@/components/ui/Logo'
 
 // Public nav items — always visible
 const publicNav = [
   { label: 'Home', href: '/' },
-  { label: 'Products', href: '/products' },
+  { label: 'Product Suite', href: '/products' },
   { label: 'Calculator', href: '/calculator' },
-  { label: 'Trust Check', href: '/evaluate' },
   { label: 'University', href: '/university' },
   { label: 'Blog', href: '/blog' },
   { label: 'FAQs', href: '/faqs' },
@@ -19,13 +17,21 @@ const publicNav = [
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const [userRole, setUserRole] = useState<string | null>(null)
   const [userName, setUserName] = useState<string>('')
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
 
-  // Check for demo user (replaced by real Supabase auth when configured)
+  // Scroll shadow
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Check for demo user
   useEffect(() => {
     const loadUser = () => {
       try {
@@ -61,6 +67,7 @@ export default function Navbar() {
   // Close dropdown on route change
   useEffect(() => {
     setDropdownOpen(false)
+    setMenuOpen(false)
   }, [pathname])
 
   // Don't show navbar on dashboard/admin/auth routes
@@ -78,8 +85,8 @@ export default function Navbar() {
   const isAdmin = userRole === 'admin'
   const isPartner = userRole === 'partner'
   const roleBadge = isAdmin
-    ? { label: 'Admin', color: 'bg-red-500/15 text-red-400 border-red-400/20', icon: '🛡️' }
-    : { label: 'Partner', color: 'bg-blue-500/15 text-blue-400 border-blue-400/20', icon: '🤝' }
+    ? { label: 'Admin', color: 'bg-red-500/20 text-red-200 border-red-300/30', icon: '🛡️' }
+    : { label: 'Partner', color: 'bg-white/20 text-white border-white/30', icon: '🤝' }
 
   function handleLogout() {
     localStorage.removeItem('autopilotroi-demo-user')
@@ -90,52 +97,64 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[#08205b]/55 backdrop-blur-xl">
-      <div className="mx-auto flex h-[4.8rem] max-w-7xl items-center justify-between gap-8 px-6 lg:px-10">
+    <header
+      className="sticky top-0 z-50"
+      style={{
+        background: 'linear-gradient(135deg, #1250b0 0%, #1b61c9 50%, #1558c0 100%)',
+        boxShadow: scrolled ? '0 2px 20px rgba(18, 80, 176, 0.45)' : 'none',
+        transition: 'box-shadow 0.25s ease',
+      }}
+    >
+      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-8 px-6 lg:px-10">
 
         {/* Logo */}
-        <Link href="/">
-          <Logo size={42} showText />
+        <Link href="/" className="flex-shrink-0">
+          <Logo size={38} showText />
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center justify-center gap-8 lg:flex">
+        <nav className="hidden items-center justify-center gap-7 lg:flex">
           {publicNav.map((item) => (
             <Link
               key={item.label}
               href={item.href}
-              className={`text-base font-medium transition hover:text-white ${
-                pathname === item.href ? 'text-white' : 'text-blue-50/80'
-              }`}
+              className="relative text-[0.9rem] font-medium text-white/80 transition-colors hover:text-white"
+              style={{
+                color: pathname === item.href ? '#ffffff' : undefined,
+              }}
             >
               {item.label}
+              {pathname === item.href && (
+                <span
+                  className="absolute -bottom-1 left-0 right-0 h-[2px] rounded-full bg-white"
+                />
+              )}
             </Link>
           ))}
         </nav>
 
-        {/* Right side — Auth buttons + Theme toggle */}
+        {/* Right side — Auth buttons */}
         <div className="flex items-center gap-3">
-          <ThemeToggle />
 
-          {/* Auth-dependent buttons */}
+          {/* Desktop auth */}
           <div className="hidden lg:flex items-center gap-3">
             {userRole ? (
               /* ── Authenticated: Avatar Dropdown ── */
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/5 pl-2.5 pr-3.5 py-1.5 transition hover:bg-white/10 hover:border-white/20"
+                  className="flex items-center gap-2.5 rounded-xl border border-white/25 bg-white/12 pl-2.5 pr-3.5 py-1.5 transition hover:bg-white/20"
                   aria-expanded={dropdownOpen}
                   aria-haspopup="true"
                 >
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${isAdmin ? 'bg-red-500' : 'bg-blue-500'}`}>
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white ${isAdmin ? 'bg-red-500' : 'bg-white/30'}`}>
                     {userInitial}
                   </div>
-                  <span className="text-sm font-medium text-white max-w-[120px] truncate">
+                  <span className="text-sm font-semibold text-white max-w-[120px] truncate">
                     {userName || 'User'}
                   </span>
                   <svg
-                    className={`h-3.5 w-3.5 text-white/50 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
+                    className={`h-3.5 w-3.5 text-white/60 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -147,16 +166,19 @@ export default function Navbar() {
 
                 {/* Dropdown Menu */}
                 {dropdownOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-64 origin-top-right rounded-2xl border border-white/10 bg-[#0b1d4f]/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl" style={{ animation: 'fadeDown 0.15s ease-out' }}>
+                  <div
+                    className="absolute right-0 top-full mt-2 w-64 origin-top-right rounded-2xl border border-[#d0d8e8] bg-white p-2 shadow-2xl"
+                    style={{ animation: 'fadeDown 0.15s ease-out' }}
+                  >
                     {/* User info header */}
-                    <div className="px-3 py-3 border-b border-white/10 mb-1">
+                    <div className="px-3 py-3 border-b border-[#e0e2e6] mb-1">
                       <div className="flex items-center gap-3">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${isAdmin ? 'bg-red-500' : 'bg-blue-500'}`}>
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${isAdmin ? 'bg-red-500' : 'bg-[#1b61c9]'}`}>
                           {userInitial}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-white truncate">{userName || 'User'}</p>
-                          <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${roleBadge.color}`}>
+                          <p className="text-sm font-semibold text-[#181d26] truncate">{userName || 'User'}</p>
+                          <span className={`inline-flex items-center gap-1 rounded-full border-0 bg-blue-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1b61c9]`}>
                             {roleBadge.icon} {roleBadge.label}
                           </span>
                         </div>
@@ -177,10 +199,10 @@ export default function Navbar() {
                     </div>
 
                     {/* Logout */}
-                    <div className="border-t border-white/10 pt-1 mt-1">
+                    <div className="border-t border-[#e0e2e6] pt-1 mt-1">
                       <button
                         onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
                       >
                         <span className="text-base">🚪</span>
                         Log Out
@@ -193,15 +215,15 @@ export default function Navbar() {
               <>
                 <Link
                   href="/login"
-                  className="text-sm font-medium text-blue-50/80 transition hover:text-white"
+                  className="text-sm font-semibold text-white/80 transition hover:text-white"
                 >
                   Log In
                 </Link>
                 <Link
                   href="/signup"
-                  className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-500"
+                  className="btn-white text-sm px-5 py-2"
                 >
-                  Start Here
+                  Start Here →
                 </Link>
               </>
             )}
@@ -209,7 +231,7 @@ export default function Navbar() {
 
           {/* Mobile hamburger */}
           <button
-            className="flex lg:hidden items-center justify-center h-10 w-10 rounded-xl border border-white/15 bg-white/8 text-white"
+            className="flex lg:hidden items-center justify-center h-10 w-10 rounded-xl border border-white/25 bg-white/12 text-white"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle navigation"
           >
@@ -228,69 +250,71 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <nav className="border-t border-white/10 bg-[#08205b]/95 px-6 py-4 backdrop-blur-xl lg:hidden">
+        <nav
+          className="border-t border-white/15 px-6 py-4 lg:hidden"
+          style={{ background: 'linear-gradient(180deg, #1557c8 0%, #1250b0 100%)' }}
+        >
           <div className="flex flex-col gap-1">
             {publicNav.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 onClick={() => setMenuOpen(false)}
-                className={`rounded-xl px-4 py-3 text-base font-medium transition ${
-                  pathname === item.href
-                    ? 'bg-white/12 text-white'
-                    : 'text-blue-50/80 hover:bg-white/8 hover:text-white'
-                }`}
+                className="rounded-xl px-4 py-3 text-base font-medium transition"
+                style={{
+                  background: pathname === item.href ? 'rgba(255,255,255,0.15)' : 'transparent',
+                  color: pathname === item.href ? '#ffffff' : 'rgba(255,255,255,0.75)',
+                }}
               >
                 {item.label}
               </Link>
             ))}
 
-            {/* Auth links (mobile) */}
-            <div className="mt-3 border-t border-white/10 pt-3 space-y-1">
+            {/* Mobile auth */}
+            <div className="mt-3 border-t border-white/15 pt-3 space-y-1">
               {userRole ? (
                 <>
-                  {/* User info */}
                   <div className="flex items-center gap-3 px-4 py-2 mb-2">
-                    <div className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white ${isAdmin ? 'bg-red-500' : 'bg-blue-500'}`}>
+                    <div className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white ${isAdmin ? 'bg-red-500' : 'bg-white/30'}`}>
                       {userInitial}
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-white">{userName || 'User'}</p>
-                      <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${roleBadge.color}`}>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white/60">
                         {roleBadge.icon} {roleBadge.label}
                       </span>
                     </div>
                   </div>
                   {(isPartner || isAdmin) && (
-                    <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block">
+                    <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-white/75 hover:bg-white/10 hover:text-white block">
                       📊 Partner Dashboard
                     </Link>
                   )}
                   {isAdmin && (
-                    <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block">
+                    <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-white/75 hover:bg-white/10 hover:text-white block">
                       🛡️ Admin Panel
                     </Link>
                   )}
-                  <Link href="/dashboard/links" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block">
+                  <Link href="/dashboard/links" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-white/75 hover:bg-white/10 hover:text-white block">
                     🔗 Referral Links
                   </Link>
-                  <Link href="/dashboard/settings" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block">
+                  <Link href="/dashboard/settings" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-white/75 hover:bg-white/10 hover:text-white block">
                     ⚙️ Settings
                   </Link>
                   <button
                     onClick={() => { handleLogout(); setMenuOpen(false) }}
-                    className="w-full rounded-xl px-4 py-3 text-left text-base font-medium text-red-400 hover:bg-red-500/10"
+                    className="w-full rounded-xl px-4 py-3 text-left text-base font-medium text-red-300 hover:bg-white/10"
                   >
                     🚪 Log Out
                   </button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-blue-50/80 hover:bg-white/8 hover:text-white block">
+                  <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-xl px-4 py-3 text-base font-medium text-white/75 hover:bg-white/10 hover:text-white block">
                     Log In
                   </Link>
-                  <Link href="/signup" onClick={() => setMenuOpen(false)} className="mt-2 rounded-xl bg-blue-600 px-4 py-3 text-center text-base font-semibold text-white block">
-                    Start Here
+                  <Link href="/signup" onClick={() => setMenuOpen(false)} className="btn-white mt-2 w-full justify-center block text-center py-3">
+                    Start Here →
                   </Link>
                 </>
               )}
@@ -308,7 +332,7 @@ function DropdownLink({ href, icon, label, onClick }: { href: string; icon: stri
     <Link
       href={href}
       onClick={onClick}
-      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-blue-50/80 transition hover:bg-white/8 hover:text-white"
+      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#181d26] transition hover:bg-[#f0f4ff] hover:text-[#1b61c9]"
     >
       <span className="text-base">{icon}</span>
       {label}

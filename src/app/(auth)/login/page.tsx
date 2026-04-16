@@ -1,97 +1,70 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
-import { Suspense } from 'react'
+
+/* ── Input field shared style ── */
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  borderRadius: '10px',
+  border: '1.5px solid #e0e2e6',
+  padding: '0.75rem 1rem',
+  fontSize: '0.95rem',
+  color: '#181d26',
+  background: '#fff',
+  outline: 'none',
+  transition: 'border-color 0.15s',
+}
+
+const DEMO_ACCOUNTS: Record<string, { password: string; role: string; name: string }> = {
+  'admin@autopilotroi.com':   { password: 'Admin2026!',   role: 'admin',   name: 'Admin User' },
+  'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
+}
 
 function LoginForm() {
-  const [email, setEmail] = useState('')
+  const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
+  const router       = useRouter()
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') || '/'
+  const redirect     = searchParams.get('redirect') || '/'
 
-  const isConfigured =
-    process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
-
-  // ── Demo accounts always available (even when Supabase is configured) ──
-  const DEMO_ACCOUNTS: Record<string, { password: string; role: string; name: string }> = {
-    'admin@autopilotroi.com': { password: 'Admin2026!', role: 'admin', name: 'Admin User' },
-    'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
-  }
+  const isConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    // ── Step 1: Try demo accounts first (always available) ──
-    const demoAccount = DEMO_ACCOUNTS[email.toLowerCase()]
-    if (demoAccount) {
-      if (demoAccount.password !== password) {
-        setError('Invalid password. Please try again.')
-        setLoading(false)
-        return
-      }
-
-      localStorage.setItem(
-        'autopilotroi-demo-user',
-        JSON.stringify({ email, role: demoAccount.role, name: demoAccount.name })
-      )
-
-      if (demoAccount.role === 'admin') {
-        router.push('/admin')
-      } else {
-        router.push('/dashboard')
-      }
+    // Demo accounts
+    const demo = DEMO_ACCOUNTS[email.toLowerCase()]
+    if (demo) {
+      if (demo.password !== password) { setError('Invalid password. Please try again.'); setLoading(false); return }
+      localStorage.setItem('autopilotroi-demo-user', JSON.stringify({ email, role: demo.role, name: demo.name }))
+      router.push(demo.role === 'admin' ? '/admin' : '/dashboard')
       return
     }
 
-    // ── Step 2: Try Supabase auth (if configured) ──
     if (!isConfigured) {
-      setError('No account found with that email. Try admin@autopilotroi.com or partner@autopilotroi.com')
+      setError('No account found. Try admin@autopilotroi.com or partner@autopilotroi.com')
       setLoading(false)
       return
     }
 
     try {
       const supabase = createClient()
+      const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+      if (loginError) { setError(loginError.message); setLoading(false); return }
 
-      const { error: loginError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (loginError) {
-        setError(loginError.message)
-        setLoading(false)
-        return
-      }
-
-      // Get user role for redirect
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-
+      const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single()
-
-        if (profile?.role === 'admin') {
-          router.push('/admin')
-        } else if (profile?.role === 'partner') {
-          router.push('/dashboard')
-        } else {
-          router.push(redirect)
-        }
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+        if (profile?.role === 'admin') router.push('/admin')
+        else if (profile?.role === 'partner') router.push('/dashboard')
+        else router.push(redirect)
       }
     } catch {
       setError('Something went wrong. Please try again.')
@@ -101,90 +74,78 @@ function LoginForm() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="w-full max-w-md"
-    >
-      <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-8 shadow-xl backdrop-blur-xl">
-        <h1 className="mb-2 text-center font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)]">
+    <div className="w-full max-w-md">
+      <div
+        className="rounded-2xl p-8 sm:p-10"
+        style={{ background: '#fff', border: '1px solid #e0e2e6', boxShadow: '0 4px 24px rgba(27,97,201,0.08)' }}
+      >
+        <h1 className="text-2xl font-bold text-center mb-1" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>
           Welcome Back
         </h1>
-        <p className="mb-8 text-center text-sm text-[var(--text-tertiary)]">
-          Log in to your AutoPilot ROI account
+        <p className="text-sm text-center mb-8" style={{ color: 'rgba(4,14,32,0.5)' }}>
+          Log in to your AutopilotROI account
         </p>
 
-        <div className="mb-6 rounded-lg border border-blue-400/30 bg-blue-500/10 px-4 py-3 text-sm text-blue-200">
-            <strong className="text-blue-300">📋 Test Accounts</strong>
-            <div className="mt-2 space-y-1.5 text-xs font-mono">
-              <div className="flex items-center justify-between rounded bg-white/5 px-2 py-1">
-                <span>🛡️ Admin</span>
-                <span className="text-blue-300">admin@autopilotroi.com / Admin2026!</span>
+        {/* Test accounts */}
+        <div
+          className="mb-6 rounded-xl p-4"
+          style={{ background: 'rgba(27,97,201,0.05)', border: '1px solid rgba(27,97,201,0.15)' }}
+        >
+          <p className="text-xs font-bold mb-2" style={{ color: '#1b61c9' }}>📋 Test Accounts</p>
+          <div className="space-y-1.5">
+            {[
+              { icon: '🛡️', label: 'Admin',   cred: 'admin@autopilotroi.com / Admin2026!' },
+              { icon: '🤝', label: 'Partner', cred: 'partner@autopilotroi.com / Partner2026!' },
+            ].map(a => (
+              <div key={a.label} className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs" style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
+                <span className="font-medium" style={{ color: '#181d26' }}>{a.icon} {a.label}</span>
+                <span style={{ color: '#1b61c9', fontFamily: 'monospace' }}>{a.cred}</span>
               </div>
-              <div className="flex items-center justify-between rounded bg-white/5 px-2 py-1">
-                <span>🤝 Partner</span>
-                <span className="text-blue-300">partner@autopilotroi.com / Partner2026!</span>
-              </div>
-            </div>
+            ))}
           </div>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label
-              htmlFor="email"
-              className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]"
-            >
+            <label htmlFor="email" className="block text-sm font-semibold mb-1.5" style={{ color: '#181d26' }}>
               Email Address
             </label>
             <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="email" type="email" required value={email}
+              onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#1b61c9')}
+              onBlur={e  => (e.target.style.borderColor = '#e0e2e6')}
             />
           </div>
 
           <div>
-            <label
-              htmlFor="password"
-              className="mb-1.5 block text-sm font-medium text-[var(--text-secondary)]"
-            >
+            <label htmlFor="login-password" className="block text-sm font-semibold mb-1.5" style={{ color: '#181d26' }}>
               Password
             </label>
             <input
-              id="password"
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="login-password" type="password" required value={password}
+              onChange={e => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-4 py-3 text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+              style={inputStyle}
+              onFocus={e => (e.target.style.borderColor = '#1b61c9')}
+              onBlur={e  => (e.target.style.borderColor = '#e0e2e6')}
             />
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-400">
+            <div className="rounded-lg px-4 py-3 text-sm" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c' }}>
               {error}
-            </p>
+            </div>
           )}
 
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                defaultChecked
-                className="h-4 w-4 rounded border-white/20 bg-white/5 accent-blue-500"
-              />
-              <span className="text-xs text-[var(--text-muted)]">Remember me</span>
+              <input type="checkbox" defaultChecked className="h-4 w-4 rounded accent-blue-600" />
+              <span className="text-xs" style={{ color: 'rgba(4,14,32,0.5)' }}>Remember me</span>
             </label>
-            <Link
-              href="/forgot-password"
-              className="text-xs font-medium text-blue-400 hover:text-blue-300 transition"
-            >
+            <Link href="/forgot-password" className="text-xs font-semibold" style={{ color: '#1b61c9' }}>
               Forgot password?
             </Link>
           </div>
@@ -192,23 +153,23 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-6 py-3.5 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40 disabled:opacity-50"
+            className="w-full rounded-xl py-3.5 font-bold text-white transition disabled:opacity-50"
+            style={{ background: '#1b61c9', fontSize: '0.95rem', letterSpacing: '-0.01em' }}
+            onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#254fad')}
+            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1b61c9')}
           >
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? 'Logging in…' : 'Log In →'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
+        <p className="mt-6 text-center text-sm" style={{ color: 'rgba(4,14,32,0.5)' }}>
           Don&apos;t have an account?{' '}
-          <Link
-            href="/signup"
-            className="text-blue-400 hover:text-blue-300 transition"
-          >
+          <Link href="/signup" className="font-semibold" style={{ color: '#1b61c9' }}>
             Start Here
           </Link>
         </p>
       </div>
-    </motion.div>
+    </div>
   )
 }
 

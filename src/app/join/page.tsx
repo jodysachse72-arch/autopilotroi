@@ -1,19 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Suspense } from 'react'
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: (i: number = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-  }),
-}
 
 function JoinContent() {
   const searchParams = useSearchParams()
@@ -22,133 +11,92 @@ function JoinContent() {
 
   useEffect(() => {
     if (refCode) {
-      try {
-        localStorage.setItem('autopilotroi-ref', refCode)
-        setSaved(true)
-      } catch {
-        // localStorage unavailable
-      }
+      try { localStorage.setItem('autopilotroi-ref', refCode); setSaved(true) } catch {}
     }
   }, [refCode])
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
-      <div className="relative overflow-hidden bg-[var(--bg-section)] px-6 py-24 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.2),transparent_60%)]" />
-        <div className="relative mx-auto max-w-2xl text-center">
+    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+      {/* Hero */}
+      <section className="px-6 py-24 lg:px-10" style={{ background: '#fff', borderBottom: '1px solid #e0e2e6' }}>
+        <div className="mx-auto max-w-2xl text-center">
           {refCode ? (
             <>
-              <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-5 py-2 text-sm font-medium text-emerald-200">
+              <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] mb-6"
+                style={{ background: 'rgba(16,185,129,0.08)', color: '#059669', border: '1px solid rgba(16,185,129,0.2)' }}>
                 ✓ Referral Code Recognized
-              </motion.div>
-
-              <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1}
-                className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-5xl">
+              </span>
+              <h1 className="text-4xl font-bold mb-5" style={{ color: '#181d26', letterSpacing: '-0.03em' }}>
                 You&apos;ve been invited to<br />
-                <span className="bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">
-                  Team AutoPilot ROI
-                </span>
-              </motion.h1>
-
-              <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-                className="mx-auto mt-6 max-w-lg text-lg leading-8 text-[var(--text-secondary)]">
-                A partner from our team shared this link with you. Your referral has been
-                saved — when you complete onboarding, the right partner will be notified
-                and credited.
-              </motion.p>
-
-              {/* Referral confirmation card */}
-              <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3}
-                className="mx-auto mt-8 max-w-sm rounded-2xl border border-[var(--border-secondary)] bg-[var(--bg-card)] p-6 shadow-[var(--card-shadow,none)]">
-                <div className="text-sm text-[var(--text-muted)] mb-1">Referral Code</div>
-                <div className="text-xl font-mono font-bold text-[var(--text-primary)] tracking-wide">{refCode}</div>
-                {saved && (
-                  <div className="mt-2 text-xs text-emerald-300/80">
-                    ✓ Saved to your session
-                  </div>
-                )}
-              </motion.div>
+                <span style={{ color: '#1b61c9' }}>Team AutoPilot ROI</span>
+              </h1>
+              <p className="text-lg mb-8" style={{ color: 'rgba(4,14,32,0.55)', lineHeight: 1.7 }}>
+                A partner from our team shared this link with you. Your referral has been saved — when you complete onboarding, the right partner will be notified and credited.
+              </p>
+              {/* Referral card */}
+              <div className="mx-auto max-w-sm rounded-2xl p-6 mb-8" style={{ background: '#f8fafc', border: '1px solid #e0e2e6' }}>
+                <div className="text-xs font-bold uppercase tracking-[0.12em] mb-2" style={{ color: 'rgba(4,14,32,0.4)' }}>Referral Code</div>
+                <div className="text-2xl font-bold" style={{ color: '#181d26', fontFamily: 'monospace', letterSpacing: '0.1em' }}>{refCode}</div>
+                {saved && <div className="mt-2 text-xs font-semibold" style={{ color: '#059669' }}>✓ Saved to your session</div>}
+              </div>
             </>
           ) : (
             <>
-              <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-5 py-2 text-sm font-medium text-blue-200">
-                👋 Welcome
-              </motion.div>
-
-              <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1}
-                className="font-[var(--font-sora)] text-4xl font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-5xl">
-                Welcome to<br />
-                <span className="bg-gradient-to-r from-blue-300 to-blue-100 bg-clip-text text-transparent">
-                  Team AutoPilot ROI
-                </span>
-              </motion.h1>
-
-              <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-                className="mx-auto mt-6 max-w-lg text-lg leading-8 text-[var(--text-secondary)]">
-                AutoPilot ROI is the structured onboarding system for the Aurum ecosystem.
-                Start your journey with education, guided setup, and personal partner support.
-              </motion.p>
-
-              {/* No referral info box */}
-              <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3}
-                className="mx-auto mt-8 max-w-sm rounded-xl border border-amber-400/20 bg-amber-500/8 px-5 py-4">
-                <p className="text-sm leading-relaxed text-amber-200/80">
-                  <strong>No referral code detected.</strong> If someone sent you a link,
-                  make sure you&apos;re using the full URL they shared. You can still explore
-                  the site freely.
+              <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] mb-6"
+                style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9', border: '1px solid rgba(27,97,201,0.15)' }}>
+                Welcome
+              </span>
+              <h1 className="text-4xl font-bold mb-5" style={{ color: '#181d26', letterSpacing: '-0.03em' }}>
+                Welcome to<br /><span style={{ color: '#1b61c9' }}>Team AutoPilot ROI</span>
+              </h1>
+              <p className="text-lg mb-8" style={{ color: 'rgba(4,14,32,0.55)', lineHeight: 1.7 }}>
+                AutoPilot ROI is the structured onboarding system for the Aurum ecosystem. Start your journey with education, guided setup, and personal partner support.
+              </p>
+              <div className="mx-auto max-w-sm rounded-xl p-4 mb-8" style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.25)' }}>
+                <p className="text-sm" style={{ color: '#d97706' }}>
+                  <strong>No referral code detected.</strong> If someone sent you a link, make sure you&apos;re using the full URL they shared. You can still explore the site freely.
                 </p>
-              </motion.div>
+              </div>
             </>
           )}
 
-          {/* CTAs */}
-          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4}
-            className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/start"
-              className="group relative overflow-hidden rounded-xl border border-blue-300/40 bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-8 py-3.5 text-base font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:brightness-110"
-            >
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link href="/start" className="rounded-xl px-8 py-3.5 font-bold text-white transition hover:opacity-90" style={{ background: '#1b61c9' }}>
               Start Onboarding →
             </Link>
-            <Link
-              href="/university"
-              className="rounded-xl border border-[var(--border-secondary)] bg-[var(--bg-card)] px-8 py-3.5 text-base font-medium text-[var(--text-primary)] transition hover:border-[var(--border-accent)]"
-            >
+            <Link href="/university" className="rounded-xl px-8 py-3.5 font-bold transition hover:shadow" style={{ background: '#fff', border: '1px solid #e0e2e6', color: '#181d26' }}>
               Explore University
             </Link>
-          </motion.div>
+          </div>
+        </div>
+      </section>
 
-          {/* What you'll get */}
-          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={5}
-            className="mx-auto mt-16 grid max-w-lg gap-4 text-left sm:grid-cols-2">
+      {/* What you get */}
+      <section className="px-6 py-16 lg:px-10">
+        <div className="mx-auto max-w-4xl">
+          <div className="grid gap-5 sm:grid-cols-2">
             {[
               { icon: '🎓', title: 'Full Education', desc: 'Videos, guides, and due diligence before you invest anything.' },
               { icon: '🤝', title: 'Personal Support', desc: 'A dedicated partner walks you through every step.' },
               { icon: '🔗', title: 'Correct Placement', desc: 'Your referral code ensures you\'re placed in the right team position.' },
               { icon: '📊', title: 'Readiness Score', desc: 'Know exactly where you stand before committing.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-4 shadow-[var(--card-shadow,none)]">
-                <div className="text-2xl">{item.icon}</div>
-                <h3 className="mt-2 text-sm font-semibold text-[var(--text-primary)]">{item.title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-[var(--text-muted)]">{item.desc}</p>
+            ].map(item => (
+              <div key={item.title} className="rounded-2xl p-6 transition-shadow hover:shadow-[0_8px_24px_rgba(27,97,201,0.08)]" style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
+                <div className="text-3xl mb-3">{item.icon}</div>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#181d26' }}>{item.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(4,14,32,0.55)' }}>{item.desc}</p>
               </div>
             ))}
-          </motion.div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }
 
 export default function JoinPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
-        <div className="text-[var(--text-muted)]">Loading...</div>
-      </div>
-    }>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ background: '#f8fafc' }}><div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" /></div>}>
       <JoinContent />
     </Suspense>
   )

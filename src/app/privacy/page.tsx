@@ -1,89 +1,45 @@
-export const metadata = {
-  title: 'Privacy Policy | AutoPilot ROI',
-  description: 'How AutoPilot ROI collects, uses, and protects your personal information.',
-}
+export const metadata = { title: 'Privacy Policy — AutopilotROI', description: 'How AutopilotROI collects, uses, and protects your personal information.' }
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
-      <div className="relative overflow-hidden border-b border-[var(--border-primary)] bg-[var(--bg-section)] px-6 py-16 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(59,130,246,0.15),transparent_60%)]" />
-        <div className="relative mx-auto max-w-3xl text-center">
-          <h1 className="font-[var(--font-sora)] text-4xl font-bold text-[var(--text-primary)]">Privacy Policy</h1>
-          <p className="mt-4 text-[var(--text-tertiary)]">Last updated: April 12, 2026</p>
+    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+      <section className="px-6 py-16 lg:px-10" style={{ background: '#fff', borderBottom: '1px solid #e0e2e6' }}>
+        <div className="mx-auto max-w-3xl">
+          <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] mb-4"
+            style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9', border: '1px solid rgba(27,97,201,0.15)' }}>
+            Legal
+          </span>
+          <h1 className="text-3xl font-bold mb-3" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>Privacy Policy</h1>
+          <p className="text-sm" style={{ color: 'rgba(4,14,32,0.45)' }}>Last updated: January 1, 2026</p>
         </div>
-      </div>
+      </section>
 
-      <div className="mx-auto max-w-3xl px-6 py-16 lg:px-10">
-        <div className="prose max-w-none space-y-8 text-[var(--text-secondary)] [&_h2]:text-[var(--text-primary)] [&_h2]:font-[var(--font-sora)] [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4 [&_strong]:text-[var(--text-primary)]">
+      <section className="px-6 py-14 lg:px-10">
+        <div className="mx-auto max-w-3xl rounded-2xl p-8 lg:p-12" style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
+          <div className="prose prose-slate max-w-none" style={{ color: 'rgba(4,14,32,0.75)', lineHeight: 1.8 }}>
+            <h2 style={{ color: '#181d26', fontWeight: 700, marginTop: '1.5rem' }}>1. Information We Collect</h2>
+            <p>We collect information you provide directly — such as name and email address when you register — and information automatically collected through your use of the platform, including usage data and device information.</p>
 
-          <h2>1. Information We Collect</h2>
-          <p>We collect the following information when you use AutoPilot ROI:</p>
-          <ul className="list-disc pl-6 space-y-2">
-            <li><strong>Personal Information:</strong> Name and email address provided during signup.</li>
-            <li><strong>Assessment Data:</strong> Readiness quiz answers and scores.</li>
-            <li><strong>Referral Data:</strong> Partner referral codes used during signup.</li>
-            <li><strong>Usage Data:</strong> Pages visited, video watch progress, and interaction patterns (via privacy-friendly analytics).</li>
-          </ul>
+            <h2 style={{ color: '#181d26', fontWeight: 700, marginTop: '1.5rem' }}>2. How We Use Your Information</h2>
+            <p>We use your information to provide and improve the platform, send you relevant communications about your account and the Aurum ecosystem, and analyze platform usage to improve user experience.</p>
 
-          <h2>2. How We Use Your Information</h2>
-          <ul className="list-disc pl-6 space-y-2">
-            <li>To provide the onboarding and education experience.</li>
-            <li>To assess your readiness level and personalize onboarding content.</li>
-            <li>To notify your referring partner so they can guide your setup.</li>
-            <li>To send you welcome and onboarding emails.</li>
-            <li>To improve the Platform and user experience.</li>
-          </ul>
+            <h2 style={{ color: '#181d26', fontWeight: 700, marginTop: '1.5rem' }}>3. Information Sharing</h2>
+            <p>We do not sell your personal information. We may share information with your assigned partner, with service providers who assist in platform operations, and when required by law.</p>
 
-          <h2>3. Data Sharing</h2>
-          <p>
-            We share your information only with:
-          </p>
-          <ul className="list-disc pl-6 space-y-2">
-            <li><strong>Your Referring Partner:</strong> Name, email, readiness score, and tier to facilitate onboarding.</li>
-            <li><strong>Service Providers:</strong> Supabase (database), Resend (email), Cloudflare (security), Plausible (analytics).</li>
-          </ul>
-          <p>We do not sell your personal data to third parties.</p>
+            <h2 style={{ color: '#181d26', fontWeight: 700, marginTop: '1.5rem' }}>4. Data Security</h2>
+            <p>We implement appropriate technical and organizational measures to protect your information. However, no method of transmission over the internet is 100% secure.</p>
 
-          <h2>4. Data Storage &amp; Security</h2>
-          <p>
-            Your data is stored in Supabase (PostgreSQL). We use row-level security, encrypted
-            connections, and service role keys to protect your information. Email communications
-            are sent via Resend with TLS encryption.
-          </p>
+            <h2 style={{ color: '#181d26', fontWeight: 700, marginTop: '1.5rem' }}>5. Cookies</h2>
+            <p>We use cookies and similar technologies to maintain session state and analyze platform usage. You can control cookies through your browser settings.</p>
 
-          <h2>5. Analytics</h2>
-          <p>
-            We use Plausible Analytics, a privacy-friendly analytics tool that does not use cookies
-            and does not collect personally identifiable information. No cookie consent banner is required.
-          </p>
+            <h2 style={{ color: '#181d26', fontWeight: 700, marginTop: '1.5rem' }}>6. Your Rights</h2>
+            <p>You have the right to access, correct, or delete your personal information. To exercise these rights, contact us through the platform support channels.</p>
 
-          <h2>6. Your Rights</h2>
-          <p>You have the right to:</p>
-          <ul className="list-disc pl-6 space-y-2">
-            <li>Request access to your personal data.</li>
-            <li>Request correction or deletion of your data.</li>
-            <li>Withdraw consent for communications at any time.</li>
-          </ul>
-          <p>
-            To exercise these rights, email{' '}
-            <a href="mailto:privacy@autopilotroi.com" className="text-blue-400 underline">privacy@autopilotroi.com</a>.
-          </p>
-
-          <h2>7. Data Retention</h2>
-          <p>
-            We retain your personal information for as long as your account is active or as needed
-            to provide services. You may request deletion at any time.
-          </p>
-
-          <h2>8. Changes to This Policy</h2>
-          <p>
-            We may update this Privacy Policy periodically. Changes will be posted on this page
-            with an updated date. Your continued use of the Platform after changes constitutes
-            acceptance of the updated policy.
-          </p>
+            <h2 style={{ color: '#181d26', fontWeight: 700, marginTop: '1.5rem' }}>7. Contact</h2>
+            <p>For privacy-related inquiries, please reach out through our support channels.</p>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

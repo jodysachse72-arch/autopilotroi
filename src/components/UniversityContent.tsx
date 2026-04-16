@@ -33,7 +33,6 @@ const fallbackVideos = [
   { _id: '24', title: 'Inside Aurum at ETHCC Cannes', youtubeId: 'hDmt6QPSeo0', description: 'Aurum\'s presence at the ETHCC conference in Cannes — networking and strategic partnerships.', category: 'advanced', duration: '12:00', order: 24, featured: false },
 ]
 
-
 const categories = [
   { id: 'all', label: 'All Videos', icon: '📚' },
   { id: 'beginner', label: 'Beginner', icon: '🟢' },
@@ -95,42 +94,43 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
   const progress = videos.length > 0 ? Math.round((watched.size / videos.length) * 100) : 0
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
-      {/* ═══ Hero ═══ */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_60%_40%,rgba(59,130,246,0.15),transparent_60%)]" />
+    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+
+      {/* Hero — stays blue as a strong brand accent */}
+      <div className="px-6 py-16 lg:px-10" style={{ background: '#1b61c9', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="relative mx-auto max-w-6xl text-center">
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}
-            className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/15 px-4 py-2 text-sm font-medium text-blue-200">
+            className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+            style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff' }}>
             🎓 Aurum University
           </motion.div>
           <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1}
-            className="font-[var(--font-sora)] text-5xl font-semibold tracking-[-0.055em] text-white sm:text-6xl">
+            className="text-5xl font-bold tracking-tight text-white sm:text-6xl" style={{ letterSpacing: '-0.03em' }}>
             Aurum University
           </motion.h1>
           <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-            className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-blue-100/80">
+            className="mx-auto mt-4 max-w-2xl text-lg leading-8" style={{ color: 'rgba(255,255,255,0.78)' }}>
             Structured video learning for new and existing Aurum members — from wallet setup to
             advanced bot strategy. Watch, learn, and track your progress.
           </motion.p>
 
           {/* Progress bar */}
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3} className="mx-auto mt-8 max-w-md">
-            <div className="flex items-center justify-between text-sm text-blue-200/70 mb-2">
+            <div className="flex items-center justify-between text-sm mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
               <span>{watched.size} of {videos.length} watched</span>
-              <span className="font-semibold text-blue-300">{progress}%</span>
+              <span className="font-semibold text-white">{progress}%</span>
             </div>
-            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.15)' }}>
               <div
-                className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-300 transition-all duration-700"
-                style={{ width: `${progress}%` }}
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #fff, rgba(255,255,255,0.7))' }}
               />
             </div>
           </motion.div>
 
           {/* Stats */}
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4}
-            className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm">
+            className="mt-8 flex flex-wrap items-center justify-center gap-8 text-sm">
             {[
               { value: `${videos.length}`, label: 'Videos' },
               { value: `${categories.length - 1}`, label: 'Categories' },
@@ -138,7 +138,7 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
             ].map((s) => (
               <div key={s.label} className="flex flex-col items-center">
                 <span className="text-2xl font-bold text-white">{s.value}</span>
-                <span className="text-blue-200/60">{s.label}</span>
+                <span style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</span>
               </div>
             ))}
           </motion.div>
@@ -146,11 +146,11 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
       </div>
 
       <div className="mx-auto max-w-6xl px-6 py-12 lg:px-10">
-        {/* ═══ Featured Videos ═══ */}
+        {/* Featured Videos */}
         {featured.length > 0 && (
           <div className="mb-12">
-            <h2 className="mb-6 flex items-center gap-2 font-[var(--font-sora)] text-2xl font-semibold text-white">
-              <span className="text-amber-400">⭐</span> Recommended Starting Points
+            <h2 className="mb-6 flex items-center gap-2 text-2xl font-bold" style={{ color: '#181d26' }}>
+              <span className="text-amber-500">⭐</span> Recommended Starting Points
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((video, i) => (
@@ -169,24 +169,25 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           </div>
         )}
 
-        {/* ═══ Category Filters ═══ */}
+        {/* Category Filters */}
         <div className="mb-8 flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                activeCategory === cat.id
-                  ? 'bg-blue-600 text-white shadow-[0_4px_12px_rgba(59,130,246,0.4)]'
-                  : 'bg-white/10 text-blue-100/80 hover:bg-white/15 hover:text-white'
-              }`}
+              className="rounded-full px-4 py-2 text-sm font-semibold transition-all"
+              style={{
+                background: activeCategory === cat.id ? '#1b61c9' : '#fff',
+                color: activeCategory === cat.id ? '#fff' : 'rgba(4,14,32,0.6)',
+                border: activeCategory === cat.id ? '1px solid #1b61c9' : '1px solid #e0e2e6',
+              }}
             >
               {cat.icon} {cat.label}
             </button>
           ))}
         </div>
 
-        {/* ═══ Video Grid ═══ */}
+        {/* Video Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
             {filtered.map((video, i) => (
@@ -204,32 +205,30 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
         </div>
 
         {filtered.length === 0 && (
-          <div className="rounded-2xl border border-white/10 bg-white/6 p-12 text-center text-blue-100/60">
+          <div className="rounded-2xl border p-12 text-center" style={{ border: '1px solid #e0e2e6', background: '#fff', color: 'rgba(4,14,32,0.45)' }}>
             No videos in this category yet. Check back soon!
           </div>
         )}
 
-        {/* ═══ Bottom CTA ═══ */}
-        <div className="mt-16 rounded-[2rem] border border-white/15 bg-white/6 p-8 text-center backdrop-blur-sm">
+        {/* Bottom CTA */}
+        <div className="mt-16 rounded-2xl p-8 text-center" style={{ background: '#1b61c9' }}>
           <div className="text-4xl">🎯</div>
-          <h2 className="mt-4 font-[var(--font-sora)] text-2xl font-semibold text-white">
+          <h2 className="mt-4 text-2xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
             Ready to get started?
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-base leading-7 text-blue-100/80">
+          <p className="mx-auto mt-3 max-w-lg text-base leading-7" style={{ color: 'rgba(255,255,255,0.78)' }}>
             Once you&apos;ve completed the key education videos, start your onboarding
             with confidence. Your partner will guide you through every step.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/signup"
-              className="rounded-xl border border-blue-300/40 bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-7 py-3 text-base font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.35)] transition hover:brightness-110"
-            >
+            <Link href="/signup"
+              className="rounded-xl px-7 py-3 text-base font-bold transition hover:opacity-90"
+              style={{ background: '#fff', color: '#1b61c9' }}>
               Begin Onboarding →
             </Link>
-            <Link
-              href="/resources"
-              className="rounded-xl border border-white/20 bg-white/10 px-7 py-3 text-base font-medium text-white backdrop-blur-md transition hover:bg-white/15"
-            >
+            <Link href="/resources"
+              className="rounded-xl px-7 py-3 text-base font-semibold text-white transition"
+              style={{ border: '1.5px solid rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.1)' }}>
               Browse Resources
             </Link>
           </div>
@@ -267,14 +266,15 @@ function VideoCard({
       animate="show"
       exit={{ opacity: 0, scale: 0.95 }}
       custom={index * 0.06}
-      className={`group relative overflow-hidden rounded-2xl border backdrop-blur-sm transition-all ${
-        isFeatured
-          ? 'border-amber-400/30 bg-amber-500/5 hover:border-amber-400/50'
-          : 'border-white/10 bg-white/6 hover:border-white/20'
-      }`}
+      className="group relative overflow-hidden rounded-2xl transition-all hover:shadow-lg"
+      style={{
+        background: '#fff',
+        border: isFeatured ? '1px solid #fde68a' : '1px solid #e0e2e6',
+        boxShadow: isFeatured ? '0 0 0 1px rgba(251,191,36,0.1)' : undefined,
+      }}
     >
       {/* Thumbnail / Player */}
-      <div className="relative aspect-video w-full overflow-hidden bg-[#0a1a3f]">
+      <div className="relative aspect-video w-full overflow-hidden" style={{ background: '#0f172a' }}>
         {isPlaying ? (
           <div className="relative h-full w-full">
             <iframe
@@ -293,27 +293,23 @@ function VideoCard({
           </div>
         ) : (
           <button onClick={onPlay} className="relative h-full w-full cursor-pointer">
-            {/* YouTube thumbnail */}
             <YouTubeThumbnail
               videoId={video.youtubeId}
               title={video.title}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
-            {/* Play overlay */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/20">
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e12a2b] shadow-[0_8px_24px_rgba(225,42,43,0.5)] transition-all group-hover:scale-110">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e12a2b] shadow-lg transition-all group-hover:scale-110">
                 <svg viewBox="0 0 24 24" className="h-6 w-6 ml-0.5 fill-white">
                   <path d="M8 5.14v14l11-7-11-7z" />
                 </svg>
               </div>
             </div>
-            {/* Duration badge */}
             {video.duration && (
               <span className="absolute bottom-2 right-2 rounded bg-black/80 px-2 py-0.5 text-xs font-medium text-white">
                 {video.duration}
               </span>
             )}
-            {/* Watched badge */}
             {isWatched && (
               <span className="absolute left-2 top-2 rounded bg-emerald-500/90 px-2 py-0.5 text-xs font-bold text-white">
                 ✓ Watched
@@ -326,24 +322,27 @@ function VideoCard({
       {/* Info */}
       <div className="p-4">
         <div className="mb-2 flex items-center gap-2">
-          <span className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide ${
-            isFeatured
-              ? 'bg-amber-500/20 text-amber-300'
-              : 'bg-blue-500/20 text-blue-300'
-          }`}>
+          <span className="rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide"
+            style={
+              isFeatured
+                ? { background: 'rgba(217,119,6,0.1)', color: '#b45309' }
+                : { background: 'rgba(27,97,201,0.08)', color: '#1b61c9' }
+            }>
             {categoryLabel}
           </span>
           {isFeatured && (
-            <span className="rounded-full bg-amber-500/20 px-2.5 py-0.5 text-[0.65rem] font-semibold text-amber-300">
+            <span className="rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold"
+              style={{ background: 'rgba(217,119,6,0.1)', color: '#b45309' }}>
               ⭐ Recommended
             </span>
           )}
         </div>
-        <h3 className="text-sm font-semibold leading-snug text-white line-clamp-2">
+        <h3 className="text-sm font-bold leading-snug line-clamp-2 transition-colors group-hover:text-[#1b61c9]"
+          style={{ color: '#181d26' }}>
           {video.title}
         </h3>
         {video.description && (
-          <p className="mt-1.5 text-xs leading-relaxed text-blue-100/60 line-clamp-2">
+          <p className="mt-1.5 text-xs leading-relaxed line-clamp-2" style={{ color: 'rgba(4,14,32,0.5)' }}>
             {video.description}
           </p>
         )}

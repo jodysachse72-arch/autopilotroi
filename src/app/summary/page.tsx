@@ -42,8 +42,9 @@ const summaryContent = {
         {
           title: 'EX-AI Bot',
           description: 'Automated cryptocurrency trading on the world\'s top exchanges. BTC, ETH, USDT and more — live 24/7.',
-          gradient: 'from-blue-500/20 to-cyan-500/10',
-          iconColor: 'text-blue-400',
+          borderColor: '#bfdbfe',
+          iconBg: 'rgba(27,97,201,0.08)',
+          iconColor: '#1b61c9',
           icon: (
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="5" y="8" width="14" height="12" rx="2"/><path d="M12 8V4H8"/>
@@ -53,8 +54,9 @@ const summaryContent = {
         {
           title: 'Visa Crypto Card',
           description: 'Spend your crypto earnings anywhere Visa is accepted — 80M+ merchants globally.',
-          gradient: 'from-rose-500/20 to-pink-500/10',
-          iconColor: 'text-rose-400',
+          borderColor: '#fecaca',
+          iconBg: 'rgba(239,68,68,0.08)',
+          iconColor: '#dc2626',
           icon: (
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="5" width="20" height="14" rx="3"/><line x1="2" y1="10" x2="22" y2="10"/>
@@ -64,8 +66,9 @@ const summaryContent = {
         {
           title: 'Gold RWA Trading',
           description: 'Tokenised real-world gold from African suppliers with AI-driven trading and physical delivery options.',
-          gradient: 'from-amber-500/20 to-yellow-500/10',
-          iconColor: 'text-amber-400',
+          borderColor: '#fde68a',
+          iconBg: 'rgba(217,119,6,0.08)',
+          iconColor: '#b45309',
           icon: (
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 9l4-3 4 3"/>
@@ -75,8 +78,9 @@ const summaryContent = {
         {
           title: 'Zeus AI & Web3 NeoBank',
           description: 'Manage crypto and fiat in one account with Swift, SEPA transfers, and 24/7 support.',
-          gradient: 'from-purple-500/20 to-violet-500/10',
-          iconColor: 'text-purple-400',
+          borderColor: '#ddd6fe',
+          iconBg: 'rgba(109,40,217,0.08)',
+          iconColor: '#6d28d9',
           icon: (
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
@@ -113,39 +117,40 @@ export default function SummaryPage() {
   const { headline, intro, sections, cta } = summaryContent
 
   return (
-    <div className="min-h-screen bg-[#06122f]">
+    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
 
       {/* Header */}
-      <div className="relative overflow-hidden border-b border-white/10 bg-[linear-gradient(180deg,#0b1f57_0%,#06122f_100%)] px-6 py-16 lg:px-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(59,130,246,0.15),transparent_60%)]" />
-        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px)', backgroundSize: '50px 50px' }} />
+      <div className="px-6 py-16 lg:px-10" style={{ background: '#1b61c9', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="relative mx-auto max-w-4xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
+            style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff' }}>
+            <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
             Executive Summary
           </div>
-          <h1 className="font-[var(--font-sora)] text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl" style={{ letterSpacing: '-0.03em' }}>
             {headline}
           </h1>
-          <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-blue-100/60">{intro}</p>
+          <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{intro}</p>
         </div>
       </div>
 
       {/* Sections */}
-      <div className="mx-auto max-w-4xl space-y-10 px-6 py-16 lg:px-10">
+      <div className="mx-auto max-w-4xl space-y-6 px-6 py-16 lg:px-10">
         {sections.map((section) => (
-          <section key={section.id} id={section.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-8 backdrop-blur-sm">
+          <section key={section.id} id={section.id} className="rounded-2xl p-8"
+            style={{ background: '#fff', border: '1px solid #e0e2e6', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
             <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/10 text-blue-400 border border-blue-400/20">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl"
+                style={{ background: 'rgba(27,97,201,0.08)', border: '1px solid rgba(27,97,201,0.2)', color: '#1b61c9' }}>
                 {section.icon}
               </div>
-              <h2 className="font-[var(--font-sora)] text-2xl font-bold text-white">
+              <h2 className="text-2xl font-bold" style={{ color: '#181d26' }}>
                 {section.title}
               </h2>
             </div>
 
             {section.body.map((para, i) => (
-              <p key={i} className="mb-4 text-[0.95rem] leading-relaxed text-blue-100/60">
+              <p key={i} className="mb-4 text-[0.95rem] leading-relaxed" style={{ color: 'rgba(4,14,32,0.6)' }}>
                 {para}
               </p>
             ))}
@@ -153,30 +158,28 @@ export default function SummaryPage() {
             {'products' in section && section.products && (
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {section.products.map((product) => (
-                  <div
-                    key={product.title}
-                    className={`rounded-xl border border-white/10 bg-gradient-to-br ${product.gradient} p-5 transition-all hover:border-white/20`}
-                  >
-                    <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 ${product.iconColor}`}>
+                  <div key={product.title} className="rounded-xl p-5 transition-shadow hover:shadow-md"
+                    style={{ border: `1px solid ${product.borderColor}`, background: '#fafbff' }}>
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg"
+                      style={{ background: product.iconBg, color: product.iconColor }}>
                       {product.icon}
                     </div>
-                    <h3 className="font-[var(--font-sora)] text-lg font-semibold text-white">
+                    <h3 className="text-lg font-bold" style={{ color: '#181d26' }}>
                       {product.title}
                     </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-blue-100/60">{product.description}</p>
+                    <p className="mt-2 text-sm leading-relaxed" style={{ color: 'rgba(4,14,32,0.55)' }}>{product.description}</p>
                   </div>
                 ))}
               </div>
             )}
 
             {section.callout && (
-              <div
-                className={`mt-6 rounded-xl border p-5 text-sm leading-relaxed ${
+              <div className="mt-6 rounded-xl border p-5 text-sm leading-relaxed"
+                style={
                   section.calloutType === 'warning'
-                    ? 'border-amber-400/30 bg-amber-400/10 text-amber-200'
-                    : 'border-blue-400/30 bg-blue-400/10 text-blue-200'
-                }`}
-              >
+                    ? { borderColor: '#fde68a', background: '#fffbeb', color: '#b45309' }
+                    : { borderColor: '#bfdbfe', background: '#eff6ff', color: '#1d4ed8' }
+                }>
                 {section.callout}
               </div>
             )}
@@ -184,24 +187,22 @@ export default function SummaryPage() {
         ))}
 
         {/* CTA */}
-        <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-900/30 to-transparent p-10 text-center backdrop-blur-sm">
-          <h2 className="font-[var(--font-sora)] text-2xl font-bold text-white">
+        <div className="rounded-2xl p-10 text-center" style={{ background: '#1b61c9' }}>
+          <h2 className="text-2xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
             {cta.headline}
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed text-blue-100/60">
+          <p className="mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
             {cta.description}
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href={cta.primaryCta.href}
-              className="rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-7 py-3 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40"
-            >
+            <Link href={cta.primaryCta.href}
+              className="rounded-xl px-7 py-3 font-bold text-white transition hover:opacity-90"
+              style={{ background: '#fff', color: '#1b61c9' }}>
               {cta.primaryCta.label}
             </Link>
-            <Link
-              href={cta.secondaryCta.href}
-              className="rounded-xl border border-white/20 bg-white/10 px-7 py-3 font-semibold text-white transition hover:bg-white/15"
-            >
+            <Link href={cta.secondaryCta.href}
+              className="rounded-xl px-7 py-3 font-semibold text-white transition"
+              style={{ border: '1.5px solid rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.1)' }}>
               {cta.secondaryCta.label}
             </Link>
           </div>

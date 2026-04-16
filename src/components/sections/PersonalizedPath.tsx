@@ -21,9 +21,9 @@ interface TierPath {
   title: string
   subtitle: string
   emoji: string
-  color: string
-  bgColor: string
-  borderColor: string
+  headerBg: string
+  headerText: string
+  accentColor: string
   steps: PathStep[]
 }
 
@@ -32,9 +32,9 @@ const TIER_PATHS: Record<string, TierPath> = {
     title: 'Beginner Path',
     subtitle: 'You\'re new to crypto — we\'ll walk you through everything.',
     emoji: '🌱',
-    color: 'text-amber-400',
-    bgColor: 'bg-amber-500/10',
-    borderColor: 'border-amber-400/20',
+    headerBg: '#fffbeb',
+    headerText: '#92400e',
+    accentColor: '#d97706',
     steps: [
       {
         title: 'Watch the Platform Overview',
@@ -68,9 +68,9 @@ const TIER_PATHS: Record<string, TierPath> = {
     title: 'Intermediate Path',
     subtitle: 'You have some crypto knowledge — let\'s build on it.',
     emoji: '⚡',
-    color: 'text-blue-400',
-    bgColor: 'bg-blue-500/10',
-    borderColor: 'border-blue-400/20',
+    headerBg: '#eff6ff',
+    headerText: '#1d4ed8',
+    accentColor: '#1b61c9',
     steps: [
       {
         title: 'Review the Trading Bot Strategy',
@@ -104,9 +104,9 @@ const TIER_PATHS: Record<string, TierPath> = {
     title: 'Advanced Path',
     subtitle: 'You know crypto — skip the basics, get to the strategy.',
     emoji: '🚀',
-    color: 'text-emerald-400',
-    bgColor: 'bg-emerald-500/10',
-    borderColor: 'border-emerald-400/20',
+    headerBg: '#f0fdf4',
+    headerText: '#15803d',
+    accentColor: '#16a34a',
     steps: [
       {
         title: 'Dive Into the Products',
@@ -148,7 +148,6 @@ interface PersonalizedPathProps {
 export default function PersonalizedPath({ tier, watchedVideoCount = 0 }: PersonalizedPathProps) {
   const path = TIER_PATHS[tier] || TIER_PATHS.beginner
 
-  // Auto-complete first step if they've watched at least 1 video
   const steps = path.steps.map((step, i) => ({
     ...step,
     completed: i === 0 && watchedVideoCount > 0,
@@ -159,55 +158,66 @@ export default function PersonalizedPath({ tier, watchedVideoCount = 0 }: Person
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`rounded-2xl border ${path.borderColor} ${path.bgColor} p-6 sm:p-8`}
+        className="rounded-2xl overflow-hidden"
+        style={{ border: '1px solid #e0e2e6', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
       >
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-3xl">{path.emoji}</span>
+        {/* Header band */}
+        <div className="px-6 py-5 flex items-center gap-3" style={{ background: path.headerBg, borderBottom: '1px solid #e0e2e6' }}>
+          <span className="text-2xl">{path.emoji}</span>
           <div>
-            <h3 className={`font-[var(--font-sora)] text-lg font-bold ${path.color}`}>
+            <h3 className="text-base font-bold" style={{ color: path.headerText }}>
               Your Recommended {path.title}
             </h3>
-            <p className="text-sm text-white/50">{path.subtitle}</p>
+            <p className="text-sm mt-0.5" style={{ color: 'rgba(4,14,32,0.55)' }}>{path.subtitle}</p>
           </div>
         </div>
 
         {/* Steps */}
-        <div className="space-y-4">
+        <div className="p-6 space-y-4">
           {steps.map((step, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`relative flex gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition hover:bg-white/[0.06] ${
-                step.completed ? 'opacity-60' : ''
-              }`}
+              className="relative flex gap-4 rounded-xl p-4 transition"
+              style={{
+                background: step.completed ? '#f0fdf4' : '#f8fafc',
+                border: step.completed ? '1px solid #bbf7d0' : '1px solid #e0e2e6',
+                opacity: step.completed ? 0.7 : 1,
+              }}
             >
               {/* Step number + connector */}
               <div className="flex flex-col items-center">
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  step.completed
-                    ? 'bg-emerald-500/20 text-emerald-400'
-                    : 'bg-white/10 text-white/60'
-                }`}>
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
+                  style={{
+                    background: step.completed ? '#dcfce7' : 'rgba(27,97,201,0.08)',
+                    color: step.completed ? '#15803d' : path.accentColor,
+                    border: `1px solid ${step.completed ? '#bbf7d0' : 'rgba(27,97,201,0.2)'}`,
+                  }}>
                   {step.completed ? '✓' : step.icon}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="mt-2 h-full w-px bg-white/5" />
+                  <div className="mt-2 h-full min-h-[16px] w-px" style={{ background: '#e0e2e6' }} />
                 )}
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <h4 className={`font-semibold ${step.completed ? 'text-white/40 line-through' : 'text-white'}`}>
+                <h4 className="font-semibold text-sm" style={{
+                  color: step.completed ? '#6b7280' : '#181d26',
+                  textDecoration: step.completed ? 'line-through' : 'none',
+                }}>
                   {step.title}
                 </h4>
-                <p className="mt-1 text-sm text-white/40">{step.description}</p>
+                <p className="mt-1 text-xs leading-relaxed" style={{ color: 'rgba(4,14,32,0.5)' }}>
+                  {step.description}
+                </p>
                 {step.link && !step.completed && (
                   <Link
                     href={step.link}
-                    className={`mt-2 inline-block text-sm font-semibold ${path.color} hover:underline`}
+                    className="mt-2 inline-block text-xs font-semibold transition hover:underline"
+                    style={{ color: path.accentColor }}
                   >
                     {step.linkLabel || 'Learn More'} →
                   </Link>

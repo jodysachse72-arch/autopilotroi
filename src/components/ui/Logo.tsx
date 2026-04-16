@@ -14,6 +14,8 @@ interface LogoProps {
   size?: number
   showText?: boolean
   className?: string
+  /** Color class for the 'Autopilot' wordmark — defaults to white (for blue navbar) */
+  textColorClass?: string
 }
 
 export function LogoIcon({ size = 44, className = '' }: { size?: number; className?: string }) {
@@ -114,14 +116,14 @@ export function LogoIcon({ size = 44, className = '' }: { size?: number; classNa
   )
 }
 
-export default function Logo({ size = 44, showText = false, className = '' }: LogoProps) {
+export default function Logo({ size = 44, showText = false, className = '', textColorClass = 'text-white' }: LogoProps) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <LogoIcon size={size} className="shrink-0 drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]" />
       {showText && (
         <span className="font-[var(--font-sora)] text-[1.7rem] font-semibold tracking-[-0.06em] leading-none">
-          <span className="text-[var(--text-primary)]">Autopilot</span>
-          <span className="text-blue-400">ROI</span>
+          <span className={textColorClass}>Autopilot</span>
+          <span className="text-blue-300">ROI</span>
         </span>
       )}
     </span>

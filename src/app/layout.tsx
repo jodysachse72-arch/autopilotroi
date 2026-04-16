@@ -1,22 +1,18 @@
 import type { Metadata } from 'next'
-import { Manrope, Sora } from 'next/font/google'
+import { Instrument_Sans } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import AnnouncementBanner from '@/components/layout/AnnouncementBanner'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import { ThemeProvider } from '@/components/ThemeProvider'
 import { FeatureFlagProvider } from '@/lib/feature-flags'
 import SmartFaqBot from '@/components/ui/SmartFaqBot'
 
-const sora = Sora({
+const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
-  variable: '--font-sora',
-})
-
-const manrope = Manrope({
-  subsets: ['latin'],
-  variable: '--font-manrope',
+  variable: '--font-instrument',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -62,19 +58,20 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${sora.variable} ${manrope.variable}`}>
-      <body className="flex min-h-screen flex-col font-[var(--font-manrope)]">
-        <ThemeProvider>
-          <FeatureFlagProvider>
-            <AnnouncementBanner />
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <SmartFaqBot />
-          </FeatureFlagProvider>
-        </ThemeProvider>
+    <html lang="en" className={instrumentSans.variable}>
+      <body
+        className="flex min-h-screen flex-col"
+        style={{ fontFamily: 'var(--font-instrument, var(--font-sans))' }}
+      >
+        <FeatureFlagProvider>
+          <AnnouncementBanner />
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <SmartFaqBot />
+        </FeatureFlagProvider>
 
-        {/* Plausible Analytics — privacy-friendly, no cookie banner needed */}
+        {/* Plausible Analytics — privacy-friendly */}
         {plausibleDomain && (
           <Script
             defer
@@ -84,16 +81,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         )}
 
-        {/* ThriveDesk Helpdesk Widget — stub until embed script provided */}
+        {/* ThriveDesk Helpdesk Widget */}
         {thriveDeskId && thriveDeskId !== 'placeholder' && (
           <Script
             id="thrivedesk-widget"
             strategy="afterInteractive"
             dangerouslySetInnerHTML={{
               __html: `
-                // ThriveDesk widget will be initialized here.
-                // Replace this placeholder with the actual embed script
-                // from your ThriveDesk dashboard (Settings → Assistant → Installation).
                 console.log('[ThriveDesk] Widget ID: ${thriveDeskId} — ready for embed script');
               `,
             }}

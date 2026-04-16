@@ -148,16 +148,20 @@ export default function WaitingRoomPage() {
   const tc = tierConfig[tier]
 
   return (
-    <div className="min-h-screen">
-      {/* ── Header Bar ── */}
-      <header className="sticky top-0 z-50 border-b border-[var(--border-primary)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
+    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+      {/* Header Bar */}
+      <header className="sticky top-0 z-50" style={{ borderBottom: '1px solid #e0e2e6', background: '#fff' }}>
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
           <Link href="/">
             <Logo size={32} showText />
           </Link>
-
           {readiness && (
-            <div className={`flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${tc.bg} ${tc.border} border ${tc.color}`}>
+            <div className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
+              style={{
+                background: tier === 'advanced' ? 'rgba(16,185,129,0.1)' : tier === 'intermediate' ? 'rgba(27,97,201,0.08)' : 'rgba(245,158,11,0.08)',
+                color: tier === 'advanced' ? '#059669' : tier === 'intermediate' ? '#1b61c9' : '#b45309',
+                border: `1px solid ${tier === 'advanced' ? 'rgba(16,185,129,0.25)' : tier === 'intermediate' ? 'rgba(27,97,201,0.2)' : 'rgba(245,158,11,0.25)'}`,
+              }}>
               {tc.emoji} {readiness.tierLabel} — {readiness.score}/100
             </div>
           )}
@@ -211,15 +215,16 @@ export default function WaitingRoomPage() {
         <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} />
       )}
 
-      {/* ── Learning Progress ── */}
+      {/* Learning Progress */}
       <div className="mx-auto max-w-7xl px-6 py-8">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-[var(--text-secondary)]">Learning Progress</span>
-          <span className="text-sm font-bold text-blue-400">{watchProgress}%</span>
+          <span className="text-sm font-semibold" style={{ color: '#181d26' }}>Learning Progress</span>
+          <span className="text-sm font-bold" style={{ color: '#1b61c9' }}>{watchProgress}%</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--bg-card)]">
+        <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: '#e0e2e6' }}>
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400"
+            className="h-full rounded-full"
+            style={{ background: 'linear-gradient(90deg, #1b61c9, #06b6d4)' }}
             initial={{ width: 0 }}
             animate={{ width: `${watchProgress}%` }}
             transition={{ duration: 0.6, delay: 0.3 }}
@@ -227,87 +232,50 @@ export default function WaitingRoomPage() {
         </div>
       </div>
 
-      {/* ── Category Filters ── */}
+      {/* Category Filters */}
       <div className="mx-auto max-w-7xl px-6 pb-4">
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                activeCategory === cat
-                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-primary)] hover:border-blue-500/50'
-              }`}
-            >
+            <button key={cat} onClick={() => setActiveCategory(cat)}
+              className="rounded-full px-4 py-2 text-sm font-semibold transition-all"
+              style={{
+                background: activeCategory === cat ? '#1b61c9' : '#fff',
+                color: activeCategory === cat ? '#fff' : 'rgba(4,14,32,0.6)',
+                border: activeCategory === cat ? '1px solid #1b61c9' : '1px solid #e0e2e6',
+              }}>
               {cat}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── Video Grid ── */}
+      {/* Video Grid */}
       <div className="mx-auto max-w-7xl px-6 pb-20">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredVideos.map((video, i) => (
-            <motion.div
-              key={video.id}
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true }}
-              custom={i * 0.08}
-            >
-              <VideoModal
-                videoUrl={`https://www.youtube.com/watch?v=${video.id}`}
-                ctaLabel="Ready to Get Started? →"
-                ctaHref="/signup"
-              >
-                <div
-                  className="group cursor-pointer overflow-hidden rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] transition-all hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/5"
-                  onClick={() => markWatched(video.id)}
-                >
-                  {/* Thumbnail */}
-                  <div className="relative aspect-video overflow-hidden bg-slate-900">
-                    <YouTubeThumbnail
-                      videoId={video.id}
-                      title={video.title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    {/* Play overlay */}
+            <motion.div key={video.id} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={i * 0.08}>
+              <VideoModal videoUrl={`https://www.youtube.com/watch?v=${video.id}`} ctaLabel="Ready to Get Started? →" ctaHref="/signup">
+                <div className="group cursor-pointer overflow-hidden rounded-2xl transition-all hover:shadow-lg"
+                  style={{ background: '#fff', border: '1px solid #e0e2e6' }}
+                  onClick={() => markWatched(video.id)}>
+                  <div className="relative aspect-video overflow-hidden" style={{ background: '#0f172a' }}>
+                    <YouTubeThumbnail videoId={video.id} title={video.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/40">
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg transition-transform group-hover:scale-110">
-                        <svg viewBox="0 0 24 24" className="h-5 w-5 ml-0.5 fill-white">
-                          <path d="M8 5.14v14l11-7-11-7z" />
-                        </svg>
+                        <svg viewBox="0 0 24 24" className="h-5 w-5 ml-0.5 fill-white"><path d="M8 5.14v14l11-7-11-7z" /></svg>
                       </div>
                     </div>
-                    {/* Duration badge */}
-                    <div className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">
-                      {video.duration}
-                    </div>
-                    {/* Watched badge */}
+                    <div className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">{video.duration}</div>
                     {watchedVideos.has(video.id) && (
                       <div className="absolute top-2 right-2 rounded-full bg-emerald-500 p-1">
-                        <svg className="h-3 w-3 fill-white" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+                        <svg className="h-3 w-3 fill-white" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                       </div>
                     )}
-                    {/* Category tag */}
-                    <div className="absolute top-2 left-2 rounded-full bg-blue-600/90 px-2 py-0.5 text-[0.6rem] font-semibold text-white backdrop-blur-sm">
-                      {video.category}
-                    </div>
+                    <div className="absolute top-2 left-2 rounded-full px-2 py-0.5 text-[0.6rem] font-semibold text-white" style={{ background: 'rgba(27,97,201,0.9)' }}>{video.category}</div>
                   </div>
-
-                  {/* Info */}
                   <div className="p-4">
-                    <h3 className="mb-1 text-sm font-bold text-[var(--text-primary)] line-clamp-2 group-hover:text-blue-400 transition-colors">
-                      {video.title}
-                    </h3>
-                    <p className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">
-                      {video.description}
-                    </p>
+                    <h3 className="mb-1 text-sm font-bold line-clamp-2 transition-colors group-hover:text-blue-600" style={{ color: '#181d26' }}>{video.title}</h3>
+                    <p className="text-xs line-clamp-2 leading-relaxed" style={{ color: 'rgba(4,14,32,0.5)' }}>{video.description}</p>
                   </div>
                 </div>
               </VideoModal>
@@ -316,26 +284,18 @@ export default function WaitingRoomPage() {
         </div>
       </div>
 
-      {/* ── Bottom CTA ── */}
-      <section className="border-t border-[var(--border-primary)] bg-[var(--bg-card)] px-6 py-12 text-center">
-        <h2 className="mb-3 font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)]">
-          What Happens Next?
-        </h2>
-        <p className="mx-auto max-w-lg text-[var(--text-secondary)] leading-relaxed mb-6">
+      {/* Bottom CTA */}
+      <section className="px-6 py-16 text-center" style={{ borderTop: '1px solid #e0e2e6', background: '#fff' }}>
+        <h2 className="mb-3 text-2xl font-bold" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>What Happens Next?</h2>
+        <p className="mx-auto max-w-lg leading-relaxed mb-6" style={{ color: 'rgba(4,14,32,0.55)' }}>
           Your partner will review your assessment and send you a personalized onboarding link via email.
-          Keep an eye on your inbox for <span className="text-blue-400 font-medium">{lead?.email}</span>.
+          Keep an eye on your inbox for <span className="font-semibold" style={{ color: '#1b61c9' }}>{lead?.email}</span>.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/university"
-            className="rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-8 py-3 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40"
-          >
+          <Link href="/university" className="rounded-xl px-8 py-3 font-bold text-white transition" style={{ background: '#1b61c9' }}>
             Explore Full University →
           </Link>
-          <Link
-            href="/"
-            className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card-hover)] px-8 py-3 font-semibold text-[var(--text-primary)] transition hover:bg-[var(--bg-card)]"
-          >
+          <Link href="/" className="rounded-xl px-8 py-3 font-semibold transition" style={{ background: '#f8fafc', border: '1px solid #e0e2e6', color: '#181d26' }}>
             Back to Home
           </Link>
         </div>

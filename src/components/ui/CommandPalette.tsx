@@ -107,13 +107,14 @@ export default function CommandPalette() {
   return (
     <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setOpen(false)} />
 
       {/* Palette */}
-      <div className="relative w-full max-w-lg rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-2xl"
+        style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
         {/* Search input */}
-        <div className="flex items-center gap-3 border-b border-[var(--border-primary)] px-4 py-3">
-          <svg className="h-5 w-5 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: '1px solid #e0e2e6' }}>
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'rgba(4,14,32,0.35)' }}>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -123,9 +124,11 @@ export default function CommandPalette() {
             onChange={(e) => { setQuery(e.target.value); setSelectedIndex(0) }}
             onKeyDown={handleKeyDown}
             placeholder="Search pages... (type to filter)"
-            className="flex-1 bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none"
+            className="flex-1 bg-transparent text-sm outline-none"
+            style={{ color: '#181d26' }}
           />
-          <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-[var(--border-primary)] bg-white/5 px-2 py-0.5 text-[10px] text-[var(--text-muted)]">
+          <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border px-2 py-0.5 text-[10px]"
+            style={{ border: '1px solid #e0e2e6', color: 'rgba(4,14,32,0.45)', background: '#f8fafc' }}>
             ESC
           </kbd>
         </div>
@@ -133,7 +136,7 @@ export default function CommandPalette() {
         {/* Results */}
         <div className="max-h-[40vh] overflow-y-auto py-2">
           {filtered.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-[var(--text-muted)]">
+            <div className="px-4 py-8 text-center text-sm" style={{ color: 'rgba(4,14,32,0.45)' }}>
               No pages match &quot;{query}&quot;
             </div>
           ) : (
@@ -142,22 +145,23 @@ export default function CommandPalette() {
                 key={result.href}
                 onClick={() => navigate(result.href)}
                 onMouseEnter={() => setSelectedIndex(i)}
-                className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition ${
-                  i === selectedIndex
-                    ? 'bg-blue-500/15 text-blue-400'
-                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'
-                }`}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition"
+                style={{
+                  background: i === selectedIndex ? 'rgba(27,97,201,0.07)' : 'transparent',
+                  color: i === selectedIndex ? '#1b61c9' : 'rgba(4,14,32,0.69)',
+                }}
               >
                 <span className="text-base">{result.icon}</span>
                 <span className="flex-1 font-medium">{result.label}</span>
-                <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">{result.category}</span>
+                <span className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(4,14,32,0.35)' }}>{result.category}</span>
               </button>
             ))
           )}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-[var(--border-primary)] px-4 py-2 flex items-center gap-4 text-[10px] text-[var(--text-muted)]">
+        <div className="flex items-center gap-4 px-4 py-2 text-[10px]"
+          style={{ borderTop: '1px solid #e0e2e6', color: 'rgba(4,14,32,0.35)' }}>
           <span>↑↓ Navigate</span>
           <span>↵ Open</span>
           <span>ESC Close</span>
