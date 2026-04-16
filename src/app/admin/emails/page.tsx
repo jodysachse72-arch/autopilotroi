@@ -9,23 +9,20 @@ import { motion, AnimatePresence } from 'framer-motion'
    Visual preview of all system email templates.
    Shows subject lines, triggers, and live HTML rendering
    with sample data. View-only with Copy HTML option.
+   
+   NOTE: The email HTML templates are intentionally dark — that is
+   the actual email design sent to prospects/partners. The admin
+   UI shell around them is light-mode design system.
    ═══════════════════════════════════════════════════════════════ */
 
 const SITE_URL = 'https://autopilotroi.com'
 
-// Sample data for previews
 const sampleLead = {
   name: 'Sarah Thompson',
   email: 'sarah@example.com',
   score: 78,
   tier: 'Intermediate',
 }
-
-const samplePartner = {
-  email: 'jody@autopilotroi.com',
-}
-
-// ── Email Templates ──
 
 interface EmailTemplate {
   id: string
@@ -38,6 +35,7 @@ interface EmailTemplate {
   html: string
 }
 
+// Email footer — dark because this is the actual email HTML
 const FOOTER = `
   <div style="border-top: 1px solid #1e293b; margin-top: 32px; padding-top: 24px; text-align: center;">
     <p style="color: #475569; font-size: 11px; margin: 0;">
@@ -253,10 +251,10 @@ export default function EmailsPage() {
     <div className="mx-auto max-w-6xl space-y-8">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[#181d26] tracking-tight">
           Email Templates
         </h1>
-        <p className="mt-2 text-[var(--text-muted)]">
+        <p className="mt-2 text-[rgba(4,14,32,0.55)]">
           Preview all system emails. 2 transactional + 5 drip re-engagement emails in the automated sequence.
         </p>
       </motion.div>
@@ -266,14 +264,14 @@ export default function EmailsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6"
+        className="rounded-2xl border border-[#e0e2e6] bg-white p-6"
       >
-        <h2 className="mb-4 font-[var(--font-sora)] text-lg font-bold text-[var(--text-primary)]">
+        <h2 className="mb-4 font-[var(--font-sora)] text-lg font-bold text-[#181d26]">
           📬 Drip Sequence Timeline
         </h2>
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        <div className="flex items-center gap-1 overflow-x-auto pb-2">
           {[
-            { day: 'Signup', color: 'bg-blue-500', label: 'Welcome + Partner Notify' },
+            { day: 'Signup', color: 'bg-[#1b61c9]', label: 'Welcome + Partner Notify' },
             { day: 'Day 1', color: 'bg-blue-400', label: 'Profile review' },
             { day: 'Day 2', color: 'bg-blue-400', label: '3 videos' },
             { day: 'Day 3', color: 'bg-amber-400', label: 'Quick question' },
@@ -283,40 +281,54 @@ export default function EmailsPage() {
             <div key={step.day} className="flex items-center">
               <div className="flex flex-col items-center min-w-[100px]">
                 <div className={`h-3 w-3 rounded-full ${step.color}`} />
-                <div className="mt-1.5 text-xs font-bold text-[var(--text-primary)]">{step.day}</div>
-                <div className="mt-0.5 text-[10px] text-[var(--text-muted)] text-center leading-tight">{step.label}</div>
+                <div className="mt-1.5 text-xs font-bold text-[#181d26]">{step.day}</div>
+                <div className="mt-0.5 text-[10px] text-[rgba(4,14,32,0.45)] text-center leading-tight">{step.label}</div>
               </div>
               {i < 5 && (
-                <div className="h-0.5 w-8 bg-white/10 -mt-5" />
+                <div className="h-0.5 w-8 bg-[#e0e2e6] -mt-5" />
               )}
             </div>
           ))}
         </div>
-        <p className="mt-4 text-xs text-[var(--text-muted)]">
-          ✅ CAN-SPAM compliant — all emails include unsubscribe links, physical address placeholder, and List-Unsubscribe headers.
+        <p className="mt-4 text-xs text-[rgba(4,14,32,0.45)]">
+          ✅ CAN-SPAM compliant — all emails include unsubscribe links and List-Unsubscribe headers.
         </p>
       </motion.div>
 
       {/* Transactional Emails */}
       <div>
-        <h2 className="mb-4 font-[var(--font-sora)] text-xl font-bold text-[var(--text-primary)]">
+        <h2 className="mb-4 font-[var(--font-sora)] text-xl font-bold text-[#181d26]">
           ⚡ Transactional Emails
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {transactional.map((email, i) => (
-            <EmailCard key={email.id} email={email} index={i} onPreview={() => setPreviewId(email.id)} onCopy={() => copyHtml(email.id, email.html)} isCopied={copiedId === email.id} />
+            <EmailCard
+              key={email.id}
+              email={email}
+              index={i}
+              onPreview={() => setPreviewId(email.id)}
+              onCopy={() => copyHtml(email.id, email.html)}
+              isCopied={copiedId === email.id}
+            />
           ))}
         </div>
       </div>
 
       {/* Drip Emails */}
       <div>
-        <h2 className="mb-4 font-[var(--font-sora)] text-xl font-bold text-[var(--text-primary)]">
+        <h2 className="mb-4 font-[var(--font-sora)] text-xl font-bold text-[#181d26]">
           💧 Drip Re-Engagement Sequence
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {drip.map((email, i) => (
-            <EmailCard key={email.id} email={email} index={i} onPreview={() => setPreviewId(email.id)} onCopy={() => copyHtml(email.id, email.html)} isCopied={copiedId === email.id} />
+            <EmailCard
+              key={email.id}
+              email={email}
+              index={i}
+              onPreview={() => setPreviewId(email.id)}
+              onCopy={() => copyHtml(email.id, email.html)}
+              isCopied={copiedId === email.id}
+            />
           ))}
         </div>
       </div>
@@ -328,43 +340,44 @@ export default function EmailsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm"
             onClick={() => setPreviewId(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-body)] p-1"
-              onClick={(e) => e.stopPropagation()}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#e0e2e6] bg-white shadow-2xl"
+              onClick={e => e.stopPropagation()}
             >
               {/* Modal header */}
-              <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-xl bg-[var(--bg-card)] border-b border-[var(--border-primary)] px-5 py-3">
+              <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl bg-white border-b border-[#e0e2e6] px-5 py-4">
                 <div>
-                  <h3 className="text-sm font-bold text-[var(--text-primary)]">{previewEmail.name}</h3>
-                  <p className="text-xs text-[var(--text-muted)]">Subject: {previewEmail.subject}</p>
+                  <h3 className="text-sm font-bold text-[#181d26]">{previewEmail.name}</h3>
+                  <p className="text-xs text-[rgba(4,14,32,0.45)] mt-0.5">Subject: {previewEmail.subject}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => copyHtml(previewEmail.id, previewEmail.html)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
                       copiedId === previewEmail.id
-                        ? 'bg-emerald-500/20 text-emerald-400'
-                        : 'bg-white/10 text-[var(--text-muted)] hover:bg-white/15'
+                        ? 'bg-emerald-100 text-emerald-700'
+                        : 'bg-[#f0f2f5] text-[rgba(4,14,32,0.55)] hover:bg-[#e8edf5]'
                     }`}
                   >
-                    {copiedId === previewEmail.id ? '✓ Copied' : '📋 Copy HTML'}
+                    {copiedId === previewEmail.id ? '✓ Copied!' : '📋 Copy HTML'}
                   </button>
                   <button
                     onClick={() => setPreviewId(null)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-[var(--text-muted)] hover:bg-white/20 transition"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f0f2f5] text-[rgba(4,14,32,0.55)] hover:bg-[#e0e2e6] transition text-sm"
                   >
                     ✕
                   </button>
                 </div>
               </div>
-              {/* Email render */}
-              <div className="p-4 bg-slate-700/30 rounded-b-xl">
+              {/* Email render — on purpose dark bg, simulating inbox */}
+              <div className="p-4 bg-[#f1f5f9] rounded-b-2xl">
+                <p className="text-center text-[10px] text-[rgba(4,14,32,0.35)] mb-3 uppercase tracking-wider">Email Preview (actual dark email design)</p>
                 <div dangerouslySetInnerHTML={{ __html: previewEmail.html }} />
               </div>
             </motion.div>
@@ -394,36 +407,36 @@ function EmailCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 + index * 0.05 }}
-      className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 transition hover:border-blue-500/20"
+      className="rounded-2xl border border-[#e0e2e6] bg-white p-5 transition hover:border-[#1b61c9]/30 hover:shadow-sm"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
             email.type === 'transactional'
-              ? 'bg-blue-500/20 text-blue-400'
-              : 'bg-purple-500/20 text-purple-400'
+              ? 'bg-blue-100 text-blue-700'
+              : 'bg-purple-100 text-purple-700'
           }`}>
             {email.type}
           </span>
-          <span className="text-[10px] font-medium text-[var(--text-muted)]">{email.timing}</span>
+          <span className="text-[10px] font-medium text-[rgba(4,14,32,0.40)]">{email.timing}</span>
         </div>
       </div>
 
-      <h3 className="text-sm font-bold text-[var(--text-primary)] mb-1">{email.name}</h3>
-      <p className="text-xs text-[var(--text-muted)] mb-1">
-        <strong>Subject:</strong> {email.subject}
+      <h3 className="text-sm font-bold text-[#181d26] mb-1">{email.name}</h3>
+      <p className="text-xs text-[rgba(4,14,32,0.55)] mb-1">
+        <strong className="text-[rgba(4,14,32,0.69)]">Subject:</strong> {email.subject}
       </p>
-      <p className="text-xs text-[var(--text-muted)] mb-1">
-        <strong>Trigger:</strong> {email.trigger}
+      <p className="text-xs text-[rgba(4,14,32,0.55)] mb-1">
+        <strong className="text-[rgba(4,14,32,0.69)]">Trigger:</strong> {email.trigger}
       </p>
-      <p className="text-xs leading-relaxed text-[var(--text-muted)]/70 mb-4">
+      <p className="text-xs leading-relaxed text-[rgba(4,14,32,0.45)] mb-4">
         {email.description}
       </p>
 
       <div className="flex items-center gap-2">
         <button
           onClick={onPreview}
-          className="rounded-lg bg-blue-500/15 px-3 py-1.5 text-xs font-semibold text-blue-400 hover:bg-blue-500/25 transition"
+          className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-semibold text-[#1b61c9] hover:bg-blue-100 transition"
         >
           👁 Preview
         </button>
@@ -431,8 +444,8 @@ function EmailCard({
           onClick={onCopy}
           className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
             isCopied
-              ? 'bg-emerald-500/20 text-emerald-400'
-              : 'bg-white/10 text-[var(--text-muted)] hover:bg-white/15'
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'bg-[#f0f2f5] text-[rgba(4,14,32,0.55)] hover:bg-[#e8edf5]'
           }`}
         >
           {isCopied ? '✓ Copied' : '📋 HTML'}

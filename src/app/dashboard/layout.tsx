@@ -21,7 +21,7 @@ const sidebarLinks = [
   { id: 'nav-leaderboard', label: 'Leaderboard',    href: '/dashboard/leaderboard',  icon: '🏆' },
   { id: 'nav-links',       label: 'Referral Links', href: '/dashboard/links',        icon: '🔗' },
   { id: 'nav-videos',      label: 'Partner Videos', href: '/dashboard/videos',       icon: '🎬' },
-  { id: 'nav-resources',   label: 'Resources',      href: '/resources',              icon: '📚' },
+  { id: 'nav-resources',   label: 'Resources',      href: '/dashboard/resources',    icon: '📚' },
   { id: 'nav-settings',    label: 'Settings',       href: '/dashboard/settings',     icon: '⚙️' },
 ]
 

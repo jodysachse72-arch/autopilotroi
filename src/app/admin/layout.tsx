@@ -25,8 +25,9 @@ const sidebarLinks = [
   { id: 'admin-strategy',   label: 'Roadmap',         href: '/admin/roadmap',     icon: '🗺️' },
   { id: 'admin-changelog',  label: 'Changelog',       href: '/admin/changelog',   icon: '📝' },
   { id: 'admin-checklist',  label: 'Checklist',       href: '/admin/checklist',   icon: '✅' },
-  { id: 'admin-guide',      label: 'Platform Guide',  href: '/admin/guide',       icon: '📖' },
-  { id: 'admin-audit',      label: 'Audit Log',       href: '/admin/audit',       icon: '📋' },
+  { id: 'admin-guide',      label: 'Platform Guide',  href: '/admin/guide',        icon: '📖' },
+  { id: 'admin-resources',  label: 'Resources',       href: '/admin/resources',    icon: '📚' },
+  { id: 'admin-audit',      label: 'Audit Log',       href: '/admin/audit',        icon: '📋' },
   { id: 'admin-settings',   label: 'Integrations',    href: '/admin/settings',    icon: '⚙️' },
 ]
 
