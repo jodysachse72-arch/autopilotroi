@@ -2,784 +2,631 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import type { JSONContent } from '@tiptap/react'
 import {
-  loadStore, saveStore, undo, getUndoCount, exportContent, importContent,
-  createBlog, updateBlog, deleteBlog,
-  createFaq, updateFaq, deleteFaq,
-  createVideo, updateVideo, deleteVideo,
-  type ContentStore, type BlogPost, type FaqItem, type VideoItem,
-  updatePageCopy,
-} from '@/lib/content-store'
+  listPosts, getPost, createPost, updatePost, deletePost,
+  publishPost, unpublishPost, getRevisions, restoreRevision, uploadMedia,
+  type CmsPost, type CmsPostSummary, type CmsRevision,
+} from '@/lib/cms/service'
 import { useToast } from '@/components/ui/Toast'
 
 /* ═══════════════════════════════════════════════════════════════
-   CONTENT EDITOR — In-app CMS for Barry (and team)
+   CONTENT EDITOR  (/admin/cms)
+   3-panel layout: List | Tiptap Editor | Meta
    
-   Page-based editing: Homepage | Blog | FAQs | Videos
-   Features: inline editing, undo, export/import, walkthrough
+   Data: Supabase cms_posts / cms_revisions / cms_media
+   Editor: Tiptap (rich text — bold, headings, images, YouTube…)
+   
+   To migrate to Payload CMS: only change src/lib/cms/service.ts
    ═══════════════════════════════════════════════════════════════ */
 
-type Tab = 'homepage' | 'blog' | 'faqs' | 'videos'
+// Lazy-load Tiptap (it's heavy — no SSR)
+const RichEditor = dynamic(() => import('@/components/cms/RichEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[360px] items-center justify-center text-sm text-[rgba(4,14,32,0.35)]">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1b61c9] border-t-transparent" />
+        Loading editor…
+      </div>
+    </div>
+  ),
+})
 
-const TABS: { key: Tab; label: string; icon: string; desc: string }[] = [
-  { key: 'homepage', label: 'Homepage', icon: '🏠', desc: 'Edit hero headline, CTAs, and page copy' },
-  { key: 'blog', label: 'Blog Posts', icon: '📝', desc: 'Create and manage blog articles' },
-  { key: 'faqs', label: 'FAQs', icon: '❓', desc: 'Add, edit, and reorder Q&A pairs' },
-  { key: 'videos', label: 'Videos', icon: '🎬', desc: 'Manage YouTube video library' },
+type Tab = 'blog' | 'faq' | 'video' | 'page_copy'
+
+const TABS: { key: Tab; label: string; icon: string }[] = [
+  { key: 'blog',      label: 'Blog Posts',   icon: '📝' },
+  { key: 'faq',       label: 'FAQs',         icon: '❓' },
+  { key: 'video',     label: 'Videos',       icon: '🎬' },
+  { key: 'page_copy', label: 'Page Copy',    icon: '🏠' },
 ]
 
-// ── Walkthrough Slides ──────────────────────────────────────
+const STATUS_STYLES = {
+  published: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  draft:     'bg-amber-50  text-amber-700  border-amber-200',
+  scheduled: 'bg-blue-50   text-blue-700   border-blue-200',
+}
 
-const WALKTHROUGH_KEY = 'autopilotroi-cms-walkthrough-seen'
+const BLOG_CATEGORIES = ['education','product-updates','announcements','partner-resources','market-insights']
+const FAQ_CATEGORIES  = ['general','products','getting-started','payments','partners']
 
-const slides = [
-  {
-    title: 'Welcome to the Content Editor ✍️',
-    body: 'This is where you edit all the content on your website — headlines, blog posts, FAQs, and videos. No code required.',
-    icon: '🎯',
-  },
-  {
-    title: 'Edit by Page',
-    body: 'Content is organized by page — click the tab for the section you want to update. Each tab shows the current content with Edit buttons.',
-    icon: '📄',
-  },
-  {
-    title: 'Undo Any Mistake',
-    body: 'Press Ctrl+Z or click the Undo button to revert your last change. We keep 50 levels of undo history — so feel free to experiment!',
-    icon: '↩️',
-  },
-  {
-    title: 'Backup & Restore',
-    body: 'Use Export to download all your content as a JSON file. Use Import to restore from a backup. Great for moving content between environments.',
-    icon: '💾',
-  },
-]
+// ── Empty post template per type ─────────────────────────────
+
+function newPost(type: Tab): Partial<CmsPost> {
+  const base = { type, status: 'draft' as const, sort_order: 0, meta: {} }
+  if (type === 'blog')  return { ...base, title: 'Untitled Post', slug: '', meta: { category: 'education', author: 'Barry Goss', featured: false } }
+  if (type === 'faq')   return { ...base, title: 'New FAQ',       meta: { category: 'general' } }
+  if (type === 'video') return { ...base, title: 'New Video',     meta: { youtubeId: '', duration: '', category: 'Overview', featured: false, section: 'university' } }
+  return { ...base, title: 'Page Copy', slug: 'homepage', meta: {} }
+}
+
+// ── Main page ────────────────────────────────────────────────
 
 export default function ContentEditorPage() {
-  const [store, setStore] = useState<ContentStore | null>(null)
-  const [activeTab, setActiveTab] = useState<Tab>('homepage')
-  const [undoCount, setUndoCount] = useState(0)
-  const [showWalkthrough, setShowWalkthrough] = useState(false)
-  const [walkthroughStep, setWalkthroughStep] = useState(0)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const { toast, ToastContainer } = useToast()
+  const [activeTab, setActiveTab]         = useState<Tab>('blog')
+  const [posts, setPosts]                 = useState<CmsPostSummary[]>([])
+  const [selectedId, setSelectedId]       = useState<string | null>(null)
+  const [selected, setSelected]           = useState<CmsPost | null>(null)
+  const [revisions, setRevisions]         = useState<CmsRevision[]>([])
+  const [showRevisions, setShowRevisions] = useState(false)
+  const [isSaving, setIsSaving]           = useState(false)
+  const [isLoading, setIsLoading]         = useState(true)
+  const [isNew, setIsNew]                 = useState(false)
+  const [draft, setDraft]                 = useState<Partial<CmsPost>>({})
+  const [bodyJson, setBodyJson]           = useState<JSONContent | null>(null)
+  const [bodyHtml, setBodyHtml]           = useState<string>('')
+  const autoSaveTimer                     = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
+  const { toast, ToastContainer }         = useToast()
 
-  // Load store on mount
+  // Load list
+  const loadList = useCallback(async () => {
+    setIsLoading(true)
+    const data = await listPosts({ type: activeTab })
+    setPosts(data)
+    setIsLoading(false)
+  }, [activeTab])
+
   useEffect(() => {
-    setStore(loadStore())
-    setUndoCount(getUndoCount())
-    // Show walkthrough on first visit
-    if (!localStorage.getItem(WALKTHROUGH_KEY)) {
-      setShowWalkthrough(true)
-    }
-  }, [])
+    loadList()
+    setSelectedId(null)
+    setSelected(null)
+    setIsNew(false)
+    setDraft({})
+  }, [loadList])
 
-  // Ctrl+Z handler
+  // Load full post when selected
   useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
-        e.preventDefault()
-        handleUndo()
-      }
-    }
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  })
+    if (!selectedId || isNew) return
+    getPost(selectedId).then((p) => {
+      if (!p) return
+      setSelected(p)
+      setDraft({ title: p.title, slug: p.slug, meta: p.meta, status: p.status, sort_order: p.sort_order })
+      setBodyJson(p.body as JSONContent | null)
+      setBodyHtml(p.body_html ?? '')
+    })
+    getRevisions(selectedId).then(setRevisions)
+  }, [selectedId, isNew])
 
-  const refreshStore = useCallback(() => {
-    setStore(loadStore())
-    setUndoCount(getUndoCount())
+  // Auto-save on body change (1.5s debounce)
+  const triggerAutoSave = useCallback(() => {
+    if (!selectedId || isNew) return
+    setAutoSaveStatus('saving')
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current)
+    autoSaveTimer.current = setTimeout(async () => {
+      await updatePost(selectedId, { body: bodyJson ?? undefined, body_html: bodyHtml })
+      setAutoSaveStatus('saved')
+      setTimeout(() => setAutoSaveStatus('idle'), 2000)
+    }, 1500)
+  }, [selectedId, isNew, bodyJson, bodyHtml])
+
+  const handleEditorChange = useCallback((json: JSONContent, html: string) => {
+    setBodyJson(json)
+    setBodyHtml(html)
+    triggerAutoSave()
+  }, [triggerAutoSave])
+
+  // Save (meta + body)
+  const handleSave = useCallback(async () => {
+    setIsSaving(true)
+    try {
+      if (isNew) {
+        const created = await createPost({
+          ...newPost(activeTab),
+          ...draft,
+          body:      bodyJson ?? null,
+          body_html: bodyHtml || null,
+          type:      activeTab,
+          status:    draft.status ?? 'draft',
+          sort_order: draft.sort_order ?? 0,
+          meta:      draft.meta ?? {},
+          slug:      draft.slug ?? null,
+          title:     draft.title ?? null,
+          created_by: null,
+          publish_at: null,
+        })
+        setSelectedId(created.id)
+        setIsNew(false)
+        toast('Post created!', 'success')
+      } else if (selectedId) {
+        await updatePost(selectedId, {
+          ...draft,
+          body:      bodyJson ?? undefined,
+          body_html: bodyHtml || undefined,
+        })
+        toast('Saved!', 'success')
+      }
+      loadList()
+    } catch (e) {
+      toast('Save failed', 'error')
+      console.error(e)
+    } finally {
+      setIsSaving(false)
+    }
+  }, [isNew, selectedId, draft, bodyJson, bodyHtml, activeTab, loadList, toast])
+
+  const handlePublish = useCallback(async () => {
+    if (!selectedId) return
+    setIsSaving(true)
+    try {
+      await publishPost(selectedId)
+      setDraft(d => ({ ...d, status: 'published' }))
+      loadList()
+      toast('Published! 🚀', 'success')
+    } catch { toast('Publish failed', 'error') }
+    finally { setIsSaving(false) }
+  }, [selectedId, loadList, toast])
+
+  const handleUnpublish = useCallback(async () => {
+    if (!selectedId) return
+    await unpublishPost(selectedId)
+    setDraft(d => ({ ...d, status: 'draft' }))
+    loadList()
+    toast('Moved to Draft', 'info')
+  }, [selectedId, loadList, toast])
+
+  const handleDelete = useCallback(async () => {
+    if (!selectedId || !confirm('Delete this post? This cannot be undone.')) return
+    await deletePost(selectedId)
+    setSelectedId(null)
+    setSelected(null)
+    setDraft({})
+    loadList()
+    toast('Deleted', 'info')
+  }, [selectedId, loadList, toast])
+
+  const handleRestore = useCallback(async (rev: CmsRevision) => {
+    if (!selectedId) return
+    await restoreRevision(rev.id)
+    const refreshed = await getPost(selectedId)
+    if (refreshed) {
+      setSelected(refreshed)
+      setBodyJson(refreshed.body as JSONContent | null)
+      setBodyHtml(refreshed.body_html ?? '')
+    }
+    setShowRevisions(false)
+    toast('Version restored', 'success')
+  }, [selectedId])
+
+  const handleImageUpload = useCallback(async (file: File): Promise<string> => {
+    const media = await uploadMedia(file, '')
+    return media.public_url
   }, [])
 
-  const handleUndo = useCallback(() => {
-    const restored = undo()
-    if (restored) {
-      setStore(restored)
-      setUndoCount(getUndoCount())
-      toast('Change undone!', 'info')
-    } else {
-      toast('Nothing to undo', 'info')
-    }
-  }, [toast])
+  const startNew = () => {
+    setIsNew(true)
+    setSelectedId(null)
+    setSelected(null)
+    setBodyJson(null)
+    setBodyHtml('')
+    setDraft(newPost(activeTab) as Partial<CmsPost>)
+  }
 
-  const handleExport = useCallback(() => {
-    const json = exportContent()
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `autopilotroi-content-${new Date().toISOString().slice(0, 10)}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-    toast('Content exported!', 'success')
-  }, [toast])
-
-  const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const json = ev.target?.result as string
-      const imported = importContent(json)
-      if (imported) {
-        setStore(imported)
-        setUndoCount(getUndoCount())
-        toast('Content imported successfully!', 'success')
-      } else {
-        toast('Invalid file format', 'error')
-      }
-    }
-    reader.readAsText(file)
-    e.target.value = ''
-  }, [toast])
-
-  const dismissWalkthrough = useCallback(() => {
-    localStorage.setItem(WALKTHROUGH_KEY, 'true')
-    setShowWalkthrough(false)
-  }, [])
-
-  if (!store) return <div className="p-8 text-[var(--text-muted)]">Loading content...</div>
+  const hasEditor = selected !== null || isNew
+  const currentStatus = (draft.status ?? 'draft') as keyof typeof STATUS_STYLES
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-start justify-between gap-4">
+    <div className="flex h-[calc(100vh-80px)] flex-col">
+
+      {/* Top bar */}
+      <div className="flex shrink-0 items-center justify-between border-b border-[#e0e2e6] bg-white px-6 py-3">
         <div>
-          <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
-            Content Editor
-          </h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
-            Edit your website content — headlines, blog posts, FAQs, and videos. Changes are saved automatically.
-          </p>
-          <div className="mt-2 flex items-center gap-3 text-[10px]">
-            <span className="flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-400/20 px-2.5 py-1 text-amber-400 font-semibold">
-              💾 localStorage
-            </span>
-            <span className="text-[var(--text-muted)]">{store.blogs.length} posts · {store.faqs.length} FAQs · {store.videos.length} videos</span>
-          </div>
+          <h1 className="font-[var(--font-sora)] text-xl font-bold text-[#181d26]">Content Editor</h1>
+          <p className="text-xs text-[rgba(4,14,32,0.40)]">Supabase-backed · changes auto-save · {posts.length} {activeTab === 'blog' ? 'posts' : activeTab === 'faq' ? 'FAQs' : activeTab === 'video' ? 'videos' : 'entries'}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleUndo}
-            disabled={undoCount === 0}
-            className="flex items-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-xs font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-card-hover)] disabled:opacity-30 disabled:cursor-not-allowed"
-            title={`Undo (${undoCount} steps available)`}
-          >
-            ↩️ Undo {undoCount > 0 && <span className="rounded-full bg-blue-500/20 px-1.5 py-0.5 text-[10px] text-blue-400">{undoCount}</span>}
-          </button>
-          <button
-            onClick={handleExport}
-            className="flex items-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-xs font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-card-hover)]"
-          >
-            ⬇️ Export
-          </button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-xs font-medium text-[var(--text-secondary)] transition hover:bg-[var(--bg-card-hover)]"
-          >
-            ⬆️ Import
-          </button>
-          <input ref={fileInputRef} type="file" accept=".json" onChange={handleImport} className="hidden" />
-          <button
-            onClick={() => { setWalkthroughStep(0); setShowWalkthrough(true) }}
-            className="flex items-center gap-1.5 rounded-xl border border-blue-400/30 bg-blue-500/10 px-3 py-2 text-xs font-medium text-blue-400 transition hover:bg-blue-500/20"
-          >
-            ❓ Help
-          </button>
-        </div>
-      </motion.div>
+          {/* Auto-save status */}
+          <AnimatePresence>
+            {autoSaveStatus !== 'idle' && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5 text-xs text-[rgba(4,14,32,0.45)]">
+                {autoSaveStatus === 'saving'
+                  ? <><div className="h-3 w-3 animate-spin rounded-full border border-[#1b61c9] border-t-transparent" /> Saving…</>
+                  : <><span className="text-emerald-500">✓</span> Saved</>}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      {/* Tabs */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {hasEditor && selected && (
+            <>
+              <button onClick={() => { setShowRevisions(!showRevisions) }}
+                className="rounded-xl border border-[#e0e2e6] bg-white px-3 py-1.5 text-xs font-medium text-[rgba(4,14,32,0.55)] hover:bg-[#f8fafc]">
+                🕐 History {revisions.length > 0 && `(${revisions.length})`}
+              </button>
+              <button onClick={handleDelete}
+                className="rounded-xl border border-red-200 px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50">
+                🗑️ Delete
+              </button>
+            </>
+          )}
+
+          {hasEditor && (
+            <>
+              <button onClick={handleSave} disabled={isSaving}
+                className="rounded-xl border border-[#e0e2e6] bg-white px-4 py-1.5 text-xs font-semibold text-[#181d26] transition hover:bg-[#f8fafc] disabled:opacity-50">
+                {isSaving ? 'Saving…' : '💾 Save'}
+              </button>
+              {currentStatus !== 'published' ? (
+                <button onClick={handlePublish} disabled={isSaving || isNew}
+                  className="rounded-xl bg-[#1b61c9] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1550aa] disabled:opacity-40">
+                  🚀 Publish
+                </button>
+              ) : (
+                <button onClick={handleUnpublish}
+                  className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-100">
+                  ↩ Unpublish
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Type tabs */}
+      <div className="flex shrink-0 gap-0 border-b border-[#e0e2e6] bg-[#f8fafc]">
         {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+            className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium transition border-b-2 ${
               activeTab === tab.key
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                : 'border border-[var(--border-primary)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'
-            }`}
-          >
-            <span>{tab.icon}</span>
-            {tab.label}
+                ? 'border-[#1b61c9] text-[#1b61c9] bg-white'
+                : 'border-transparent text-[rgba(4,14,32,0.50)] hover:text-[#181d26]'
+            }`}>
+            <span>{tab.icon}</span> {tab.label}
           </button>
         ))}
       </div>
 
-      {/* Tab Content */}
-      <AnimatePresence mode="wait">
-        <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}>
-          {activeTab === 'homepage' && <HomepageEditor store={store} onRefresh={refreshStore} toast={toast} />}
-          {activeTab === 'blog' && <BlogEditor store={store} onRefresh={refreshStore} toast={toast} />}
-          {activeTab === 'faqs' && <FaqEditor store={store} onRefresh={refreshStore} toast={toast} />}
-          {activeTab === 'videos' && <VideoEditor store={store} onRefresh={refreshStore} toast={toast} />}
-        </motion.div>
-      </AnimatePresence>
+      {/* 3-panel body */}
+      <div className="flex flex-1 overflow-hidden">
 
-      {/* Walkthrough Modal */}
-      <AnimatePresence>
-        {showWalkthrough && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={dismissWalkthrough} />
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-md rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-8 shadow-2xl"
-            >
-              <div className="text-center mb-6">
-                <span className="text-5xl">{slides[walkthroughStep].icon}</span>
-                <h2 className="mt-4 font-[var(--font-sora)] text-xl font-bold text-[var(--text-primary)]">
-                  {slides[walkthroughStep].title}
-                </h2>
-                <p className="mt-3 text-sm text-[var(--text-muted)] leading-relaxed">
-                  {slides[walkthroughStep].body}
-                </p>
-              </div>
-              {/* Progress dots */}
-              <div className="flex justify-center gap-2 mb-6">
-                {slides.map((_, i) => (
-                  <div key={i} className={`h-2 w-2 rounded-full transition ${i === walkthroughStep ? 'bg-blue-500' : 'bg-white/20'}`} />
-                ))}
-              </div>
-              <div className="flex justify-between">
-                <button onClick={dismissWalkthrough} className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)]">Skip</button>
-                <button
-                  onClick={() => {
-                    if (walkthroughStep < slides.length - 1) {
-                      setWalkthroughStep(s => s + 1)
-                    } else {
-                      dismissWalkthrough()
-                    }
-                  }}
-                  className="rounded-xl bg-blue-600 px-6 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
-                >
-                  {walkthroughStep < slides.length - 1 ? 'Next →' : 'Get Started!'}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <ToastContainer />
-    </div>
-  )
-}
-
-// ═══════════════════════════════════════════════════════════════
-// SUB-EDITORS — Each tab gets its own component
-// ═══════════════════════════════════════════════════════════════
-
-type ToastFn = (msg: string, type: 'success' | 'error' | 'info') => void
-
-/* ── HOMEPAGE EDITOR ── */
-function HomepageEditor({ store, onRefresh, toast }: { store: ContentStore; onRefresh: () => void; toast: ToastFn }) {
-  const pageCopy = store.pages.homepage || {}
-  const [editing, setEditing] = useState<string | null>(null)
-  const [draft, setDraft] = useState('')
-
-  const fields = [
-    { key: 'heroHeadline', label: 'Hero Headline', hint: 'The big text at the top of the homepage', multiline: true },
-    { key: 'heroSubheadline', label: 'Hero Subheadline', hint: 'Smaller text below the headline', multiline: true },
-    { key: 'heroPrimaryCta', label: 'Primary CTA Button', hint: 'The main call-to-action button text', multiline: false },
-    { key: 'heroSecondaryCta', label: 'Secondary CTA Button', hint: 'The secondary button text (e.g., "Watch Demo")', multiline: false },
-    { key: 'heroVideoUrl', label: 'Hero Video URL', hint: 'YouTube URL for the demo video modal', multiline: false },
-    { key: 'finalCtaHeadline', label: 'Bottom CTA Headline', hint: 'The headline above the final call-to-action section', multiline: false },
-    { key: 'finalCtaDescription', label: 'Bottom CTA Description', hint: 'Supporting text below the bottom CTA headline', multiline: true },
-  ]
-
-  function startEdit(key: string) {
-    setEditing(key)
-    setDraft(pageCopy[key] || '')
-  }
-
-  function saveEdit(key: string) {
-    updatePageCopy('homepage', { [key]: draft })
-    setEditing(null)
-    onRefresh()
-    toast('Saved!', 'success')
-  }
-
-  function cancelEdit() {
-    setEditing(null)
-    setDraft('')
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="rounded-2xl border border-blue-400/20 bg-blue-500/5 p-4">
-        <p className="text-sm text-blue-300">
-          💡 <strong>Tip:</strong> Click &quot;Edit&quot; on any field to change it. Press Enter or click &quot;Save&quot; when done. Press Escape to cancel.
-        </p>
-      </div>
-
-      {fields.map((field) => (
-        <div key={field.key} className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5">
-          <div className="flex items-start justify-between mb-2">
-            <div>
-              <label className="text-sm font-semibold text-[var(--text-primary)]">{field.label}</label>
-              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{field.hint}</p>
-            </div>
-            {editing !== field.key && (
-              <button
-                onClick={() => startEdit(field.key)}
-                className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-500"
-              >
-                ✏️ Edit
-              </button>
-            )}
+        {/* ── LEFT: Post List ────────────────────────────── */}
+        <aside className="flex w-72 shrink-0 flex-col border-r border-[#e0e2e6] bg-white overflow-y-auto">
+          <div className="flex items-center justify-between border-b border-[#e0e2e6] px-4 py-3">
+            <span className="text-xs font-semibold text-[rgba(4,14,32,0.45)] uppercase tracking-widest">{TABS.find(t=>t.key===activeTab)?.label}</span>
+            <button onClick={startNew}
+              className="rounded-lg bg-[#1b61c9] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1550aa]">
+              + New
+            </button>
           </div>
-          {editing === field.key ? (
-            <div className="space-y-2">
-              {field.multiline ? (
-                <textarea
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Escape') cancelEdit() }}
-                  rows={3}
-                  className="w-full rounded-xl border border-blue-500/50 bg-blue-500/5 px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-blue-500/30 transition"
-                  autoFocus
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') saveEdit(field.key)
-                    if (e.key === 'Escape') cancelEdit()
-                  }}
-                  className="w-full rounded-xl border border-blue-500/50 bg-blue-500/5 px-4 py-3 text-sm text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-blue-500/30 transition"
-                  autoFocus
-                />
-              )}
-              <div className="flex gap-2">
-                <button onClick={() => saveEdit(field.key)} className="rounded-lg bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-500">
-                  ✅ Save
-                </button>
-                <button onClick={cancelEdit} className="rounded-lg border border-[var(--border-primary)] px-4 py-1.5 text-xs text-[var(--text-muted)] transition hover:bg-[var(--bg-card-hover)]">
-                  Cancel
-                </button>
-              </div>
+
+          {isLoading ? (
+            <div className="flex flex-1 items-center justify-center">
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#1b61c9] border-t-transparent" />
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
+              <span className="text-3xl">{TABS.find(t => t.key === activeTab)?.icon}</span>
+              <p className="text-sm text-[rgba(4,14,32,0.45)]">No {activeTab === 'faq' ? 'FAQs' : 'posts'} yet</p>
+              <button onClick={startNew} className="rounded-lg bg-[#1b61c9] px-4 py-2 text-xs font-semibold text-white">Create First</button>
             </div>
           ) : (
-            <div className="rounded-xl bg-[var(--bg-card-hover)] px-4 py-3 text-sm text-[var(--text-secondary)] whitespace-pre-wrap min-h-[2.5rem]">
-              {pageCopy[field.key] || <span className="text-[var(--text-muted)] italic">Not set — click Edit to add content</span>}
+            <div className="flex-1 divide-y divide-[#f0f2f7]">
+              {/* New post placeholder in list */}
+              {isNew && (
+                <div className="flex items-start gap-3 bg-blue-50 px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-[#1b61c9]">{draft.title || 'New Post'}</div>
+                    <div className="text-[10px] text-[rgba(4,14,32,0.40)] mt-0.5">Unsaved draft</div>
+                  </div>
+                  <span className="text-[10px] rounded-full border px-1.5 py-0.5 bg-amber-50 text-amber-700 border-amber-200">draft</span>
+                </div>
+              )}
+              {posts.map((post) => (
+                <button key={post.id} onClick={() => { setSelectedId(post.id); setIsNew(false) }}
+                  className={`w-full flex items-start gap-3 px-4 py-3 text-left transition hover:bg-[#f8fafc] ${selectedId === post.id && !isNew ? 'bg-blue-50/60 border-l-2 border-[#1b61c9]' : ''}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-sm font-medium truncate ${selectedId === post.id && !isNew ? 'text-[#1b61c9]' : 'text-[#181d26]'}`}>
+                      {post.title || 'Untitled'}
+                    </div>
+                    <div className="text-[10px] text-[rgba(4,14,32,0.35)] mt-0.5 truncate">
+                      {post.meta?.category ?? post.meta?.youtubeId ?? '—'} · {new Date(post.updated_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <span className={`shrink-0 text-[10px] rounded-full border px-1.5 py-0.5 font-semibold ${STATUS_STYLES[post.status]}`}>
+                    {post.status}
+                  </span>
+                </button>
+              ))}
             </div>
           )}
-        </div>
-      ))}
-    </div>
-  )
-}
+        </aside>
 
-/* ── BLOG EDITOR ── */
-function BlogEditor({ store, onRefresh, toast }: { store: ContentStore; onRefresh: () => void; toast: ToastFn }) {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [showNew, setShowNew] = useState(false)
-  const [newPost, setNewPost] = useState({ title: '', slug: '', excerpt: '', body: '', author: 'Barry Goss', category: 'education', featured: false, publishedAt: new Date().toISOString().slice(0, 10) })
-
-  function handleCreate() {
-    if (!newPost.title.trim()) { toast('Title is required', 'error'); return }
-    const slug = newPost.slug || newPost.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-    createBlog({ ...newPost, slug })
-    setNewPost({ title: '', slug: '', excerpt: '', body: '', author: 'Barry Goss', category: 'education', featured: false, publishedAt: new Date().toISOString().slice(0, 10) })
-    setShowNew(false)
-    onRefresh()
-    toast('Blog post created!', 'success')
-  }
-
-  function handleDelete(id: string, title: string) {
-    if (!confirm(`Delete "${title}"? You can undo this.`)) return
-    deleteBlog(id)
-    onRefresh()
-    toast('Post deleted (Ctrl+Z to undo)', 'info')
-  }
-
-  function handleUpdate(id: string, updates: Partial<BlogPost>) {
-    updateBlog(id, updates)
-    setEditingId(null)
-    onRefresh()
-    toast('Saved!', 'success')
-  }
-
-  const categories = ['education', 'product-updates', 'announcements', 'partner-resources', 'market-insights']
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-[var(--text-muted)]">{store.blogs.length} posts</p>
-        <button onClick={() => setShowNew(true)} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500">
-          + New Post
-        </button>
-      </div>
-
-      {/* New post form */}
-      <AnimatePresence>
-        {showNew && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-5 space-y-3"
-          >
-            <h3 className="text-sm font-semibold text-emerald-400">New Blog Post</h3>
-            <input type="text" value={newPost.title} onChange={e => setNewPost({ ...newPost, title: e.target.value })} placeholder="Post title" className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none" />
-            <textarea value={newPost.excerpt} onChange={e => setNewPost({ ...newPost, excerpt: e.target.value })} placeholder="Brief excerpt / summary" rows={2} className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none" />
-            <textarea value={newPost.body} onChange={e => setNewPost({ ...newPost, body: e.target.value })} placeholder="Post body (supports plain text or markdown)" rows={4} className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none font-mono text-xs" />
-            <div className="flex gap-3 flex-wrap">
-              <select value={newPost.category} onChange={e => setNewPost({ ...newPost, category: e.target.value })} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none">
-                {categories.map(c => <option key={c} value={c}>{c.replace('-', ' ')}</option>)}
-              </select>
-              <input type="text" value={newPost.author} onChange={e => setNewPost({ ...newPost, author: e.target.value })} placeholder="Author" className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none w-40" />
-              <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-                <input type="checkbox" checked={newPost.featured} onChange={e => setNewPost({ ...newPost, featured: e.target.checked })} className="accent-blue-500" /> Featured
-              </label>
+        {/* ── CENTER: Editor ─────────────────────────────── */}
+        <main className="flex flex-1 flex-col overflow-y-auto bg-[#f8fafc]">
+          {!hasEditor ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center p-12">
+              <span className="text-5xl opacity-30">✍️</span>
+              <p className="text-sm text-[rgba(4,14,32,0.40)]">Select a post to edit, or create a new one</p>
+              <button onClick={startNew} className="rounded-xl bg-[#1b61c9] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#1550aa]">
+                + Create New
+              </button>
             </div>
-            <div className="flex gap-2">
-              <button onClick={handleCreate} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-emerald-500">Create Post</button>
-              <button onClick={() => setShowNew(false)} className="rounded-xl border border-[var(--border-primary)] px-4 py-2 text-xs text-[var(--text-muted)] transition hover:bg-[var(--bg-card-hover)]">Cancel</button>
+          ) : (
+            <div className="flex flex-col gap-5 p-6">
+
+              {/* Title */}
+              <input
+                type="text"
+                value={draft.title ?? ''}
+                onChange={(e) => setDraft(d => ({ ...d, title: e.target.value }))}
+                placeholder={activeTab === 'faq' ? 'Question…' : activeTab === 'video' ? 'Video title…' : 'Post title…'}
+                className="w-full rounded-2xl border border-[#e0e2e6] bg-white px-5 py-3.5 font-[var(--font-sora)] text-2xl font-bold text-[#181d26] placeholder:text-[rgba(4,14,32,0.25)] outline-none focus:border-[#1b61c9] focus:ring-2 focus:ring-[#1b61c9]/15 shadow-sm transition"
+              />
+
+              {/* Slug (blog only) */}
+              {activeTab === 'blog' && (
+                <div className="flex items-center gap-2 rounded-xl border border-[#e0e2e6] bg-white px-4 py-2 shadow-sm">
+                  <span className="text-xs text-[rgba(4,14,32,0.35)] shrink-0">slug /blog/</span>
+                  <input
+                    type="text"
+                    value={draft.slug ?? ''}
+                    onChange={(e) => setDraft(d => ({ ...d, slug: e.target.value }))}
+                    placeholder="my-post-slug"
+                    className="flex-1 bg-transparent text-sm text-[#181d26] outline-none placeholder:text-[rgba(4,14,32,0.25)]"
+                  />
+                </div>
+              )}
+
+              {/* Rich editor (blog, faq, page_copy) */}
+              {(activeTab === 'blog' || activeTab === 'faq' || activeTab === 'page_copy') && (
+                <RichEditor
+                  key={selectedId ?? 'new'}
+                  content={bodyJson}
+                  contentHtml={bodyHtml}
+                  placeholder={
+                    activeTab === 'faq' ? 'Write the answer…'
+                    : activeTab === 'blog' ? 'Start writing your post…'
+                    : 'Edit page copy…'
+                  }
+                  onChange={handleEditorChange}
+                  onImageUpload={handleImageUpload}
+                  minHeight={400}
+                />
+              )}
+
+              {/* Video-specific fields */}
+              {activeTab === 'video' && (
+                <div className="space-y-3 rounded-2xl border border-[#e0e2e6] bg-white p-5 shadow-sm">
+                  <h3 className="text-sm font-semibold text-[#181d26]">Video Details</h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="col-span-2">
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">YouTube URL or ID</label>
+                      <input type="text"
+                        value={draft.meta?.youtubeId as string ?? ''}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, youtubeId: e.target.value } }))}
+                        placeholder="https://youtube.com/watch?v=... or dQw4w9WgXcQ"
+                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
+                    {draft.meta?.youtubeId && (
+                      <div className="col-span-2">
+                        <img
+                          src={`https://i.ytimg.com/vi/${String(draft.meta.youtubeId).replace(/.*[?&]v=/, '').split('&')[0]}/hqdefault.jpg`}
+                          alt="Thumbnail preview"
+                          className="rounded-xl border border-[#e0e2e6] max-h-40 object-cover"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Duration</label>
+                      <input type="text"
+                        value={draft.meta?.duration as string ?? ''}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, duration: e.target.value } }))}
+                        placeholder="12:30"
+                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Category</label>
+                      <input type="text"
+                        value={draft.meta?.category as string ?? ''}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, category: e.target.value } }))}
+                        placeholder="Overview"
+                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Section</label>
+                      <select
+                        value={draft.meta?.section as string ?? 'university'}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, section: e.target.value as 'university' | 'media' } }))}
+                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]">
+                        <option value="university">University</option>
+                        <option value="media">Media</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Display order</label>
+                      <input type="number"
+                        value={draft.sort_order ?? 0}
+                        onChange={(e) => setDraft(d => ({ ...d, sort_order: parseInt(e.target.value) || 0 }))}
+                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Description</label>
+                    <textarea
+                      value={(draft.body_html ?? '') as string}
+                      onChange={(e) => setBodyHtml(e.target.value)}
+                      rows={3}
+                      placeholder="Brief description of the video…"
+                      className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9] resize-none" />
+                  </div>
+                </div>
+              )}
+
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </main>
 
-      {/* Posts list */}
-      {store.blogs.length === 0 ? (
-        <EmptyState icon="📝" text="No blog posts yet" action="Create your first post" onAction={() => setShowNew(true)} />
-      ) : (
-        store.blogs.map((post) => (
-          <PostCard key={post.id} post={post} isEditing={editingId === post.id}
-            onEdit={() => setEditingId(post.id)} onCancel={() => setEditingId(null)}
-            onSave={(updates) => handleUpdate(post.id, updates)}
-            onDelete={() => handleDelete(post.id, post.title)}
-            categories={categories}
-          />
-        ))
-      )}
-    </div>
-  )
-}
+        {/* ── RIGHT: Meta Panel ──────────────────────────── */}
+        <AnimatePresence>
+          {hasEditor && (
+            <motion.aside
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 272, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              className="flex shrink-0 flex-col border-l border-[#e0e2e6] bg-white overflow-y-auto overflow-x-hidden"
+            >
+              <div className="divide-y divide-[#f0f2f7]">
 
-/* ── Post Card ── */
-function PostCard({ post, isEditing, onEdit, onCancel, onSave, onDelete, categories }: {
-  post: BlogPost; isEditing: boolean; onEdit: () => void; onCancel: () => void;
-  onSave: (u: Partial<BlogPost>) => void; onDelete: () => void; categories: string[];
-}) {
-  const [draft, setDraft] = useState(post)
-  useEffect(() => { setDraft(post) }, [post])
+                {/* Status */}
+                <div className="p-4 space-y-3">
+                  <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">Status</div>
+                  <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_STYLES[currentStatus]}`}>
+                    <span className={`h-1.5 w-1.5 rounded-full ${currentStatus === 'published' ? 'bg-emerald-500 animate-pulse' : currentStatus === 'scheduled' ? 'bg-blue-500' : 'bg-amber-500'}`} />
+                    {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
+                  </div>
+                  {currentStatus !== 'published' ? (
+                    <button onClick={handlePublish} disabled={isSaving || isNew}
+                      className="w-full rounded-xl bg-[#1b61c9] py-2 text-xs font-semibold text-white hover:bg-[#1550aa] disabled:opacity-40 transition">
+                      🚀 Publish Now
+                    </button>
+                  ) : (
+                    <button onClick={handleUnpublish}
+                      className="w-full rounded-xl border border-amber-200 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50 transition">
+                      ↩ Move to Draft
+                    </button>
+                  )}
+                </div>
 
-  return (
-    <div className={`rounded-2xl border bg-[var(--bg-card)] p-5 transition ${isEditing ? 'border-blue-500/40' : 'border-[var(--border-primary)]'}`}>
-      {isEditing ? (
-        <div className="space-y-3">
-          <input type="text" value={draft.title} onChange={e => setDraft({ ...draft, title: e.target.value })} className="w-full rounded-xl border border-blue-500/30 bg-blue-500/5 px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] outline-none" />
-          <textarea value={draft.excerpt} onChange={e => setDraft({ ...draft, excerpt: e.target.value })} rows={2} className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none" />
-          <textarea value={draft.body} onChange={e => setDraft({ ...draft, body: e.target.value })} rows={4} placeholder="Post body" className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none font-mono text-xs" />
-          <div className="flex gap-3 flex-wrap items-center">
-            <select value={draft.category} onChange={e => setDraft({ ...draft, category: e.target.value })} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none">
-              {categories.map(c => <option key={c} value={c}>{c.replace('-', ' ')}</option>)}
-            </select>
-            <input type="text" value={draft.author} onChange={e => setDraft({ ...draft, author: e.target.value })} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none w-40" />
-            <label className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-              <input type="checkbox" checked={draft.featured} onChange={e => setDraft({ ...draft, featured: e.target.checked })} className="accent-blue-500" /> Featured
-            </label>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => onSave(draft)} className="rounded-lg bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500">✅ Save</button>
-            <button onClick={onCancel} className="rounded-lg border border-[var(--border-primary)] px-4 py-1.5 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)]">Cancel</button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              {post.featured && <span className="text-[10px] rounded-full bg-amber-500/15 text-amber-400 px-2 py-0.5 font-semibold">⭐ Featured</span>}
-              <span className="text-[10px] rounded-full bg-blue-500/15 text-blue-400 px-2 py-0.5 font-semibold capitalize">{post.category.replace('-', ' ')}</span>
-            </div>
-            <h3 className="font-semibold text-[var(--text-primary)]">{post.title}</h3>
-            <p className="mt-1 text-xs text-[var(--text-muted)] line-clamp-2">{post.excerpt}</p>
-            <p className="mt-2 text-[10px] text-[var(--text-muted)]">{post.author} · {post.publishedAt}</p>
-          </div>
-          <div className="flex gap-1.5 shrink-0">
-            <button onClick={onEdit} className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500">✏️ Edit</button>
-            <button onClick={onDelete} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10">🗑️</button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
+                {/* Blog meta */}
+                {activeTab === 'blog' && (
+                  <div className="p-4 space-y-3">
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">Post Settings</div>
 
-/* ── FAQ EDITOR ── */
-function FaqEditor({ store, onRefresh, toast }: { store: ContentStore; onRefresh: () => void; toast: ToastFn }) {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [showNew, setShowNew] = useState(false)
-  const [newFaq, setNewFaq] = useState({ question: '', answer: '', category: 'general' })
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Author</label>
+                      <input type="text"
+                        value={draft.meta?.author as string ?? ''}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, author: e.target.value } }))}
+                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
 
-  function handleCreate() {
-    if (!newFaq.question.trim()) { toast('Question is required', 'error'); return }
-    createFaq({ ...newFaq, order: store.faqs.length + 1 })
-    setNewFaq({ question: '', answer: '', category: 'general' })
-    setShowNew(false)
-    onRefresh()
-    toast('FAQ added!', 'success')
-  }
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Category</label>
+                      <select
+                        value={draft.meta?.category as string ?? 'education'}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, category: e.target.value } }))}
+                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]">
+                        {BLOG_CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/-/g, ' ')}</option>)}
+                      </select>
+                    </div>
 
-  function handleUpdate(id: string, updates: Partial<FaqItem>) {
-    updateFaq(id, updates)
-    setEditingId(null)
-    onRefresh()
-    toast('Saved!', 'success')
-  }
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Excerpt</label>
+                      <textarea
+                        value={draft.meta?.excerpt as string ?? ''}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, excerpt: e.target.value } }))}
+                        rows={3}
+                        placeholder="Short summary for post cards…"
+                        className="w-full resize-none rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
 
-  function handleDelete(id: string) {
-    if (!confirm('Delete this FAQ? You can undo.')) return
-    deleteFaq(id)
-    onRefresh()
-    toast('FAQ deleted (Ctrl+Z to undo)', 'info')
-  }
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Publish Date</label>
+                      <input type="date"
+                        value={draft.meta?.publishedAt as string ?? ''}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, publishedAt: e.target.value } }))}
+                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
 
-  function moveUp(idx: number) {
-    if (idx === 0) return
-    const ids = store.faqs.map(f => f.id)
-    ;[ids[idx - 1], ids[idx]] = [ids[idx], ids[idx - 1]]
-    // We need to manually reorder
-    const reordered = ids.map((id, i) => ({ ...store.faqs.find(f => f.id === id)!, order: i + 1 }))
-    const s = loadStore()
-    s.faqs = reordered
-    saveStore(s, 'Reordered FAQs')
-    onRefresh()
-  }
+                    <label className="flex items-center gap-2.5 cursor-pointer">
+                      <div
+                        onClick={() => setDraft(d => ({ ...d, meta: { ...d.meta, featured: !d.meta?.featured } }))}
+                        className={`relative h-5 w-9 rounded-full transition-colors ${draft.meta?.featured ? 'bg-[#1b61c9]' : 'bg-[#e0e2e6]'}`}>
+                        <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${draft.meta?.featured ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                      </div>
+                      <span className="text-xs font-medium text-[rgba(4,14,32,0.65)]">Featured post</span>
+                    </label>
+                  </div>
+                )}
 
-  function moveDown(idx: number) {
-    if (idx === store.faqs.length - 1) return
-    const ids = store.faqs.map(f => f.id)
-    ;[ids[idx], ids[idx + 1]] = [ids[idx + 1], ids[idx]]
-    const reordered = ids.map((id, i) => ({ ...store.faqs.find(f => f.id === id)!, order: i + 1 }))
-    const s = loadStore()
-    s.faqs = reordered
-    saveStore(s, 'Reordered FAQs')
-    onRefresh()
-  }
+                {/* FAQ meta */}
+                {activeTab === 'faq' && (
+                  <div className="p-4 space-y-3">
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">FAQ Settings</div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Category</label>
+                      <select
+                        value={draft.meta?.category as string ?? 'general'}
+                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, category: e.target.value } }))}
+                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]">
+                        {FAQ_CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/-/g, ' ')}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Sort Order</label>
+                      <input type="number"
+                        value={draft.sort_order ?? 0}
+                        onChange={(e) => setDraft(d => ({ ...d, sort_order: parseInt(e.target.value) || 0 }))}
+                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
+                    </div>
+                  </div>
+                )}
 
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-[var(--text-muted)]">{store.faqs.length} questions · drag to reorder</p>
-        <button onClick={() => setShowNew(true)} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500">+ New FAQ</button>
-      </div>
+                {/* SEO preview (blog only) */}
+                {activeTab === 'blog' && draft.title && (
+                  <div className="p-4 space-y-2">
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">SEO Preview</div>
+                    <div className="rounded-xl border border-[#e0e2e6] bg-[#f8fafc] p-3 space-y-1">
+                      <div className="text-[11px] text-emerald-600 truncate">autopilotroi.com › blog › {draft.slug || 'post-slug'}</div>
+                      <div className="text-sm font-semibold text-[#1a0dab] line-clamp-2 leading-tight">{draft.title}</div>
+                      {draft.meta?.excerpt && (
+                        <div className="text-[11px] text-[rgba(4,14,32,0.55)] line-clamp-3 leading-relaxed">{draft.meta.excerpt as string}</div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
-      <AnimatePresence>
-        {showNew && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-5 space-y-3"
-          >
-            <input type="text" value={newFaq.question} onChange={e => setNewFaq({ ...newFaq, question: e.target.value })} placeholder="Question" className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none" />
-            <textarea value={newFaq.answer} onChange={e => setNewFaq({ ...newFaq, answer: e.target.value })} placeholder="Answer" rows={3} className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none" />
-            <div className="flex gap-2">
-              <button onClick={handleCreate} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500">Add FAQ</button>
-              <button onClick={() => setShowNew(false)} className="rounded-xl border border-[var(--border-primary)] px-4 py-2 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)]">Cancel</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {/* Version history pill */}
+                {revisions.length > 0 && (
+                  <div className="p-4">
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)] mb-3">Version History</div>
+                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                      {revisions.map((rev) => (
+                        <div key={rev.id} className="flex items-center justify-between gap-2 rounded-xl border border-[#e0e2e6] bg-[#f8fafc] px-3 py-2">
+                          <div>
+                            <div className="text-[11px] font-semibold text-[#181d26]">{rev.label || 'Auto-save'}</div>
+                            <div className="text-[10px] text-[rgba(4,14,32,0.40)]">{new Date(rev.created_at).toLocaleString()}</div>
+                          </div>
+                          <button onClick={() => handleRestore(rev)}
+                            className="rounded-lg border border-[#1b61c9]/20 bg-blue-50 px-2 py-1 text-[10px] font-semibold text-[#1b61c9] hover:bg-blue-100 transition">
+                            Restore
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-      {store.faqs.length === 0 ? (
-        <EmptyState icon="❓" text="No FAQs yet" action="Add your first FAQ" onAction={() => setShowNew(true)} />
-      ) : (
-        store.faqs.sort((a, b) => a.order - b.order).map((faq, idx) => (
-          <FaqCard key={faq.id} faq={faq} isEditing={editingId === faq.id}
-            onEdit={() => setEditingId(faq.id)} onCancel={() => setEditingId(null)}
-            onSave={(u) => handleUpdate(faq.id, u)} onDelete={() => handleDelete(faq.id)}
-            onMoveUp={() => moveUp(idx)} onMoveDown={() => moveDown(idx)}
-            isFirst={idx === 0} isLast={idx === store.faqs.length - 1}
-          />
-        ))
-      )}
-    </div>
-  )
-}
-
-function FaqCard({ faq, isEditing, onEdit, onCancel, onSave, onDelete, onMoveUp, onMoveDown, isFirst, isLast }: {
-  faq: FaqItem; isEditing: boolean; onEdit: () => void; onCancel: () => void;
-  onSave: (u: Partial<FaqItem>) => void; onDelete: () => void;
-  onMoveUp: () => void; onMoveDown: () => void; isFirst: boolean; isLast: boolean;
-}) {
-  const [draft, setDraft] = useState(faq)
-  useEffect(() => { setDraft(faq) }, [faq])
-
-  return (
-    <div className={`rounded-2xl border bg-[var(--bg-card)] p-5 transition ${isEditing ? 'border-blue-500/40' : 'border-[var(--border-primary)]'}`}>
-      {isEditing ? (
-        <div className="space-y-3">
-          <input type="text" value={draft.question} onChange={e => setDraft({ ...draft, question: e.target.value })} className="w-full rounded-xl border border-blue-500/30 bg-blue-500/5 px-4 py-2.5 text-sm font-semibold text-[var(--text-primary)] outline-none" />
-          <textarea value={draft.answer} onChange={e => setDraft({ ...draft, answer: e.target.value })} rows={3} className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] outline-none" />
-          <div className="flex gap-2">
-            <button onClick={() => onSave(draft)} className="rounded-lg bg-emerald-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500">✅ Save</button>
-            <button onClick={onCancel} className="rounded-lg border border-[var(--border-primary)] px-4 py-1.5 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)]">Cancel</button>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-start gap-3">
-          <div className="flex flex-col gap-1 shrink-0">
-            <button onClick={onMoveUp} disabled={isFirst} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-primary)] disabled:opacity-20">▲</button>
-            <span className="text-[10px] text-[var(--text-muted)] text-center">{faq.order}</span>
-            <button onClick={onMoveDown} disabled={isLast} className="text-[10px] text-[var(--text-muted)] hover:text-[var(--text-primary)] disabled:opacity-20">▼</button>
-          </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm text-[var(--text-primary)]">{faq.question}</h3>
-            <p className="mt-1 text-xs text-[var(--text-muted)] line-clamp-2">{faq.answer}</p>
-          </div>
-          <div className="flex gap-1.5 shrink-0">
-            <button onClick={onEdit} className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500">✏️</button>
-            <button onClick={onDelete} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10">🗑️</button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-/* ── VIDEO EDITOR ── */
-function VideoEditor({ store, onRefresh, toast }: { store: ContentStore; onRefresh: () => void; toast: ToastFn }) {
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [showNew, setShowNew] = useState(false)
-  const [newVideo, setNewVideo] = useState({ title: '', youtubeId: '', description: '', category: 'Overview', duration: '', order: 0, featured: false, section: 'university' as const })
-
-  function extractYouTubeId(input: string): string {
-    // Handle full URLs or just IDs
-    const match = input.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/)
-    return match ? match[1] : input.trim()
-  }
-
-  function handleCreate() {
-    if (!newVideo.title.trim()) { toast('Title is required', 'error'); return }
-    const ytId = extractYouTubeId(newVideo.youtubeId)
-    createVideo({ ...newVideo, youtubeId: ytId, order: store.videos.length + 1 })
-    setNewVideo({ title: '', youtubeId: '', description: '', category: 'Overview', duration: '', order: 0, featured: false, section: 'university' })
-    setShowNew(false)
-    onRefresh()
-    toast('Video added!', 'success')
-  }
-
-  function handleUpdate(id: string, updates: Partial<VideoItem>) {
-    if (updates.youtubeId) updates.youtubeId = extractYouTubeId(updates.youtubeId)
-    updateVideo(id, updates)
-    setEditingId(null)
-    onRefresh()
-    toast('Saved!', 'success')
-  }
-
-  function handleDelete(id: string, title: string) {
-    if (!confirm(`Delete "${title}"?`)) return
-    deleteVideo(id)
-    onRefresh()
-    toast('Video deleted (Ctrl+Z to undo)', 'info')
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <p className="text-sm text-[var(--text-muted)]">{store.videos.length} videos</p>
-        <button onClick={() => setShowNew(true)} className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500">+ Add Video</button>
-      </div>
-
-      <AnimatePresence>
-        {showNew && (
-          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-            className="rounded-2xl border border-emerald-400/20 bg-emerald-500/5 p-5 space-y-3"
-          >
-            <input type="text" value={newVideo.title} onChange={e => setNewVideo({ ...newVideo, title: e.target.value })} placeholder="Video title" className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none" />
-            <input type="text" value={newVideo.youtubeId} onChange={e => setNewVideo({ ...newVideo, youtubeId: e.target.value })} placeholder="YouTube URL or Video ID (e.g. dQw4w9WgXcQ)" className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none" />
-            {newVideo.youtubeId && (
-              <div className="rounded-xl overflow-hidden border border-[var(--border-primary)]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`https://i.ytimg.com/vi/${extractYouTubeId(newVideo.youtubeId)}/hqdefault.jpg`} alt="Preview" className="w-full max-w-[200px] rounded-lg" />
               </div>
-            )}
-            <textarea value={newVideo.description} onChange={e => setNewVideo({ ...newVideo, description: e.target.value })} placeholder="Description" rows={2} className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none" />
-            <div className="flex gap-3 flex-wrap">
-              <input type="text" value={newVideo.category} onChange={e => setNewVideo({ ...newVideo, category: e.target.value })} placeholder="Category" className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none w-36" />
-              <input type="text" value={newVideo.duration} onChange={e => setNewVideo({ ...newVideo, duration: e.target.value })} placeholder="Duration (e.g. 12:30)" className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none w-32" />
-            </div>
-            <div className="flex gap-2">
-              <button onClick={handleCreate} className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-500">Add Video</button>
-              <button onClick={() => setShowNew(false)} className="rounded-xl border border-[var(--border-primary)] px-4 py-2 text-xs text-[var(--text-muted)] hover:bg-[var(--bg-card-hover)]">Cancel</button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.aside>
+          )}
+        </AnimatePresence>
 
-      {store.videos.length === 0 ? (
-        <EmptyState icon="🎬" text="No videos yet" action="Add your first video" onAction={() => setShowNew(true)} />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {store.videos.map((video) => (
-            <VideoCard key={video.id} video={video} isEditing={editingId === video.id}
-              onEdit={() => setEditingId(video.id)} onCancel={() => setEditingId(null)}
-              onSave={(u) => handleUpdate(video.id, u)} onDelete={() => handleDelete(video.id, video.title)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function VideoCard({ video, isEditing, onEdit, onCancel, onSave, onDelete }: {
-  video: VideoItem; isEditing: boolean; onEdit: () => void; onCancel: () => void;
-  onSave: (u: Partial<VideoItem>) => void; onDelete: () => void;
-}) {
-  const [draft, setDraft] = useState(video)
-  useEffect(() => { setDraft(video) }, [video])
-
-  return (
-    <div className={`rounded-2xl border bg-[var(--bg-card)] overflow-hidden transition ${isEditing ? 'border-blue-500/40' : 'border-[var(--border-primary)]'}`}>
-      {/* Thumbnail */}
-      <div className="aspect-video bg-slate-900 relative">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`https://i.ytimg.com/vi/${isEditing ? draft.youtubeId : video.youtubeId}/hqdefault.jpg`} alt={video.title} className="w-full h-full object-cover opacity-80" />
-        {!isEditing && (
-          <span className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 text-[10px] font-semibold text-white">{video.duration}</span>
-        )}
       </div>
-      <div className="p-4">
-        {isEditing ? (
-          <div className="space-y-2">
-            <input type="text" value={draft.title} onChange={e => setDraft({ ...draft, title: e.target.value })} className="w-full rounded-lg border border-blue-500/30 bg-blue-500/5 px-3 py-2 text-sm font-semibold text-[var(--text-primary)] outline-none" />
-            <input type="text" value={draft.youtubeId} onChange={e => setDraft({ ...draft, youtubeId: e.target.value })} placeholder="YouTube ID or URL" className="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-xs text-[var(--text-primary)] outline-none" />
-            <textarea value={draft.description} onChange={e => setDraft({ ...draft, description: e.target.value })} rows={2} className="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--bg-card)] px-3 py-2 text-xs text-[var(--text-primary)] outline-none" />
-            <div className="flex gap-2">
-              <button onClick={() => onSave(draft)} className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500">✅ Save</button>
-              <button onClick={onCancel} className="rounded-lg border border-[var(--border-primary)] px-3 py-1.5 text-xs text-[var(--text-muted)]">Cancel</button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center gap-2 mb-1">
-              {video.featured && <span className="text-[10px] rounded-full bg-amber-500/15 text-amber-400 px-2 py-0.5 font-semibold">⭐</span>}
-              <span className="text-[10px] text-[var(--text-muted)]">{video.category}</span>
-            </div>
-            <h3 className="font-semibold text-sm text-[var(--text-primary)]">{video.title}</h3>
-            <p className="mt-1 text-xs text-[var(--text-muted)] line-clamp-2">{video.description}</p>
-            <div className="flex gap-1.5 mt-3">
-              <button onClick={onEdit} className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-500">✏️ Edit</button>
-              <button onClick={onDelete} className="rounded-lg border border-red-400/30 px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10">🗑️</button>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
 
-/* ── Empty State ── */
-function EmptyState({ icon, text, action, onAction }: { icon: string; text: string; action: string; onAction: () => void }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-[var(--border-primary)] bg-[var(--bg-card)] p-12 text-center">
-      <span className="text-4xl">{icon}</span>
-      <p className="mt-3 text-sm text-[var(--text-muted)]">{text}</p>
-      <button onClick={onAction} className="mt-4 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500">{action}</button>
+      <ToastContainer />
     </div>
   )
 }

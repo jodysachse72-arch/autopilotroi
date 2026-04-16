@@ -583,3 +583,106 @@ dialog::backdrop {
     font-size: 4.2rem;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════
+   TIPTAP CMS EDITOR STYLES
+   Scoped to .cms-editor / .cms-content
+   ════════════════════════════════════════════════════════════════ */
+
+.cms-editor .ProseMirror {
+  min-height: inherit;
+  padding: 1.25rem 1.5rem;
+  outline: none;
+  color: #181d26;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+
+.cms-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: rgba(4, 14, 32, 0.30);
+  pointer-events: none;
+  float: left;
+  height: 0;
+  font-style: italic;
+}
+
+.cms-editor .ProseMirror h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin: 1.5em 0 0.5em; color: #181d26; }
+.cms-editor .ProseMirror h2 { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; margin: 1.25em 0 0.4em; color: #181d26; }
+.cms-editor .ProseMirror h3 { font-size: 1.125rem; font-weight: 700; margin: 1em 0 0.35em; color: #181d26; }
+.cms-editor .ProseMirror p  { margin: 0.75em 0; }
+.cms-editor .ProseMirror p:first-child { margin-top: 0; }
+.cms-editor .ProseMirror ul { list-style: disc; padding-left: 1.5em; margin: 0.75em 0; }
+.cms-editor .ProseMirror ol { list-style: decimal; padding-left: 1.5em; margin: 0.75em 0; }
+.cms-editor .ProseMirror li { margin: 0.25em 0; }
+.cms-editor .ProseMirror li p { margin: 0; }
+
+.cms-editor .ProseMirror blockquote {
+  border-left: 3px solid #1b61c9;
+  background: rgba(27,97,201,0.04);
+  margin: 1em 0;
+  padding: 0.75em 1.25em;
+  border-radius: 0 0.5em 0.5em 0;
+  color: rgba(4,14,32,0.70);
+  font-style: italic;
+}
+
+.cms-editor .ProseMirror code {
+  background: rgba(4,14,32,0.06);
+  border: 1px solid #e0e2e6;
+  border-radius: 0.25em;
+  padding: 0.1em 0.4em;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  font-size: 0.85em;
+  color: #1b61c9;
+}
+
+.cms-editor .ProseMirror pre {
+  background: #1e2537;
+  border-radius: 0.75em;
+  padding: 1em 1.25em;
+  margin: 1em 0;
+  overflow-x: auto;
+}
+.cms-editor .ProseMirror pre code { background: none; border: none; color: #e2e8f0; padding: 0; font-size: 0.875em; }
+
+.cms-editor .ProseMirror hr { border: none; border-top: 2px solid #e0e2e6; margin: 1.5em 0; }
+
+.cms-editor .ProseMirror a { color: #1b61c9; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; transition: color 0.15s; }
+.cms-editor .ProseMirror a:hover { color: #1550aa; }
+
+.cms-editor .ProseMirror img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75em;
+  border: 1px solid #e0e2e6;
+  margin: 0.5em 0;
+  display: block;
+}
+.cms-editor .ProseMirror img.ProseMirror-selectednode { outline: 3px solid #1b61c9; outline-offset: 2px; }
+
+.cms-editor .ProseMirror div[data-youtube-video] { width: 100%; margin: 1em 0; }
+.cms-editor .ProseMirror div[data-youtube-video] iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border-radius: 0.75em;
+  border: 1px solid #e0e2e6;
+}
+
+.cms-editor .ProseMirror mark { background: rgba(251,196,4,0.30); border-radius: 0.2em; padding: 0 0.15em; }
+.cms-editor .ProseMirror ::selection { background: rgba(27,97,201,0.15); }
+.cms-editor .ProseMirror:focus-visible { outline: none; }
+
+/* Rendered CMS HTML on public pages ── .cms-content */
+.cms-content h1 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.03em; margin: 1.25em 0 0.5em; color: #181d26; }
+.cms-content h2 { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; margin: 1em 0 0.4em; color: #181d26; }
+.cms-content h3 { font-size: 1.125rem; font-weight: 700; margin: 0.85em 0 0.35em; color: #181d26; }
+.cms-content p  { margin: 0.75em 0; line-height: 1.75; color: rgba(4,14,32,0.75); }
+.cms-content ul { list-style: disc; padding-left: 1.5em; margin: 0.75em 0; }
+.cms-content ol { list-style: decimal; padding-left: 1.5em; margin: 0.75em 0; }
+.cms-content li { margin: 0.25em 0; color: rgba(4,14,32,0.75); }
+.cms-content a  { color: #1b61c9; text-decoration: underline; }
+.cms-content blockquote { border-left: 3px solid #1b61c9; padding: 0.75em 1.25em; margin: 1em 0; background: rgba(27,97,201,0.04); border-radius: 0 0.5em 0.5em 0; font-style: italic; color: rgba(4,14,32,0.65); }
+.cms-content img { max-width: 100%; border-radius: 0.75em; border: 1px solid #e0e2e6; margin: 0.5em 0; }
+.cms-content code { background: rgba(4,14,32,0.06); border: 1px solid #e0e2e6; border-radius: 0.25em; padding: 0.1em 0.4em; font-size: 0.85em; color: #1b61c9; }
