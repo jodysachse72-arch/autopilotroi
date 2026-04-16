@@ -160,10 +160,10 @@ export default function ChecklistPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <div>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
+        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[#181d26]">
           Launch Checklist
         </h1>
-        <p className="mt-2 text-[var(--text-muted)]">
+        <p className="mt-2 text-[rgba(4,14,32,0.55)]">
           Interactive checklist — progress is saved locally.
         </p>
       </div>
@@ -172,19 +172,19 @@ export default function ChecklistPage() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6"
+        className="rounded-2xl border border-[#e0e2e6] bg-white p-6"
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-white">
+          <span className="text-sm font-medium text-[#181d26]">
             Overall Progress
           </span>
-          <span className="text-sm text-white/50">
+          <span className="text-sm text-[rgba(4,14,32,0.55)]">
             {completedItems}/{totalItems} ({progressPercent}%)
           </span>
         </div>
-        <div className="h-3 w-full rounded-full bg-white/5 overflow-hidden">
+        <div className="h-3 w-full rounded-full bg-[#f0f2f5] overflow-hidden">
           <motion.div
-            className="h-3 rounded-full bg-gradient-to-r from-blue-500 to-emerald-400"
+            className="h-3 rounded-full bg-gradient-to-r from-[#1b61c9] to-emerald-500"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -206,43 +206,43 @@ export default function ChecklistPage() {
             transition={{ delay: sIdx * 0.05 }}
             className={`rounded-2xl border overflow-hidden transition-colors ${
               sectionDone
-                ? 'border-emerald-400/20 bg-emerald-500/5'
-                : 'border-[var(--border-primary)] bg-[var(--bg-card)]'
+                ? 'border-emerald-300 bg-emerald-50'
+                : 'border-[#e0e2e6] bg-white'
             }`}
           >
-            <div className="flex items-center justify-between border-b border-white/5 px-6 py-4">
+            <div className="flex items-center justify-between border-b border-[#e0e2e6] px-6 py-4">
               <div className="flex items-center gap-3">
                 <span className="text-xl">{section.icon}</span>
                 <div>
-                  <h2 className="font-[var(--font-sora)] text-base font-bold text-white">{section.title}</h2>
-                  <span className="text-xs text-white/30">{section.phase}</span>
+                  <h2 className="font-[var(--font-sora)] text-base font-bold text-[#181d26]">{section.title}</h2>
+                  <span className="text-xs text-[rgba(4,14,32,0.45)]">{section.phase}</span>
                 </div>
               </div>
-              <span className={`text-sm font-semibold ${sectionDone ? 'text-emerald-400' : 'text-white/40'}`}>
+              <span className={`text-sm font-semibold ${sectionDone ? 'text-emerald-600' : 'text-[rgba(4,14,32,0.45)]'}`}>
                 {sectionComplete}/{sectionTotal}
               </span>
             </div>
 
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-[#f0f2f5]">
               {section.items.map((item) => (
                 <label
                   key={item.id}
-                  className="flex cursor-pointer items-start gap-4 px-6 py-4 hover:bg-white/[0.02] transition-colors"
+                  className="flex cursor-pointer items-start gap-4 px-6 py-4 hover:bg-[#f8fafc] transition-colors"
                 >
                   <input
                     type="checkbox"
                     checked={!!checked[item.id]}
                     onChange={() => toggle(item.id)}
-                    className="mt-0.5 h-5 w-5 rounded border-white/20 bg-white/5 accent-blue-500"
+                    className="mt-0.5 h-5 w-5 rounded border-[#c8ccd4] accent-[#1b61c9]"
                   />
                   <div className="flex-1 min-w-0">
                     <div className={`text-sm font-medium transition-colors ${
-                      checked[item.id] ? 'text-white/30 line-through' : 'text-white'
+                      checked[item.id] ? 'text-[rgba(4,14,32,0.35)] line-through' : 'text-[#181d26]'
                     }`}>
                       {item.label}
                     </div>
                     {item.detail && (
-                      <div className="mt-0.5 text-xs text-white/30">{item.detail}</div>
+                      <div className="mt-0.5 text-xs text-[rgba(4,14,32,0.45)]">{item.detail}</div>
                     )}
                   </div>
                 </label>

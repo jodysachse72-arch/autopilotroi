@@ -20,11 +20,11 @@ const demoPartners = [
 ]
 
 const tiers: Record<string, { color: string; bg: string; min: number }> = {
-  Diamond: { color: 'text-cyan-300', bg: 'bg-cyan-500/15', min: 40 },
-  Platinum: { color: 'text-violet-300', bg: 'bg-violet-500/15', min: 25 },
-  Gold: { color: 'text-amber-300', bg: 'bg-amber-500/15', min: 15 },
-  Silver: { color: 'text-slate-300', bg: 'bg-slate-500/15', min: 5 },
-  Bronze: { color: 'text-orange-300', bg: 'bg-orange-500/15', min: 0 },
+  Diamond: { color: 'text-cyan-600', bg: 'bg-cyan-100', min: 40 },
+  Platinum: { color: 'text-violet-600', bg: 'bg-violet-100', min: 25 },
+  Gold: { color: 'text-amber-600', bg: 'bg-amber-100', min: 15 },
+  Silver: { color: 'text-slate-500', bg: 'bg-slate-100', min: 5 },
+  Bronze: { color: 'text-orange-600', bg: 'bg-orange-100', min: 0 },
 }
 
 const achievements = [
@@ -84,11 +84,11 @@ export default function LeaderboardPage() {
               className={`flex flex-col items-center justify-end ${i === 1 ? 'order-first sm:order-none' : ''}`}
             >
               <span className="text-3xl mb-2">{partner.badge}</span>
-              <div className="text-sm font-bold text-white">{partner.name}</div>
+              <div className="text-sm font-bold text-[#181d26]">{partner.name}</div>
               <div className={`text-xs font-semibold ${t.color}`}>{partner.tier}</div>
               <div className="text-xs text-[var(--text-muted)] mt-1">{partner.leads} leads · {partner.converted} converted</div>
               <div className={`mt-3 w-full rounded-t-xl ${t.bg} ${heights[idx]} flex items-center justify-center`}>
-                <span className="font-[var(--font-sora)] text-3xl font-black text-white/20">
+                <span className="font-[var(--font-sora)] text-3xl font-black text-[rgba(4,14,32,0.15)]">
                   #{partner.rank}
                 </span>
               </div>
@@ -128,7 +128,7 @@ export default function LeaderboardPage() {
                     animate={{ opacity: 1 }}
                     className="border-b border-[var(--border-primary)] transition hover:bg-[var(--bg-card-hover)]"
                   >
-                    <td className="px-6 py-4 font-mono text-lg font-bold text-white/20">
+                    <td className="px-6 py-4 font-mono text-lg font-bold text-[rgba(4,14,32,0.25)]">
                       {p.badge || `#${p.rank}`}
                     </td>
                     <td className="px-6 py-4">
@@ -147,7 +147,7 @@ export default function LeaderboardPage() {
                       {p.streak > 0 ? (
                         <span className="text-amber-400">🔥 {p.streak}d</span>
                       ) : (
-                        <span className="text-white/20">—</span>
+                        <span className="text-[rgba(4,14,32,0.25)]">—</span>
                       )}
                     </td>
                   </motion.tr>
@@ -169,8 +169,8 @@ export default function LeaderboardPage() {
               key={a.name}
               className={`rounded-xl border p-4 text-center transition ${
                 a.unlocked
-                  ? 'border-emerald-400/20 bg-emerald-500/5'
-                  : 'border-white/5 bg-white/[0.01] opacity-40'
+                  ? 'border-emerald-300 bg-emerald-50'
+                  : 'border-[#e0e2e6] bg-[#f8fafc] opacity-40'
               }`}
             >
               <div className="text-3xl mb-2">{a.unlocked ? a.icon : '🔒'}</div>

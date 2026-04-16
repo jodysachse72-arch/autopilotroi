@@ -365,7 +365,7 @@ export default function AdminGuidePage() {
                         key={i}
                         className="text-sm text-[var(--text-secondary)] leading-relaxed"
                         dangerouslySetInnerHTML={{
-                          __html: para.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>'),
+                          __html: para.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[#181d26] font-semibold">$1</strong>'),
                         }}
                       />
                     ))}
@@ -378,11 +378,11 @@ export default function AdminGuidePage() {
       </div>
 
       {/* Footer */}
-      <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5 text-center">
-        <p className="text-sm text-white/40">
+      <div className="rounded-xl border border-[#e0e2e6] bg-[#f8fafc] p-5 text-center">
+        <p className="text-sm text-[rgba(4,14,32,0.55)]">
           Can&apos;t find what you need? Check the{' '}
-          <a href="/admin/features" className="text-blue-400 hover:underline">Feature Toggles</a> page for detailed feature documentation, or the{' '}
-          <a href="/admin/checklist" className="text-blue-400 hover:underline">Launch Checklist</a> for pre-go-live tasks.
+          <a href="/admin/features" className="text-[#1b61c9] hover:underline">Feature Toggles</a> page for detailed feature documentation, or the{' '}
+          <a href="/admin/checklist" className="text-[#1b61c9] hover:underline">Launch Checklist</a> for pre-go-live tasks.
         </p>
       </div>
     </div>

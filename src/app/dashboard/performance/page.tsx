@@ -119,7 +119,7 @@ export default function PerformancePage() {
                   <span className="text-sm font-medium text-[var(--text-primary)]">{source.source}</span>
                   <span className="text-xs text-[var(--text-muted)]">{source.count} leads · {source.pct}%</span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-white/5">
+                <div className="h-2 w-full rounded-full bg-[#e8edf5]">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${source.pct}%` }}
@@ -144,15 +144,15 @@ export default function PerformancePage() {
               key={m.target}
               className={`flex-1 min-w-[140px] rounded-xl border p-4 text-center transition ${
                 m.reached
-                  ? 'border-emerald-400/30 bg-emerald-500/5'
-                  : 'border-white/5 bg-white/[0.02] opacity-60'
+                  ? 'border-emerald-200 bg-emerald-50'
+                  : 'border-[#e0e2e6] bg-[#f8fafc] opacity-60'
               }`}
             >
               <div className="text-2xl mb-1">{m.reached ? '🏆' : '🔒'}</div>
-              <div className={`text-sm font-bold ${m.reached ? 'text-emerald-400' : 'text-white/40'}`}>
+              <div className={`text-sm font-bold ${m.reached ? 'text-emerald-700' : 'text-[rgba(4,14,32,0.35)]'}`}>
                 {m.label}
               </div>
-              <div className="mt-1 text-xs text-white/30">{m.reward}</div>
+              <div className="mt-1 text-xs text-[rgba(4,14,32,0.40)]">{m.reward}</div>
             </div>
           ))}
         </div>

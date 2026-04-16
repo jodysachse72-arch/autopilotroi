@@ -127,9 +127,9 @@ export default function RoadmapPage() {
   const grandAiHours = allPhases.reduce((s, p) => s + p.aiHoursTotal, 0)
 
   const statusColors = {
-    complete: 'bg-blue-500/15 text-blue-400 border-blue-400/30',
-    active: 'bg-emerald-500/15 text-emerald-400 border-emerald-400/30',
-    planned: 'bg-white/5 text-white/40 border-white/10',
+    complete: 'bg-blue-100 text-blue-700 border-blue-200',
+    active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    planned: 'bg-[#f0f2f5] text-[rgba(4,14,32,0.45)] border-[#e0e2e6]',
   }
 
   const statusLabels = { complete: '✅ Complete', active: '🔨 In Progress', planned: '📋 Planned' }
@@ -150,29 +150,29 @@ export default function RoadmapPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-emerald-400/20 bg-gradient-to-r from-emerald-500/10 to-blue-500/10 p-8"
+        className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-blue-50 p-8"
       >
-        <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-emerald-200/40 blur-3xl" />
         <div className="relative grid gap-6 sm:grid-cols-4">
           <div>
-            <div className="text-xs uppercase tracking-wider text-emerald-300/60">Dev Team Cost</div>
-            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-white">{formatCurrency(grandDevTotal)}</div>
-            <div className="text-sm text-white/40">{grandDevHours} hours</div>
+            <div className="text-xs uppercase tracking-wider text-emerald-700/70">Dev Team Cost</div>
+            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-[#181d26]">{formatCurrency(grandDevTotal)}</div>
+            <div className="text-sm text-[rgba(4,14,32,0.45)]">{grandDevHours} hours</div>
           </div>
           <div>
-            <div className="text-xs uppercase tracking-wider text-blue-300/60">Our Cost</div>
-            <div className="mt-1 font-[var(--font-sora)] text-lg font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">Antigravity + Google Ultra + Jody</div>
-            <div className="text-sm font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">= Priceless</div>
+            <div className="text-xs uppercase tracking-wider text-blue-700/70">Our Cost</div>
+            <div className="mt-1 font-[var(--font-sora)] text-lg font-bold bg-gradient-to-r from-[#1b61c9] via-purple-600 to-cyan-600 bg-clip-text text-transparent">Antigravity + Google Ultra + Jody</div>
+            <div className="text-sm font-bold bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent">= Priceless</div>
           </div>
           <div>
-            <div className="text-xs uppercase tracking-wider text-emerald-300/60">Total Savings</div>
-            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-emerald-400">{formatCurrency(grandSavings)}</div>
-            <div className="text-sm text-emerald-300/60">100% saved</div>
+            <div className="text-xs uppercase tracking-wider text-emerald-700/70">Total Savings</div>
+            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-emerald-700">{formatCurrency(grandSavings)}</div>
+            <div className="text-sm text-emerald-600">100% saved</div>
           </div>
           <div>
-            <div className="text-xs uppercase tracking-wider text-amber-300/60">Time Saved</div>
-            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-amber-400">{Math.round(grandDevHours / 8)}→{Math.round(grandAiHours / 8)} days</div>
-            <div className="text-sm text-amber-300/60">{Math.round(((grandDevHours - grandAiHours) / grandDevHours) * 100)}% faster</div>
+            <div className="text-xs uppercase tracking-wider text-amber-700/70">Time Saved</div>
+            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-amber-600">{Math.round(grandDevHours / 8)}→{Math.round(grandAiHours / 8)} days</div>
+            <div className="text-sm text-amber-600">{Math.round(((grandDevHours - grandAiHours) / grandDevHours) * 100)}% faster</div>
           </div>
         </div>
       </motion.div>
@@ -187,26 +187,26 @@ export default function RoadmapPage() {
         </div>
         <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
           {scorecard.map((s) => (
-            <div key={s.category} className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
+            <div key={s.category} className="rounded-xl border border-[#e0e2e6] bg-white p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-white">{s.category}</span>
+                <span className="text-sm font-medium text-[#181d26]">{s.category}</span>
                 <span className={`text-sm font-bold ${
-                  s.grade.startsWith('A') ? 'text-emerald-400' :
-                  s.grade.startsWith('B') ? 'text-blue-400' :
-                  s.grade.startsWith('C') ? 'text-amber-400' : 'text-red-400'
+                  s.grade.startsWith('A') ? 'text-emerald-700' :
+                  s.grade.startsWith('B') ? 'text-[#1b61c9]' :
+                  s.grade.startsWith('C') ? 'text-amber-700' : 'text-red-700'
                 }`}>{s.grade}</span>
               </div>
-              <div className="h-2 w-full rounded-full bg-white/5">
+              <div className="h-2 w-full rounded-full bg-[#f0f2f5]">
                 <div
                   className={`h-2 rounded-full transition-all ${
-                    s.grade.startsWith('A') ? 'bg-emerald-400' :
-                    s.grade.startsWith('B') ? 'bg-blue-400' :
-                    s.grade.startsWith('C') ? 'bg-amber-400' : 'bg-red-400'
+                    s.grade.startsWith('A') ? 'bg-emerald-500' :
+                    s.grade.startsWith('B') ? 'bg-[#1b61c9]' :
+                    s.grade.startsWith('C') ? 'bg-amber-500' : 'bg-red-500'
                   }`}
                   style={{ width: `${(s.current / s.max) * 100}%` }}
                 />
               </div>
-              <div className="mt-1 text-xs text-white/30">{s.current}/{s.max} features</div>
+              <div className="mt-1 text-xs text-[rgba(4,14,32,0.45)]">{s.current}/{s.max} features</div>
             </div>
           ))}
         </div>
@@ -222,17 +222,17 @@ export default function RoadmapPage() {
           className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden"
         >
           {/* Phase Header */}
-          <div className="flex flex-wrap items-center justify-between border-b border-[var(--border-primary)] px-6 py-4 gap-3">
+          <div className="flex flex-wrap items-center justify-between border-b border-[#e0e2e6] px-6 py-4 gap-3 bg-[#f8fafc]">
             <div className="flex items-center gap-3">
-              <h2 className="font-[var(--font-sora)] text-lg font-bold text-white">{phase.name}</h2>
+              <h2 className="font-[var(--font-sora)] text-lg font-bold text-[#181d26]">{phase.name}</h2>
               <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusColors[phase.status]}`}>
                 {statusLabels[phase.status]}
               </span>
             </div>
             <div className="flex gap-4 text-xs">
-              <span className="text-white/40">Dev: <span className="text-red-400 font-semibold">{formatCurrency(phase.devTotal)}</span></span>
-              <span className="text-white/40">Our: <span className="text-emerald-400 font-semibold italic">Priceless</span></span>
-              <span className="text-white/40">Saved: <span className="text-blue-400 font-semibold">{formatCurrency(phase.savings)}</span></span>
+              <span className="text-[rgba(4,14,32,0.45)]">Dev: <span className="text-red-600 font-semibold">{formatCurrency(phase.devTotal)}</span></span>
+              <span className="text-[rgba(4,14,32,0.45)]">Our: <span className="text-emerald-700 font-semibold italic">Priceless</span></span>
+              <span className="text-[rgba(4,14,32,0.45)]">Saved: <span className="text-[#1b61c9] font-semibold">{formatCurrency(phase.savings)}</span></span>
             </div>
           </div>
 
@@ -240,7 +240,7 @@ export default function RoadmapPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-wider text-white/30">
+                <tr className="text-left text-xs uppercase tracking-wider text-[rgba(4,14,32,0.40)] border-b border-[#e0e2e6]">
                   <th className="px-6 py-3">Feature</th>
                   <th className="px-4 py-3 text-right whitespace-nowrap">Dev Hours</th>
                   <th className="px-4 py-3 text-right whitespace-nowrap">Dev Rate</th>
@@ -254,13 +254,13 @@ export default function RoadmapPage() {
                   const devCost = item.devHours * item.devRate
                   const aiCost = item.aiHours * AI_COST_PER_HOUR
                   return (
-                    <tr key={i} className="border-t border-white/5 hover:bg-white/[0.02] transition-colors">
-                      <td className="px-6 py-3 text-white/80">{item.feature}</td>
-                      <td className="px-4 py-3 text-right text-white/40">{item.devHours}h</td>
-                      <td className="px-4 py-3 text-right text-white/40">${item.devRate}/h</td>
-                      <td className="px-4 py-3 text-right text-red-400/80">{formatCurrency(devCost)}</td>
-                      <td className="px-4 py-3 text-right text-emerald-400/80">{item.aiHours}h</td>
-                      <td className="px-4 py-3 text-right font-semibold text-blue-400">{formatCurrency(devCost - aiCost)}</td>
+                    <tr key={i} className="border-t border-[#f0f2f5] hover:bg-[#f8fafc] transition-colors">
+                      <td className="px-6 py-3 text-[rgba(4,14,32,0.69)]">{item.feature}</td>
+                      <td className="px-4 py-3 text-right text-[rgba(4,14,32,0.45)]">{item.devHours}h</td>
+                      <td className="px-4 py-3 text-right text-[rgba(4,14,32,0.45)]">${item.devRate}/h</td>
+                      <td className="px-4 py-3 text-right text-red-600">{formatCurrency(devCost)}</td>
+                      <td className="px-4 py-3 text-right text-emerald-700">{item.aiHours}h</td>
+                      <td className="px-4 py-3 text-right font-semibold text-[#1b61c9]">{formatCurrency(devCost - aiCost)}</td>
                     </tr>
                   )
                 })}

@@ -7,15 +7,13 @@ import { getAnnouncementMessage, setAnnouncementMessage } from '@/components/lay
 
 /* ═══════════════════════════════════════════════════════════════
    ADMIN FEATURE TOGGLES — with built-in documentation
-   Every toggle explains WHAT it does, WHY it matters,
-   and WHEN to turn it on/off — in plain English.
    ═══════════════════════════════════════════════════════════════ */
 
 const riskBadge: Record<string, { label: string; color: string }> = {
-  none: { label: 'Safe', color: 'bg-emerald-500/15 text-emerald-400' },
-  low: { label: 'Low Risk', color: 'bg-blue-500/15 text-blue-400' },
-  medium: { label: 'Medium Risk', color: 'bg-amber-500/15 text-amber-400' },
-  high: { label: '⚠️ High Risk', color: 'bg-red-500/15 text-red-400' },
+  none: { label: 'Safe', color: 'bg-emerald-100 text-emerald-700' },
+  low: { label: 'Low Risk', color: 'bg-blue-100 text-blue-700' },
+  medium: { label: 'Medium Risk', color: 'bg-amber-100 text-amber-700' },
+  high: { label: '⚠️ High Risk', color: 'bg-red-100 text-red-700' },
 }
 
 export default function FeatureTogglesPage() {
@@ -25,14 +23,12 @@ export default function FeatureTogglesPage() {
   const [bannerMsg, setBannerMsg] = useState('')
   const [bannerSaved, setBannerSaved] = useState(false)
 
-  // Load banner message on mount
   useEffect(() => {
     setBannerMsg(getAnnouncementMessage())
   }, [])
 
   const categories = [...new Set(Object.values(FEATURE_META).map((m) => m.category))]
 
-  // Filter by search
   const matchesSearch = (key: string) => {
     if (!searchQuery) return true
     const q = searchQuery.toLowerCase()
@@ -48,37 +44,37 @@ export default function FeatureTogglesPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <div>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
+        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[#181d26]">
           Feature Toggles
         </h1>
-        <p className="mt-2 text-[var(--text-muted)]">
+        <p className="mt-2 text-[rgba(4,14,32,0.55)]">
           Turn features on and off instantly. Click any feature to see what it does and when to use it.
         </p>
       </div>
 
       {/* Status Overview */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/5 p-4 text-center">
-          <div className="text-2xl font-bold text-emerald-400">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+          <div className="text-2xl font-bold text-emerald-700">
             {Object.values(flags).filter(Boolean).length}
           </div>
-          <div className="text-xs text-white/40">Active</div>
+          <div className="text-xs text-emerald-600 mt-1">Active</div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
-          <div className="text-2xl font-bold text-white/40">
+        <div className="rounded-xl border border-[#e0e2e6] bg-[#f8fafc] p-4 text-center">
+          <div className="text-2xl font-bold text-[rgba(4,14,32,0.45)]">
             {Object.values(flags).filter((v) => !v).length}
           </div>
-          <div className="text-xs text-white/40">Disabled</div>
+          <div className="text-xs text-[rgba(4,14,32,0.45)] mt-1">Disabled</div>
         </div>
-        <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center">
-          <div className="text-2xl font-bold text-white">
+        <div className="rounded-xl border border-[#e0e2e6] bg-[#f8fafc] p-4 text-center">
+          <div className="text-2xl font-bold text-[#181d26]">
             {Object.keys(flags).length}
           </div>
-          <div className="text-xs text-white/40">Total Features</div>
+          <div className="text-xs text-[rgba(4,14,32,0.45)] mt-1">Total Features</div>
         </div>
-        <div className="rounded-xl border border-blue-400/20 bg-blue-500/5 p-4 text-center">
-          <div className="text-2xl font-bold text-blue-400">{categories.length}</div>
-          <div className="text-xs text-white/40">Categories</div>
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-center">
+          <div className="text-2xl font-bold text-[#1b61c9]">{categories.length}</div>
+          <div className="text-xs text-blue-600 mt-1">Categories</div>
         </div>
       </div>
 
@@ -89,9 +85,9 @@ export default function FeatureTogglesPage() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search features by name, description, or category..."
-          className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-3 pl-10 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-blue-500 transition"
+          className="w-full rounded-xl border border-[#e0e2e6] bg-white px-4 py-3 pl-10 text-sm text-[#181d26] placeholder:text-[rgba(4,14,32,0.35)] outline-none focus:border-[#1b61c9] transition"
         />
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[rgba(4,14,32,0.35)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
@@ -109,15 +105,15 @@ export default function FeatureTogglesPage() {
             key={category}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden"
+            className="rounded-2xl border border-[#e0e2e6] bg-white overflow-hidden"
           >
-            <div className="border-b border-[var(--border-primary)] px-6 py-4">
-              <h2 className="font-[var(--font-sora)] text-base font-bold text-[var(--text-primary)]">
+            <div className="border-b border-[#e0e2e6] px-6 py-4 bg-[#f8fafc]">
+              <h2 className="font-[var(--font-sora)] text-base font-bold text-[#181d26]">
                 {category}
               </h2>
             </div>
 
-            <div className="divide-y divide-white/5">
+            <div className="divide-y divide-[#f0f2f5]">
               {categoryFlags.map(([key, meta]) => {
                 const isOn = flags[key]
                 const isDangerous = meta.risk === 'high'
@@ -127,7 +123,7 @@ export default function FeatureTogglesPage() {
                 return (
                   <div
                     key={key}
-                    className={`transition ${isDangerous && isOn ? 'bg-red-500/5' : ''}`}
+                    className={`transition ${isDangerous && isOn ? 'bg-red-50' : ''}`}
                   >
                     {/* Toggle row */}
                     <div className="flex items-center justify-between px-6 py-5">
@@ -136,18 +132,18 @@ export default function FeatureTogglesPage() {
                         className="flex-1 min-w-0 pr-4 text-left"
                       >
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-medium text-white">{meta.label}</span>
+                          <span className="text-sm font-medium text-[#181d26]">{meta.label}</span>
                           <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${risk.color}`}>
                             {risk.label}
                           </span>
-                          <span className="rounded-full bg-white/5 px-2 py-0.5 text-[10px] text-white/30">
+                          <span className="rounded-full bg-[#f0f2f5] px-2 py-0.5 text-[10px] text-[rgba(4,14,32,0.45)]">
                             {meta.phase}
                           </span>
-                          <span className="text-[10px] text-white/20">
+                          <span className="text-[10px] text-[rgba(4,14,32,0.35)]">
                             {isExpanded ? '▼' : '▶'} Click for details
                           </span>
                         </div>
-                        <p className="mt-0.5 text-xs text-white/40 line-clamp-1">{meta.description}</p>
+                        <p className="mt-0.5 text-xs text-[rgba(4,14,32,0.55)] line-clamp-1">{meta.description}</p>
                       </button>
 
                       {/* Toggle Switch */}
@@ -158,7 +154,7 @@ export default function FeatureTogglesPage() {
                             ? isDangerous
                               ? 'bg-red-500'
                               : 'bg-emerald-500'
-                            : 'bg-white/10'
+                            : 'bg-[#c8ccd4]'
                         }`}
                       >
                         <span
@@ -179,44 +175,40 @@ export default function FeatureTogglesPage() {
                           transition={{ duration: 0.2 }}
                           className="overflow-hidden"
                         >
-                          <div className="px-6 pb-5 space-y-4">
-                            {/* What it does */}
-                            <div className="rounded-lg bg-white/[0.02] border border-white/5 p-4">
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">
+                          <div className="px-6 pb-5 space-y-3 bg-[#f8fafc]">
+                            <div className="rounded-lg bg-white border border-[#e0e2e6] p-4">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-[#1b61c9] mb-2">
                                 📖 What It Does
                               </h4>
-                              <p className="text-sm text-white/60 leading-relaxed">
+                              <p className="text-sm text-[rgba(4,14,32,0.69)] leading-relaxed">
                                 {meta.description}
                               </p>
                             </div>
 
-                            {/* Why it matters */}
-                            <div className="rounded-lg bg-white/[0.02] border border-white/5 p-4">
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400 mb-2">
+                            <div className="rounded-lg bg-white border border-[#e0e2e6] p-4">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">
                                 💡 Why It Matters
                               </h4>
-                              <p className="text-sm text-white/60 leading-relaxed">
+                              <p className="text-sm text-[rgba(4,14,32,0.69)] leading-relaxed">
                                 {meta.why}
                               </p>
                             </div>
 
-                            {/* When to use */}
-                            <div className="rounded-lg bg-white/[0.02] border border-white/5 p-4">
-                              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                            <div className="rounded-lg bg-white border border-[#e0e2e6] p-4">
+                              <h4 className="text-xs font-bold uppercase tracking-wider text-amber-700 mb-2">
                                 ⏰ When To Turn On/Off
                               </h4>
-                              <p className="text-sm text-white/60 leading-relaxed">
+                              <p className="text-sm text-[rgba(4,14,32,0.69)] leading-relaxed">
                                 {meta.whenToUse}
                               </p>
                             </div>
 
-                            {/* ── Announcement Banner Message Editor ── */}
                             {key === 'announcementBanner' && (
-                              <div className="rounded-lg bg-blue-500/5 border border-blue-400/20 p-4">
-                                <h4 className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">
+                              <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+                                <h4 className="text-xs font-bold uppercase tracking-wider text-[#1b61c9] mb-2">
                                   ✏️ Edit Banner Message
                                 </h4>
-                                <p className="text-xs text-white/40 mb-3">
+                                <p className="text-xs text-[rgba(4,14,32,0.55)] mb-3">
                                   This is the text displayed in the banner at the top of every page when the toggle is ON.
                                 </p>
                                 <div className="flex gap-2">
@@ -225,7 +217,7 @@ export default function FeatureTogglesPage() {
                                     value={bannerMsg}
                                     onChange={(e) => { setBannerMsg(e.target.value); setBannerSaved(false) }}
                                     placeholder="Enter announcement message..."
-                                    className="flex-1 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-blue-500 transition"
+                                    className="flex-1 rounded-xl border border-[#e0e2e6] bg-white px-4 py-2.5 text-sm text-[#181d26] placeholder:text-[rgba(4,14,32,0.35)] outline-none focus:border-[#1b61c9] transition"
                                   />
                                   <button
                                     onClick={() => {
@@ -233,13 +225,13 @@ export default function FeatureTogglesPage() {
                                       setBannerSaved(true)
                                       setTimeout(() => setBannerSaved(false), 2000)
                                     }}
-                                    className="shrink-0 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
+                                    className="shrink-0 rounded-xl bg-[#1b61c9] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
                                   >
                                     {bannerSaved ? '✓ Saved!' : 'Save'}
                                   </button>
                                 </div>
-                                <p className="mt-2 text-[10px] text-white/30">
-                                  💡 Tip: Use emojis to make announcements eye-catching. Example: "🎉 New feature: Profit Calculator is now live!"
+                                <p className="mt-2 text-[10px] text-[rgba(4,14,32,0.35)]">
+                                  💡 Tip: Use emojis to make announcements eye-catching.
                                 </p>
                               </div>
                             )}
@@ -256,19 +248,19 @@ export default function FeatureTogglesPage() {
       })}
 
       {/* Legend */}
-      <div className="rounded-xl border border-white/5 bg-white/[0.02] p-5 space-y-3">
-        <h3 className="text-sm font-bold text-white">Understanding Risk Levels</h3>
+      <div className="rounded-xl border border-[#e0e2e6] bg-white p-5 space-y-3">
+        <h3 className="text-sm font-bold text-[#181d26]">Understanding Risk Levels</h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {Object.entries(riskBadge).map(([key, value]) => (
             <div key={key} className="flex items-center gap-2">
               <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${value.color}`}>{value.label}</span>
-              <span className="text-xs text-white/30">
+              <span className="text-xs text-[rgba(4,14,32,0.45)]">
                 {key === 'none' ? 'No impact' : key === 'low' ? 'Minimal impact' : key === 'medium' ? 'Test first' : 'Use carefully'}
               </span>
             </div>
           ))}
         </div>
-        <p className="text-xs text-white/20 mt-2">
+        <p className="text-xs text-[rgba(4,14,32,0.35)] mt-2">
           💡 Tip: Click any feature name to see a detailed explanation of what it does, why it exists, and exactly when you should turn it on or off.
         </p>
       </div>
