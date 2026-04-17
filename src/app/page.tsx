@@ -195,7 +195,7 @@ export default function HomePage() {
             <motion.div
               variants={fadeUp} initial="hidden" animate="show" custom={4}
               className="mt-9 flex flex-wrap items-center gap-5 text-xs font-semibold"
-              style={{ color: 'rgba(255,255,255,0.55)' }}
+              style={{ color: 'rgba(255,255,255,0.82)' }}
             >
               {["No Credit Card Required", "Free to Get Started", "18,000+ Active Partners"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
@@ -259,7 +259,7 @@ export default function HomePage() {
           FEATURE HIGHLIGHTS — 3 pillars on white
       ═══════════════════════════════════════════════════ */}
       <section className="section-white" style={{ paddingTop: 72, paddingBottom: 72 }}>
-        <div className="mx-auto max-w-6xl">
+        <div className="container">
           <div className="grid gap-5 sm:grid-cols-3">
             {[
               { icon: <BotFeatureIcon />, title: 'AI Automation', desc: 'Automated performance with advanced crypto-fintech tools that work 24/7 for you.', iconBg: '#1b61c9' },
@@ -272,7 +272,7 @@ export default function HomePage() {
                   {f.icon}
                 </div>
                 <h3 className="mb-2 text-[1.0625rem] font-bold" style={{ color: '#181d26' }}>{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(4,14,32,0.60)' }}>{f.desc}</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(4,14,32,0.72)' }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -283,7 +283,7 @@ export default function HomePage() {
           METRICS BAR
       ═══════════════════════════════════════════════════ */}
       <section className="section-surface" style={{ paddingTop: 72, paddingBottom: 72 }}>
-        <div className="mx-auto max-w-5xl">
+        <div className="container">
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 text-center">
             {[
               { value: 18000, label: 'Active Partners', suffix: '+', prefix: '' },
@@ -295,7 +295,7 @@ export default function HomePage() {
                 <div className="text-4xl font-bold sm:text-[3rem]" style={{ color: '#1b61c9', letterSpacing: '-0.03em' }}>
                   <NumberTicker value={m.value} prefix={m.prefix} suffix={m.suffix} delay={0.2 + i * 0.15} />
                 </div>
-                <div className="mt-2 text-xs font-bold uppercase tracking-[0.14em]" style={{ color: 'rgba(4,14,32,0.40)' }}>
+                <div className="mt-2 text-xs font-bold uppercase tracking-[0.14em]" style={{ color: 'rgba(4,14,32,0.55)' }}>
                   {m.label}
                 </div>
               </div>
@@ -307,9 +307,9 @@ export default function HomePage() {
       {/* ═══════════════════════════════════════════════════
           AS SEEN IN
       ═══════════════════════════════════════════════════ */}
-      <section className="px-6 py-10 lg:px-10" style={{ background: '#ffffff', borderBottom: '1px solid #e0e2e6' }}>
-        <div className="mx-auto max-w-5xl">
-          <p className="mb-6 text-center text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: 'rgba(4,14,32,0.35)' }}>As Seen In</p>
+      <section className="py-10 lg:py-12" style={{ background: '#ffffff', borderBottom: '1px solid #e0e2e6' }}>
+        <div className="container">
+          <p className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.3em]" style={{ color: 'rgba(4,14,32,0.50)' }}>As Seen In</p>
           <Marquee pauseOnHover gap="3rem" duration="30s" className="[--marquee-gap:3rem]">
             <svg className="h-6 flex-shrink-0 transition" style={{ color: 'rgba(4,14,32,0.35)' }} viewBox="0 0 150 40" fill="currentColor">
               <text x="0" y="32" fontFamily="Georgia, serif" fontWeight="700" fontSize="36" letterSpacing="-1">Forbes</text>
@@ -337,7 +337,7 @@ export default function HomePage() {
           PRODUCT ECOSYSTEM — "One Platform. Five Revenue Streams."
       ═══════════════════════════════════════════════════ */}
       <section className="section-white">
-        <div className="mx-auto max-w-7xl">
+        <div className="container">
           <div className="mb-14 text-center reveal">
             <span className="section-eyebrow">Ecosystem</span>
             <h2 className="section-heading">One Platform. Five Revenue Streams.</h2>
@@ -363,7 +363,7 @@ export default function HomePage() {
                   </div>
                   <span className={`badge ${p.badgeCls} flex-shrink-0`}>{p.stat}</span>
                 </div>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(4,14,32,0.60)' }}>{p.desc}</p>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(4,14,32,0.72)' }}>{p.desc}</p>
                 <Link href="/products"
                   className="mt-4 inline-flex items-center gap-1 text-xs font-bold opacity-0 transition-opacity group-hover:opacity-100"
                   style={{ color: '#1b61c9' }}>
@@ -384,7 +384,7 @@ export default function HomePage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-bold" style={{ color: '#181d26' }}>See What Your Investment Could Become</h3>
-                <p className="mt-0.5 text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+                <p className="mt-0.5 text-sm" style={{ color: 'rgba(4,14,32,0.72)' }}>
                   Use our Profit Calculator to model your returns across all tiers — with compound interest.
                 </p>
               </div>
@@ -416,7 +416,7 @@ export default function HomePage() {
           <rect width="100%" height="100%" fill="url(#suite-circuit)"/>
         </svg>
 
-        <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="relative z-10 container">
           <div className="mb-12 text-center reveal">
             <span className="mb-3 inline-block rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest"
               style={{ background: 'rgba(255,255,255,0.15)', color: 'white', border: '1px solid rgba(255,255,255,0.25)' }}>
@@ -425,7 +425,7 @@ export default function HomePage() {
             <h2 className="text-[2.2rem] font-bold tracking-tight text-white sm:text-[2.8rem]" style={{ letterSpacing: '-0.02em' }}>
               Our Product Suite
             </h2>
-            <p className="mx-auto mt-3 max-w-lg" style={{ color: 'rgba(255,255,255,0.72)' }}>
+            <p className="mx-auto mt-3 max-w-lg" style={{ color: 'rgba(255,255,255,0.82)' }}>
               Four powerful products. One unified ecosystem.
             </p>
           </div>
@@ -459,7 +459,7 @@ export default function HomePage() {
                     <h3 className="mb-2 text-[0.95rem] font-bold tracking-tight" style={{ color: '#181d26' }}>
                       {card.title}
                     </h3>
-                    <p className="mb-5 flex-1 text-[0.8rem] leading-relaxed" style={{ color: 'rgba(4,14,32,0.55)' }}>
+                    <p className="mb-5 flex-1 text-[0.875rem] leading-relaxed" style={{ color: 'rgba(4,14,32,0.72)' }}>
                       {card.desc}
                     </p>
                     <Link href={card.href} className="btn-primary w-full justify-center text-sm py-2.5">
@@ -477,7 +477,7 @@ export default function HomePage() {
           ACTION STEPS
       ═══════════════════════════════════════════════════ */}
       <section id="how-it-works" className="section-surface">
-        <div className="mx-auto max-w-7xl">
+        <div className="container">
           <div className="mb-14 text-center reveal">
             <h2 className="section-heading">
               <span style={{ color: '#1b61c9' }}>Action Steps:</span> Register Your AutopilotROI Account
@@ -500,12 +500,12 @@ export default function HomePage() {
                       style={{ background: '#1b61c9', boxShadow: '0 4px 12px rgba(27,97,201,0.36)' }}>
                       {step.num}
                     </span>
-                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(4,14,32,0.38)' }}>
+                    <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(4,14,32,0.52)' }}>
                       Step {step.num}
                     </span>
                   </div>
                   <h3 className="mb-2 text-[0.95rem] font-bold" style={{ color: '#181d26' }}>{step.title}</h3>
-                  <p className="mb-4 flex-1 text-[0.8rem] leading-relaxed" style={{ color: 'rgba(4,14,32,0.55)' }}>{step.desc}</p>
+                  <p className="mb-4 flex-1 text-[0.875rem] leading-relaxed" style={{ color: 'rgba(4,14,32,0.72)' }}>{step.desc}</p>
                   <div style={{ color: '#1b61c9' }}>{step.icon}</div>
                 </div>
               ))}
@@ -525,7 +525,7 @@ export default function HomePage() {
                     <div className="mx-auto text-[0.45rem] text-slate-400 font-medium">app.autopilotroi.com</div>
                   </div>
                   <div className="flex-1 p-3">
-                    <div className="text-[0.5rem] font-bold uppercase tracking-wider" style={{ color: 'rgba(4,14,32,0.38)' }}>Dashboard</div>
+                    <div className="text-[0.5rem] font-bold uppercase tracking-wider" style={{ color: 'rgba(4,14,32,0.45)' }}>Dashboard</div>
                     <div className="mt-1 text-xl font-bold" style={{ color: '#181d26' }}>$24,529.00</div>
                     <div className="mt-0.5 text-[0.55rem] font-semibold" style={{ color: '#10b981' }}>▲ +12.48% this month</div>
                     <svg viewBox="0 0 200 70" className="mt-2 h-16 w-full overflow-visible">
@@ -549,9 +549,9 @@ export default function HomePage() {
                 </div>
                 <div className="flex min-h-[140px] flex-col gap-2 px-2.5 pb-4 pt-2" style={{ background: '#f8fafc' }}>
                   <div className="text-center text-[0.5rem] font-bold" style={{ color: '#1b61c9' }}>🔵 AutopilotROI</div>
-                  <div className="mt-1 text-[0.4rem] font-medium" style={{ color: 'rgba(4,14,32,0.55)' }}>Email</div>
+                  <div className="mt-1 text-[0.4rem] font-medium" style={{ color: 'rgba(4,14,32,0.65)' }}>Email</div>
                   <div className="flex h-5 items-center rounded px-1.5 text-[0.4rem] text-slate-300" style={{ border: '1px solid #e2e8f0', background: 'white' }}>name@email.com</div>
-                  <div className="text-[0.4rem] font-medium" style={{ color: 'rgba(4,14,32,0.55)' }}>Password</div>
+                  <div className="text-[0.4rem] font-medium" style={{ color: 'rgba(4,14,32,0.65)' }}>Password</div>
                   <div className="flex h-5 items-center rounded px-1.5 text-[0.4rem] text-slate-300" style={{ border: '1px solid #e2e8f0', background: 'white' }}>••••••••</div>
                   <div className="mt-1 flex h-5 items-center justify-center rounded text-[0.45rem] font-bold text-white"
                     style={{ background: '#1b61c9' }}>
@@ -563,7 +563,7 @@ export default function HomePage() {
           </div>
 
           {/* Trust row */}
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold" style={{ color: 'rgba(4,14,32,0.65)' }}>
             {["✓ Quick & Easy", "✓ Secure", "✓ Get Started in Minutes"].map((item) => (
               <span key={item}>{item}</span>
             ))}
@@ -595,11 +595,11 @@ export default function HomePage() {
         <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full opacity-20"
           style={{ background: 'radial-gradient(circle, #60a5fa 0%, transparent 70%)' }} />
 
-        <div className="relative z-10 mx-auto max-w-3xl reveal">
+        <div className="relative z-10 container text-center reveal">
           <h2 className="text-[2rem] font-bold text-white sm:text-[2.75rem]" style={{ letterSpacing: '-0.02em' }}>
             Ready to Take the Next Step?
           </h2>
-          <p className="mx-auto mt-5 max-w-xl leading-relaxed" style={{ color: 'rgba(255,255,255,0.78)' }}>
+          <p className="mx-auto mt-5 max-w-xl leading-relaxed" style={{ color: 'rgba(255,255,255,0.88)' }}>
             Join thousands of members already building their financial future through the Aurum AI ecosystem — guided every step of the way.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">

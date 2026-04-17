@@ -356,12 +356,101 @@ export default function ContentEditorPage() {
         {/* ── CENTER: Editor ─────────────────────────────── */}
         <main className="flex flex-1 flex-col overflow-y-auto bg-[#f8fafc]">
           {!hasEditor ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center p-12">
-              <span className="text-5xl opacity-30">✍️</span>
-              <p className="text-sm text-[rgba(4,14,32,0.40)]">Select a post to edit, or create a new one</p>
-              <button onClick={startNew} className="rounded-xl bg-[#1b61c9] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#1550aa]">
-                + Create New
-              </button>
+            <div className="flex flex-1 flex-col overflow-y-auto">
+              <div className="m-6 rounded-2xl border border-[#e0e2e6] bg-white p-8 shadow-sm">
+
+                <div className="mb-6 flex items-start gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#1b61c9]">
+                    <span className="text-xl">✍️</span>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#181d26]">Content Editor</h2>
+                    <p className="mt-1 text-sm text-[rgba(4,14,32,0.50)] leading-relaxed">
+                      Backed by Supabase — edits go live on the public site within 60 seconds. No rebuild needed.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">How it works</h3>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    {[
+                      { step: '1', label: 'Choose a content type', detail: 'Use the Blog / FAQs / Videos / Page Copy tabs above' },
+                      { step: '2', label: 'Create or select a post', detail: 'Click any item in the left panel, or press "+ New"' },
+                      { step: '3', label: 'Write, save, publish', detail: 'Body auto-saves as you type. Hit Publish to go live.' },
+                    ].map(s => (
+                      <div key={s.step} className="rounded-xl border border-[#e0e2e6] p-4">
+                        <div className="mb-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#1b61c9] text-xs font-bold text-white">{s.step}</div>
+                        <div className="text-sm font-semibold text-[#181d26]">{s.label}</div>
+                        <div className="mt-1 text-xs text-[rgba(4,14,32,0.50)]">{s.detail}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Where content appears on the public site</h3>
+                  <div className="overflow-hidden rounded-xl border border-[#e0e2e6]">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-[#e0e2e6] bg-[#f8fafc]">
+                          <th className="px-4 py-2.5 text-left text-xs font-semibold text-[rgba(4,14,32,0.45)]">Tab</th>
+                          <th className="px-4 py-2.5 text-left text-xs font-semibold text-[rgba(4,14,32,0.45)]">Public URL</th>
+                          <th className="px-4 py-2.5 text-left text-xs font-semibold text-[rgba(4,14,32,0.45)]">Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#f0f2f7]">
+                        {[
+                          { icon: '📝', tab: 'Blog Posts', url: '/blog  ·  /blog/[slug]',        note: 'Title + excerpt on list. Full rich-text body on post page.' },
+                          { icon: '❓', tab: 'FAQs',       url: '/faqs',                          note: 'Title = question. Body (rich text) = answer in accordion.' },
+                          { icon: '🎬', tab: 'Videos',     url: '/university  or  /media',        note: 'Set the "Section" field to choose which page it appears on.' },
+                          { icon: '🏠', tab: 'Page Copy',  url: 'Homepage, Products…',           note: 'Slug = page key (e.g. "homepage"). Key-value meta fields.' },
+                        ].map(r => (
+                          <tr key={r.tab}>
+                            <td className="px-4 py-3 font-medium text-[#181d26]">{r.icon} {r.tab}</td>
+                            <td className="px-4 py-3 font-mono text-xs text-[#1b61c9]">{r.url}</td>
+                            <td className="px-4 py-3 text-xs text-[rgba(4,14,32,0.50)]">{r.note}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="mb-6 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-[#e0e2e6] p-4">
+                    <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Draft → Published workflow</h3>
+                    <ol className="space-y-1.5 text-xs text-[rgba(4,14,32,0.65)]">
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">1.</span> Create or select a post from the left panel</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">2.</span> Write content — body auto-saves every 1.5 s</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">3.</span> Fill metadata in the right panel (author, excerpt, category…)</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">4.</span> Press <strong className="text-[#181d26]">💾 Save</strong> to persist metadata</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">5.</span> Press <strong className="text-[#181d26]">🚀 Publish</strong> — appears on site in ~60 s</li>
+                    </ol>
+                  </div>
+                  <div className="rounded-xl border border-[#e0e2e6] p-4 space-y-3">
+                    <div>
+                      <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Version History</h3>
+                      <p className="text-xs text-[rgba(4,14,32,0.65)]">Every save creates a snapshot. Click <strong className="text-[#181d26]">🕐 History</strong> in the top bar to browse and restore any previous version.</p>
+                    </div>
+                    <div>
+                      <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Images &amp; YouTube</h3>
+                      <p className="text-xs text-[rgba(4,14,32,0.65)]">Drag images into the editor or click 🖼️. Paste a YouTube URL and click the YouTube button to embed a video inline. Images upload to Supabase Storage automatically.</p>
+                    </div>
+                    <div>
+                      <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Rich Text Toolbar</h3>
+                      <p className="text-xs text-[rgba(4,14,32,0.65)]">H1/H2/H3 · Bold · Italic · Underline · Lists · Quote · Code · Link · Align · Highlight · HR · Undo/Redo</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <button onClick={startNew}
+                    className="rounded-xl bg-[#1b61c9] px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#1550aa]">
+                    + Create New {TABS.find(t => t.key === activeTab)?.label.slice(0, -1) || 'Post'}
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="flex flex-col gap-5 p-6">

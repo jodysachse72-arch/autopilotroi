@@ -19,8 +19,8 @@
 
   /* ── Text ── */
   --color-text:        #181d26;
-  --color-text-weak:   rgba(4, 14, 32, 0.69);
-  --color-text-muted:  rgba(4, 14, 32, 0.45);
+  --color-text-weak:   rgba(4, 14, 32, 0.72);
+  --color-text-muted:  rgba(4, 14, 32, 0.58);
   --color-text-blue:   #1b61c9;
 
   /* ── Borders ── */
@@ -79,8 +79,8 @@
   --bg-card-hover:      #f8fafc;
 
   --text-primary:       #181d26;
-  --text-secondary:     rgba(4, 14, 32, 0.69);
-  --text-muted:         rgba(4, 14, 32, 0.45);
+  --text-secondary:     rgba(4, 14, 32, 0.72);
+  --text-muted:         rgba(4, 14, 32, 0.58);
   --text-tertiary:      rgba(4, 14, 32, 0.45);
 
   --border-primary:     #e0e2e6;
@@ -110,7 +110,9 @@ body {
   min-height: 100vh;
   background: var(--color-white);
   color: var(--color-text);
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
@@ -296,11 +298,13 @@ a {
 /* ── Sections ── */
 .section-white {
   background: var(--color-white);
-  padding: 96px 24px;
+  padding-top: 96px;
+  padding-bottom: 96px;
 }
 .section-surface {
   background: var(--color-surface);
-  padding: 96px 24px;
+  padding-top: 96px;
+  padding-bottom: 96px;
   border-top: 1px solid var(--color-border-light);
   border-bottom: 1px solid var(--color-border-light);
 }
@@ -309,7 +313,8 @@ a {
 /* ── Footer links ── */
 .footer-link {
   font-size: 0.875rem;
-  color: rgba(4, 14, 32, 0.55);
+  font-weight: 500;
+  color: rgba(4, 14, 32, 0.62);
   transition: color 0.18s ease;
 }
 .footer-link:hover {
@@ -335,8 +340,70 @@ a {
 .section-sub {
   margin-top: 0.75rem;
   font-size: 1.0625rem;
+  font-weight: 500;
   color: var(--color-text-weak);
   line-height: 1.7;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CONTAINER — centred, max-width layout shell
+   Use as a child inside every section wrapper.
+   Provides consistent horizontal padding at all viewport sizes.
+   Matches OnePay / Airtable / ThriveDesk layout pattern.
+   ════════════════════════════════════════════════════════════════ */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;   /* 24px — mobile */
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 2rem;     /* 32px — large mobile / small tablet */
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: 2.5rem;   /* 40px — tablet */
+    padding-right: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 3.5rem;   /* 56px — desktop */
+    padding-right: 3.5rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .container {
+    padding-left: 5rem;     /* 80px — wide desktop */
+    padding-right: 5rem;
+  }
+}
+
+/* Narrow variant for text-heavy columns (blog, legal, docs) */
+.container-narrow {
+  width: 100%;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container-narrow {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════

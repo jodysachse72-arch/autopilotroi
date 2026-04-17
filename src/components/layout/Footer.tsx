@@ -28,10 +28,10 @@ const quickLinks = [
 export default function Footer() {
   return (
     <footer
-      className="border-t px-6 pt-16 pb-10 lg:px-10"
+      className="border-t"
       style={{ background: '#ffffff', borderTopColor: '#e0e2e6' }}
     >
-      <div className="mx-auto max-w-7xl">
+      <div className="container pt-16 pb-10">
         <div className="grid gap-12 md:grid-cols-4">
 
           {/* Brand */}
@@ -97,8 +97,8 @@ export default function Footer() {
 
         {/* Bottom */}
         <div className="mt-12 pt-8 space-y-4" style={{ borderTop: '1px solid #e0e2e6' }}>
-          <p className="text-xs leading-relaxed" style={{ color: 'rgba(4, 14, 32, 0.40)' }}>
-            <strong style={{ color: 'rgba(4, 14, 32, 0.55)' }}>Risk Disclaimer:</strong>{' '}
+          <p className="text-xs leading-relaxed" style={{ color: 'rgba(4, 14, 32, 0.62)' }}>
+            <strong style={{ color: 'rgba(4, 14, 32, 0.75)' }}>Risk Disclaimer:</strong>{' '}
             AutoPilot ROI is an independent onboarding platform. This site does not provide financial
             advice. All investments carry risk, including the risk of total loss. Returns referenced
             on this site are illustrative and not guaranteed. Never invest more than you can afford
@@ -108,7 +108,7 @@ export default function Footer() {
             </Link>{' '}
             for details.
           </p>
-          <p className="text-xs" style={{ color: 'rgba(4, 14, 32, 0.30)' }}>
+          <p className="text-xs" style={{ color: 'rgba(4, 14, 32, 0.50)' }}>
             © {new Date().getFullYear()} AutoPilot ROI. All rights reserved.
           </p>
         </div>

@@ -105,7 +105,7 @@ export default function Navbar() {
         transition: 'box-shadow 0.25s ease',
       }}
     >
-      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between gap-8 px-6 lg:px-10">
+      <div className="container flex h-[4.5rem] items-center justify-between gap-8">
 
         {/* Logo */}
         <Link href="/" className="flex-shrink-0">
