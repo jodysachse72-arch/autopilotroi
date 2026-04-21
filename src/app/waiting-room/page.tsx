@@ -148,10 +148,10 @@ export default function WaitingRoomPage() {
   const tc = tierConfig[tier]
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+    <div className="page-bg">
       {/* Header Bar */}
       <header className="sticky top-0 z-50" style={{ borderBottom: '1px solid #e0e2e6', background: '#fff' }}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+        <div className="container-xl" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.75rem 1.5rem' }}>
           <Link href="/">
             <Logo size={32} showText />
           </Link>
@@ -216,8 +216,8 @@ export default function WaitingRoomPage() {
       )}
 
       {/* Learning Progress */}
-      <div className="mx-auto max-w-7xl px-6 py-8">
-        <div className="flex items-center justify-between mb-2">
+      <div className="container-xl" style={{ padding:'2rem 1.5rem 0.5rem' }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.5rem' }}>
           <span className="text-sm font-semibold" style={{ color: '#181d26' }}>Learning Progress</span>
           <span className="text-sm font-bold" style={{ color: '#1b61c9' }}>{watchProgress}%</span>
         </div>
@@ -233,7 +233,7 @@ export default function WaitingRoomPage() {
       </div>
 
       {/* Category Filters */}
-      <div className="mx-auto max-w-7xl px-6 pb-4">
+      <div className="container-xl" style={{ paddingTop:'1rem', paddingBottom:'1rem', paddingLeft:'1.5rem', paddingRight:'1.5rem' }}>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map((cat) => (
             <button key={cat} onClick={() => setActiveCategory(cat)}
@@ -250,7 +250,7 @@ export default function WaitingRoomPage() {
       </div>
 
       {/* Video Grid */}
-      <div className="mx-auto max-w-7xl px-6 pb-20">
+      <div className="container-xl" style={{ paddingBottom:'5rem', paddingLeft:'1.5rem', paddingRight:'1.5rem', paddingTop:'0.5rem' }}>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredVideos.map((video, i) => (
             <motion.div key={video.id} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={i * 0.08}>
@@ -285,19 +285,17 @@ export default function WaitingRoomPage() {
       </div>
 
       {/* Bottom CTA */}
-      <section className="px-6 py-16 text-center" style={{ borderTop: '1px solid #e0e2e6', background: '#fff' }}>
-        <h2 className="mb-3 text-2xl font-bold" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>What Happens Next?</h2>
-        <p className="mx-auto max-w-lg leading-relaxed mb-6" style={{ color: 'rgba(4,14,32,0.55)' }}>
-          Your partner will review your assessment and send you a personalized onboarding link via email.
-          Keep an eye on your inbox for <span className="font-semibold" style={{ color: '#1b61c9' }}>{lead?.email}</span>.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <Link href="/university" className="rounded-xl px-8 py-3 font-bold text-white transition" style={{ background: '#1b61c9' }}>
-            Explore Full University →
-          </Link>
-          <Link href="/" className="rounded-xl px-8 py-3 font-semibold transition" style={{ background: '#f8fafc', border: '1px solid #e0e2e6', color: '#181d26' }}>
-            Back to Home
-          </Link>
+      <section className="section-box" style={{ textAlign:'center' }}>
+        <div className="container-xl section-padding">
+          <h2 style={{ fontFamily:'var(--font-display)', fontWeight:800, fontSize:'clamp(1.25rem,3vw,1.75rem)', color:'#181d26', letterSpacing:'-0.02em', marginBottom:'0.75rem' }}>What Happens Next?</h2>
+          <p style={{ maxWidth:'36rem', margin:'0 auto 1.75rem', lineHeight:'var(--lh-relaxed)', color:'var(--color-text-weak)', fontSize:'var(--text-body)' }}>
+            Your partner will review your assessment and send you a personalized onboarding link via email.
+            Keep an eye on your inbox for <span style={{ fontWeight:600, color:'#1b61c9' }}>{lead?.email}</span>.
+          </p>
+          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', gap:'0.875rem' }}>
+            <Link href="/university" style={{ display:'inline-flex', alignItems:'center', background:'linear-gradient(135deg,#2563eb 0%,#1b61c9 100%)', color:'#fff', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:700, fontSize:'var(--text-body)', textDecoration:'none', boxShadow:'0 4px 16px rgba(27,97,201,0.35)' }}>Explore Full University →</Link>
+            <Link href="/" style={{ display:'inline-flex', alignItems:'center', background:'#fff', border:'1.5px solid var(--color-border)', color:'#181d26', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:600, fontSize:'var(--text-body)', textDecoration:'none' }}>Back to Home</Link>
+          </div>
         </div>
       </section>
     </div>

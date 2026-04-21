@@ -117,25 +117,29 @@ export default function SummaryPage() {
   const { headline, intro, sections, cta } = summaryContent
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+    <div className="page-bg">
+      <div className="sections-stack">
 
       {/* Header */}
-      <div className="px-6 py-16 lg:px-10" style={{ background: '#1b61c9', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="relative mx-auto max-w-4xl text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff' }}>
-            <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+      <section style={{ background:'#1b61c9', borderBottom:'1px solid rgba(255,255,255,0.1)' }}>
+        <div className="container-xl section-padding" style={{ textAlign:'center' }}>
+          <div style={{ position:'relative', maxWidth:'52rem', margin:'0 auto' }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:'0.5rem', background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.25)', borderRadius:'99px', padding:'0.5rem 1rem', fontSize:'var(--text-body)', fontWeight:600, color:'#fff', marginBottom:'1.25rem' }}>
+            <span style={{ width:'0.375rem', height:'0.375rem', borderRadius:'50%', background:'#fff', animation:'pulse 2s infinite' }} />
             Executive Summary
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl" style={{ letterSpacing: '-0.03em' }}>
             {headline}
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{intro}</p>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Sections */}
-      <div className="mx-auto max-w-4xl space-y-6 px-6 py-16 lg:px-10">
+      <section className="section-box">
+        <div className="container-xl section-padding">
+        <div style={{ maxWidth:'52rem', margin:'0 auto', display:'flex', flexDirection:'column', gap:'1.5rem' }}>
         {sections.map((section) => (
           <section key={section.id} id={section.id} className="rounded-2xl p-8"
             style={{ background: '#fff', border: '1px solid #e0e2e6', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
@@ -187,26 +191,26 @@ export default function SummaryPage() {
         ))}
 
         {/* CTA */}
-        <div className="rounded-2xl p-10 text-center" style={{ background: '#1b61c9' }}>
-          <h2 className="text-2xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
+        <div style={{ background:'linear-gradient(135deg,#1b61c9 0%,#254fad 100%)', borderRadius:'var(--radius-card)', padding:'3rem 2.5rem', textAlign:'center' }}>
+          <h2 style={{ fontFamily:'var(--font-display)', fontWeight:800, fontSize:'clamp(1.5rem,3vw,2rem)', color:'#fff', letterSpacing:'-0.02em', marginBottom:'1rem' }}>
             {cta.headline}
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[0.95rem] leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>
+          <p style={{ maxWidth:'36rem', margin:'0 auto 2rem', lineHeight:'var(--lh-relaxed)', color:'rgba(255,255,255,0.78)', fontSize:'var(--text-body)' }}>
             {cta.description}
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link href={cta.primaryCta.href}
-              className="rounded-xl px-7 py-3 font-bold text-white transition hover:opacity-90"
-              style={{ background: '#fff', color: '#1b61c9' }}>
+          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', gap:'0.875rem' }}>
+            <Link href={cta.primaryCta.href} style={{ display:'inline-flex', alignItems:'center', background:'#fff', color:'#1b61c9', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:700, fontSize:'var(--text-body)', textDecoration:'none' }}>
               {cta.primaryCta.label}
             </Link>
-            <Link href={cta.secondaryCta.href}
-              className="rounded-xl px-7 py-3 font-semibold text-white transition"
-              style={{ border: '1.5px solid rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.1)' }}>
+            <Link href={cta.secondaryCta.href} style={{ display:'inline-flex', alignItems:'center', background:'rgba(255,255,255,0.12)', border:'1.5px solid rgba(255,255,255,0.3)', color:'#fff', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:600, fontSize:'var(--text-body)', textDecoration:'none' }}>
               {cta.secondaryCta.label}
             </Link>
           </div>
         </div>
+      </div>
+      </div>
+      </section>
+
       </div>
     </div>
   )

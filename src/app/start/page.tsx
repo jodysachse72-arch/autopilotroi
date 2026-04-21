@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
@@ -28,23 +28,23 @@ interface OnboardingStep {
 const onboardingSteps: OnboardingStep[] = [
   {
     id: 1,
-    symbol: '💼',
+    symbol: 'ðŸ’¼',
     title: 'Set Up Trust Wallet',
     subtitle: 'Your self-custodial crypto wallet',
     status: 'current' as const,
-    why: 'Trust Wallet is a self-custodial wallet — meaning you control your own funds with a private seed phrase. You need it to hold USDT and interact with the Aurum platform.',
+    why: 'Trust Wallet is a self-custodial wallet â€” meaning you control your own funds with a private seed phrase. You need it to hold USDT and interact with the Aurum platform.',
     warning:
-      'Never share your 12-word seed phrase with anyone — including your AutoPilot ROI partner. Anyone who asks for it is a scammer.',
-    videoLabel: 'Aurum University · Step 1',
+      'Never share your 12-word seed phrase with anyone â€” including your AutoPilot ROI partner. Anyone who asks for it is a scammer.',
+    videoLabel: 'Aurum University Â· Step 1',
     videoNote: 'How to set up Trust Wallet correctly',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    link: { label: 'Download Trust Wallet — Official Site', href: 'https://trustwallet.com' },
+    link: { label: 'Download Trust Wallet â€” Official Site', href: 'https://trustwallet.com' },
     instructions: [
       {
-        text: 'Download Trust Wallet from the official App Store or Google Play. Ensure the developer is "Six Days LLC" — do not download unofficial versions.',
+        text: 'Download Trust Wallet from the official App Store or Google Play. Ensure the developer is "Six Days LLC" â€” do not download unofficial versions.',
       },
       {
-        text: 'Open the app and select "Create a new wallet". Write down your 12-word recovery phrase on paper — not your phone.',
+        text: 'Open the app and select "Create a new wallet". Write down your 12-word recovery phrase on paper â€” not your phone.',
         warning: 'If you lose your seed phrase, you lose access to your funds permanently.',
       },
       {
@@ -52,24 +52,24 @@ const onboardingSteps: OnboardingStep[] = [
       },
       {
         text: 'Add USDT (TRC20) to your wallet. In Trust Wallet, tap the "+" icon and search for "USDT TRC20". Enable it.',
-        tip: 'Always use USDT on the TRC20 network for Aurum deposits — it has the lowest fees.',
+        tip: 'Always use USDT on the TRC20 network for Aurum deposits â€” it has the lowest fees.',
       },
     ],
   },
   {
     id: 2,
-    symbol: '🔒',
+    symbol: 'ðŸ”’',
     title: 'Set Up a VPN',
     subtitle: 'Required to access the Aurum platform',
     status: 'locked' as const,
     why: 'Aurum is geo-restricted in some regions. A VPN lets you connect from a supported jurisdiction. This is a requirement, not optional.',
     warning:
       'Never use a free VPN for financial applications. Free VPNs can log your data and expose your accounts. Use a paid, reputable provider.',
-    videoLabel: 'Aurum University · Step 2',
+    videoLabel: 'Aurum University Â· Step 2',
     videoNote: 'VPN setup guide for Aurum access',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     link: {
-      label: 'Get NordVPN — Recommended Provider',
+      label: 'Get NordVPN â€” Recommended Provider',
       href: 'https://nordvpn.com',
     },
     instructions: [
@@ -77,7 +77,7 @@ const onboardingSteps: OnboardingStep[] = [
         text: 'Download NordVPN or ExpressVPN from their official website. Both have mobile and desktop apps.',
       },
       {
-        text: 'Create an account and start your subscription — both have money-back guarantees.',
+        text: 'Create an account and start your subscription â€” both have money-back guarantees.',
       },
       {
         text: 'Connect to a server in a supported country (USA, UK, or Germany typically work well).',
@@ -90,22 +90,22 @@ const onboardingSteps: OnboardingStep[] = [
   },
   {
     id: 3,
-    symbol: '💵',
+    symbol: 'ðŸ’µ',
     title: 'Acquire USDT',
     subtitle: 'Purchase Tether (USDT) to fund your bot',
     status: 'locked' as const,
-    why: 'USDT is a stablecoin (1 USDT ≈ $1 USD). Aurum requires USDT for deposits. It is the safest and most stable way to fund your account without volatility risk.',
+    why: 'USDT is a stablecoin (1 USDT â‰ˆ $1 USD). Aurum requires USDT for deposits. It is the safest and most stable way to fund your account without volatility risk.',
     warning:
       'Only use the TRC20 (Tron) network to send USDT to Aurum. Sending on the wrong network will result in lost funds.',
-    videoLabel: 'Aurum University · Step 3',
+    videoLabel: 'Aurum University Â· Step 3',
     videoNote: 'How to buy and transfer USDT safely',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     instructions: [
       {
-        text: 'The minimum to activate the Aurum bot is $100 USDT. Most members start with $500–$1,000.',
+        text: 'The minimum to activate the Aurum bot is $100 USDT. Most members start with $500â€“$1,000.',
       },
       {
-        text: 'Purchase USDT on a reputable exchange — Binance, Kraken, or Coinbase are recommended. Use your bank card or bank transfer.',
+        text: 'Purchase USDT on a reputable exchange â€” Binance, Kraken, or Coinbase are recommended. Use your bank card or bank transfer.',
       },
       {
         text: 'Withdraw your USDT to your Trust Wallet. Select the TRC20 network when withdrawing.',
@@ -118,13 +118,13 @@ const onboardingSteps: OnboardingStep[] = [
   },
   {
     id: 4,
-    symbol: '🌐',
+    symbol: 'ðŸŒ',
     title: 'Create Your Aurum Account',
     subtitle: 'Register on Aurum Foundation with your referral code',
     status: 'locked' as const,
     warning:
       'You must use the referral link provided by your AutoPilot ROI partner. Creating an account without a referral link will mean you are placed incorrectly in the structure and may lose spillover benefits.',
-    videoLabel: 'Aurum University · Step 4',
+    videoLabel: 'Aurum University Â· Step 4',
     videoNote: 'Creating your Aurum account step by step',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     link: {
@@ -152,14 +152,14 @@ const onboardingSteps: OnboardingStep[] = [
   },
   {
     id: 5,
-    symbol: '🤖',
+    symbol: 'ðŸ¤–',
     title: 'Fund and Activate the Bot',
     subtitle: 'Deposit USDT and start the EX-AI Trading Bot',
     status: 'locked' as const,
     why: 'Funding your Aurum account activates the EX-AI Bot, which begins automated trading on Binance, Bybit, and KuCoin. Returns are generated and credited to your Aurum balance.',
     warning:
-      'Only use the TRC20 USDT deposit address shown in your Aurum back office. Do not deposit directly from an exchange — always send from Trust Wallet.',
-    videoLabel: 'Aurum University · Step 5',
+      'Only use the TRC20 USDT deposit address shown in your Aurum back office. Do not deposit directly from an exchange â€” always send from Trust Wallet.',
+    videoLabel: 'Aurum University Â· Step 5',
     videoNote: 'How to fund your Aurum account and activate the AI bot',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     instructions: [
@@ -184,12 +184,12 @@ const onboardingSteps: OnboardingStep[] = [
   },
   {
     id: 6,
-    symbol: '✅',
+    symbol: 'âœ…',
     title: 'Confirm Your Referral Placement',
     subtitle: 'Verify with your partner that everything is correct',
     status: 'locked' as const,
     why: 'Referral confirmation ensures you are placed in the correct position within the AutoPilot ROI spillover structure and that your partner is notified of your successful onboarding.',
-    videoLabel: 'Aurum University · Step 6',
+    videoLabel: 'Aurum University Â· Step 6',
     videoNote: 'Confirming your referral and team placement',
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     instructions: [
@@ -203,7 +203,7 @@ const onboardingSteps: OnboardingStep[] = [
         text: 'Your partner will confirm your placement in the spillover tree and guide you to the Resources section for next steps.',
       },
       {
-        text: 'Bookmark the AutoPilot ROI Resources page — it is your ongoing hub for education, updates, and community.',
+        text: 'Bookmark the AutoPilot ROI Resources page â€” it is your ongoing hub for education, updates, and community.',
         tip: 'If you are joining the Partner Program, your partner will now walk you through the referral tools.',
       },
     ],
@@ -233,13 +233,15 @@ export default function StartPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+    <div className="page-bg">
+      <div className="sections-stack">
+
       {/* Header */}
-      <div className="px-6 py-12 lg:px-10" style={{ background: '#fff', borderBottom: '1px solid #e0e2e6' }}>
-        <div className="mx-auto max-w-7xl">
+      <section className="section-box">
+        <div className="container-xl section-padding">
           <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] mb-4"
             style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9', border: '1px solid rgba(27,97,201,0.15)' }}>
-            🚀 Guided Onboarding
+            ðŸš€ Guided Onboarding
           </span>
           <h1 className="text-4xl font-bold mb-3 lg:text-5xl" style={{ color: '#181d26', letterSpacing: '-0.03em' }}>
             Start Your Aurum Journey
@@ -260,7 +262,7 @@ export default function StartPage() {
                       color: done ? '#059669' : i + 1 === expandedStep ? '#fff' : 'rgba(4,14,32,0.45)',
                       border: done ? '1px solid rgba(16,185,129,0.3)' : 'none',
                     }}>
-                    {done && <span>✓</span>}
+                    {done && <span>âœ“</span>}
                     {step.label}
                   </div>
                   {i < progressSteps.length - 1 && (
@@ -271,9 +273,10 @@ export default function StartPage() {
             })}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
+      <section className="section-box">
+        <div className="container-xl section-padding">
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           {/* Steps */}
           <div className="space-y-4">
@@ -299,7 +302,7 @@ export default function StartPage() {
                         background: isComplete ? '#10b981' : isExpanded ? '#1b61c9' : '#f0f2f7',
                         color: isComplete || isExpanded ? '#fff' : 'rgba(4,14,32,0.4)',
                       }}>
-                      {isComplete ? '✓' : step.id}
+                      {isComplete ? 'âœ“' : step.id}
                     </div>
                     <div className="flex-1">
                       <div className="text-xs font-bold uppercase tracking-[0.12em] mb-0.5" style={{ color: '#1b61c9' }}>
@@ -312,11 +315,11 @@ export default function StartPage() {
                     </div>
                     {isComplete && (
                       <span className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold" style={{ background: 'rgba(16,185,129,0.1)', color: '#059669' }}>
-                        ✓ Complete
+                        âœ“ Complete
                       </span>
                     )}
                     <span className="shrink-0 transition-transform" style={{ color: '#1b61c9', transform: isExpanded ? 'rotate(180deg)' : 'none' }}>
-                      ▾
+                      â–¾
                     </span>
                   </button>
 
@@ -325,13 +328,13 @@ export default function StartPage() {
                       {step.videoUrl && (
                         <VideoModal videoUrl={step.videoUrl}>
                           <div className="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition hover:shadow" style={{ background: '#f8fafc', border: '1px solid #e0e2e6' }}>
-                            <span className="text-2xl">🎬</span>
+                            <span className="text-2xl">ðŸŽ¬</span>
                             <div>
                               <div className="text-xs font-bold" style={{ color: '#1b61c9' }}>{step.videoLabel}</div>
                               <div className="text-sm font-medium" style={{ color: '#181d26' }}>{step.videoNote}</div>
                             </div>
                             <span className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-red-500 text-white">
-                              ▶
+                              â–¶
                             </span>
                           </div>
                         </VideoModal>
@@ -339,13 +342,13 @@ export default function StartPage() {
 
                       {step.warning && (
                         <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }}>
-                          ⚠️ {step.warning}
+                          âš ï¸ {step.warning}
                         </div>
                       )}
 
                       {step.why && (
                         <div className="rounded-xl p-4 text-sm leading-relaxed" style={{ background: 'rgba(27,97,201,0.05)', border: '1px solid rgba(27,97,201,0.15)', color: '#1b61c9' }}>
-                          <strong>ℹ️ Why this step? </strong>
+                          <strong>â„¹ï¸ Why this step? </strong>
                           {step.why}
                         </div>
                       )}
@@ -354,7 +357,7 @@ export default function StartPage() {
                         <a href={step.link.href} target="_blank" rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-80"
                           style={{ background: 'rgba(27,97,201,0.06)', border: '1px solid rgba(27,97,201,0.2)', color: '#1b61c9' }}>
-                          🔗 {step.link.label} →
+                          ðŸ”— {step.link.label} â†’
                         </a>
                       )}
 
@@ -368,12 +371,12 @@ export default function StartPage() {
                               {instruction.text}
                               {instruction.warning && (
                                 <div className="mt-2 rounded-lg px-3 py-2 text-xs" style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', color: '#b45309' }}>
-                                  ⚠️ {instruction.warning}
+                                  âš ï¸ {instruction.warning}
                                 </div>
                               )}
                               {instruction.tip && (
                                 <div className="mt-2 rounded-lg px-3 py-2 text-xs" style={{ background: 'rgba(6,182,212,0.06)', border: '1px solid rgba(6,182,212,0.2)', color: '#0891b2' }}>
-                                  💡 {instruction.tip}
+                                  ðŸ’¡ {instruction.tip}
                                 </div>
                               )}
                             </div>
@@ -388,7 +391,7 @@ export default function StartPage() {
                         onMouseEnter={e => !isComplete && ((e.currentTarget as HTMLButtonElement).style.background = '#254fad')}
                         onMouseLeave={e => !isComplete && ((e.currentTarget as HTMLButtonElement).style.background = '#1b61c9')}
                       >
-                        {isComplete ? `✓ ${step.id === 6 ? 'All Steps Complete!' : 'Mark Incomplete'}` : step.id === 6 ? "I've Confirmed with My Partner ✦" : `${step.title} — Mark Complete ✓`}
+                        {isComplete ? `âœ“ ${step.id === 6 ? 'All Steps Complete!' : 'Mark Incomplete'}` : step.id === 6 ? "I've Confirmed with My Partner âœ¦" : `${step.title} â€” Mark Complete âœ“`}
                       </button>
                     </div>
                   )}
@@ -397,17 +400,17 @@ export default function StartPage() {
             })}
 
             {showCongrats && (
-              <div className="rounded-2xl p-8 text-center" style={{ background: '#1b61c9', border: '1px solid rgba(27,97,201,0.3)' }}>
-                <div className="text-4xl">🎉</div>
-                <h2 className="mt-4 text-3xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
+              <div style={{ background: 'linear-gradient(135deg,#1b61c9 0%,#254fad 100%)', borderRadius:'var(--radius-card)', padding:'2.5rem', textAlign:'center' }}>
+                <div style={{ fontSize:'3rem', marginBottom:'1rem' }}>ðŸŽ‰</div>
+                <h2 style={{ fontFamily:'var(--font-display)', fontSize:'clamp(1.5rem,3vw,2rem)', fontWeight:800, color:'#fff', letterSpacing:'-0.02em', marginBottom:'0.75rem' }}>
                   You&apos;re Fully Onboarded!
                 </h2>
-                <p className="mt-3 text-white/75">
+                <p style={{ color:'rgba(255,255,255,0.78)', marginBottom:'1.75rem', lineHeight:'var(--lh-relaxed)' }}>
                   Your AI trading bot is active and you are now part of the AutoPilot ROI team.
                 </p>
-                <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-                  <Link href="/resources" className="rounded-xl bg-white px-6 py-3 text-base font-bold transition hover:bg-blue-50" style={{ color: '#1b61c9' }}>Go to Resources →</Link>
-                  <Link href="/university" className="text-sm font-semibold text-white/80 underline underline-offset-2 hover:text-white">Visit Aurum University</Link>
+                <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', gap:'0.875rem' }}>
+                  <Link href="/resources" style={{ display:'inline-flex', alignItems:'center', background:'#fff', color:'#1b61c9', padding:'0.75rem 1.75rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:700, fontSize:'var(--text-body)', textDecoration:'none' }}>Go to Resources â†’</Link>
+                  <Link href="/university" style={{ fontSize:'var(--text-body)', fontWeight:600, color:'rgba(255,255,255,0.8)', textDecoration:'underline', textUnderlineOffset:'3px' }}>Visit Aurum University</Link>
                 </div>
               </div>
             )}
@@ -433,7 +436,7 @@ export default function StartPage() {
                         background: done ? 'rgba(16,185,129,0.08)' : expandedStep === step.id ? 'rgba(27,97,201,0.08)' : 'transparent',
                         color: done ? '#059669' : expandedStep === step.id ? '#1b61c9' : 'rgba(4,14,32,0.55)',
                       }}>
-                      <span className="shrink-0 font-bold">{done ? '✓' : step.symbol}</span>
+                      <span className="shrink-0 font-bold">{done ? 'âœ“' : step.symbol}</span>
                       <div>
                         <div className="font-semibold">{step.title}</div>
                         <div className="text-xs opacity-70">{step.subtitle}</div>
@@ -452,17 +455,20 @@ export default function StartPage() {
             </div>
 
             <div className="rounded-2xl p-5" style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
-              <div className="text-2xl mb-2">🎓</div>
+              <div className="text-2xl mb-2">ðŸŽ“</div>
               <h3 className="font-bold mb-2" style={{ color: '#181d26' }}>Aurum University</h3>
               <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(4,14,32,0.5)' }}>
                 Each step includes embedded Aurum University videos. Watch them in order to fully understand each part of the onboarding process before acting.
               </p>
               <Link href="/university" className="block text-center text-sm font-semibold transition" style={{ color: '#1b61c9' }}>
-                Browse All Videos →
+                Browse All Videos â†’
               </Link>
             </div>
           </div>
         </div>
+        </div>
+      </section>
+
       </div>
     </div>
   )
