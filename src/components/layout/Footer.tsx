@@ -1,117 +1,139 @@
-'use client'
-
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
 
-const navLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'Product Suite', href: '/products' },
-  { label: 'University', href: '/university' },
-  { label: 'Resources', href: '/resources' },
-  { label: 'Blog', href: '/blog' },
-  { label: 'FAQs', href: '/faqs' },
+const FOOTER_COLS = [
+  {
+    heading: 'Platform',
+    links: [
+      { label: 'Products',    href: '/products' },
+      { label: 'University',  href: '/university' },
+      { label: 'Calculator',  href: '/calculator' },
+      { label: 'Media',       href: '/media' },
+    ],
+  },
+  {
+    heading: 'Support',
+    links: [
+      { label: 'FAQs',          href: '/faqs' },
+      { label: 'Blog',          href: '/blog' },
+      { label: 'Onboarding',    href: '/onboarding' },
+      { label: 'Partner Tools', href: '/partner-tools' },
+    ],
+  },
+  {
+    heading: 'Legal',
+    links: [
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Terms of Use',   href: '/terms' },
+      { label: 'Disclaimer',     href: '/disclaimer' },
+    ],
+  },
 ]
 
-const legalLinks = [
-  { label: 'Terms of Service', href: '/terms' },
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Earnings Disclaimer', href: '/disclaimer' },
-]
-
-const quickLinks = [
-  { label: 'Calculator', href: '/calculator' },
-  { label: 'Trust Checker', href: '/evaluate' },
-  { label: 'Media Kit', href: '/media' },
-  { label: 'Partner Summary', href: '/summary' },
-]
+/* ── Inline styles only (server component) ── */
+const linkStyle: React.CSSProperties = {
+  fontSize: 'var(--text-body)',
+  color: 'rgba(255,255,255,0.58)',
+  textDecoration: 'none',
+  display: 'block',
+  padding: '0.125rem 0',
+  transition: 'color 150ms ease',
+}
 
 export default function Footer() {
+  const year = new Date().getFullYear()
+
   return (
-    <footer
-      className="border-t"
-      style={{ background: '#ffffff', borderTopColor: '#e0e2e6' }}
-    >
-      <div className="container pt-16 pb-10">
-        <div className="grid gap-12 md:grid-cols-4">
+    <footer style={{ background: '#181d26', color: '#ffffff' }}>
+      <style>{`
+        .footer-link:hover { color: #ffffff !important; }
+      `}</style>
 
-          {/* Brand */}
-          <div className="md:col-span-1">
-            <Logo size={32} showText textColorClass="text-[#181d26]" />
-            <p className="mt-4 text-sm leading-7" style={{ color: 'rgba(4, 14, 32, 0.55)' }}>
-              The structured onboarding platform for the Aurum ecosystem — educating, guiding, and
-              supporting every new member on their path to AI-managed finance.
-            </p>
-            <Link href="/signup" className="btn-primary mt-6 inline-flex text-sm px-5 py-2.5">
-              Get Started Free →
+      <div className="container-xl" style={{ paddingTop: '4rem', paddingBottom: '2.5rem' }}>
+
+        {/* Top row */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: '3rem',
+          marginBottom: '3rem',
+        }}>
+          {/* Brand col */}
+          <div>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', marginBottom: '1.25rem' }}>
+              <span style={{
+                width: '2rem', height: '2rem',
+                background: '#1b61c9',
+                borderRadius: '0.5rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: 'var(--font-display)', fontWeight: 800,
+                fontSize: '0.875rem', color: '#fff',
+              }}>A</span>
+              <span style={{
+                fontFamily: 'var(--font-display)', fontWeight: 800,
+                fontSize: '1.0625rem', color: '#ffffff',
+                letterSpacing: '-0.01em',
+              }}>
+                AutoPilot<span style={{ color: '#60a5fa' }}>ROI</span>
+              </span>
             </Link>
+            <p style={{
+              fontSize: 'var(--text-caption)',
+              color: 'rgba(255,255,255,0.45)',
+              lineHeight: 1.65,
+              maxWidth: '18rem',
+            }}>
+              The structured onboarding platform for AI-managed finance. Trading bots, crypto cards, exchange, and a Web3 neobank.
+            </p>
           </div>
 
-          {/* Navigate */}
-          <div>
-            <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.1em]" style={{ color: '#181d26' }}>
-              Navigate
-            </h4>
-            <ul className="space-y-2.5">
-              {navLinks.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="footer-link">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Link columns */}
+          {FOOTER_COLS.map(col => (
+            <div key={col.heading}>
+              <div style={{
+                fontSize: 'var(--text-caption)',
+                fontWeight: 700,
+                letterSpacing: '0.10em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.38)',
+                marginBottom: '1rem',
+              }}>
+                {col.heading}
+              </div>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                {col.links.map(link => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="footer-link" style={linkStyle}>
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.1em]" style={{ color: '#181d26' }}>
-              Tools
-            </h4>
-            <ul className="space-y-2.5">
-              {quickLinks.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="footer-link">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.1em]" style={{ color: '#181d26' }}>
-              Legal
-            </h4>
-            <ul className="space-y-2.5">
-              {legalLinks.map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="footer-link">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        {/* Bottom row */}
+        <div style={{
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          paddingTop: '1.5rem',
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '1rem',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <p style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.32)' }}>
+            © {year} AutoPilotROI. All rights reserved. Not financial advice.
+          </p>
+          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+            {(['/privacy', '/terms', '/disclaimer'] as const).map((href, i) => (
+              <Link key={href} href={href} className="footer-link" style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.32)', textDecoration: 'none' }}>
+                {['Privacy', 'Terms', 'Disclaimer'][i]}
+              </Link>
+            ))}
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-12 pt-8 space-y-4" style={{ borderTop: '1px solid #e0e2e6' }}>
-          <p className="text-xs leading-relaxed" style={{ color: 'rgba(4, 14, 32, 0.62)' }}>
-            <strong style={{ color: 'rgba(4, 14, 32, 0.75)' }}>Risk Disclaimer:</strong>{' '}
-            AutoPilot ROI is an independent onboarding platform. This site does not provide financial
-            advice. All investments carry risk, including the risk of total loss. Returns referenced
-            on this site are illustrative and not guaranteed. Never invest more than you can afford
-            to lose. See our{' '}
-            <Link href="/disclaimer" className="footer-link underline">
-              full disclaimer
-            </Link>{' '}
-            for details.
-          </p>
-          <p className="text-xs" style={{ color: 'rgba(4, 14, 32, 0.50)' }}>
-            © {new Date().getFullYear()} AutoPilot ROI. All rights reserved.
-          </p>
-        </div>
       </div>
     </footer>
   )

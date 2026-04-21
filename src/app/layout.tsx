@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Instrument_Sans } from 'next/font/google'
+import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import AnnouncementBanner from '@/components/layout/AnnouncementBanner'
@@ -8,10 +8,17 @@ import Footer from '@/components/layout/Footer'
 import { FeatureFlagProvider } from '@/lib/feature-flags'
 import SmartFaqBot from '@/components/ui/SmartFaqBot'
 
-const instrumentSans = Instrument_Sans({
+const jakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-instrument',
-  weight: ['400', '500', '600', '700'],
+  variable: '--font-display',
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-body',
+  weight: ['400', '500', '600'],
   display: 'swap',
 })
 
@@ -21,9 +28,9 @@ export const metadata: Metadata = {
     template: '%s | AutopilotROI',
   },
   description:
-    'AutopilotROI is building a product-led entry point into AI automation, digital banking, crypto infrastructure, and guided onboarding.',
+    'AutopilotROI is the structured onboarding platform for AI-managed finance — trading bots, crypto cards, exchange, and a Web3 neobank.',
   keywords:
-    'AutopilotROI, AI finance, digital banking, crypto infrastructure, automation, neobank, exchange',
+    'AutopilotROI, AI finance, digital banking, crypto infrastructure, Aurum, automation, neobank, exchange',
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://autopilotroi.com'),
   openGraph: {
     type: 'website',
@@ -58,11 +65,8 @@ const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={instrumentSans.variable}>
-      <body
-        className="flex min-h-screen flex-col"
-        style={{ fontFamily: 'var(--font-instrument, var(--font-sans))' }}
-      >
+    <html lang="en" className={`${jakartaSans.variable} ${inter.variable}`}>
+      <body className="flex min-h-screen flex-col font-body antialiased">
         <FeatureFlagProvider>
           <AnnouncementBanner />
           <Navbar />
@@ -71,7 +75,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <SmartFaqBot />
         </FeatureFlagProvider>
 
-        {/* Plausible Analytics — privacy-friendly */}
         {plausibleDomain && (
           <Script
             defer
@@ -81,15 +84,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         )}
 
-        {/* ThriveDesk Helpdesk Widget */}
         {thriveDeskId && thriveDeskId !== 'placeholder' && (
           <Script
             id="thrivedesk-widget"
             strategy="afterInteractive"
             dangerouslySetInnerHTML={{
-              __html: `
-                console.log('[ThriveDesk] Widget ID: ${thriveDeskId} — ready for embed script');
-              `,
+              __html: `console.log('[ThriveDesk] Widget ID: ${thriveDeskId} — ready for embed script');`,
             }}
           />
         )}
