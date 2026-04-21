@@ -53,98 +53,171 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const excerpt = post.meta?.excerpt as string | undefined
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+    <div className="page-bg">
+      <div className="sections-stack">
 
-      {/* Header bar */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e0e2e6' }} className="px-6 py-4">
-        <div className="mx-auto max-w-4xl">
-          <Link href="/blog"
-            className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-[#1b61c9]"
-            style={{ color: 'rgba(4,14,32,0.50)' }}>
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 5l-7 7 7 7" />
-            </svg>
-            Back to Blog
-          </Link>
+        {/* ── Back nav bar ── */}
+        <div style={{ background: '#ffffff', borderBottom: '1px solid var(--color-border)' }}>
+          <div className="container-xl" style={{ padding: '1rem 1.5rem' }}>
+            <Link
+              href="/blog"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                fontSize: 'var(--text-body)', fontWeight: 500,
+                color: 'var(--color-text-muted)',
+                textDecoration: 'none',
+                transition: 'color 150ms ease',
+              }}
+              onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = '#1b61c9')}
+              onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = 'var(--color-text-muted)')}
+            >
+              <svg style={{ width: '1rem', height: '1rem' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 12H5M12 5l-7 7 7 7" />
+              </svg>
+              Back to Blog
+            </Link>
+          </div>
         </div>
-      </div>
 
-      {/* Article */}
-      <article className="mx-auto max-w-4xl px-6 py-12 lg:px-10">
+        {/* ── Article ── */}
+        <section className="section-box">
+          <div className="container-xl section-padding">
+            <article style={{ maxWidth: '48rem', margin: '0 auto' }}>
 
-        {/* Meta header */}
-        <div className="mb-8">
-          {cat && (
-            <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold capitalize mb-5"
-              style={{ background: cc.bg, color: cc.color, border: `1px solid ${cc.color}20` }}>
-              {cat.replace(/-/g, ' ')}
-            </span>
-          )}
+              {/* Meta header */}
+              <div style={{ marginBottom: '2rem' }}>
+                {cat && (
+                  <span style={{
+                    display: 'inline-block',
+                    background: cc.bg,
+                    color: cc.color,
+                    border: `1px solid ${cc.color}25`,
+                    borderRadius: '99px',
+                    padding: '0.375rem 1rem',
+                    fontSize: 'var(--text-caption)',
+                    fontWeight: 700,
+                    textTransform: 'capitalize',
+                    marginBottom: '1.25rem',
+                  }}>
+                    {cat.replace(/-/g, ' ')}
+                  </span>
+                )}
 
-          <h1 className="text-3xl font-bold lg:text-4xl xl:text-5xl mb-6"
-            style={{ color: '#181d26', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
-            {post.title}
-          </h1>
+                <h1 style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+                  fontWeight: 800,
+                  color: '#181d26',
+                  letterSpacing: '-0.03em',
+                  lineHeight: 1.15,
+                  marginBottom: '1.25rem',
+                }}>
+                  {post.title}
+                </h1>
 
-          {excerpt && (
-            <p className="text-lg leading-relaxed mb-6" style={{ color: 'rgba(4,14,32,0.60)' }}>
-              {excerpt}
-            </p>
-          )}
+                {excerpt && (
+                  <p style={{
+                    fontSize: 'var(--text-body-lg)',
+                    lineHeight: 'var(--lh-relaxed)',
+                    color: 'var(--color-text-weak)',
+                    marginBottom: '1.5rem',
+                  }}>
+                    {excerpt}
+                  </p>
+                )}
 
-          <div className="flex flex-wrap items-center gap-4 pb-6 text-sm"
-            style={{ color: 'rgba(4,14,32,0.45)', borderBottom: '1px solid #e0e2e6' }}>
-            {author && (
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full font-bold text-xs text-white"
-                  style={{ background: '#1b61c9' }}>
-                  {author.charAt(0)}
+                <div style={{
+                  display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.75rem',
+                  paddingBottom: '1.5rem',
+                  color: 'var(--color-text-muted)',
+                  borderBottom: '1px solid var(--color-border)',
+                  fontSize: 'var(--text-body)',
+                }}>
+                  {author && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '2rem', height: '2rem',
+                        borderRadius: '50%',
+                        background: '#1b61c9',
+                        fontFamily: 'var(--font-display)', fontWeight: 700,
+                        fontSize: 'var(--text-caption)', color: '#fff',
+                      }}>
+                        {author.charAt(0)}
+                      </div>
+                      <span style={{ fontWeight: 600, color: '#181d26' }}>{author}</span>
+                    </div>
+                  )}
+                  {publishedAt && (
+                    <>
+                      <span>·</span>
+                      <span>{formatDate(publishedAt)}</span>
+                    </>
+                  )}
                 </div>
-                <span className="font-medium" style={{ color: '#181d26' }}>{author}</span>
               </div>
-            )}
-            {publishedAt && (
-              <>
-                <span>·</span>
-                <span>{formatDate(publishedAt)}</span>
-              </>
-            )}
-          </div>
-        </div>
 
-        {/* Rich content body */}
-        {post.body_html ? (
-          <div
-            className="cms-content"
-            dangerouslySetInnerHTML={{ __html: post.body_html }}
-          />
-        ) : (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-8 text-center">
-            <div className="text-3xl mb-3">✍️</div>
-            <p className="text-sm font-medium text-amber-800">
-              This post is available in the Content Editor but full article text hasn&apos;t been written yet.
-            </p>
-            <p className="mt-2 text-xs text-amber-700">
-              Visit <strong>Admin → Content Editor</strong> to add the full article body.
-            </p>
-          </div>
-        )}
+              {/* Rich content body */}
+              {post.body_html ? (
+                <div className="cms-content" dangerouslySetInnerHTML={{ __html: post.body_html }} />
+              ) : (
+                <div style={{
+                  background: 'rgba(245,158,11,0.06)',
+                  border: '1px solid rgba(245,158,11,0.25)',
+                  borderRadius: 'var(--radius-card)',
+                  padding: '2rem',
+                  textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>✍️</div>
+                  <p style={{ fontSize: 'var(--text-body)', fontWeight: 600, color: '#92400e' }}>
+                    This post is available in the Content Editor but full article text hasn&apos;t been written yet.
+                  </p>
+                  <p style={{ marginTop: '0.5rem', fontSize: 'var(--text-caption)', color: '#b45309' }}>
+                    Visit <strong>Admin → Content Editor</strong> to add the full article body.
+                  </p>
+                </div>
+              )}
 
-        {/* Footer */}
-        <div className="mt-16 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between pt-8"
-          style={{ borderTop: '1px solid #e0e2e6' }}>
-          <Link href="/blog"
-            className="inline-flex items-center gap-2 rounded-xl border border-[#e0e2e6] bg-white px-5 py-2.5 text-sm font-semibold transition hover:border-[#1b61c9] hover:text-[#1b61c9]"
-            style={{ color: '#181d26' }}>
-            ← All Posts
-          </Link>
-          <Link href="/signup"
-            className="inline-flex items-center rounded-xl px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
-            style={{ background: '#1b61c9' }}>
-            Begin Onboarding →
-          </Link>
-        </div>
-      </article>
+              {/* Article footer */}
+              <div style={{
+                display: 'flex', flexWrap: 'wrap', gap: '0.875rem',
+                alignItems: 'center', justifyContent: 'space-between',
+                marginTop: '4rem', paddingTop: '2rem',
+                borderTop: '1px solid var(--color-border)',
+              }}>
+                <Link href="/blog" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                  padding: '0.6875rem 1.25rem',
+                  background: '#ffffff',
+                  border: '1.5px solid var(--color-border)',
+                  borderRadius: 'var(--radius-btn)',
+                  fontFamily: 'var(--font-display)', fontWeight: 600,
+                  fontSize: 'var(--text-body)',
+                  color: '#181d26',
+                  textDecoration: 'none',
+                  transition: 'border-color 150ms ease',
+                }}>
+                  ← All Posts
+                </Link>
+                <Link href="/signup" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                  padding: '0.6875rem 1.5rem',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
+                  borderRadius: 'var(--radius-btn)',
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  fontSize: 'var(--text-body)',
+                  color: '#ffffff',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 16px rgba(27,97,201,0.35)',
+                }}>
+                  Begin Onboarding →
+                </Link>
+              </div>
+            </article>
+          </div>
+        </section>
+
+      </div>
     </div>
   )
 }
