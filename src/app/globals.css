@@ -21,7 +21,7 @@
   --color-blue-pale:    #e8f0fd;
   --color-white:        #ffffff;
   --color-surface:      #f8fafc;
-  --color-page:         #d5d9e2;
+  --color-page:         #eef0f4;
 
   /* Text */
   --color-text:         #181d26;
@@ -102,7 +102,7 @@
     0 4px 20px rgba(27,97,201,0.35),
     0 1px 4px rgba(27,97,201,0.20);
   --shadow-section:
-    0 2px 40px rgba(0,0,0,0.06);
+    0 1px 8px rgba(0,0,0,0.04);
 }
 
 /* ── Base reset ─────────────────────────────────────────────────── */
@@ -185,7 +185,7 @@ body {
 
 /* Page-level background */
 .page-bg {
-  background: #d5d9e2;
+  background: #eef0f4;
   min-height: 100vh;
 }
 
