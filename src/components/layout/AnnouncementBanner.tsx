@@ -56,11 +56,11 @@ export default function AnnouncementBanner() {
   if (!enabled || !message || dismissed) return null
 
   return (
-    <div className="relative z-[60] bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white text-center px-10 py-2">
-      <p className="text-xs sm:text-sm font-medium">{message}</p>
+    <div className="relative z-[60] bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 text-white text-center px-10 py-3">
+      <p className="text-sm font-semibold tracking-wide">{message}</p>
       <button
         onClick={() => setDismissed(true)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition text-lg"
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition text-xl leading-none"
         aria-label="Dismiss announcement"
       >
         ×

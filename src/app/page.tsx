@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import VideoModal from '@/components/ui/VideoModal'
 
 // ── Scroll reveal hook ───────────────────────────────────────────
 function useScrollReveal() {
@@ -261,7 +262,7 @@ export default function HomePage() {
                   transition={{ duration: 0.5, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 >
                   <Link href="/signup" className="btn btn-primary-lg">
-                    Begin Onboarding →
+                    Start Here →
                   </Link>
                   <Link href="/calculator" className="btn btn-ghost btn-primary-lg" style={{
                     background: 'rgba(255,255,255,0.10)',
@@ -272,6 +273,51 @@ export default function HomePage() {
                   }}>
                     Calculate ROI
                   </Link>
+                </motion.div>
+
+                {/* Video trigger */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.32 }}
+                  style={{ marginBottom: '1.5rem' }}
+                >
+                  <VideoModal
+                    videoUrl="https://youtu.be/MmAnR4YAPv4"
+                    ctaLabel="Start Here →"
+                    ctaHref="/signup"
+                  >
+                    <button style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.625rem',
+                      background: 'rgba(255,255,255,0.12)',
+                      border: '1.5px solid rgba(255,255,255,0.28)',
+                      borderRadius: '99px',
+                      padding: '0.5rem 1.25rem 0.5rem 0.5rem',
+                      cursor: 'pointer',
+                      color: '#ffffff',
+                      fontSize: 'var(--text-body)',
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 500,
+                      transition: 'background 150ms ease, border-color 150ms ease',
+                    }}>
+                      <span style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '2rem',
+                        height: '2rem',
+                        borderRadius: '50%',
+                        background: '#ffffff',
+                      }}>
+                        <svg width="10" height="12" viewBox="0 0 10 12" fill="#1b61c9">
+                          <path d="M0 0L10 6L0 12V0Z"/>
+                        </svg>
+                      </span>
+                      Watch how it works
+                    </button>
+                  </VideoModal>
                 </motion.div>
 
                 <motion.div

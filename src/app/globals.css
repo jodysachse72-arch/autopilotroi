@@ -52,7 +52,7 @@
   --radius-btn:     0.75rem;    /* 12px — button */
   --radius-card:    1rem;       /* 16px — card */
   --radius-lg:      1.5rem;     /* 24px — large card */
-  --radius-section: 2.5rem;     /* 40px — scroll-box sections */
+  --radius-section: 1.125rem;   /* 18px — credit-card rounding */
 
   /* Spacing */
   --space-section-sm: 5rem;     /* 80px  */
