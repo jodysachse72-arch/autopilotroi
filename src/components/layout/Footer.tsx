@@ -5,7 +5,7 @@ const FOOTER_COLS = [
   {
     heading: 'Platform',
     links: [
-      { label: 'Products',    href: '/products' },
+      { label: 'What Is Aurum', href: '/products' },
       { label: 'University',  href: '/university' },
       { label: 'Calculator',  href: '/calculator' },
       { label: 'Media',       href: '/media' },

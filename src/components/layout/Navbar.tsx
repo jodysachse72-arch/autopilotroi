@@ -7,7 +7,7 @@ import { LogoIcon } from '@/components/ui/Logo'
 
 // Public nav items — always visible
 const publicNav = [
-  { label: 'Products',    href: '/products' },
+  { label: 'What Is Aurum', href: '/products' },
   { label: 'Calculator',  href: '/calculator' },
   { label: 'University',  href: '/university' },
   { label: 'Blog',        href: '/blog' },
