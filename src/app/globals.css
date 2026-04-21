@@ -21,7 +21,7 @@
   --color-blue-pale:    #e8f0fd;
   --color-white:        #ffffff;
   --color-surface:      #f8fafc;
-  --color-page:         #f0f2f6;
+  --color-page:         #d5d9e2;
 
   /* Text */
   --color-text:         #181d26;
@@ -185,7 +185,7 @@ body {
 
 /* Page-level background */
 .page-bg {
-  background: #f0f2f6;
+  background: #d5d9e2;
   min-height: 100vh;
 }
 
@@ -227,18 +227,15 @@ body {
 }
 
 /* Gap between sections on page-bg */
+/* clamp(min, preferred, max):
+   Mobile 375px → ~20px padding, ~12px gap
+   Laptop 1440px → ~58px padding, ~22px gap
+   4K    2560px → capped at 80px/32px */
 .sections-stack {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.75rem;
-}
-
-@media (min-width: 768px) {
-  .sections-stack {
-    gap: 1rem;
-    padding: 1rem;
-  }
+  gap: clamp(0.75rem, 1.5vw, 2rem);
+  padding: clamp(1.25rem, 4vw, 5rem);
 }
 
 /* ── Buttons ─────────────────────────────────────────────────────── */
@@ -553,8 +550,8 @@ input, textarea, select {
 /* ── Responsive utilities ────────────────────────────────────────── */
 @media (max-width: 767px) {
   .sections-stack {
-    gap: 0.5rem;
-    padding: 0.5rem;
+    gap: 0.75rem;
+    padding: 1.25rem;
   }
   .section-padding {
     padding-top: 4rem;
