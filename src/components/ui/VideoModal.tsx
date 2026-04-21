@@ -20,9 +20,12 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
     if (!dialog) return
     if (isOpen) {
       dialog.showModal()
+      document.body.style.overflow = 'hidden'
     } else {
       dialog.close()
+      document.body.style.overflow = ''
     }
+    return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
   // Close on backdrop click
@@ -30,10 +33,8 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
     const rect = dialogRef.current?.getBoundingClientRect()
     if (!rect) return
     const isOutside =
-      e.clientX < rect.left ||
-      e.clientX > rect.right ||
-      e.clientY < rect.top ||
-      e.clientY > rect.bottom
+      e.clientX < rect.left || e.clientX > rect.right ||
+      e.clientY < rect.top  || e.clientY > rect.bottom
     if (isOutside) setIsOpen(false)
   }
 
@@ -44,7 +45,6 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
       if (u.hostname.includes('youtube.com') || u.hostname.includes('youtu.be')) {
         let videoId = u.searchParams.get('v')
         if (!videoId) {
-          // Handle youtu.be/ID and youtube.com/embed/ID
           videoId = u.pathname.replace('/embed/', '').replace('/', '')
         }
         return `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`
@@ -58,22 +58,37 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
 
   return (
     <>
-      <span onClick={() => setIsOpen(true)} style={{ cursor: 'pointer' }}>
+      <span onClick={() => setIsOpen(true)} style={{ cursor: 'pointer', display: 'contents' }}>
         {children}
       </span>
 
+      {/* ── Dialog: fixed + inset:0 + margin:auto = always centered ── */}
       <dialog
         ref={dialogRef}
         onClick={handleDialogClick}
-        className="m-auto max-h-screen max-w-5xl w-full rounded-[1.8rem] border border-white/20 bg-slate-950/95 p-0 backdrop:bg-black/70 backdrop:backdrop-blur-sm"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          margin: 'auto',
+          padding: 0,
+          border: '1px solid rgba(255,255,255,0.12)',
+          width: '90vw',
+          maxWidth: '56rem',
+          maxHeight: '90vh',
+          borderRadius: '1.25rem',
+          overflow: 'hidden',
+          background: 'transparent',
+          boxShadow: '0 32px 80px rgba(0,0,0,0.55)',
+        }}
+        className="backdrop:bg-black/70 backdrop:backdrop-blur-sm"
       >
-        <div className="relative w-full overflow-hidden rounded-[1.8rem]">
+        <div style={{ background: '#0c1220', width: '100%' }}>
           {/* Video */}
-          <div className="aspect-video w-full">
+          <div style={{ aspectRatio: '16/9', width: '100%' }}>
             {isOpen && (
               <iframe
                 src={getEmbedUrl(videoUrl)}
-                className="h-full w-full"
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
                 title="AutoPilot ROI Overview Video"
@@ -81,15 +96,26 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
             )}
           </div>
 
-          {/* CTA Button below video */}
+          {/* CTA below video */}
           {ctaLabel && ctaHref && (
-            <div className="flex justify-center bg-slate-950/95 px-6 py-5">
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '1.25rem 1.5rem', background: '#0c1220' }}>
               <Link
                 href={ctaHref}
-                className="group relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-10 py-4 text-lg font-bold text-white shadow-[0_8px_24px_rgba(59,130,246,0.5)] transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(59,130,246,0.65)]"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
+                  color: '#ffffff',
+                  padding: '0.875rem 2.5rem',
+                  borderRadius: '0.75rem',
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  textDecoration: 'none',
+                  boxShadow: '0 8px 24px rgba(27,97,201,0.45)',
+                  transition: 'transform 150ms ease, box-shadow 150ms ease',
+                }}
               >
-                <span className="relative z-10">{ctaLabel}</span>
-                <span className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                {ctaLabel}
               </Link>
             </div>
           )}
@@ -97,7 +123,19 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
           {/* Close button */}
           <button
             onClick={() => setIsOpen(false)}
-            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md transition hover:bg-white/35"
+            style={{
+              position: 'absolute', right: '1rem', top: '1rem',
+              width: '2.25rem', height: '2.25rem',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.18)',
+              border: 'none',
+              color: '#ffffff',
+              fontSize: '1.125rem',
+              cursor: 'pointer',
+              backdropFilter: 'blur(8px)',
+              transition: 'background 150ms ease',
+            }}
             aria-label="Close video"
           >
             ✕

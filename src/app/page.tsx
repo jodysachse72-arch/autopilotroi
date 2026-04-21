@@ -255,8 +255,9 @@ export default function HomePage() {
                   AutoPilotROI is your structured guide into the Aurum ecosystem — AI-powered crypto trading, a Visa crypto card, exchange, and Web3 neobank. Start with $100.
                 </motion.p>
 
+                {/* ── Two CTA buttons ── */}
                 <motion.div
-                  style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}
+                  style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', marginBottom: '2rem' }}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
@@ -264,58 +265,26 @@ export default function HomePage() {
                   <Link href="/signup" className="btn btn-primary-lg">
                     Start Here →
                   </Link>
-                  <Link href="/calculator" className="btn btn-ghost btn-primary-lg" style={{
-                    background: 'rgba(255,255,255,0.10)',
-                    padding: '1rem 2.25rem',
-                    fontFamily: 'var(--font-display)',
-                    fontWeight: 700,
-                    fontSize: 'var(--text-body-lg)',
-                  }}>
-                    Calculate ROI
-                  </Link>
-                </motion.div>
 
-                {/* Video trigger */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.32 }}
-                  style={{ marginBottom: '1.5rem' }}
-                >
                   <VideoModal
                     videoUrl="https://youtu.be/MmAnR4YAPv4"
                     ctaLabel="Start Here →"
                     ctaHref="/signup"
                   >
-                    <button style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.625rem',
-                      background: 'rgba(255,255,255,0.12)',
-                      border: '1.5px solid rgba(255,255,255,0.28)',
-                      borderRadius: '99px',
-                      padding: '0.5rem 1.25rem 0.5rem 0.5rem',
-                      cursor: 'pointer',
-                      color: '#ffffff',
-                      fontSize: 'var(--text-body)',
-                      fontFamily: 'var(--font-body)',
-                      fontWeight: 500,
-                      transition: 'background 150ms ease, border-color 150ms ease',
-                    }}>
+                    <button
+                      className="btn btn-ghost btn-primary-lg"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.625rem' }}
+                    >
                       <span style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '2rem',
-                        height: '2rem',
-                        borderRadius: '50%',
-                        background: '#ffffff',
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        width: '1.5rem', height: '1.5rem', borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.95)',
                       }}>
-                        <svg width="10" height="12" viewBox="0 0 10 12" fill="#1b61c9">
-                          <path d="M0 0L10 6L0 12V0Z"/>
+                        <svg width="8" height="10" viewBox="0 0 8 10" fill="#1b61c9">
+                          <path d="M0 0L8 5L0 10V0Z"/>
                         </svg>
                       </span>
-                      Watch how it works
+                      Watch Overview
                     </button>
                   </VideoModal>
                 </motion.div>
@@ -339,92 +308,107 @@ export default function HomePage() {
                 </motion.div>
               </div>
 
-              {/* Right — dashboard placeholder */}
+              {/* ── Right: YouTube video thumbnail ── */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.96, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.18)',
-                  borderRadius: '1.5rem',
-                  overflow: 'hidden',
-                  backdropFilter: 'blur(8px)',
-                }}>
-                  {/* Mock app header */}
+                <VideoModal
+                  videoUrl="https://youtu.be/MmAnR4YAPv4"
+                  ctaLabel="Start Here →"
+                  ctaHref="/signup"
+                >
+                  {/* Browser chrome card */}
                   <div style={{
-                    background: 'rgba(255,255,255,0.07)',
-                    borderBottom: '1px solid rgba(255,255,255,0.10)',
-                    padding: '1rem 1.5rem',
-                    display: 'flex', alignItems: 'center', gap: '0.5rem',
-                  }}>
-                    {['#ff5f56','#ffbd2e','#27c93f'].map(c => (
-                      <div key={c} style={{ width: 12, height: 12, borderRadius: '50%', background: c }} />
-                    ))}
-                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.40)', marginLeft: '0.5rem' }}>
-                      AutoPilotROI Dashboard
-                    </span>
-                  </div>
-
-                  {/* Mock dashboard body */}
-                  <div style={{ padding: '1.5rem' }}>
-                    {/* Top stats row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                      {[
-                        { label: 'Portfolio Value', value: '$12,847', up: true },
-                        { label: "Today's Gain",    value: '+$234',   up: true },
-                        { label: 'Active Since',    value: '47 days', up: null },
-                      ].map(s => (
-                        <div key={s.label} style={{
-                          background: 'rgba(255,255,255,0.07)',
-                          borderRadius: '0.75rem', padding: '0.875rem',
-                        }}>
-                          <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.45)', marginBottom: '0.25rem' }}>{s.label}</div>
-                          <div style={{
-                            fontFamily: 'var(--font-display)', fontWeight: 700,
-                            fontSize: '1.0625rem', color: s.up === true ? '#34d399' : s.up === false ? '#f87171' : '#ffffff',
-                          }}>{s.value}</div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Fake chart bars */}
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.18)',
+                    borderRadius: '1.25rem',
+                    overflow: 'hidden',
+                    backdropFilter: 'blur(8px)',
+                    cursor: 'pointer',
+                    transition: 'transform 200ms ease, box-shadow 200ms ease',
+                    boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'
+                    ;(e.currentTarget as HTMLElement).style.boxShadow = '0 32px 80px rgba(0,0,0,0.45)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.transform = ''
+                    ;(e.currentTarget as HTMLElement).style.boxShadow = '0 24px 64px rgba(0,0,0,0.35)'
+                  }}
+                  >
+                    {/* Browser chrome header */}
                     <div style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      borderRadius: '0.875rem',
-                      padding: '1rem',
-                      marginBottom: '1rem',
-                    }}>
-                      <div style={{ fontSize: '0.6875rem', color: 'rgba(255,255,255,0.40)', marginBottom: '0.75rem' }}>
-                        Portfolio Performance (30d)
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.375rem', height: '72px' }}>
-                        {[40,55,48,62,58,70,65,78,72,85,80,90,88,95].map((h, i) => (
-                          <div key={i} style={{
-                            flex: 1,
-                            height: `${h}%`,
-                            background: i > 10 ? '#34d399' : 'rgba(255,255,255,0.20)',
-                            borderRadius: '3px 3px 0 0',
-                            transition: 'height 0.5s ease',
-                          }} />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* AI status pill */}
-                    <div style={{
+                      background: 'rgba(255,255,255,0.07)',
+                      borderBottom: '1px solid rgba(255,255,255,0.10)',
+                      padding: '0.75rem 1.25rem',
                       display: 'flex', alignItems: 'center', gap: '0.5rem',
-                      background: 'rgba(52,211,153,0.12)',
-                      border: '1px solid rgba(52,211,153,0.25)',
-                      borderRadius: '99px', padding: '0.5rem 1rem',
-                      width: 'fit-content',
                     }}>
-                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399', boxShadow: '0 0 0 3px rgba(52,211,153,0.3)' }} />
-                      <span style={{ fontSize: '0.8125rem', color: '#34d399', fontWeight: 600 }}>EX-AI Bot Active — trading</span>
+                      {['#ff5f56','#ffbd2e','#27c93f'].map(c => (
+                        <div key={c} style={{ width: 10, height: 10, borderRadius: '50%', background: c }} />
+                      ))}
+                      <span style={{
+                        flex: 1, textAlign: 'center',
+                        fontSize: '0.75rem', color: 'rgba(255,255,255,0.38)',
+                        marginLeft: '-1.5rem',
+                      }}>
+                        app.autopilotroi.com
+                      </span>
+                    </div>
+
+                    {/* Video thumbnail */}
+                    <div style={{ position: 'relative', aspectRatio: '16/9' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="https://i.ytimg.com/vi/MmAnR4YAPv4/hqdefault.jpg"
+                        alt="AutoPilotROI Overview Video"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                      {/* Dark overlay */}
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        background: 'rgba(0,0,0,0.28)',
+                      }} />
+                      {/* YouTube-style play button */}
+                      <div style={{
+                        position: 'absolute', inset: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <div style={{
+                          width: '64px', height: '64px', borderRadius: '50%',
+                          background: 'rgba(255,0,0,0.92)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          boxShadow: '0 4px 32px rgba(255,0,0,0.55)',
+                          transition: 'transform 200ms ease',
+                        }}>
+                          <svg width="22" height="26" viewBox="0 0 22 26" fill="white">
+                            <path d="M0 0L22 13L0 26V0Z"/>
+                          </svg>
+                        </div>
+                      </div>
+                      {/* Watch label */}
+                      <div style={{
+                        position: 'absolute', bottom: '1rem', left: 0, right: 0,
+                        display: 'flex', justifyContent: 'center',
+                      }}>
+                        <span style={{
+                          background: 'rgba(0,0,0,0.55)',
+                          backdropFilter: 'blur(6px)',
+                          borderRadius: '99px',
+                          padding: '0.375rem 1rem',
+                          fontSize: '0.8125rem',
+                          color: 'rgba(255,255,255,0.88)',
+                          fontWeight: 500,
+                          letterSpacing: '0.02em',
+                        }}>
+                          ▶ Watch Overview
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </VideoModal>
               </motion.div>
             </div>
           </div>
