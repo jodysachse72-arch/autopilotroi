@@ -14,102 +14,221 @@ const products = [
   { id: 'subscription', name: 'Subscription Tiers', tagline: 'All-Access Membership', description: 'Membership tiers that unlock progressive levels of the ecosystem. From basic bot access to full-suite institutional features and partner program access.', features: ['Tiered membership levels', 'Progressive feature unlock', 'Partner program access', 'Priority support channels'], badge: null, badgeColor: '', icon: '🎯' },
 ]
 
+const STATS = [
+  { num: '8',    label: 'Products' },
+  { num: '18K+', label: 'Partners' },
+  { num: '$30M', label: 'AUM' },
+]
+
 export default function ProductSuitePage() {
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
-      {/* Hero */}
-      <section className="px-6 py-20 lg:py-28 lg:px-10" style={{ background: '#fff', borderBottom: '1px solid #e0e2e6' }}>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mx-auto max-w-4xl text-center">
-          <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] mb-4"
-            style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9', border: '1px solid rgba(27,97,201,0.15)' }}>
-            AI-Managed Finance
-          </span>
-          <h1 className="text-4xl font-bold lg:text-5xl mb-5" style={{ color: '#181d26', letterSpacing: '-0.03em' }}>
-            The Complete Product Suite
-          </h1>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: 'rgba(4,14,32,0.55)', lineHeight: 1.7 }}>
-            Eight integrated products powering the future of digital finance — from AI-driven trading bots to a full Web 3.0 bank — everything works together as one ecosystem.
-          </p>
-          <div className="mt-10 flex justify-center gap-10">
-            {[{ num: '8', label: 'Products' }, { num: '18K+', label: 'Partners' }, { num: '$30M', label: 'AUM' }].map(s => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl font-bold" style={{ color: '#1b61c9', letterSpacing: '-0.03em' }}>{s.num}</div>
-                <div className="text-xs font-bold uppercase tracking-[0.12em] mt-1" style={{ color: 'rgba(4,14,32,0.4)' }}>{s.label}</div>
+    <div className="page-bg">
+      <div className="sections-stack">
+
+        {/* ── Hero ── */}
+        <section className="section-box">
+          <div className="container-xl section-padding">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              style={{ maxWidth: '52rem', margin: '0 auto', textAlign: 'center' }}
+            >
+              <span className="text-label" style={{
+                display: 'inline-block',
+                background: 'rgba(27,97,201,0.08)',
+                color: '#1b61c9',
+                border: '1px solid rgba(27,97,201,0.15)',
+                borderRadius: '99px',
+                padding: '0.375rem 1rem',
+                marginBottom: '1.25rem',
+              }}>
+                AI-Managed Finance
+              </span>
+
+              <h1 className="text-display" style={{ color: '#181d26', marginBottom: '1.25rem' }}>
+                The Complete Product Suite
+              </h1>
+
+              <p className="text-body-lg" style={{ color: 'var(--color-text-weak)', maxWidth: '38rem', margin: '0 auto 3rem' }}>
+                Eight integrated products powering the future of digital finance — from AI-driven trading bots to a full Web 3.0 bank — everything works together as one ecosystem.
+              </p>
+
+              {/* Stats */}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(2rem,6vw,5rem)' }}>
+                {STATS.map(s => (
+                  <div key={s.label} style={{ textAlign: 'center' }}>
+                    <div style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 'clamp(1.75rem,3vw,2.5rem)',
+                      fontWeight: 800,
+                      color: '#1b61c9',
+                      letterSpacing: '-0.03em',
+                      lineHeight: 1,
+                    }}>{s.num}</div>
+                    <div className="text-label" style={{ color: 'var(--color-text-muted)', marginTop: '0.375rem' }}>
+                      {s.label}
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </motion.div>
           </div>
-        </motion.div>
-      </section>
+        </section>
 
-      {/* Product grid */}
-      <section className="py-16 lg:py-24 px-6 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-6 md:grid-cols-2">
-            {products.map((product, i) => (
-              <motion.div
-                key={product.id}
-                id={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05, duration: 0.4 }}
-                className="group relative rounded-2xl p-8 transition-shadow hover:shadow-[0_8px_32px_rgba(27,97,201,0.12)]"
-                style={{ background: '#fff', border: '1px solid #e0e2e6' }}
-              >
-                {/* Badge */}
-                {product.badge && (
-                  <span className="absolute right-6 top-6 rounded-full px-3 py-1 text-xs font-bold text-white"
-                    style={{ background: product.badgeColor }}>
-                    {product.badge}
-                  </span>
-                )}
+        {/* ── Product grid ── */}
+        <section className="section-box">
+          <div className="container-xl section-padding">
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 26rem), 1fr))',
+              gap: '1.25rem',
+            }}>
+              {products.map((product, i) => (
+                <motion.div
+                  key={product.id}
+                  id={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.4 }}
+                  className="group"
+                  style={{
+                    position: 'relative',
+                    background: '#ffffff',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-card)',
+                    padding: '2rem',
+                    transition: 'box-shadow 200ms ease, transform 200ms ease',
+                    cursor: 'default',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card-hover)'
+                    ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none'
+                    ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+                  }}
+                >
+                  {/* Badge */}
+                  {product.badge && (
+                    <span style={{
+                      position: 'absolute', right: '1.25rem', top: '1.25rem',
+                      background: product.badgeColor,
+                      color: '#fff',
+                      borderRadius: '99px',
+                      padding: '0.25rem 0.75rem',
+                      fontSize: 'var(--text-caption)',
+                      fontWeight: 700,
+                    }}>
+                      {product.badge}
+                    </span>
+                  )}
 
-                {/* Icon */}
-                <div className="mb-5 flex h-13 w-13 items-center justify-center rounded-xl text-2xl"
-                  style={{ background: 'rgba(27,97,201,0.08)', width: '3.25rem', height: '3.25rem' }}>
-                  {product.icon}
-                </div>
+                  {/* Icon */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: '3.25rem', height: '3.25rem',
+                    background: 'rgba(27,97,201,0.08)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '1.5rem',
+                    marginBottom: '1.25rem',
+                  }}>
+                    {product.icon}
+                  </div>
 
-                <h3 className="text-xl font-bold mb-1 group-hover:text-[#1b61c9] transition-colors" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>
-                  {product.name}
-                </h3>
-                <p className="text-sm font-semibold mb-4" style={{ color: '#1b61c9' }}>{product.tagline}</p>
-                <p className="text-sm leading-relaxed mb-6" style={{ color: 'rgba(4,14,32,0.6)' }}>{product.description}</p>
+                  <h3 style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 'var(--text-subheading)',
+                    fontWeight: 700,
+                    color: '#181d26',
+                    letterSpacing: '-0.02em',
+                    marginBottom: '0.25rem',
+                  }}>
+                    {product.name}
+                  </h3>
+                  <p style={{ fontSize: 'var(--text-body)', fontWeight: 600, color: '#1b61c9', marginBottom: '0.875rem' }}>
+                    {product.tagline}
+                  </p>
+                  <p style={{ fontSize: 'var(--text-body)', lineHeight: 1.65, color: 'var(--color-text-weak)', marginBottom: '1.5rem' }}>
+                    {product.description}
+                  </p>
 
-                <ul className="grid grid-cols-2 gap-2">
-                  {product.features.map(f => (
-                    <li key={f} className="flex items-start gap-2 text-sm" style={{ color: 'rgba(4,14,32,0.7)' }}>
-                      <svg className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#1b61c9' }} fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
+                  <ul style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                    {product.features.map(f => (
+                      <li key={f} style={{
+                        display: 'flex', alignItems: 'flex-start', gap: '0.5rem',
+                        fontSize: 'var(--text-body)', color: 'var(--color-text-weak)',
+                      }}>
+                        <svg style={{ width: '1rem', height: '1rem', color: '#1b61c9', flexShrink: 0, marginTop: '0.2rem' }} fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
 
-                <div className="mt-6 flex items-center gap-1 text-sm font-semibold group-hover:gap-2 transition-all" style={{ color: '#1b61c9' }}>
-                  Explore Details <span className="transition-transform group-hover:translate-x-1">→</span>
-                </div>
-              </motion.div>
-            ))}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: '0.375rem',
+                    marginTop: '1.5rem',
+                    fontSize: 'var(--text-body)', fontWeight: 600, color: '#1b61c9',
+                  }}>
+                    Explore Details <span>→</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Band */}
-      <section className="px-6 py-20 lg:px-10 text-center" style={{ background: '#1b61c9' }}>
-        <h2 className="text-3xl font-bold text-white mb-4" style={{ letterSpacing: '-0.02em' }}>Ready to Get Started?</h2>
-        <p className="text-white/75 mb-8 max-w-xl mx-auto">
-          Complete the onboarding process and start exploring the full ecosystem with guided support from your partner.
-        </p>
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Link href="/signup" className="rounded-xl px-8 py-3.5 font-bold text-[#1b61c9] transition hover:opacity-90" style={{ background: '#fff' }}>
-            Start Here →
-          </Link>
-          <Link href="/university" className="rounded-xl border border-white/30 px-8 py-3.5 font-bold text-white transition hover:bg-white/10">
-            Explore University
-          </Link>
-        </div>
-      </section>
+        {/* ── CTA Band ── */}
+        <section className="section-box-navy">
+          <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
+            <h2 className="text-heading" style={{ color: '#ffffff', marginBottom: '1rem' }}>
+              Ready to Get Started?
+            </h2>
+            <p style={{
+              fontSize: 'var(--text-body-lg)',
+              color: 'rgba(255,255,255,0.65)',
+              maxWidth: '36rem',
+              margin: '0 auto 2.5rem',
+              lineHeight: 'var(--lh-relaxed)',
+            }}>
+              Complete the onboarding process and start exploring the full ecosystem with guided support from your partner.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', justifyContent: 'center' }}>
+              <Link href="/signup" style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
+                color: '#ffffff',
+                padding: '0.875rem 2rem',
+                borderRadius: 'var(--radius-btn)',
+                fontFamily: 'var(--font-display)', fontWeight: 700,
+                fontSize: 'var(--text-body)',
+                textDecoration: 'none',
+                boxShadow: '0 4px 16px rgba(27,97,201,0.45)',
+                letterSpacing: '0.01em',
+              }}>
+                Start Here →
+              </Link>
+              <Link href="/university" style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                background: 'rgba(255,255,255,0.08)',
+                color: '#ffffff',
+                padding: '0.875rem 2rem',
+                borderRadius: 'var(--radius-btn)',
+                fontFamily: 'var(--font-display)', fontWeight: 600,
+                fontSize: 'var(--text-body)',
+                textDecoration: 'none',
+                border: '1px solid rgba(255,255,255,0.18)',
+              }}>
+                Explore University
+              </Link>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </div>
   )
 }

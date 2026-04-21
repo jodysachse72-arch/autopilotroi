@@ -39,120 +39,235 @@ export default function BlogPageClient({ posts }: Props) {
   const featured = posts.find(p => p.meta?.featured)
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+    <div className="page-bg">
+      <div className="sections-stack">
 
-      {/* Hero */}
-      <section className="px-6 py-16 lg:px-10" style={{ background: '#fff', borderBottom: '1px solid #e0e2e6' }}>
-        <div className="mx-auto max-w-7xl text-center">
-          <span className="inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] mb-4"
-            style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9', border: '1px solid rgba(27,97,201,0.15)' }}>
-            📝 Blog
-          </span>
-          <h1 className="text-4xl font-bold mb-4" style={{ color: '#181d26', letterSpacing: '-0.03em' }}>
-            Insights &amp; Updates
-          </h1>
-          <p className="text-lg max-w-xl mx-auto" style={{ color: 'rgba(4,14,32,0.55)', lineHeight: 1.7 }}>
-            Education, product updates, and partner resources — curated by the AutoPilot ROI team.
-          </p>
-        </div>
-      </section>
+        {/* ── Hero ── */}
+        <section className="section-box">
+          <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
+            <span className="text-label" style={{
+              display: 'inline-block',
+              background: 'rgba(27,97,201,0.08)',
+              color: '#1b61c9',
+              border: '1px solid rgba(27,97,201,0.15)',
+              borderRadius: '99px',
+              padding: '0.375rem 1rem',
+              marginBottom: '1.25rem',
+            }}>
+              📝 Blog
+            </span>
 
-      {/* Featured post */}
-      {featured && (
-        <section className="px-6 pt-10 lg:px-10">
-          <div className="mx-auto max-w-7xl">
-            <Link href={`/blog/${featured.slug}`}
-              className="group block rounded-2xl p-8 lg:p-10 transition-shadow hover:shadow-[0_8px_32px_rgba(27,97,201,0.12)]"
-              style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
-              <span className="inline-block rounded-full px-3 py-1 text-xs font-bold mb-4"
-                style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9' }}>
-                ⭐ Featured
-              </span>
-              <h2 className="text-2xl font-bold mb-3 group-hover:text-[#1b61c9] transition-colors lg:text-3xl"
-                style={{ color: '#181d26', letterSpacing: '-0.02em' }}>
-                {featured.title}
-              </h2>
-              {featured.meta?.excerpt && (
-                <p className="max-w-2xl mb-4 leading-relaxed" style={{ color: 'rgba(4,14,32,0.6)' }}>
-                  {featured.meta.excerpt as string}
-                </p>
-              )}
-              <div className="flex items-center gap-3 text-sm" style={{ color: 'rgba(4,14,32,0.4)' }}>
-                {featured.meta?.author && <span>{featured.meta.author as string}</span>}
-                {featured.meta?.author && featured.meta?.publishedAt && <span>·</span>}
-                {featured.meta?.publishedAt && <span>{formatDate(featured.meta.publishedAt as string)}</span>}
-              </div>
-            </Link>
+            <h1 className="text-display" style={{ color: '#181d26', marginBottom: '1rem' }}>
+              Insights &amp; Updates
+            </h1>
+
+            <p className="text-body-lg" style={{
+              color: 'var(--color-text-weak)',
+              maxWidth: '32rem',
+              margin: '0 auto',
+              lineHeight: 'var(--lh-relaxed)',
+            }}>
+              Education, product updates, and partner resources — curated by the AutoPilot ROI team.
+            </p>
           </div>
         </section>
-      )}
 
-      {/* Category filters */}
-      <section className="px-6 py-6 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {CATEGORIES.map(cat => (
-              <button key={cat.value} onClick={() => setActiveCategory(cat.value)}
-                className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition"
+        {/* ── Featured post ── */}
+        {featured && (
+          <section className="section-box">
+            <div className="container-xl" style={{ padding: '2rem clamp(1.25rem,4vw,4rem)' }}>
+              <Link
+                href={`/blog/${featured.slug}`}
+                className="group"
                 style={{
-                  background: activeCategory === cat.value ? '#1b61c9' : '#fff',
-                  color: activeCategory === cat.value ? '#fff' : 'rgba(4,14,32,0.65)',
-                  border: activeCategory === cat.value ? '1px solid #1b61c9' : '1px solid #e0e2e6',
+                  display: 'block',
+                  background: 'var(--color-surface)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: 'clamp(1.5rem,4vw,2.5rem)',
+                  textDecoration: 'none',
+                  transition: 'box-shadow 200ms ease',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.boxShadow = 'var(--shadow-card-hover)')}
+                onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+              >
+                <span style={{
+                  display: 'inline-block',
+                  background: 'rgba(27,97,201,0.08)',
+                  color: '#1b61c9',
+                  borderRadius: '99px',
+                  padding: '0.25rem 0.75rem',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 700,
+                  marginBottom: '1rem',
                 }}>
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+                  ⭐ Featured
+                </span>
+                <h2 style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--text-subheading)',
+                  fontWeight: 700,
+                  color: '#181d26',
+                  letterSpacing: '-0.02em',
+                  marginBottom: '0.75rem',
+                  transition: 'color 150ms ease',
+                }}>
+                  {featured.title}
+                </h2>
+                {featured.meta?.excerpt && (
+                  <p style={{
+                    fontSize: 'var(--text-body)',
+                    color: 'var(--color-text-weak)',
+                    lineHeight: 'var(--lh-relaxed)',
+                    maxWidth: '48rem',
+                    marginBottom: '1rem',
+                  }}>
+                    {featured.meta.excerpt as string}
+                  </p>
+                )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+                  {featured.meta?.author && <span>{featured.meta.author as string}</span>}
+                  {featured.meta?.author && featured.meta?.publishedAt && <span>·</span>}
+                  {featured.meta?.publishedAt && <span>{formatDate(featured.meta.publishedAt as string)}</span>}
+                </div>
+              </Link>
+            </div>
+          </section>
+        )}
 
-      {/* Post grid */}
-      <section className="px-6 pb-20 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          {filtered.length === 0 ? (
-            <div className="rounded-2xl p-12 text-center" style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
-              <div className="text-3xl mb-3">📝</div>
-              <p style={{ color: 'rgba(4,14,32,0.5)' }}>No posts in this category yet.</p>
+        {/* ── Category filters + Post grid ── */}
+        <section className="section-box">
+          <div className="container-xl section-padding">
+
+            {/* Filters */}
+            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem', marginBottom: '2rem' }}>
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.value}
+                  onClick={() => setActiveCategory(cat.value)}
+                  style={{
+                    whiteSpace: 'nowrap',
+                    borderRadius: '99px',
+                    padding: '0.4375rem 1rem',
+                    fontSize: 'var(--text-body)',
+                    fontWeight: 600,
+                    background: activeCategory === cat.value ? '#1b61c9' : '#ffffff',
+                    color: activeCategory === cat.value ? '#fff' : 'var(--color-text-weak)',
+                    border: activeCategory === cat.value ? '1.5px solid #1b61c9' : '1.5px solid var(--color-border)',
+                    cursor: 'pointer',
+                    transition: 'all 150ms ease',
+                    fontFamily: 'var(--font-body)',
+                    flexShrink: 0,
+                  }}
+                >
+                  {cat.label}
+                </button>
+              ))}
             </div>
-          ) : (
-            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {filtered.map(post => {
-                const cat = post.meta?.category as string | undefined
-                const cc = (cat && CATEGORY_COLORS[cat]) || { bg: 'rgba(4,14,32,0.06)', color: 'rgba(4,14,32,0.55)' }
-                const excerpt = post.meta?.excerpt as string | undefined
-                const author = post.meta?.author as string | undefined
-                const publishedAt = (post.meta?.publishedAt as string | undefined) ?? post.publish_at
-                return (
-                  <Link key={post.id} href={`/blog/${post.slug}`}
-                    className="group block rounded-2xl p-6 transition-shadow hover:shadow-[0_8px_24px_rgba(27,97,201,0.10)]"
-                    style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
-                    {cat && (
-                      <span className="inline-block rounded-full px-3 py-1 text-xs font-bold capitalize mb-4"
-                        style={{ background: cc.bg, color: cc.color }}>
-                        {cat.replace(/-/g, ' ')}
-                      </span>
-                    )}
-                    <h3 className="text-lg font-bold mb-2 group-hover:text-[#1b61c9] transition-colors line-clamp-2"
-                      style={{ color: '#181d26', letterSpacing: '-0.01em' }}>
-                      {post.title}
-                    </h3>
-                    {excerpt && (
-                      <p className="text-sm leading-relaxed line-clamp-3 mb-4" style={{ color: 'rgba(4,14,32,0.6)' }}>
-                        {excerpt}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-2 text-xs" style={{ color: 'rgba(4,14,32,0.4)' }}>
-                      {author && <span>{author}</span>}
-                      {author && publishedAt && <span>·</span>}
-                      {publishedAt && <span>{formatDate(publishedAt)}</span>}
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          )}
-        </div>
-      </section>
+
+            {/* Grid */}
+            {filtered.length === 0 ? (
+              <div style={{
+                background: 'var(--color-surface)',
+                border: '1px solid var(--color-border)',
+                borderRadius: 'var(--radius-card)',
+                padding: '4rem',
+                textAlign: 'center',
+              }}>
+                <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>📝</div>
+                <p style={{ color: 'var(--color-text-muted)' }}>No posts in this category yet.</p>
+              </div>
+            ) : (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 20rem), 1fr))',
+                gap: '1.25rem',
+              }}>
+                {filtered.map(post => {
+                  const cat = post.meta?.category as string | undefined
+                  const cc = (cat && CATEGORY_COLORS[cat]) || { bg: 'rgba(4,14,32,0.06)', color: 'rgba(4,14,32,0.55)' }
+                  const excerpt = post.meta?.excerpt as string | undefined
+                  const author = post.meta?.author as string | undefined
+                  const publishedAt = (post.meta?.publishedAt as string | undefined) ?? post.publish_at
+                  return (
+                    <Link
+                      key={post.id}
+                      href={`/blog/${post.slug}`}
+                      style={{
+                        display: 'block',
+                        background: '#ffffff',
+                        border: '1px solid var(--color-border)',
+                        borderRadius: 'var(--radius-card)',
+                        padding: '1.5rem',
+                        textDecoration: 'none',
+                        transition: 'box-shadow 200ms ease, transform 200ms ease',
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card-hover)'
+                        ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLElement).style.boxShadow = 'none'
+                        ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+                      }}
+                    >
+                      {cat && (
+                        <span style={{
+                          display: 'inline-block',
+                          background: cc.bg, color: cc.color,
+                          borderRadius: '99px',
+                          padding: '0.25rem 0.625rem',
+                          fontSize: 'var(--text-caption)',
+                          fontWeight: 700,
+                          textTransform: 'capitalize',
+                          marginBottom: '0.875rem',
+                        }}>
+                          {cat.replace(/-/g, ' ')}
+                        </span>
+                      )}
+                      <h3 style={{
+                        fontFamily: 'var(--font-display)',
+                        fontSize: 'var(--text-body)',
+                        fontWeight: 700,
+                        color: '#181d26',
+                        letterSpacing: '-0.01em',
+                        marginBottom: '0.5rem',
+                        lineHeight: 1.4,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}>
+                        {post.title}
+                      </h3>
+                      {excerpt && (
+                        <p style={{
+                          fontSize: 'var(--text-caption)',
+                          color: 'var(--color-text-weak)',
+                          lineHeight: 'var(--lh-relaxed)',
+                          marginBottom: '1rem',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}>
+                          {excerpt}
+                        </p>
+                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+                        {author && <span>{author}</span>}
+                        {author && publishedAt && <span>·</span>}
+                        {publishedAt && <span>{formatDate(publishedAt)}</span>}
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+
+      </div>
     </div>
   )
 }

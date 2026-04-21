@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LogoIcon } from '@/components/ui/Logo'
 
 const FOOTER_COLS = [
   {
@@ -59,15 +60,8 @@ export default function Footer() {
         }}>
           {/* Brand col */}
           <div>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', marginBottom: '1.25rem' }}>
-              <span style={{
-                width: '2rem', height: '2rem',
-                background: '#1b61c9',
-                borderRadius: '0.5rem',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: 'var(--font-display)', fontWeight: 800,
-                fontSize: '0.875rem', color: '#fff',
-              }}>A</span>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none', marginBottom: '1.25rem' }}>
+              <LogoIcon size={28} />
               <span style={{
                 fontFamily: 'var(--font-display)', fontWeight: 800,
                 fontSize: '1.0625rem', color: '#ffffff',

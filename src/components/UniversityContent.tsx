@@ -130,11 +130,12 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
   const progress = videos.length > 0 ? Math.round((watched.size / videos.length) * 100) : 0
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+    <div className="page-bg">
+      <div className="sections-stack">
 
-      {/* Hero — stays blue as a strong brand accent */}
-      <div className="px-6 py-16 lg:px-10" style={{ background: '#1b61c9', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-        <div className="relative mx-auto max-w-6xl text-center">
+      {/* ── Blue hero — intentional brand accent for education section ── */}
+      <section style={{ background: '#1b61c9', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}
             className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
             style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff' }}>
@@ -179,9 +180,11 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
             ))}
           </motion.div>
         </div>
-      </div>
+      </section>
 
-      <div className="mx-auto max-w-6xl px-6 py-12 lg:px-10">
+      {/* ── Main content ── */}
+      <section className="section-box">
+        <div className="container-xl section-padding">
         {/* Featured Videos */}
         {featured.length > 0 && (
           <div className="mb-12">
@@ -240,35 +243,63 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           </AnimatePresence>
         </div>
 
-        {filtered.length === 0 && (
-          <div className="rounded-2xl border p-12 text-center" style={{ border: '1px solid #e0e2e6', background: '#fff', color: 'rgba(4,14,32,0.45)' }}>
-            No videos in this category yet. Check back soon!
-          </div>
-        )}
+          {filtered.length === 0 && (
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-card)',
+              padding: '3rem',
+              textAlign: 'center',
+              color: 'var(--color-text-muted)',
+            }}>
+              No videos in this category yet. Check back soon!
+            </div>
+          )}
+        </div>
+      </section>
 
-        {/* Bottom CTA */}
-        <div className="mt-16 rounded-2xl p-8 text-center" style={{ background: '#1b61c9' }}>
-          <div className="text-4xl">🎯</div>
-          <h2 className="mt-4 text-2xl font-bold text-white" style={{ letterSpacing: '-0.02em' }}>
+      {/* ── Bottom CTA ── */}
+      <section className="section-box-navy">
+        <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2.5rem' }}>🎯</div>
+          <h2 className="text-heading" style={{ color: '#ffffff', marginTop: '1rem', marginBottom: '0.75rem' }}>
             Ready to get started?
           </h2>
-          <p className="mx-auto mt-3 max-w-lg text-base leading-7" style={{ color: 'rgba(255,255,255,0.78)' }}>
+          <p style={{ fontSize: 'var(--text-body-lg)', color: 'rgba(255,255,255,0.72)', maxWidth: '36rem', margin: '0 auto 2rem', lineHeight: 'var(--lh-relaxed)' }}>
             Once you&apos;ve completed the key education videos, start your onboarding
             with confidence. Your partner will guide you through every step.
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <Link href="/signup"
-              className="rounded-xl px-7 py-3 text-base font-bold transition hover:opacity-90"
-              style={{ background: '#fff', color: '#1b61c9' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.875rem' }}>
+            <Link href="/signup" style={{
+              display: 'inline-flex', alignItems: 'center',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
+              color: '#ffffff',
+              padding: '0.875rem 2rem',
+              borderRadius: 'var(--radius-btn)',
+              fontFamily: 'var(--font-display)', fontWeight: 700,
+              fontSize: 'var(--text-body)',
+              textDecoration: 'none',
+              boxShadow: '0 4px 16px rgba(27,97,201,0.45)',
+            }}>
               Begin Onboarding →
             </Link>
-            <Link href="/resources"
-              className="rounded-xl px-7 py-3 text-base font-semibold text-white transition"
-              style={{ border: '1.5px solid rgba(255,255,255,0.35)', background: 'rgba(255,255,255,0.1)' }}>
+            <Link href="/resources" style={{
+              display: 'inline-flex', alignItems: 'center',
+              padding: '0.875rem 2rem',
+              borderRadius: 'var(--radius-btn)',
+              fontFamily: 'var(--font-display)', fontWeight: 600,
+              fontSize: 'var(--text-body)',
+              textDecoration: 'none',
+              color: '#ffffff',
+              border: '1.5px solid rgba(255,255,255,0.3)',
+              background: 'rgba(255,255,255,0.08)',
+            }}>
               Browse Resources
             </Link>
           </div>
         </div>
+      </section>
+
       </div>
     </div>
   )
