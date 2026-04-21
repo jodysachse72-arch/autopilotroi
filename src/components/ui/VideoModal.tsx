@@ -98,21 +98,26 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
 
           {/* CTA below video */}
           {ctaLabel && ctaHref && (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '1.25rem 1.5rem', background: '#0c1220' }}>
+            <div style={{ padding: '1.5rem', background: '#0c1220' }}>
               <Link
                 href={ctaHref}
                 style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  width: '100%',
                   background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
                   color: '#ffffff',
-                  padding: '0.875rem 2.5rem',
-                  borderRadius: '0.75rem',
+                  padding: '1rem 2rem',
+                  borderRadius: '0.875rem',
                   fontFamily: 'var(--font-display)',
                   fontWeight: 700,
-                  fontSize: '1rem',
+                  fontSize: '1.0625rem',
                   textDecoration: 'none',
-                  boxShadow: '0 8px 24px rgba(27,97,201,0.45)',
+                  boxShadow: '0 6px 24px rgba(27,97,201,0.50)',
                   transition: 'transform 150ms ease, box-shadow 150ms ease',
+                  letterSpacing: '0.01em',
                 }}
               >
                 {ctaLabel}

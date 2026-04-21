@@ -185,34 +185,70 @@ export default function HomePage() {
             HERO — Blue gradient, big text
         ══════════════════════════════════════════════════════ */}
         <section style={{
-          background: 'linear-gradient(145deg, #0c1f6e 0%, #1b61c9 58%, #0d3599 100%)',
+          background: 'linear-gradient(135deg, #050d28 0%, #0c1f6e 35%, #0e2880 65%, #091947 100%)',
           borderRadius: 'var(--radius-section)',
           overflow: 'hidden',
           position: 'relative',
         }}>
-          {/* Decorative radial glows */}
-          <div style={{
-            position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none',
-          }}>
+          {/* ── Rich circuit-board hero background ── */}
+          <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+            {/* Layered radial glow orbs */}
             <div style={{
-              position: 'absolute', right: '-10%', top: '-20%',
+              position: 'absolute', right: '-8%', top: '-15%',
+              width: '65vmax', height: '65vmax', borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(37,99,235,0.55) 0%, transparent 60%)',
+            }} />
+            <div style={{
+              position: 'absolute', left: '-8%', bottom: '-20%',
               width: '55vmax', height: '55vmax', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(59,130,246,0.35) 0%, transparent 65%)',
+              background: 'radial-gradient(circle, rgba(79,70,229,0.32) 0%, transparent 60%)',
             }} />
             <div style={{
-              position: 'absolute', left: '-5%', bottom: '-15%',
-              width: '40vmax', height: '40vmax', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(96,165,250,0.20) 0%, transparent 65%)',
+              position: 'absolute', right: '15%', bottom: '0%',
+              width: '30vmax', height: '30vmax', borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(147,51,234,0.20) 0%, transparent 65%)',
             }} />
-            {/* Subtle grid */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.05 }}>
+            <div style={{
+              position: 'absolute', left: '30%', top: '-5%',
+              width: '22vmax', height: '22vmax', borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(96,165,250,0.22) 0%, transparent 65%)',
+            }} />
+            {/* Circuit dot grid */}
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.07 }}>
               <defs>
-                <pattern id="grid" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-                  <path d="M60 0L0 0 0 60" fill="none" stroke="white" strokeWidth="0.75"/>
+                <pattern id="hero-dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <circle cx="20" cy="20" r="1.5" fill="rgba(147,197,253,1)"/>
                 </pattern>
               </defs>
-              <rect width="100%" height="100%" fill="url(#grid)"/>
+              <rect width="100%" height="100%" fill="url(#hero-dots)"/>
             </svg>
+            {/* Diagonal circuit trace lines */}
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.05 }}>
+              <defs>
+                <pattern id="hero-grid" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+                  <path d="M80 0L0 0 0 80" fill="none" stroke="rgba(147,197,253,1)" strokeWidth="0.75"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#hero-grid)"/>
+            </svg>
+            {/* Glowing SVG circuit traces with junction nodes */}
+            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.1 }} preserveAspectRatio="none">
+              <line x1="0" y1="25%" x2="35%" y2="25%" stroke="rgba(147,197,253,0.9)" strokeWidth="0.8"/>
+              <line x1="35%" y1="25%" x2="35%" y2="55%" stroke="rgba(147,197,253,0.9)" strokeWidth="0.8"/>
+              <line x1="35%" y1="55%" x2="65%" y2="55%" stroke="rgba(147,197,253,0.8)" strokeWidth="0.8"/>
+              <line x1="65%" y1="0" x2="65%" y2="55%" stroke="rgba(147,197,253,0.7)" strokeWidth="0.8"/>
+              <line x1="15%" y1="0" x2="15%" y2="40%" stroke="rgba(147,197,253,0.6)" strokeWidth="0.8"/>
+              <line x1="15%" y1="40%" x2="50%" y2="40%" stroke="rgba(147,197,253,0.6)" strokeWidth="0.8"/>
+              <line x1="50%" y1="40%" x2="50%" y2="70%" stroke="rgba(147,197,253,0.5)" strokeWidth="0.8"/>
+              <circle cx="35%" cy="25%" r="3" fill="rgba(147,197,253,1)"/>
+              <circle cx="35%" cy="55%" r="3" fill="rgba(147,197,253,1)"/>
+              <circle cx="65%" cy="55%" r="3" fill="rgba(96,165,250,0.9)"/>
+              <circle cx="15%" cy="40%" r="2.5" fill="rgba(147,197,253,0.9)"/>
+              <circle cx="50%" cy="40%" r="2.5" fill="rgba(147,197,253,0.9)"/>
+              <circle cx="50%" cy="70%" r="2" fill="rgba(147,197,253,0.7)"/>
+            </svg>
+            {/* Vignette fade */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(5,13,40,0.3) 0%, transparent 25%, transparent 75%, rgba(5,13,40,0.25) 100%)' }}/>
           </div>
 
           <div className="container-xl section-padding-lg" style={{ position: 'relative', zIndex: 1 }}>

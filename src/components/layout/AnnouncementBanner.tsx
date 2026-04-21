@@ -56,8 +56,11 @@ export default function AnnouncementBanner() {
   if (!enabled || !message || dismissed) return null
 
   return (
-    <div className="relative z-[60] bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 text-white text-center px-10 py-3">
-      <p className="text-sm font-semibold tracking-wide">{message}</p>
+    <div
+      className="relative z-[60] bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 text-white text-center px-10"
+      style={{ minHeight: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+    >
+      <p style={{ fontSize: '0.9375rem', fontWeight: 600, letterSpacing: '0.02em' }}>{message}</p>
       <button
         onClick={() => setDismissed(true)}
         className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition text-xl leading-none"
