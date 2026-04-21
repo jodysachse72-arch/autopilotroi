@@ -387,7 +387,42 @@ export default function CalculatorPage() {
                 transition={{ delay: 0.2 }}
                 style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
               >
-                {/* Why Tiers */}
+                {/* Quick Stats — Investment Breakdown at top */}
+                <div style={cardStyle}>
+                  <h3 style={{
+                    fontSize: 'var(--text-caption)',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: '#1b61c9',
+                    marginBottom: '1rem',
+                    fontFamily: 'var(--font-display)',
+                  }}>
+                    Your Investment Breakdown
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {[
+                      { label: 'Monthly Return',   value: `~${formatNumber(amount * tier.rate / 100)} USDT`, green: true },
+                      { label: 'Your Share',        value: `${tier.clientShare}%`,                           blue: true },
+                      { label: 'Duration',          value: term.label,                                        green: false, blue: false },
+                      { label: 'Total Investment',  value: `${formatNumber(amount)} USDT`,                   green: false, blue: false },
+                      { label: 'Total Return',      value: `${formatNumber(amount + profit)} USDT`,          green: true },
+                      { label: 'ROI',               value: `${formatNumber((profit / amount) * 100)}%`,      green: true },
+                    ].map((item) => (
+                      <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '0.625rem' }}>
+                        <span style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-muted)' }}>{item.label}</span>
+                        <span style={{
+                          fontSize: 'var(--text-body)',
+                          fontWeight: 700,
+                          color: item.green ? '#059669' : item.blue ? '#1b61c9' : '#181d26',
+                          fontFamily: 'var(--font-display)',
+                        }}>{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Why Tiers — moved below breakdown */}
                 <div style={cardStyle}>
                   <h3 style={{
                     fontSize: 'var(--text-caption)',
@@ -431,41 +466,6 @@ export default function CalculatorPage() {
                           ~{t.rate.toFixed(2)}%
                         </div>
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quick Stats */}
-                <div style={cardStyle}>
-                  <h3 style={{
-                    fontSize: 'var(--text-caption)',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    color: '#1b61c9',
-                    marginBottom: '1rem',
-                    fontFamily: 'var(--font-display)',
-                  }}>
-                    Your Investment Breakdown
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {[
-                      { label: 'Monthly Return',   value: `~${formatNumber(amount * tier.rate / 100)} USDT`, green: true },
-                      { label: 'Your Share',        value: `${tier.clientShare}%`,                           blue: true },
-                      { label: 'Duration',          value: term.label,                                        green: false, blue: false },
-                      { label: 'Total Investment',  value: `${formatNumber(amount)} USDT`,                   green: false, blue: false },
-                      { label: 'Total Return',      value: `${formatNumber(amount + profit)} USDT`,          green: true },
-                      { label: 'ROI',               value: `${formatNumber((profit / amount) * 100)}%`,      green: true },
-                    ].map((item) => (
-                      <div key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--color-border-light)', paddingBottom: '0.625rem' }}>
-                        <span style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-muted)' }}>{item.label}</span>
-                        <span style={{
-                          fontSize: 'var(--text-body)',
-                          fontWeight: 700,
-                          color: item.green ? '#059669' : item.blue ? '#1b61c9' : '#181d26',
-                          fontFamily: 'var(--font-display)',
-                        }}>{item.value}</span>
-                      </div>
                     ))}
                   </div>
                 </div>
