@@ -212,7 +212,7 @@ export default function WhatIsAurumPage() {
                 }}>
                   Start Here →
                 </Link>
-                <a href="https://aurum.foundation" target="_blank" rel="noopener noreferrer" style={{
+                <Link href="/calculator" style={{
                   display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
                   background: '#fff',
                   border: '1.5px solid var(--color-border)',
@@ -223,8 +223,8 @@ export default function WhatIsAurumPage() {
                   fontSize: 'var(--text-body)',
                   textDecoration: 'none',
                 }}>
-                  Visit aurum.foundation ↗
-                </a>
+                  Calculate Your Returns →
+                </Link>
               </div>
             </motion.div>
           </div>

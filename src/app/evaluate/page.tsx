@@ -746,7 +746,7 @@ export default function EvaluatePage() {
           </div>
 
           <p className="mt-8 text-center text-xs text-[var(--text-muted)]">
-            Full team details available at <a href="https://aurum.foundation/en#team" target="_blank" rel="noopener noreferrer" className="text-blue-400/40 hover:text-blue-400/60 transition underline">aurum.foundation</a>
+            Full team bios and LinkedIn profiles are publicly available and independently verifiable.
           </p>
         </motion.div>
       </div>
