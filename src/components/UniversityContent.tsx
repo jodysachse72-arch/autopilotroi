@@ -157,15 +157,15 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           </motion.p>
 
           {/* Progress bar */}
-          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3} className="mx-auto mt-10 max-w-sm">
-            <div className="flex items-center justify-between mb-2" style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.70)' }}>
+          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3}
+            style={{ margin: '2.5rem auto 0', maxWidth: '22rem', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.70)' }}>
               <span>{watched.size} of {videos.length} watched</span>
               <span style={{ fontWeight: 700, color: '#ffffff' }}>{progress}%</span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.18)' }}>
+            <div style={{ height: '0.5rem', borderRadius: '99px', overflow: 'hidden', background: 'rgba(255,255,255,0.18)' }}>
               <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${progress}%`, background: 'linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.55))' }}
+                style={{ height: '100%', borderRadius: '99px', transition: 'width 700ms ease', width: `${progress}%`, background: 'linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.55))' }}
               />
             </div>
           </motion.div>
@@ -224,37 +224,41 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
             </div>
           )}
 
-          {/* Category Filters */}
-          <div className="mb-8 flex flex-wrap gap-2.5">
-            {categories.map((cat) => {
-              const isActive = activeCategory === cat.id
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.375rem',
-                    padding: '0.5rem 1.125rem',
-                    borderRadius: '99px',
-                    fontSize: 'var(--text-body)',
-                    fontWeight: isActive ? 700 : 500,
-                    fontFamily: 'var(--font-display)',
-                    cursor: 'pointer',
-                    transition: 'all 200ms cubic-bezier(0.22,1,0.36,1)',
-                    background: isActive ? '#1b61c9' : '#ffffff',
-                    color: isActive ? '#ffffff' : 'rgba(24,29,38,0.65)',
-                    border: isActive ? '1.5px solid #1b61c9' : '1.5px solid #e0e2e6',
-                    boxShadow: isActive ? '0 4px 14px rgba(27,97,201,0.30)' : 'none',
-                    transform: isActive ? 'translateY(-1px)' : 'none',
-                  }}
-                >
-                  <span>{cat.icon}</span>
-                  {cat.label}
-                </button>
-              )
-            })}
+          {/* Category Filters — single scrollable row, never wraps */}
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginBottom: '2rem', paddingBottom: '0.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', width: 'max-content', minWidth: '100%' }}>
+              {categories.map((cat) => {
+                const isActive = activeCategory === cat.id
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                      padding: '0.4375rem 0.875rem',
+                      borderRadius: '99px',
+                      fontSize: '0.875rem',
+                      fontWeight: isActive ? 700 : 500,
+                      fontFamily: 'var(--font-display)',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      transition: 'all 200ms cubic-bezier(0.22,1,0.36,1)',
+                      background: isActive ? '#1b61c9' : '#ffffff',
+                      color: isActive ? '#ffffff' : 'rgba(24,29,38,0.65)',
+                      border: isActive ? '1.5px solid #1b61c9' : '1.5px solid #e0e2e6',
+                      boxShadow: isActive ? '0 4px 14px rgba(27,97,201,0.30)' : 'none',
+                      transform: isActive ? 'translateY(-1px)' : 'none',
+                    }}
+                  >
+                    <span>{cat.icon}</span>
+                    {cat.label}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {/* Video Grid */}
