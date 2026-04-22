@@ -202,7 +202,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden" style={{ padding: '1.25rem 1.5rem 2rem' }}>
+        <main className="flex-1 overflow-x-hidden" style={{ padding: 'clamp(1rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2.5rem) 3rem' }}>
           <Breadcrumbs />
           {children}
         </main>

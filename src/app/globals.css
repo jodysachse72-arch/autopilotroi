@@ -732,31 +732,32 @@ input, textarea, select {
 .be-card {
   background: #ffffff;
   border: 1px solid #e8eaed;
-  border-radius: var(--radius-card, 1rem);
-  padding: 1.25rem;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
   box-shadow:
-    0 1px 3px rgba(15,23,42,0.06),
-    0 1px 0 rgba(255,255,255,0.8) inset;
+    0 1px 4px rgba(15,23,42,0.06),
+    0 4px 16px rgba(15,23,42,0.04),
+    0 1px 0 rgba(255,255,255,0.9) inset;
   transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
-.be-card--padded { padding: 1.5rem; }
+.be-card--padded { padding: 2rem; }
 .be-card--flush  { padding: 0; }
 .be-card--elevated {
   box-shadow:
-    0 2px 4px rgba(15,23,42,0.06),
-    0 8px 24px -8px rgba(15,23,42,0.10),
-    0 1px 0 rgba(255,255,255,0.8) inset;
+    0 2px 8px rgba(15,23,42,0.07),
+    0 12px 32px -8px rgba(15,23,42,0.10),
+    0 1px 0 rgba(255,255,255,0.9) inset;
 }
 .be-card--interactive {
   cursor: pointer;
 }
 .be-card--interactive:hover {
-  border-color: rgba(27,97,201,0.35);
+  border-color: rgba(27,97,201,0.30);
   box-shadow:
-    0 2px 4px rgba(15,23,42,0.06),
-    0 12px 32px -10px rgba(27,97,201,0.15),
+    0 4px 12px rgba(15,23,42,0.07),
+    0 16px 40px -10px rgba(27,97,201,0.14),
     0 1px 0 rgba(255,255,255,0.9) inset;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
 
 /* ── Top app bar ──────────────────────────────────────────────── */
@@ -833,50 +834,50 @@ input, textarea, select {
 /* ── Section header + toolbar ─────────────────────────────────── */
 .be-section-title {
   font-family: var(--font-display, system-ui);
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: #181d26;
   line-height: 1.15;
 }
 .be-section-sub {
-  margin-top: 0.25rem;
-  font-size: 0.875rem;
-  color: rgba(4,14,32,0.55);
-  line-height: 1.5;
+  margin-top: 0.375rem;
+  font-size: 0.9375rem;
+  color: rgba(4,14,32,0.58);
+  line-height: 1.6;
 }
 .be-toolbar {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 /* ── StatCard internals ───────────────────────────────────────── */
 .be-stat-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: rgba(4,14,32,0.5);
+  color: rgba(4,14,32,0.52);
 }
 .be-stat-value {
   margin-top: 0.5rem;
   font-family: var(--font-display, system-ui);
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
   color: #181d26;
-  line-height: 1.1;
+  line-height: 1.05;
 }
 .be-stat-delta {
-  margin-top: 0.5rem;
+  margin-top: 0.625rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 500;
+  gap: 0.3rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 .be-stat-delta--up   { color: #059669; }
 .be-stat-delta--down { color: #dc2626; }
@@ -884,8 +885,10 @@ input, textarea, select {
 
 /* ── Empty state ──────────────────────────────────────────────── */
 .be-empty {
-  padding: 2.5rem 1.25rem;
+  padding: 4rem 2rem;
+  text-align: center;
   color: rgba(4,14,32,0.6);
+  font-size: 0.9375rem;
 }
 
 /* ── Form labels / help / error ───────────────────────────────── */
@@ -1109,3 +1112,43 @@ input, textarea, select {
 .be-pill--amber  { background: #fef3c7;               color: #b45309; }
 .be-pill--red    { background: #fef2f2;               color: #b91c1c; }
 .be-pill--purple { background: #f5f3ff;               color: #6d28d9; }
+
+/* ── SectionHeader ─────────────────────────────────────────────── */
+.be-section-header {
+  margin-bottom: 1.25rem;
+}
+.be-section-header-title {
+  font-family: var(--font-display, system-ui);
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #181d26;
+}
+.be-section-header-sub {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: rgba(4,14,32,0.54);
+}
+
+/* ── Mobile responsive overrides ─────────────────────────────── */
+/* Below lg (1024px): tighten padding inside cards + layouts */
+@media (max-width: 1024px) {
+  .be-card            { padding: 1.375rem; }
+  .be-card--padded    { padding: 1.5rem; }
+}
+
+/* Below md (768px): phone-first layout fixes */
+@media (max-width: 768px) {
+  .be-card            { padding: 1.125rem; border-radius: 1rem; }
+  .be-card--padded    { padding: 1.25rem; }
+  .be-section-title   { font-size: 1.375rem; }
+  .be-stat-value      { font-size: 1.875rem; }
+  .be-section-header-title { font-size: 1.125rem; }
+}
+
+/* Below sm (640px): tightest phone layout */
+@media (max-width: 640px) {
+  .be-card            { padding: 1rem; border-radius: 0.875rem; }
+  .be-card--padded    { padding: 1.125rem; }
+  .be-stat-value      { font-size: 1.625rem; }
+}
