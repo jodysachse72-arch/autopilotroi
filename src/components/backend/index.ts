@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 export { default as SidebarShell } from './SidebarShell'
-export type { SidebarLink, SidebarShellProps } from './SidebarShell'
+export type { SidebarLink, SidebarSection, SidebarShellProps } from './SidebarShell'
 
 export {
   Card,
