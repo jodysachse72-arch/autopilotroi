@@ -151,7 +151,7 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
 
           <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
             className="text-body-lg mx-auto mt-5 max-w-2xl"
-            style={{ color: 'rgba(255,255,255,0.80)' }}>
+            style={{ color: 'rgba(255,255,255,0.80)', textAlign: 'center' }}>
             Structured video learning for new and existing Aurum members — from wallet setup to
             advanced bot strategy. Watch, learn, and track your progress.
           </motion.p>
@@ -224,8 +224,16 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
             </div>
           )}
 
-          {/* Category Filters — single scrollable row, never wraps */}
-          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginBottom: '2rem', paddingBottom: '0.25rem' }}>
+          {/* Category Filters — padded surface container, horizontally scrollable */}
+          <div style={{
+            background: '#f4f6fa',
+            border: '1px solid #e0e2e6',
+            borderRadius: '0.875rem',
+            padding: '0.75rem 1rem',
+            marginBottom: '1.75rem',
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+          }}>
             <div style={{ display: 'flex', gap: '0.5rem', width: 'max-content', minWidth: '100%' }}>
               {categories.map((cat) => {
                 const isActive = activeCategory === cat.id
@@ -237,7 +245,7 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.3rem',
-                      padding: '0.4375rem 0.875rem',
+                      padding: '0.5rem 1rem',
                       borderRadius: '99px',
                       fontSize: '0.875rem',
                       fontWeight: isActive ? 700 : 500,
