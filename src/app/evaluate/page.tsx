@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { AutomationIcon, GrowthIcon, SecurityIcon, DataIcon, EcosystemIcon, ExchangeIcon, BankIcon, CardIcon, PartnerIcon } from '@/components/ui/Icons'
 
 /* ═══════════════════════════════════════════════════════════════
    TRUST CHECK — 60-Second Opportunity Evaluator
@@ -27,7 +28,7 @@ interface QuizOption {
 interface QuizQuestion {
   id: string
   category: string
-  categoryIcon: string
+  categoryIcon: React.ReactNode
   question: string
   context: string // explains WHY this question matters
   options: QuizOption[]
@@ -38,7 +39,7 @@ const QUESTIONS: QuizQuestion[] = [
   {
     id: 'revenue',
     category: 'Revenue Source',
-    categoryIcon: '💰',
+    categoryIcon: <BankIcon />,
     question: 'Where does the company make its money?',
     context: 'Legitimate businesses earn revenue from products, services, or technology — not from new users joining.',
     weight: 1.4, // Weighted higher — this is the #1 red flag
@@ -52,7 +53,7 @@ const QUESTIONS: QuizQuestion[] = [
   {
     id: 'sustainability',
     category: 'Sustainability',
-    categoryIcon: '🔋',
+    categoryIcon: <GrowthIcon />,
     question: 'Could this opportunity survive if no new people joined tomorrow?',
     context: 'A sustainable business doesn\'t collapse without growth. Its products have standalone value.',
     weight: 1.3,
@@ -66,7 +67,7 @@ const QUESTIONS: QuizQuestion[] = [
   {
     id: 'transparency',
     category: 'Transparency',
-    categoryIcon: '🔍',
+    categoryIcon: <DataIcon />,
     question: 'Can you verify who runs it and how it works?',
     context: 'Real companies have verifiable leadership, registered entities, auditable technology, and clear documentation.',
     weight: 1.2,
@@ -80,7 +81,7 @@ const QUESTIONS: QuizQuestion[] = [
   {
     id: 'incentives',
     category: 'Incentive Structure',
-    categoryIcon: '⚖️',
+    categoryIcon: <SecurityIcon />,
     question: 'What are you rewarded for?',
     context: 'Healthy programs reward you for using the product. Risky ones reward you mainly for recruiting others.',
     weight: 1.0,
@@ -94,7 +95,7 @@ const QUESTIONS: QuizQuestion[] = [
   {
     id: 'language',
     category: 'Marketing Language',
-    categoryIcon: '📣',
+    categoryIcon: <EcosystemIcon />,
     question: 'How does the opportunity describe itself?',
     context: 'Legitimate businesses focus on what the product does. Risky ones focus on how much money you\'ll make.',
     weight: 1.0,
@@ -295,16 +296,16 @@ export default function EvaluatePage() {
               {/* What this checks */}
               <div className="mx-auto mt-10 grid max-w-xl gap-3 sm:grid-cols-5">
                 {QUESTIONS.map((q) => (
-                  <div key={q.id} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-3 text-center">
-                    <span className="text-xl">{q.categoryIcon}</span>
-                    <div className="mt-1 text-[10px] font-medium text-[var(--text-muted)]">{q.category}</div>
+                  <div key={q.id} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-3 text-center flex flex-col items-center">
+                    <span className="w-8 h-8 flex items-center justify-center text-blue-500 mb-1">{q.categoryIcon}</span>
+                    <div className="text-[10px] font-medium text-[var(--text-muted)]">{q.category}</div>
                   </div>
                 ))}
               </div>
 
               <button
                 onClick={() => setPhase('quiz')}
-                className="mt-10 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-8 py-4 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40"
+                className="mt-10 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-8 py-4 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40 shimmer-hover"
               >
                 Start Evaluation →
               </button>
@@ -350,7 +351,7 @@ export default function EvaluatePage() {
 
               {/* Category badge */}
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
-                {QUESTIONS[currentQ].categoryIcon} {QUESTIONS[currentQ].category}
+                <span className="w-4 h-4 text-blue-400">{QUESTIONS[currentQ].categoryIcon}</span> {QUESTIONS[currentQ].category}
               </div>
 
               {/* Question */}
@@ -439,7 +440,7 @@ export default function EvaluatePage() {
                     <div key={cat.category}>
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="flex items-center gap-2 text-sm text-[var(--text-primary)]">
-                          {cat.icon} {cat.category}
+                          <span className="w-4 h-4 text-blue-500">{cat.icon}</span> {cat.category}
                           {cat.weight > 1 && (
                             <span className="text-[10px] text-[var(--text-muted)]">×{cat.weight}</span>
                           )}
@@ -561,13 +562,13 @@ export default function EvaluatePage() {
                 <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                   <Link
                     href="/products"
-                    className="rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-6 py-3 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40"
+                    className="btn-primary shimmer-hover" style={{ padding: '0.75rem 1.5rem', borderRadius: '0.75rem' }}
                   >
                     Explore the Products →
                   </Link>
                   <Link
                     href="/signup"
-                    className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-6 py-3 font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-card-hover)]"
+                    className="btn-outline shimmer-hover" style={{ padding: '0.75rem 1.5rem', borderRadius: '0.75rem' }}
                   >
                     Take the Readiness Quiz
                   </Link>
@@ -638,37 +639,37 @@ export default function EvaluatePage() {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                icon: '💰',
+                icon: <BankIcon />,
                 title: 'Real Revenue Model',
                 desc: 'Aurum earns through exchange fees, AI bot subscriptions, Neo-Bank services, and card transactions — not through recruitment.',
                 color: 'emerald',
               },
               {
-                icon: '🔍',
+                icon: <DataIcon />,
                 title: 'Fully Transparent',
                 desc: 'Named CEO (Bryan Benson, ex-Binance), registered in Hong Kong (Cert #77289699), public team with verifiable LinkedIn profiles.',
                 color: 'blue',
               },
               {
-                icon: '🛡️',
+                icon: <SecurityIcon />,
                 title: '3 International Licenses',
                 desc: 'Regulated across multiple jurisdictions. Contracts with leading exchanges for secure, compliant custodial services.',
                 color: 'blue',
               },
               {
-                icon: '🤖',
+                icon: <AutomationIcon />,
                 title: '5 Real Tech Products',
                 desc: 'Ex-AI Bot, Zeus AI Bot, NeoBank, Exchange, and Crypto Cards — all functional, all generating real value.',
                 color: 'emerald',
               },
               {
-                icon: '📰',
+                icon: <EcosystemIcon />,
                 title: 'Global Media Coverage',
                 desc: 'Featured in Forbes, Entrepreneur, Cointelegraph, Benzinga, Bitcoin.com, Crypto.news, and Hackernoon.',
                 color: 'blue',
               },
               {
-                icon: '🌍',
+                icon: <PartnerIcon />,
                 title: '18,000+ Active Partners',
                 desc: '$30M+ assets under management. A growing global ecosystem — not a promise, but measurable traction.',
                 color: 'emerald',
@@ -676,13 +677,13 @@ export default function EvaluatePage() {
             ].map((item) => (
               <div
                 key={item.title}
-                className={`rounded-2xl border p-6 transition hover:scale-[1.02] ${
+                className={`shimmer-hover rounded-2xl border p-6 transition hover:scale-[1.02] ${
                   item.color === 'emerald'
                     ? 'border-emerald-500/20 bg-emerald-500/5'
                     : 'border-blue-500/20 bg-blue-500/5'
                 }`}
               >
-                <div className="text-2xl mb-3">{item.icon}</div>
+                <div className="w-8 h-8 text-blue-500 mb-3">{item.icon}</div>
                 <h3 className="font-[var(--font-sora)] text-base font-bold text-[var(--text-primary)] mb-2">{item.title}</h3>
                 <p className="text-sm leading-relaxed text-[var(--text-tertiary)]">{item.desc}</p>
               </div>
@@ -716,26 +717,26 @@ export default function EvaluatePage() {
                 name: 'Bryan Benson',
                 role: 'Chief Executive Officer',
                 bio: 'Web3 expert with 27 years of experience. Previously led Binance\'s expansion in Latin America. Responsible for strategic growth and bridging traditional and decentralized finance.',
-                icon: '👤',
+                icon: <PartnerIcon />,
               },
               {
                 name: 'Shane Morand',
                 role: 'Chief Network Dev Officer',
                 bio: 'Global business leader with decades of experience in network development and large-scale growth systems. Leads scalable systems and long-term ecosystem growth strategy.',
-                icon: '👤',
+                icon: <PartnerIcon />,
               },
               {
                 name: 'Ahmad Zen',
                 role: 'Co-Founder & Marketing Director',
                 bio: '15+ years of expertise in network marketing and cryptocurrency. Proven track record driving campaigns across fintech and blockchain sectors, boosting Aurum\'s global growth.',
-                icon: '👤',
+                icon: <PartnerIcon />,
               },
             ].map((person) => (
               <div
                 key={person.name}
-                className="flex flex-col items-center rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--card-shadow,none)] transition hover:border-[var(--border-accent)]"
+                className="shimmer-hover flex flex-col items-center rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--card-shadow,none)] transition hover:border-[var(--border-accent)]"
               >
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 text-3xl">
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 text-blue-400 p-4">
                   {person.icon}
                 </div>
                 <h4 className="font-[var(--font-sora)] text-lg font-bold text-[var(--text-primary)]">{person.name}</h4>

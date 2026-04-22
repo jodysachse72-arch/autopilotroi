@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import VideoModal from '@/components/ui/VideoModal'
+import { AutomationIcon, CardIcon, BankIcon, ExchangeIcon, OnboardingIcon, PartnerIcon } from '@/components/ui/Icons'
 
 // ── Scroll reveal hook ───────────────────────────────────────────
 function useScrollReveal() {
@@ -65,17 +66,22 @@ function StatItem({ value, suffix, label }: { value: number; suffix: string; lab
 
 // ── Feature card ─────────────────────────────────────────────────
 function FeatureCard({
-  icon, title, body, color = '#1b61c9', colorBg = 'rgba(27,97,201,0.08)',
-}: { icon: string; title: string; body: string; color?: string; colorBg?: string }) {
+  icon, title, body, color = '#1b61c9', colorBg = 'rgba(27,97,201,0.10)',
+}: { icon: React.ReactNode; title: string; body: string; color?: string; colorBg?: string }) {
+  // Derive a subtle glow and border from the icon color
+  const glowAlpha = colorBg.replace(/[^,]+(?=\))/, '0.18')
+  const borderAlpha = colorBg.replace(/[^,]+(?=\))/, '0.22')
   return (
-    <div className="card reveal" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      <div style={{
-        width: '3.5rem', height: '3.5rem',
-        background: colorBg, borderRadius: '1rem',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '1.5rem',
-        color,
-      }}>{icon}</div>
+    <div className="card reveal shimmer-hover" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div
+        className="icon-circle-accent"
+        style={{
+          '--icon-bg': colorBg,
+          '--icon-color': color,
+          '--icon-border': borderAlpha,
+          '--icon-glow': glowAlpha,
+        } as React.CSSProperties}
+      >{icon}</div>
       <div>
         <h3 style={{
           fontFamily: 'var(--font-display)', fontWeight: 700,
@@ -115,11 +121,11 @@ function Step({ num, title, body }: { num: string; title: string; body: string }
 // ── Ecosystem card ───────────────────────────────────────────────
 function EcoCard({
   icon, title, description, tag, tagColor,
-}: { icon: string; title: string; description: string; tag: string; tagColor: string }) {
+}: { icon: React.ReactNode; title: string; description: string; tag: string; tagColor: string }) {
   return (
-    <div className="card reveal" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div className="card reveal shimmer-hover" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '2rem' }}>{icon}</span>
+        <span className="icon-circle" style={{ background: 'transparent', boxShadow: 'none', width: '2.5rem', height: '2.5rem', justifyContent: 'flex-start' }}>{icon}</span>
         <span style={{
           fontSize: 'var(--text-caption)', fontWeight: 700,
           padding: '0.25rem 0.75rem', borderRadius: '99px',
@@ -141,7 +147,9 @@ function EcoCard({
 }
 
 // ── Testimonial ──────────────────────────────────────────────────
-function Testimonial({ quote, author, role }: { quote: string; author: string; role: string }) {
+function Testimonial({
+  quote, author, role, avatarFrom = '#1b61c9', avatarTo = '#0c1f6e',
+}: { quote: string; author: string; role: string; avatarFrom?: string; avatarTo?: string }) {
   return (
     <div className="reveal" style={{
       background: 'rgba(255,255,255,0.10)',
@@ -155,13 +163,15 @@ function Testimonial({ quote, author, role }: { quote: string; author: string; r
         fontStyle: 'italic',
       }}>"{quote}"</p>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <div style={{
-          width: '2.5rem', height: '2.5rem', borderRadius: '50%',
-          background: 'rgba(255,255,255,0.20)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'var(--font-display)', fontWeight: 700,
-          fontSize: '0.875rem', color: '#ffffff',
-        }}>{author[0]}</div>
+        <div
+          className="avatar-monogram"
+          style={{
+            '--avatar-from': avatarFrom,
+            '--avatar-to': avatarTo,
+          } as React.CSSProperties}
+        >
+          {author[0]}
+        </div>
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: '#ffffff', fontSize: 'var(--text-body)' }}>{author}</div>
           <div style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.55)' }}>{role}</div>
@@ -190,65 +200,35 @@ export default function HomePage() {
           overflow: 'hidden',
           position: 'relative',
         }}>
-          {/* ── Rich circuit-board hero background ── */}
+          {/* ── Refined hero atmosphere (no circuit clutter) ── */}
           <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-            {/* Layered radial glow orbs */}
+            {/* Primary right glow — refined, single source */}
             <div style={{
-              position: 'absolute', right: '-8%', top: '-15%',
-              width: '65vmax', height: '65vmax', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(37,99,235,0.55) 0%, transparent 60%)',
+              position: 'absolute', right: '-5%', top: '-10%',
+              width: '60vmax', height: '60vmax', borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(27,97,201,0.42) 0%, rgba(27,97,201,0.08) 45%, transparent 65%)',
             }} />
+            {/* Secondary left ambient — much more subtle */}
             <div style={{
-              position: 'absolute', left: '-8%', bottom: '-20%',
-              width: '55vmax', height: '55vmax', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(79,70,229,0.32) 0%, transparent 60%)',
+              position: 'absolute', left: '-10%', bottom: '-15%',
+              width: '50vmax', height: '50vmax', borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(79,70,229,0.18) 0%, transparent 55%)',
             }} />
+            {/* Data-ribbon lines — horizontal signal traces */}
+            <div className="hero-ribbon-line" style={{ top: '28%', animationDelay: '0s' }} />
+            <div className="hero-ribbon-line" style={{ top: '52%', animationDelay: '2s' }} />
+            <div className="hero-ribbon-line" style={{ top: '74%', animationDelay: '4s' }} />
+            {/* Very subtle noise grain via CSS */}
             <div style={{
-              position: 'absolute', right: '15%', bottom: '0%',
-              width: '30vmax', height: '30vmax', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(147,51,234,0.20) 0%, transparent 65%)',
+              position: 'absolute', inset: 0,
+              backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'1\'/%3E%3C/svg%3E")',
+              backgroundRepeat: 'repeat',
+              backgroundSize: '180px 180px',
+              opacity: 0.025,
+              mixBlendMode: 'overlay',
             }} />
-            <div style={{
-              position: 'absolute', left: '30%', top: '-5%',
-              width: '22vmax', height: '22vmax', borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(96,165,250,0.22) 0%, transparent 65%)',
-            }} />
-            {/* Circuit dot grid */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.07 }}>
-              <defs>
-                <pattern id="hero-dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <circle cx="20" cy="20" r="1.5" fill="rgba(147,197,253,1)"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#hero-dots)"/>
-            </svg>
-            {/* Diagonal circuit trace lines */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.05 }}>
-              <defs>
-                <pattern id="hero-grid" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-                  <path d="M80 0L0 0 0 80" fill="none" stroke="rgba(147,197,253,1)" strokeWidth="0.75"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#hero-grid)"/>
-            </svg>
-            {/* Glowing SVG circuit traces with junction nodes */}
-            <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.1 }} preserveAspectRatio="none">
-              <line x1="0" y1="25%" x2="35%" y2="25%" stroke="rgba(147,197,253,0.9)" strokeWidth="0.8"/>
-              <line x1="35%" y1="25%" x2="35%" y2="55%" stroke="rgba(147,197,253,0.9)" strokeWidth="0.8"/>
-              <line x1="35%" y1="55%" x2="65%" y2="55%" stroke="rgba(147,197,253,0.8)" strokeWidth="0.8"/>
-              <line x1="65%" y1="0" x2="65%" y2="55%" stroke="rgba(147,197,253,0.7)" strokeWidth="0.8"/>
-              <line x1="15%" y1="0" x2="15%" y2="40%" stroke="rgba(147,197,253,0.6)" strokeWidth="0.8"/>
-              <line x1="15%" y1="40%" x2="50%" y2="40%" stroke="rgba(147,197,253,0.6)" strokeWidth="0.8"/>
-              <line x1="50%" y1="40%" x2="50%" y2="70%" stroke="rgba(147,197,253,0.5)" strokeWidth="0.8"/>
-              <circle cx="35%" cy="25%" r="3" fill="rgba(147,197,253,1)"/>
-              <circle cx="35%" cy="55%" r="3" fill="rgba(147,197,253,1)"/>
-              <circle cx="65%" cy="55%" r="3" fill="rgba(96,165,250,0.9)"/>
-              <circle cx="15%" cy="40%" r="2.5" fill="rgba(147,197,253,0.9)"/>
-              <circle cx="50%" cy="40%" r="2.5" fill="rgba(147,197,253,0.9)"/>
-              <circle cx="50%" cy="70%" r="2" fill="rgba(147,197,253,0.7)"/>
-            </svg>
-            {/* Vignette fade */}
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(5,13,40,0.3) 0%, transparent 25%, transparent 75%, rgba(5,13,40,0.25) 100%)' }}/>
+            {/* Bottom vignette */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(5,13,40,0.2) 0%, transparent 30%, transparent 70%, rgba(5,13,40,0.2) 100%)' }}/>
           </div>
 
           <div className="container-xl section-padding-lg" style={{ position: 'relative', zIndex: 1 }}>
@@ -298,7 +278,7 @@ export default function HomePage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  <Link href="/signup" className="btn btn-primary-lg">
+                  <Link href="/signup" className="btn btn-primary-lg shimmer-hover">
                     Start Here →
                   </Link>
 
@@ -308,7 +288,7 @@ export default function HomePage() {
                     ctaHref="/signup"
                   >
                     <button
-                      className="btn btn-ghost btn-primary-lg"
+                      className="btn btn-ghost btn-primary-lg shimmer-hover"
                       style={{ display: 'inline-flex', alignItems: 'center', gap: '0.625rem' }}
                     >
                       <span style={{
@@ -491,38 +471,40 @@ export default function HomePage() {
               gap: '1.25rem',
             }}>
               <FeatureCard
-                icon="🤖"
+                icon={<AutomationIcon />}
                 title="EX-AI Trading Bot"
                 body="The AI analyzes global crypto markets 24/7 and executes trades automatically on Binance, Bybit, and KuCoin. You activate it once."
+                color="#1b61c9" colorBg="rgba(27,97,201,0.10)"
               />
               <FeatureCard
-                icon="💳"
+                icon={<CardIcon />}
                 title="Visa Crypto Card"
                 body="Spend your earnings anywhere Visa is accepted. Your crypto balance powers your everyday purchases worldwide."
-                color="#7c3aed" colorBg="rgba(124,58,237,0.08)"
+                color="#7c3aed" colorBg="rgba(124,58,237,0.10)"
               />
               <FeatureCard
-                icon="🏦"
+                icon={<BankIcon />}
                 title="Web3 Neobank"
                 body="A full-featured digital bank built on blockchain infrastructure. IBAN accounts, cross-border transfers, DeFi integration."
-                color="#0891b2" colorBg="rgba(8,145,178,0.08)"
+                color="#0891b2" colorBg="rgba(8,145,178,0.10)"
               />
               <FeatureCard
-                icon="📊"
+                icon={<ExchangeIcon />}
                 title="Crypto Exchange"
                 body="Trade 200+ assets at competitive rates with institutional-grade liquidity and a clean, intuitive interface."
-                color="#059669" colorBg="rgba(5,150,105,0.08)"
+                color="#059669" colorBg="rgba(5,150,105,0.10)"
               />
               <FeatureCard
-                icon="🧭"
+                icon={<OnboardingIcon />}
                 title="Guided Onboarding"
                 body="Step-by-step setup: wallet, VPN, USDT acquisition, Aurum account, and bot activation. Nothing gets skipped."
+                color="#1b61c9" colorBg="rgba(27,97,201,0.10)"
               />
               <FeatureCard
-                icon="🤝"
+                icon={<PartnerIcon />}
                 title="Partner Program"
                 body="Earn additional income by introducing others. 3-deep spillover model — your network grows even while you sleep."
-                color="#d97706" colorBg="rgba(217,119,6,0.08)"
+                color="#d97706" colorBg="rgba(217,119,6,0.10)"
               />
             </div>
           </div>
@@ -566,42 +548,63 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right — timeline visual */}
-              <div className="reveal" style={{
-                background: '#f8fafc',
-                borderRadius: '1.5rem',
-                padding: '2.5rem',
-                border: '1px solid #e0e2e6',
-              }}>
-                <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#1b61c9', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
-                  Typical Timeline
-                </div>
-                {[
-                  { day: 'Day 1',   action: 'Wallet + VPN setup',           done: true },
-                  { day: 'Day 1–2', action: 'Acquire USDT, fund account',   done: true },
-                  { day: 'Day 2–3', action: 'Aurum account + verification', done: true },
-                  { day: 'Day 3',   action: 'EX-AI Bot activated ✓',         done: true, highlight: true },
-                  { day: 'Ongoing', action: 'AI trades 24/7, you watch',    done: false },
-                ].map((item, i) => (
-                  <div key={i} style={{
-                    display: 'flex', gap: '1rem', alignItems: 'flex-start',
-                    marginBottom: '1.25rem',
+              {/* Right — Aurum bot dashboard screenshot */}
+              <div className="reveal" style={{ position: 'relative' }}>
+                {/* Dark card container */}
+                <div style={{
+                  background: '#181d26',
+                  borderRadius: '1.5rem',
+                  overflow: 'hidden',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  boxShadow: '0 32px 80px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.04)',
+                }}>
+                  {/* Browser chrome bar */}
+                  <div style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    padding: '0.6rem 1rem',
+                    display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  }}>
+                    {['#ff5f56','#ffbd2e','#27c93f'].map(c => (
+                      <div key={c} style={{ width: 8, height: 8, borderRadius: '50%', background: c, opacity: 0.7 }} />
+                    ))}
+                    <span style={{
+                      flex: 1, textAlign: 'center', fontSize: '0.7rem',
+                      color: 'rgba(255,255,255,0.25)', marginLeft: '-1.25rem',
+                    }}>app.aurum.foundation</span>
+                  </div>
+                  {/* Dashboard screenshot */}
+                  <div style={{ position: 'relative' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/aurum-bot-dashboard.png"
+                      alt="Aurum EX-AI Bot Dashboard"
+                      style={{ width: '100%', display: 'block', objectFit: 'cover' }}
+                    />
+                    {/* Subtle dark overlay for readability */}
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'linear-gradient(180deg, rgba(24,29,38,0) 0%, rgba(24,29,38,0.15) 100%)',
+                    }} />
+                  </div>
+                  {/* Bottom status bar */}
+                  <div style={{
+                    padding: '0.875rem 1.25rem',
+                    display: 'flex', alignItems: 'center', gap: '0.625rem',
                   }}>
                     <div style={{
-                      width: '0.5rem', height: '0.5rem', borderRadius: '50%', flexShrink: 0, marginTop: '0.45rem',
-                      background: item.highlight ? '#1b61c9' : item.done ? '#059669' : '#e0e2e6',
+                      width: '0.5rem', height: '0.5rem', borderRadius: '50%',
+                      background: '#34d399',
+                      boxShadow: '0 0 6px rgba(52,211,153,0.7)',
                     }} />
-                    <div>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'rgba(24,29,38,0.45)', marginBottom: '0.125rem' }}>{item.day}</div>
-                      <div style={{
-                        fontSize: 'var(--text-body)', color: item.highlight ? '#1b61c9' : '#181d26', fontWeight: item.highlight ? 700 : 400,
-                      }}>{item.action}</div>
-                    </div>
+                    <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.50)', fontFamily: 'var(--font-display)', fontWeight: 600 }}>
+                      EX-AI Bot · Live
+                    </span>
+                    <span style={{ marginLeft: 'auto', fontSize: '0.7rem', color: 'rgba(255,255,255,0.25)' }}>
+                      24/7 Active
+                    </span>
                   </div>
-                ))}
-                <Link href="/onboarding" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}>
-                  Start Your Onboarding
-                </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -629,28 +632,28 @@ export default function HomePage() {
               gap: '1.25rem',
             }}>
               <EcoCard
-                icon="🤖"
+                icon={<AutomationIcon />}
                 title="EX-AI Trading Bot"
                 description="Fully automated 24/7 AI trading bot across Binance, Bybit, and KuCoin. Machine learning-powered market analysis."
                 tag="LIVE"
                 tagColor="#059669"
               />
               <EcoCard
-                icon="💳"
+                icon={<CardIcon />}
                 title="Visa Crypto Card"
                 description="Spend your crypto anywhere in the world. Linked to your Aurum balance. Physical and virtual card available."
                 tag="LIVE"
                 tagColor="#059669"
               />
               <EcoCard
-                icon="🏛️"
+                icon={<ExchangeIcon />}
                 title="Crypto Exchange"
                 description="Trade 200+ crypto assets with institutional liquidity. Low fees, deep order books, fast settlement."
                 tag="LIVE"
                 tagColor="#059669"
               />
               <EcoCard
-                icon="🌐"
+                icon={<BankIcon />}
                 title="Web3 Neobank"
                 description="Digital banking on blockchain rails. IBAN accounts, cross-border transfers, DeFi access, multi-currency wallets."
                 tag="LAUNCHING"
@@ -729,10 +732,10 @@ export default function HomePage() {
                 Join thousands of members who activated the EX-AI Bot and put their money to work around the clock. Your AutoPilotROI partner handles the entire setup.
               </p>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link href="/signup" className="btn btn-primary-lg">
+                <Link href="/signup" className="btn btn-primary-lg shimmer-hover">
                   Begin Onboarding →
                 </Link>
-                <Link href="/faqs" className="btn" style={{
+                <Link href="/faqs" className="btn shimmer-hover" style={{
                   background: 'rgba(255,255,255,0.08)',
                   color: 'rgba(255,255,255,0.80)',
                   border: '1.5px solid rgba(255,255,255,0.15)',

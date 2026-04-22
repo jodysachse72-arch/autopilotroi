@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { AutomationIcon, GrowthIcon, SecurityIcon, DataIcon, EcosystemIcon, ExchangeIcon, BankIcon, CardIcon, PartnerIcon } from '@/components/ui/Icons'
 
 /* ════════════════════════════════════════════════════════════════
    WHAT IS AURUM — Products & Trust Page
@@ -16,32 +17,32 @@ import { motion } from 'framer-motion'
 // ── Why We Chose Aurum — trust signals ──────────────────────────
 const trustReasons = [
   {
-    icon: '🏛️',
+    icon: <BankIcon />,
     title: 'Legally Registered in Hong Kong',
     body: 'Aurum Foundation Limited was officially incorporated in Hong Kong on November 7, 2024 under the Companies Ordinance — one of the world\'s most respected regulatory environments for fintech. Certificate No. 77289699-000-11-24-6.',
   },
   {
-    icon: '🪪',
+    icon: <SecurityIcon />,
     title: '3 International Licenses',
     body: 'Aurum holds three internationally recognized operating licenses, allowing it to legally offer financial services and crypto-related products to clients globally. This is not a grey-market operation.',
   },
   {
-    icon: '👔',
+    icon: <GrowthIcon />,
     title: 'Leadership With Proven Track Records',
     body: 'CEO Bryan Benson previously led Binance\'s expansion across Latin America and worked at Morgan Stanley. Co-founder Drei Menza leads AI trading strategy. These are not anonymous founders — they are public, verified, and accountable.',
   },
   {
-    icon: '📰',
+    icon: <EcosystemIcon />,
     title: 'Covered by Major Media',
     body: 'Aurum has been featured across Forbes, Entrepreneur, Benzinga, Cointelegraph, Bitcoin.com, Crypto.news, Binance, Bitget, and MEXC — independently recognized as institutional-grade financial infrastructure.',
   },
   {
-    icon: '🤝',
+    icon: <PartnerIcon />,
     title: 'Exchange Partnerships',
     body: 'Aurum operates under formal contracts with leading exchanges including Binance, Bybit, and KuCoin. These are legally binding, compliance-reviewed agreements — not informal affiliate relationships.',
   },
   {
-    icon: '💡',
+    icon: <DataIcon />,
     title: 'We Did the Homework So You Don\'t Have To',
     body: 'Before recommending Aurum to anyone, we independently verified the registration, leadership backgrounds, license numbers, and media coverage. We would not stake our reputation — or yours — on something we hadn\'t fully vetted.',
   },
@@ -63,7 +64,8 @@ const products = [
     tagline: 'AI-Managed Liquidity Engine',
     description: 'Machine-learning algorithms execute trades 24/7 across Binance, Bybit, and KuCoin — detecting mid-term opportunities and rebalancing in real time. Zero manual input required.',
     features: ['24/7 automated execution', 'Multi-exchange arbitrage', 'AI-optimized entry/exit', 'Real-time portfolio rebalancing'],
-    badge: 'Flagship', badgeColor: '#1b61c9', icon: '🤖',
+    badge: 'Flagship', badgeColor: '#1b61c9', icon: <AutomationIcon />,
+    image: '/product-bots.png',
   },
   {
     id: 'zeus',
@@ -71,7 +73,8 @@ const products = [
     tagline: 'Institutional-Grade Capital Growth',
     description: 'Higher-tier liquidity management with advanced algorithmic strategies. Zeus operates with larger capital pools for institutional-grade execution and priority support.',
     features: ['Advanced algorithmic strategies', 'Higher capital tier entry', 'Institutional-grade execution', 'Priority support channel'],
-    badge: 'Pro Tier', badgeColor: '#7c3aed', icon: '⚡',
+    badge: 'Pro Tier', badgeColor: '#7c3aed', icon: <GrowthIcon />,
+    image: null,
   },
   {
     id: 'flash-loans',
@@ -79,7 +82,8 @@ const products = [
     tagline: 'Instant DeFi Capital Access',
     description: 'Access instant capital through DeFi flash loan mechanisms. Designed for short-duration, high-volume transactions within a single block — no collateral required.',
     features: ['Instantaneous execution', 'No collateral required', 'DeFi-native architecture', 'Smart contract secured'],
-    badge: null, badgeColor: '', icon: '💡',
+    badge: null, badgeColor: '', icon: <DataIcon />,
+    image: null,
   },
   {
     id: 'exchange',
@@ -87,7 +91,8 @@ const products = [
     tagline: 'Next-Gen Crypto Exchange',
     description: 'A full-featured cryptocurrency exchange with deep liquidity, advanced order types, institutional-grade security, and seamless ecosystem integration.',
     features: ['Deep liquidity pools', 'Advanced order types', 'Institutional-grade security', '200+ trading pairs'],
-    badge: null, badgeColor: '', icon: '📈',
+    badge: null, badgeColor: '', icon: <ExchangeIcon />,
+    image: '/product-exchange.png',
   },
   {
     id: 'neobank',
@@ -95,7 +100,8 @@ const products = [
     tagline: 'Web 3.0 Banking Infrastructure',
     description: 'A Web 3.0 bank for secure, private management of crypto and fiat assets. Seamless integration between traditional and decentralised finance — one app, one account.',
     features: ['Crypto + fiat unified', 'Store, earn, and spend', 'Global SWIFT & SEPA', 'Privacy-first design'],
-    badge: 'Coming Soon', badgeColor: '#0ea5e9', icon: '🏦',
+    badge: 'Coming Soon', badgeColor: '#0ea5e9', icon: <BankIcon />,
+    image: '/product-neobank.png',
   },
   {
     id: 'cards',
@@ -103,7 +109,8 @@ const products = [
     tagline: 'Spend Crypto Anywhere',
     description: 'Premium crypto debit cards powered by Visa. Spend your crypto earnings at 80M+ merchants globally, withdraw from ATMs, and manage everything from your app.',
     features: ['Visa-powered cards', '4 tiers: Nova → Infinity', 'ATM withdrawals worldwide', 'Instant crypto-to-fiat'],
-    badge: null, badgeColor: '', icon: '💳',
+    badge: null, badgeColor: '', icon: <CardIcon />,
+    image: '/product-card.png',
   },
   {
     id: 'token',
@@ -111,7 +118,8 @@ const products = [
     tagline: 'Ecosystem Utility Token',
     description: 'The native utility token powering the entire ecosystem. Used for governance voting, staking rewards, fee discounts, and premium feature access across all products.',
     features: ['Governance voting rights', 'Staking rewards', 'Fee discounts across platform', 'Premium tier access'],
-    badge: null, badgeColor: '', icon: '🪙',
+    badge: null, badgeColor: '', icon: <EcosystemIcon />,
+    image: null,
   },
   {
     id: 'subscription',
@@ -119,7 +127,8 @@ const products = [
     tagline: 'All-Access Membership',
     description: 'Membership tiers that unlock progressive levels of the ecosystem. From basic bot access to full-suite institutional features and partner program access.',
     features: ['Tiered membership levels', 'Progressive feature unlock', 'Partner program access', 'Priority support channels'],
-    badge: null, badgeColor: '', icon: '🎯',
+    badge: null, badgeColor: '', icon: <PartnerIcon />,
+    image: null,
   },
 ]
 
@@ -199,24 +208,18 @@ export default function WhatIsAurumPage() {
               </p>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem' }}>
-                <Link href="/signup" style={{
+                <Link href="/signup" className="btn-primary shimmer-hover" style={{
                   display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-                  background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
-                  color: '#ffffff',
                   padding: '0.875rem 2rem',
                   borderRadius: 'var(--radius-btn)',
                   fontFamily: 'var(--font-display)', fontWeight: 700,
                   fontSize: 'var(--text-body)',
                   textDecoration: 'none',
-                  boxShadow: '0 4px 16px rgba(27,97,201,0.35)',
                 }}>
                   Start Here →
                 </Link>
-                <Link href="/calculator" style={{
+                <Link href="/calculator" className="btn-outline shimmer-hover" style={{
                   display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-                  background: '#fff',
-                  border: '1.5px solid var(--color-border)',
-                  color: '#181d26',
                   padding: '0.875rem 2rem',
                   borderRadius: 'var(--radius-btn)',
                   fontFamily: 'var(--font-display)', fontWeight: 600,
@@ -336,8 +339,9 @@ export default function WhatIsAurumPage() {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '0.875rem',
-                    transition: 'box-shadow 200ms ease, transform 200ms ease',
+                    transition: 'all 400ms cubic-bezier(0.22, 1, 0.36, 1)',
                   }}
+                  className="shimmer-hover"
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card-hover)'
                     ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
@@ -350,10 +354,8 @@ export default function WhatIsAurumPage() {
                   <div style={{
                     display: 'flex', alignItems: 'center', gap: '0.875rem',
                   }}>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    <div className="icon-circle" style={{
                       width: '3rem', height: '3rem', flexShrink: 0,
-                      background: 'rgba(27,97,201,0.08)',
                       borderRadius: 'var(--radius-md)',
                       fontSize: '1.375rem',
                     }}>
@@ -457,9 +459,10 @@ export default function WhatIsAurumPage() {
                     border: '1px solid var(--color-border)',
                     borderRadius: 'var(--radius-card)',
                     padding: '2rem',
-                    transition: 'box-shadow 200ms ease, transform 200ms ease',
+                    transition: 'all 400ms cubic-bezier(0.22, 1, 0.36, 1)',
                     cursor: 'default',
                   }}
+                  className="shimmer-hover"
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card-hover)'
                     ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
@@ -483,10 +486,26 @@ export default function WhatIsAurumPage() {
                     </span>
                   )}
 
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  {/* Product image — shown only for products with imagery */}
+                  {product.image && (
+                    <div style={{
+                      marginBottom: '1.5rem',
+                      borderRadius: 'var(--radius-md)',
+                      overflow: 'hidden',
+                      border: '1px solid var(--color-border-light)',
+                      aspectRatio: '16 / 9',
+                    }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={product.image}
+                        alt={`${product.name} interface`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="icon-circle" style={{
                     width: '3.25rem', height: '3.25rem',
-                    background: 'rgba(27,97,201,0.08)',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '1.5rem',
                     marginBottom: '1.25rem',
@@ -546,20 +565,17 @@ export default function WhatIsAurumPage() {
               Complete the onboarding process and start exploring the full ecosystem with guided support from your partner.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem', justifyContent: 'center' }}>
-              <Link href="/signup" style={{
+              <Link href="/signup" className="btn-primary shimmer-hover" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-                background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
-                color: '#ffffff',
                 padding: '0.875rem 2rem',
                 borderRadius: 'var(--radius-btn)',
                 fontFamily: 'var(--font-display)', fontWeight: 700,
                 fontSize: 'var(--text-body)',
                 textDecoration: 'none',
-                boxShadow: '0 4px 16px rgba(27,97,201,0.45)',
               }}>
                 Start Here →
               </Link>
-              <Link href="/calculator" style={{
+              <Link href="/calculator" className="btn-outline shimmer-hover" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
                 background: 'rgba(255,255,255,0.08)',
                 color: '#ffffff',
