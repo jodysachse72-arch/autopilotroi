@@ -203,21 +203,36 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
 
           {/* Featured Videos — distinct treatment */}
           {featured.length > 0 && (
-            <div className="mb-14">
-              <div className="mb-7 flex items-center gap-3">
+            <div style={{ marginBottom: '3.5rem' }}>
+              {/* Section heading row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.75rem' }}>
                 <div style={{
                   width: '4px', height: '2rem', borderRadius: '2px',
                   background: 'linear-gradient(180deg, #f59e0b, #d97706)',
                   flexShrink: 0,
                 }} />
-                <h2 className="text-subheading" style={{ color: '#181d26' }}>
+                <h2 style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'var(--text-subheading)',
+                  fontWeight: 700,
+                  lineHeight: 'var(--lh-snug)',
+                  color: '#181d26',
+                  margin: 0,
+                }}>
                   Recommended Starting Points
                 </h2>
-                <span className="badge" style={{ background: 'rgba(217,119,6,0.10)', color: '#b45309', border: '1px solid rgba(217,119,6,0.20)', marginLeft: '0.25rem' }}>
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                  padding: '0.3125rem 0.875rem', borderRadius: '99px',
+                  fontSize: 'var(--text-caption)', fontWeight: 600,
+                  background: 'rgba(217,119,6,0.10)', color: '#b45309',
+                  border: '1px solid rgba(217,119,6,0.20)',
+                }}>
                   ⭐ {featured.length} videos
                 </span>
               </div>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {/* Featured grid */}
+              <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
                 {featured.map((video, i) => (
                   <VideoCard
                     key={video._id}
@@ -239,8 +254,8 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
             background: '#eef0f5',
             border: '1.5px solid #d8dae0',
             borderRadius: '0.875rem',
-            padding: '0.75rem 1rem',
-            marginBottom: '1.75rem',
+            padding: '0.875rem 1.125rem',
+            marginBottom: '2.5rem',
             overflowX: 'auto',
             WebkitOverflowScrolling: 'touch',
           }}>
@@ -280,7 +295,7 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           </div>
 
           {/* Video Grid */}
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div style={{ display: 'grid', gap: '1.25rem', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
             <AnimatePresence mode="popLayout">
               {filtered.map((video, i) => (
                 <VideoCard
@@ -323,10 +338,28 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           }}>
             🎯
           </div>
-          <h2 className="text-heading" style={{ color: '#ffffff', marginBottom: '0.875rem' }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'var(--text-heading)',
+            fontWeight: 700,
+            lineHeight: 'var(--lh-snug)',
+            letterSpacing: 'var(--ls-tight)',
+            color: '#ffffff',
+            marginBottom: '1rem',
+            textAlign: 'center',
+          }}>
             Ready to get started?
           </h2>
-          <p className="text-body-lg mx-auto" style={{ color: 'rgba(255,255,255,0.72)', maxWidth: '36rem', marginBottom: '2.25rem', lineHeight: 'var(--lh-relaxed)' }}>
+          <p style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'var(--text-body-lg)',
+            lineHeight: 'var(--lh-relaxed)',
+            color: 'rgba(255,255,255,0.78)',
+            maxWidth: '36rem',
+            margin: '0 auto 2.25rem',
+            textAlign: 'center',
+            display: 'block',
+          }}>
             Once you&apos;ve completed the key education videos, start your onboarding
             with confidence. Your partner will guide you through every step.
           </p>
