@@ -6,15 +6,14 @@ import Link from 'next/link'
 import {
   PageShell,
   SectionBox,
-  SectionHeader,
   HeroBlue,
   CTABand,
 } from '@/components/sections'
 
 /* ═══════════════════════════════════════════════════════════════
-   PROFIT CALCULATOR — Wise.com-style
-   Big input → live output, side commentary explaining the math.
-   Tier comparison as horizontal cards with per-tier accent color.
+   PROFIT CALCULATOR — single unified panel
+   Layout: inputs + result on the left, vertical tier rail on the
+   right, "How this is calculated" + disclaimer along the bottom.
    All calc logic preserved from the prior implementation.
    ═══════════════════════════════════════════════════════════════ */
 
@@ -65,16 +64,12 @@ function formatInt(n: number) {
   return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n)
 }
 
-/* ── Inline icons ── */
-function InfoIcon({ className = 'w-5 h-5' }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
-      <circle cx="12" cy="12" r="9" />
-      <path strokeLinecap="round" d="M12 8h.01M11 12h1v4h1" />
-    </svg>
-  )
+function formatRange(min: number, max: number) {
+  const fmt = (n: number) => n >= 1000 ? `$${Math.round(n / 1000)}k` : `$${n}`
+  return `${fmt(min)} – ${fmt(max + 0.01)}`
 }
 
+/* ── Inline icons ── */
 function AlertIcon({ className = 'w-5 h-5' }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.6}>
@@ -177,21 +172,23 @@ export default function CalculatorPage() {
         description="Move the slider, pick a term — your projected return updates live. No sign-in required."
       />
 
-      {/* ── 2. BIG INPUT → LIVE OUTPUT (Wise pattern) ── */}
+      {/* ── 2. UNIFIED CALCULATOR PANEL ── */}
       <SectionBox variant="white" padding="lg">
+
+        {/* Top row: inputs + result | tier rail */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.35fr) minmax(0, 1fr)',
-          gap: '3rem',
+          gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)',
+          gap: '2.5rem',
           alignItems: 'start',
         }}>
 
-          {/* LEFT: Input + Live output */}
+          {/* LEFT: Input + Live output + CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}
           >
 
             {/* OVERSIZED amount input — the hero element */}
@@ -259,7 +256,7 @@ export default function CalculatorPage() {
                   {tier.name} tier
                 </span>
                 <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-                  ~{tier.rate.toFixed(2)}% monthly · {tier.clientShare}% client share
+                  ~{tier.rate.toFixed(2)}% monthly &middot; {tier.clientShare}% client share
                 </span>
               </div>
             </div>
@@ -357,27 +354,28 @@ export default function CalculatorPage() {
                 <span style={{ fontSize: '1.25rem', fontWeight: 600, opacity: 0.6, marginLeft: '0.625rem' }}>USDT</span>
               </div>
               <div style={{ marginTop: '0.875rem', fontSize: 'var(--text-body)', color: 'var(--color-text-weak)' }}>
-                {formatNumber(amount)} invested · <strong style={{ color: '#059669' }}>+{formatNumber(profit)}</strong> profit over {term.label}
-                {compound && <span style={{ color: 'var(--color-text-muted)' }}> · compounded monthly</span>}
+                {formatNumber(amount)} invested &middot; <strong style={{ color: '#059669' }}>+{formatNumber(profit)}</strong> profit over {term.label}
+                {compound && <span style={{ color: 'var(--color-text-muted)' }}> &middot; compounded monthly</span>}
               </div>
 
-              {/* Mini breakdown row */}
+              {/* Mini breakdown row — folds in the previous standalone metric cards */}
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
+                gridTemplateColumns: 'repeat(4, 1fr)',
                 gap: '0.75rem',
                 marginTop: '1.25rem',
                 paddingTop: '1.25rem',
                 borderTop: '1px solid var(--color-border-light)',
               }}>
                 {[
-                  { label: 'Monthly', value: `~${formatInt(monthlyReturn)}` },
-                  { label: 'Your share', value: `${tier.clientShare}%` },
-                  { label: 'ROI', value: `${roiPct.toFixed(1)}%` },
+                  { label: 'Monthly',     value: `~${formatInt(monthlyReturn)}`, color: '#181d26' },
+                  { label: 'Total profit', value: formatInt(profit),              color: '#059669' },
+                  { label: 'Your share',  value: `${tier.clientShare}%`,         color: '#181d26' },
+                  { label: 'ROI',         value: `${roiPct.toFixed(1)}%`,        color: '#059669' },
                 ].map((s) => (
                   <div key={s.label}>
                     <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{s.label}</div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.125rem', fontWeight: 700, color: '#181d26', marginTop: '0.125rem' }}>{s.value}</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.125rem', fontWeight: 700, color: s.color, marginTop: '0.125rem' }}>{s.value}</div>
                   </div>
                 ))}
               </div>
@@ -412,39 +410,149 @@ export default function CalculatorPage() {
             </Link>
           </motion.div>
 
-          {/* RIGHT: Side commentary explaining the math (Wise pattern) */}
+          {/* RIGHT: Vertical tier rail — picks the rate that drives the math on the left */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+            style={{ display: 'flex', flexDirection: 'column' }}
           >
-            <div style={{ marginBottom: '0.25rem' }}>
+            <div style={{ marginBottom: '1rem' }}>
               <div style={{ fontSize: 'var(--text-caption)', fontWeight: 700, color: tier.accent, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-display)' }}>
-                How this is calculated
+                The 8 tiers
               </div>
-              <h3 className="text-display-sm" style={{ color: '#181d26', marginTop: '0.5rem', marginBottom: 0 }}>
-                Three things drive your return.
+              <h3 className="text-display-sm" style={{ color: '#181d26', marginTop: '0.5rem', marginBottom: '0.375rem' }}>
+                Pick a tier to preview.
               </h3>
+              <p style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.5 }}>
+                Auto-detected from your amount. The bot routes you the moment your balance crosses a threshold — no manual upgrade needed.
+              </p>
             </div>
 
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem',
+              background: '#f8fafc',
+              border: '1px solid var(--color-border-light)',
+              borderRadius: '1rem',
+              padding: '0.625rem',
+            }}>
+              {TIERS.map((t, i) => {
+                const active = i === tierIndex
+                return (
+                  <motion.button
+                    key={t.name}
+                    onClick={() => {
+                      setTierIndex(i)
+                      if (amount < t.min) setAmount(t.min)
+                    }}
+                    whileHover={{ x: active ? 0 : 2 }}
+                    style={{
+                      textAlign: 'left',
+                      background: active ? '#ffffff' : 'transparent',
+                      border: active ? `1.5px solid ${t.accent}` : '1.5px solid transparent',
+                      borderLeft: `4px solid ${t.accent}`,
+                      borderRadius: '0.625rem',
+                      padding: '0.75rem 0.875rem',
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font-display)',
+                      transition: 'background 150ms ease, border-color 150ms ease, box-shadow 150ms ease',
+                      boxShadow: active ? `0 4px 16px ${t.accentBg}` : 'none',
+                      display: 'grid',
+                      gridTemplateColumns: 'auto 1fr auto',
+                      alignItems: 'center',
+                      columnGap: '0.75rem',
+                    }}
+                  >
+                    {/* Tier name badge */}
+                    <span style={{
+                      background: active ? t.accent : t.accentBg,
+                      color: active ? '#fff' : t.accent,
+                      fontSize: '0.625rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      padding: '0.25rem 0.5rem',
+                      borderRadius: '0.3125rem',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {t.name}
+                    </span>
+
+                    {/* Rate + share */}
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{
+                        fontSize: '1.0625rem',
+                        fontWeight: 800,
+                        color: t.accent,
+                        letterSpacing: '-0.015em',
+                        lineHeight: 1.1,
+                      }}>
+                        {t.rate.toFixed(2)}%
+                        <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--color-text-muted)', marginLeft: '0.375rem', letterSpacing: 0 }}>
+                          monthly
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--color-text-muted)', marginTop: '0.125rem', letterSpacing: '0.04em' }}>
+                        {t.clientShare}% client share
+                      </div>
+                    </div>
+
+                    {/* Range */}
+                    <div style={{
+                      fontSize: '0.75rem',
+                      fontFamily: 'var(--font-body)',
+                      fontWeight: 600,
+                      color: 'var(--color-text-weak)',
+                      whiteSpace: 'nowrap',
+                    }}>
+                      {formatRange(t.min, t.max)}
+                    </div>
+                  </motion.button>
+                )
+              })}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ── BOTTOM: How this is calculated + disclaimer ── */}
+        <div style={{
+          marginTop: '2.5rem',
+          paddingTop: '2rem',
+          borderTop: '1px solid var(--color-border-light)',
+        }}>
+          <div style={{ marginBottom: '1.25rem' }}>
+            <div style={{ fontSize: 'var(--text-caption)', fontWeight: 700, color: tier.accent, letterSpacing: '0.08em', textTransform: 'uppercase', fontFamily: 'var(--font-display)' }}>
+              How this is calculated
+            </div>
+            <h3 className="text-display-sm" style={{ color: '#181d26', marginTop: '0.5rem', marginBottom: 0 }}>
+              Three things drive your return.
+            </h3>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
+            gap: '1rem',
+          }}>
             {[
               {
                 Icon: LayersIcon,
                 title: 'Your tier sets the rate',
-                body: <>The bot routes capital through different liquidity pools by deposit size. Larger deposits unlock deeper pools — that\u0027s why <strong style={{ color: tier.accent }}>{tier.name}</strong> earns ~{tier.rate.toFixed(2)}% monthly while BASIC earns ~10.50%.</>,
+                body: <>The bot routes capital through different liquidity pools by deposit size. Larger deposits unlock deeper pools — that&apos;s why <strong style={{ color: tier.accent }}>{tier.name}</strong> earns ~{tier.rate.toFixed(2)}% monthly while BASIC earns ~10.50%.</>,
               },
               {
                 Icon: PieIcon,
                 title: 'Your share is fixed by tier',
-                body: <>The bot keeps the rest as a performance fee. At <strong style={{ color: tier.accent }}>{tier.name}</strong> you keep <strong>{tier.clientShare}%</strong> of every cycle\u0027s profit. The higher your tier, the bigger your slice.</>,
+                body: <>The bot keeps the rest as a performance fee. At <strong style={{ color: tier.accent }}>{tier.name}</strong> you keep <strong>{tier.clientShare}%</strong> of every cycle&apos;s profit. The higher your tier, the bigger your slice.</>,
               },
               {
                 Icon: TrendUpIcon,
                 title: compound ? 'Compounding accelerates growth' : 'Simple interest pays out monthly',
                 body: compound
-                  ? <>Each month\u0027s profit is reinvested into the next month\u0027s base. Over <strong>{term.label}</strong>, your <strong>{formatNumber(amount)}</strong> compounds to <strong style={{ color: tier.accent }}>{formatNumber(totalReturn)}</strong> USDT.</>
-                  : <>Profit is calculated on your original <strong>{formatNumber(amount)}</strong> every cycle and paid out — no reinvestment. Over <strong>{term.label}</strong> that\u0027s a flat <strong style={{ color: tier.accent }}>{formatNumber(profit)}</strong> USDT in profit.</>,
+                  ? <>Each month&apos;s profit is reinvested into the next month&apos;s base. Over <strong>{term.label}</strong>, your <strong>{formatNumber(amount)}</strong> compounds to <strong style={{ color: tier.accent }}>{formatNumber(totalReturn)}</strong> USDT.</>
+                  : <>Profit is calculated on your original <strong>{formatNumber(amount)}</strong> every cycle and paid out — no reinvestment. Over <strong>{term.label}</strong> that&apos;s a flat <strong style={{ color: tier.accent }}>{formatNumber(profit)}</strong> USDT in profit.</>,
               },
             ].map((card, i) => (
               <div key={i} style={{
@@ -476,178 +584,31 @@ export default function CalculatorPage() {
                 </div>
               </div>
             ))}
+          </div>
 
-            {/* Disclaimer */}
-            <div style={{
-              background: 'rgba(245,158,11,0.06)',
-              border: '1px solid rgba(245,158,11,0.22)',
-              borderRadius: '0.75rem',
-              padding: '0.875rem 1rem',
-              display: 'flex',
-              gap: '0.625rem',
-              alignItems: 'flex-start',
-              color: 'rgba(180,120,0,0.95)',
-            }}>
-              <span style={{ flexShrink: 0, marginTop: '0.125rem' }}><AlertIcon className="w-4 h-4" /></span>
-              <p style={{ fontSize: '0.75rem', lineHeight: 1.6, margin: 0 }}>
-                Estimates use the EX-AI Bot&apos;s historical monthly performance band. Real returns vary with market
-                conditions. Past performance does not guarantee future results — never invest more than you can afford to lose.
-              </p>
-            </div>
-          </motion.div>
-
+          {/* Disclaimer footer */}
+          <div style={{
+            marginTop: '1.25rem',
+            background: 'rgba(245,158,11,0.06)',
+            border: '1px solid rgba(245,158,11,0.22)',
+            borderRadius: '0.75rem',
+            padding: '0.875rem 1rem',
+            display: 'flex',
+            gap: '0.625rem',
+            alignItems: 'flex-start',
+            color: 'rgba(180,120,0,0.95)',
+          }}>
+            <span style={{ flexShrink: 0, marginTop: '0.125rem' }}><AlertIcon className="w-4 h-4" /></span>
+            <p style={{ fontSize: '0.75rem', lineHeight: 1.6, margin: 0 }}>
+              Estimates use the EX-AI Bot&apos;s historical monthly performance band. Real returns vary with market
+              conditions. Past performance does not guarantee future results — never invest more than you can afford to lose.
+            </p>
+          </div>
         </div>
+
       </SectionBox>
 
-      {/* ── 3. TIER COMPARISON — horizontal cards w/ per-tier accent ── */}
-      <SectionBox variant="surface" padding="lg">
-        <SectionHeader
-          eyebrow="The 8 tiers"
-          title={<>One bot, eight tiers.<br />Pick the one your capital unlocks.</>}
-        >
-          Each tier corresponds to a deposit range. The bot auto-routes you the moment your balance crosses a threshold — no manual upgrade needed.
-        </SectionHeader>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 14rem), 1fr))',
-          gap: '1rem',
-          marginTop: '1rem',
-        }}>
-          {TIERS.map((t, i) => {
-            const active = i === tierIndex
-            return (
-              <motion.button
-                key={t.name}
-                onClick={() => {
-                  setTierIndex(i)
-                  if (amount < t.min) setAmount(t.min)
-                }}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.04 }}
-                whileHover={{ y: -4 }}
-                style={{
-                  textAlign: 'left',
-                  background: active ? t.accentBg : '#ffffff',
-                  border: active ? `2px solid ${t.accent}` : '1.5px solid var(--color-border)',
-                  borderTop: `4px solid ${t.accent}`,
-                  borderRadius: '0.875rem',
-                  padding: '1.25rem',
-                  cursor: 'pointer',
-                  fontFamily: 'var(--font-display)',
-                  transition: 'background 150ms ease, border-color 150ms ease, box-shadow 150ms ease',
-                  boxShadow: active ? `0 8px 24px ${t.accentBg}` : '0 2px 8px rgba(24,29,38,0.04)',
-                }}
-              >
-                <div style={{
-                  display: 'inline-block',
-                  background: t.accent,
-                  color: '#fff',
-                  fontSize: '0.6875rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  padding: '0.25rem 0.625rem',
-                  borderRadius: '0.375rem',
-                  marginBottom: '0.875rem',
-                }}>
-                  {t.name}
-                </div>
-                <div style={{
-                  fontSize: '1.875rem',
-                  fontWeight: 800,
-                  color: t.accent,
-                  letterSpacing: '-0.025em',
-                  lineHeight: 1,
-                }}>
-                  {t.rate.toFixed(2)}%
-                </div>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--color-text-muted)', marginTop: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  monthly · {t.clientShare}% your share
-                </div>
-                <div style={{
-                  marginTop: '1rem',
-                  paddingTop: '0.875rem',
-                  borderTop: '1px dashed var(--color-border)',
-                  fontSize: '0.8125rem',
-                  color: 'var(--color-text-weak)',
-                  fontFamily: 'var(--font-body)',
-                  fontWeight: 500,
-                }}>
-                  {`$${formatInt(t.min)} – $${formatInt(t.max)}`}
-                </div>
-              </motion.button>
-            )
-          })}
-        </div>
-
-        {/* Helper note under tiers */}
-        <div style={{
-          marginTop: '1.75rem',
-          display: 'flex',
-          gap: '0.625rem',
-          alignItems: 'flex-start',
-          background: '#ffffff',
-          border: '1px solid var(--color-border-light)',
-          borderRadius: '0.75rem',
-          padding: '0.875rem 1rem',
-          color: 'var(--color-text-weak)',
-        }}>
-          <span style={{ flexShrink: 0, marginTop: '0.125rem', color: '#1b61c9' }}><InfoIcon className="w-4 h-4" /></span>
-          <p style={{ fontSize: '0.875rem', lineHeight: 1.55, margin: 0 }}>
-            Click any tier to preview its math above. Your live tier is auto-detected from the amount you enter — you don&apos;t pick it manually when funding for real.
-          </p>
-        </div>
-      </SectionBox>
-
-      {/* ── 4. FULL BREAKDOWN — detail table for current selection ── */}
-      <SectionBox variant="white" padding="lg">
-        <SectionHeader
-          eyebrow="Full breakdown"
-          title={<>Your {tier.name} projection,<br />line by line.</>}
-          align="left"
-          maxWidth="42rem"
-          marginBottom="2.5rem"
-        >
-          Every figure below updates from the inputs above. Use it as a sanity check — the math is intentionally boring.
-        </SectionHeader>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 16rem), 1fr))',
-          gap: '1rem',
-        }}>
-          {[
-            { label: 'You invest',          value: `${formatNumber(amount)} USDT`,                     color: '#181d26' },
-            { label: 'Tier rate',           value: `~${tier.rate.toFixed(2)}% monthly`,                color: tier.accent },
-            { label: 'Your share',          value: `${tier.clientShare}%`,                              color: tier.accent },
-            { label: 'Term',                value: term.label,                                          color: '#181d26' },
-            { label: 'Mode',                value: compound ? 'Compounding' : 'Simple',                 color: '#181d26' },
-            { label: 'Monthly profit (est)', value: `~${formatNumber(monthlyReturn)} USDT`,             color: '#059669' },
-            { label: 'Total profit',        value: `${formatNumber(profit)} USDT`,                     color: '#059669' },
-            { label: 'Total return',        value: `${formatNumber(totalReturn)} USDT`,                color: '#059669' },
-            { label: 'ROI over term',       value: `${roiPct.toFixed(2)}%`,                            color: '#059669' },
-          ].map((row) => (
-            <div key={row.label} style={{
-              background: '#f8fafc',
-              border: '1px solid var(--color-border-light)',
-              borderRadius: '0.75rem',
-              padding: '1rem 1.125rem',
-            }}>
-              <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.375rem' }}>
-                {row.label}
-              </div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.375rem', fontWeight: 800, color: row.color, letterSpacing: '-0.015em' }}>
-                {row.value}
-              </div>
-            </div>
-          ))}
-        </div>
-      </SectionBox>
-
-      {/* ── 5. CLOSING CTA ── */}
+      {/* ── 3. CLOSING CTA ── */}
       <CTABand
         eyebrow="Ready to put it on autopilot?"
         title={<>The bot does the trading.<br />You do the watching.</>}
