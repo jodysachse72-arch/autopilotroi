@@ -114,9 +114,11 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
   const videos = (cmsVideos && cmsVideos.length > 0) ? cmsVideos : liveVideos
 
   const featured = videos.filter((v) => v.featured)
-  const filtered = videos.filter(
-    (v) => activeCategory === 'all' || v.category === activeCategory
-  )
+  const featuredIds = new Set(featured.map((v) => v._id))
+  const filtered = videos.filter((v) => {
+    if (activeCategory === 'all') return !featuredIds.has(v._id)
+    return v.category === activeCategory
+  })
 
   function markWatched(id: string) {
     setWatched((prev) => {
@@ -150,8 +152,16 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           </motion.h1>
 
           <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-            className="text-body-lg mx-auto mt-5 max-w-2xl"
-            style={{ color: 'rgba(255,255,255,0.80)', textAlign: 'center' }}>
+            style={{
+              color: 'rgba(255,255,255,0.80)',
+              textAlign: 'center',
+              fontSize: 'var(--text-body-lg)',
+              lineHeight: 'var(--lh-relaxed)',
+              maxWidth: '42rem',
+              margin: '1.25rem auto 0',
+              display: 'block',
+              width: '100%',
+            }}>
             Structured video learning for new and existing Aurum members — from wallet setup to
             advanced bot strategy. Watch, learn, and track your progress.
           </motion.p>
@@ -159,9 +169,9 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           {/* Progress bar */}
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3}
             style={{ margin: '2.5rem auto 0', maxWidth: '22rem', width: '100%' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.70)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '0.5rem', fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.70)' }}>
               <span>{watched.size} of {videos.length} watched</span>
-              <span style={{ fontWeight: 700, color: '#ffffff' }}>{progress}%</span>
+              <span style={{ fontWeight: 700, color: '#ffffff' }}>· {progress}%</span>
             </div>
             <div style={{ height: '0.5rem', borderRadius: '99px', overflow: 'hidden', background: 'rgba(255,255,255,0.18)' }}>
               <div
@@ -226,8 +236,8 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
 
           {/* Category Filters — padded surface container, horizontally scrollable */}
           <div style={{
-            background: '#f4f6fa',
-            border: '1px solid #e0e2e6',
+            background: '#eef0f5',
+            border: '1.5px solid #d8dae0',
             borderRadius: '0.875rem',
             padding: '0.75rem 1rem',
             marginBottom: '1.75rem',
