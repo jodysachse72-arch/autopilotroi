@@ -146,7 +146,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               )}
               {publishedAt && (
                 <>
-                  <span>\u00b7</span>
+                  <span>{'\u00b7'}</span>
                   <span>{formatDate(publishedAt)}</span>
                 </>
               )}

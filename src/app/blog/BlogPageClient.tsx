@@ -109,7 +109,7 @@ export default function BlogPageClient({ posts }: Props) {
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
               {featured.meta?.author ? <span>{featured.meta.author as string}</span> : null}
-              {featured.meta?.author && featured.meta?.publishedAt ? <span>\u00b7</span> : null}
+              {featured.meta?.author && featured.meta?.publishedAt ? <span>{'\u00b7'}</span> : null}
               {featured.meta?.publishedAt ? <span>{formatDate(featured.meta.publishedAt as string)}</span> : null}
             </div>
           </Link>
@@ -239,7 +239,7 @@ export default function BlogPageClient({ posts }: Props) {
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
                     {author && <span>{author}</span>}
-                    {author && publishedAt && <span>\u00b7</span>}
+                    {author && publishedAt && <span>{'\u00b7'}</span>}
                     {publishedAt && <span>{formatDate(publishedAt)}</span>}
                   </div>
                 </Link>
