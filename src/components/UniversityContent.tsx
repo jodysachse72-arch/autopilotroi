@@ -36,13 +36,13 @@ const fallbackVideos = [
 ]
 
 const categories = [
-  { id: 'all', label: 'All Videos', icon: '📚' },
-  { id: 'beginner', label: 'Beginner', icon: '🟢' },
-  { id: 'product', label: 'Product Info', icon: 'ℹ️' },
-  { id: 'due-diligence', label: 'Due Diligence', icon: '🔍' },
-  { id: 'partner', label: 'Partner Program', icon: '💸' },
-  { id: 'onboarding', label: 'Onboarding', icon: '🚀' },
-  { id: 'advanced', label: 'Advanced', icon: '⚡' },
+  { id: 'all',           label: 'All Videos',     icon: '📚' },
+  { id: 'beginner',      label: 'Beginner',        icon: '🟢' },
+  { id: 'product',       label: 'Product Info',    icon: 'ℹ️' },
+  { id: 'due-diligence', label: 'Due Diligence',   icon: '🔍' },
+  { id: 'partner',       label: 'Partner Program', icon: '💸' },
+  { id: 'onboarding',    label: 'Onboarding',      icon: '🚀' },
+  { id: 'advanced',      label: 'Advanced',        icon: '⚡' },
 ]
 
 const fadeUp = {
@@ -81,7 +81,7 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
           .order('sort_order', { ascending: true })
         if (error || !data || data.length === 0) return
         const sectionVideos = (data as CmsPost[]).filter(v => v.meta?.section === 'university')
-        if (sectionVideos.length === 0) return // keep fallback
+        if (sectionVideos.length === 0) return
         const mapped: UniversityVideo[] = sectionVideos.map(v => ({
           _id: v.id,
           title: v.title ?? 'Untitled',
@@ -133,49 +133,54 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
     <div className="page-bg">
       <div className="sections-stack">
 
-      {/* ── Blue hero — intentional brand accent for education section ── */}
-      <section style={{ background: '#1b61c9', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+      {/* ── Hero — blue brand accent ── */}
+      <section style={{ background: 'linear-gradient(145deg, #1047b0 0%, #1b61c9 60%, #0d3599 100%)', borderRadius: 'var(--radius-section)', overflow: 'hidden' }}>
         <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
+
+          {/* Badge */}
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}
-            className="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#fff' }}>
+            className="mb-6 inline-flex items-center gap-2 badge badge-white">
             🎓 Aurum University
           </motion.div>
+
+          {/* H1 — no longer duplicates the badge text */}
           <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1}
-            className="text-5xl font-bold tracking-tight text-white sm:text-6xl" style={{ letterSpacing: '-0.03em' }}>
-            Aurum University
+            className="text-display" style={{ color: '#ffffff', letterSpacing: '-0.03em' }}>
+            Your Learning Path Starts Here
           </motion.h1>
+
           <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2}
-            className="mx-auto mt-4 max-w-2xl text-lg leading-8" style={{ color: 'rgba(255,255,255,0.78)' }}>
+            className="text-body-lg mx-auto mt-5 max-w-2xl"
+            style={{ color: 'rgba(255,255,255,0.80)' }}>
             Structured video learning for new and existing Aurum members — from wallet setup to
             advanced bot strategy. Watch, learn, and track your progress.
           </motion.p>
 
           {/* Progress bar */}
-          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3} className="mx-auto mt-8 max-w-md">
-            <div className="flex items-center justify-between text-sm mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>
+          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3} className="mx-auto mt-10 max-w-sm">
+            <div className="flex items-center justify-between mb-2" style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.70)' }}>
               <span>{watched.size} of {videos.length} watched</span>
-              <span className="font-semibold text-white">{progress}%</span>
+              <span style={{ fontWeight: 700, color: '#ffffff' }}>{progress}%</span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.15)' }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.18)' }}>
               <div
                 className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #fff, rgba(255,255,255,0.7))' }}
+                style={{ width: `${progress}%`, background: 'linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.55))' }}
               />
             </div>
           </motion.div>
 
           {/* Stats */}
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4}
-            className="mt-8 flex flex-wrap items-center justify-center gap-8 text-sm">
+            className="mt-10 flex flex-wrap items-center justify-center gap-10">
             {[
               { value: `${videos.length}`, label: 'Videos' },
               { value: `${categories.length - 1}`, label: 'Categories' },
               { value: 'Free', label: 'Always' },
             ].map((s) => (
-              <div key={s.label} className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-white">{s.value}</span>
-                <span style={{ color: 'rgba(255,255,255,0.6)' }}>{s.label}</span>
+              <div key={s.label} className="flex flex-col items-center gap-1">
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>{s.value}</span>
+                <span style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.62)', letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600 }}>{s.label}</span>
               </div>
             ))}
           </motion.div>
@@ -185,14 +190,77 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
       {/* ── Main content ── */}
       <section className="section-box">
         <div className="container-xl section-padding">
-        {/* Featured Videos */}
-        {featured.length > 0 && (
-          <div className="mb-12">
-            <h2 className="mb-6 flex items-center gap-2 text-2xl font-bold" style={{ color: '#181d26' }}>
-              <span className="text-amber-500">⭐</span> Recommended Starting Points
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {featured.map((video, i) => (
+
+          {/* Featured Videos — distinct treatment */}
+          {featured.length > 0 && (
+            <div className="mb-14">
+              <div className="mb-7 flex items-center gap-3">
+                <div style={{
+                  width: '4px', height: '2rem', borderRadius: '2px',
+                  background: 'linear-gradient(180deg, #f59e0b, #d97706)',
+                  flexShrink: 0,
+                }} />
+                <h2 className="text-subheading" style={{ color: '#181d26' }}>
+                  Recommended Starting Points
+                </h2>
+                <span className="badge" style={{ background: 'rgba(217,119,6,0.10)', color: '#b45309', border: '1px solid rgba(217,119,6,0.20)', marginLeft: '0.25rem' }}>
+                  ⭐ {featured.length} videos
+                </span>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {featured.map((video, i) => (
+                  <VideoCard
+                    key={video._id}
+                    video={video}
+                    index={i}
+                    isWatched={watched.has(video._id)}
+                    isPlaying={playingId === video._id}
+                    onPlay={() => { setPlayingId(video._id); markWatched(video._id) }}
+                    onClose={() => setPlayingId(null)}
+                    isFeatured
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Category Filters */}
+          <div className="mb-8 flex flex-wrap gap-2.5">
+            {categories.map((cat) => {
+              const isActive = activeCategory === cat.id
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.id)}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.375rem',
+                    padding: '0.5rem 1.125rem',
+                    borderRadius: '99px',
+                    fontSize: 'var(--text-body)',
+                    fontWeight: isActive ? 700 : 500,
+                    fontFamily: 'var(--font-display)',
+                    cursor: 'pointer',
+                    transition: 'all 200ms cubic-bezier(0.22,1,0.36,1)',
+                    background: isActive ? '#1b61c9' : '#ffffff',
+                    color: isActive ? '#ffffff' : 'rgba(24,29,38,0.65)',
+                    border: isActive ? '1.5px solid #1b61c9' : '1.5px solid #e0e2e6',
+                    boxShadow: isActive ? '0 4px 14px rgba(27,97,201,0.30)' : 'none',
+                    transform: isActive ? 'translateY(-1px)' : 'none',
+                  }}
+                >
+                  <span>{cat.icon}</span>
+                  {cat.label}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Video Grid */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+              {filtered.map((video, i) => (
                 <VideoCard
                   key={video._id}
                   video={video}
@@ -201,58 +269,22 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
                   isPlaying={playingId === video._id}
                   onPlay={() => { setPlayingId(video._id); markWatched(video._id) }}
                   onClose={() => setPlayingId(null)}
-                  isFeatured
                 />
               ))}
-            </div>
+            </AnimatePresence>
           </div>
-        )}
-
-        {/* Category Filters */}
-        <div className="mb-8 flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className="rounded-full px-4 py-2 text-sm font-semibold transition-all"
-              style={{
-                background: activeCategory === cat.id ? '#1b61c9' : '#fff',
-                color: activeCategory === cat.id ? '#fff' : 'rgba(4,14,32,0.6)',
-                border: activeCategory === cat.id ? '1px solid #1b61c9' : '1px solid #e0e2e6',
-              }}
-            >
-              {cat.icon} {cat.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Video Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((video, i) => (
-              <VideoCard
-                key={video._id}
-                video={video}
-                index={i}
-                isWatched={watched.has(video._id)}
-                isPlaying={playingId === video._id}
-                onPlay={() => { setPlayingId(video._id); markWatched(video._id) }}
-                onClose={() => setPlayingId(null)}
-              />
-            ))}
-          </AnimatePresence>
-        </div>
 
           {filtered.length === 0 && (
             <div style={{
-              background: '#ffffff',
+              background: '#f8fafc',
               border: '1px solid var(--color-border)',
               borderRadius: 'var(--radius-card)',
-              padding: '3rem',
+              padding: '4rem 2rem',
               textAlign: 'center',
               color: 'var(--color-text-muted)',
+              fontSize: 'var(--text-body-lg)',
             }}>
-              No videos in this category yet. Check back soon!
+              No videos in this category yet — check back soon!
             </div>
           )}
         </div>
@@ -261,39 +293,26 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
       {/* ── Bottom CTA ── */}
       <section className="section-box-navy">
         <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2.5rem' }}>🎯</div>
-          <h2 className="text-heading" style={{ color: '#ffffff', marginTop: '1rem', marginBottom: '0.75rem' }}>
+          <div style={{
+            width: '4rem', height: '4rem', borderRadius: '1rem',
+            background: 'rgba(27,97,201,0.20)',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '1.75rem', marginBottom: '1.5rem',
+          }}>
+            🎯
+          </div>
+          <h2 className="text-heading" style={{ color: '#ffffff', marginBottom: '0.875rem' }}>
             Ready to get started?
           </h2>
-          <p style={{ fontSize: 'var(--text-body-lg)', color: 'rgba(255,255,255,0.72)', maxWidth: '36rem', margin: '0 auto 2rem', lineHeight: 'var(--lh-relaxed)' }}>
+          <p className="text-body-lg mx-auto" style={{ color: 'rgba(255,255,255,0.72)', maxWidth: '36rem', marginBottom: '2.25rem', lineHeight: 'var(--lh-relaxed)' }}>
             Once you&apos;ve completed the key education videos, start your onboarding
             with confidence. Your partner will guide you through every step.
           </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.875rem' }}>
-            <Link href="/signup" style={{
-              display: 'inline-flex', alignItems: 'center',
-              background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
-              color: '#ffffff',
-              padding: '0.875rem 2rem',
-              borderRadius: 'var(--radius-btn)',
-              fontFamily: 'var(--font-display)', fontWeight: 700,
-              fontSize: 'var(--text-body)',
-              textDecoration: 'none',
-              boxShadow: '0 4px 16px rgba(27,97,201,0.45)',
-            }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+            <Link href="/signup" className="btn btn-primary-lg shimmer-hover">
               Begin Onboarding →
             </Link>
-            <Link href="/resources" style={{
-              display: 'inline-flex', alignItems: 'center',
-              padding: '0.875rem 2rem',
-              borderRadius: 'var(--radius-btn)',
-              fontFamily: 'var(--font-display)', fontWeight: 600,
-              fontSize: 'var(--text-body)',
-              textDecoration: 'none',
-              color: '#ffffff',
-              border: '1.5px solid rgba(255,255,255,0.3)',
-              background: 'rgba(255,255,255,0.08)',
-            }}>
+            <Link href="/resources" className="btn btn-ghost">
               Browse Resources
             </Link>
           </div>
@@ -333,11 +352,29 @@ function VideoCard({
       animate="show"
       exit={{ opacity: 0, scale: 0.95 }}
       custom={index * 0.06}
-      className="group relative overflow-hidden rounded-2xl transition-all hover:shadow-lg"
+      className="group relative overflow-hidden"
       style={{
         background: '#fff',
-        border: isFeatured ? '1px solid #fde68a' : '1px solid #e0e2e6',
-        boxShadow: isFeatured ? '0 0 0 1px rgba(251,191,36,0.1)' : undefined,
+        borderRadius: 'var(--radius-card)',
+        border: isFeatured ? '1.5px solid #fde68a' : '1px solid #e0e2e6',
+        boxShadow: isFeatured
+          ? '0 0 0 1px rgba(251,191,36,0.08), 0 4px 20px rgba(217,119,6,0.10)'
+          : 'var(--shadow-card)',
+        /* Featured cards get a left accent bar */
+        borderLeft: isFeatured ? '4px solid #f59e0b' : undefined,
+        transition: 'box-shadow 300ms cubic-bezier(0.22,1,0.36,1), transform 300ms cubic-bezier(0.22,1,0.36,1)',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
+        ;(e.currentTarget as HTMLElement).style.boxShadow = isFeatured
+          ? '0 0 0 1px rgba(251,191,36,0.18), 0 8px 28px rgba(217,119,6,0.16)'
+          : 'var(--shadow-card-hover)'
+      }}
+      onMouseLeave={e => {
+        ;(e.currentTarget as HTMLElement).style.transform = ''
+        ;(e.currentTarget as HTMLElement).style.boxShadow = isFeatured
+          ? '0 0 0 1px rgba(251,191,36,0.08), 0 4px 20px rgba(217,119,6,0.10)'
+          : 'var(--shadow-card)'
       }}
     >
       {/* Thumbnail / Player */}
@@ -378,7 +415,7 @@ function VideoCard({
               </span>
             )}
             {isWatched && (
-              <span className="absolute left-2 top-2 rounded bg-emerald-500/90 px-2 py-0.5 text-xs font-bold text-white">
+              <span className="absolute left-2 top-2 rounded-full bg-emerald-500/90 px-2.5 py-0.5 text-xs font-bold text-white">
                 ✓ Watched
               </span>
             )}
@@ -387,29 +424,60 @@ function VideoCard({
       </div>
 
       {/* Info */}
-      <div className="p-4">
-        <div className="mb-2 flex items-center gap-2">
-          <span className="rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide"
-            style={
-              isFeatured
-                ? { background: 'rgba(217,119,6,0.1)', color: '#b45309' }
-                : { background: 'rgba(27,97,201,0.08)', color: '#1b61c9' }
-            }>
+      <div style={{ padding: '1.25rem 1.375rem 1.375rem' }}>
+        <div className="mb-2.5 flex items-center gap-2 flex-wrap">
+          <span
+            className="rounded-full px-3 py-1"
+            style={{
+              fontSize: 'var(--text-caption)',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              ...(isFeatured
+                ? { background: 'rgba(217,119,6,0.10)', color: '#b45309' }
+                : { background: 'rgba(27,97,201,0.08)', color: '#1b61c9' }),
+            }}
+          >
             {categoryLabel}
           </span>
           {isFeatured && (
-            <span className="rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold"
-              style={{ background: 'rgba(217,119,6,0.1)', color: '#b45309' }}>
+            <span
+              className="rounded-full px-3 py-1"
+              style={{ fontSize: 'var(--text-caption)', fontWeight: 600, background: 'rgba(217,119,6,0.10)', color: '#b45309' }}
+            >
               ⭐ Recommended
             </span>
           )}
         </div>
-        <h3 className="text-sm font-bold leading-snug line-clamp-2 transition-colors group-hover:text-[#1b61c9]"
-          style={{ color: '#181d26' }}>
+        <h3
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '1rem',
+            fontWeight: 700,
+            lineHeight: 1.35,
+            color: '#181d26',
+            marginBottom: '0.5rem',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+          className="transition-colors group-hover:text-[#1b61c9]"
+        >
           {video.title}
         </h3>
         {video.description && (
-          <p className="mt-1.5 text-xs leading-relaxed line-clamp-2" style={{ color: 'rgba(4,14,32,0.5)' }}>
+          <p
+            style={{
+              fontSize: '0.875rem',
+              lineHeight: 1.6,
+              color: 'rgba(24,29,38,0.56)',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
+          >
             {video.description}
           </p>
         )}
