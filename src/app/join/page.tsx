@@ -1,91 +1,153 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import {
+  PageShell,
+  SectionBox,
+  HeroBlue,
+  CTABand,
+} from '@/components/sections'
+import {
+  AcademyIcon,
+  PartnerIcon,
+  CheckCircleIcon,
+  GrowthIcon,
+} from '@/components/ui/Icons'
+
+const FEATURES = [
+  { Icon: AcademyIcon,      title: 'Full education',   desc: 'Videos, guides, and due diligence before you invest anything.', accent: '#1b61c9' },
+  { Icon: PartnerIcon,      title: 'Personal support', desc: 'A dedicated partner walks you through every step.',             accent: '#0891b2' },
+  { Icon: CheckCircleIcon,  title: 'Correct placement', desc: 'Your referral code ensures you\u0027re placed in the right team position.', accent: '#059669' },
+  { Icon: GrowthIcon,       title: 'Readiness score',  desc: 'Know exactly where you stand before committing.',                accent: '#d97706' },
+]
 
 function JoinContent() {
   const searchParams = useSearchParams()
   const refCode = searchParams.get('ref')
-  const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     if (refCode) {
-      try { localStorage.setItem('autopilotroi-ref', refCode); setSaved(true) } catch {}
+      try { localStorage.setItem('autopilotroi-ref', refCode) } catch {}
     }
   }, [refCode])
 
-  return (
-    <div className="page-bg">
-      <div className="sections-stack">
-        {/* Hero */}
-        <section className="section-box">
-          <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
-            {refCode ? (
-              <>
-                <span style={{ display:'inline-block', background:'rgba(16,185,129,0.08)', color:'#059669', border:'1px solid rgba(16,185,129,0.2)', borderRadius:'99px', padding:'0.375rem 1rem', fontSize:'var(--text-caption)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'1.5rem' }}>✓ Referral Code Recognized</span>
-                <h1 className="text-display" style={{ color:'#181d26', marginBottom:'1.25rem' }}>
-                  You&apos;ve been invited to<br /><span style={{ color:'#1b61c9' }}>Team AutoPilot ROI</span>
-                </h1>
-                <p className="text-body-lg" style={{ color:'var(--color-text-weak)', lineHeight:'var(--lh-relaxed)', maxWidth:'36rem', margin:'0 auto 2rem' }}>
-                  A partner from our team shared this link with you. Your referral has been saved — when you complete onboarding, the right partner will be notified and credited.
-                </p>
-                <div style={{ display:'inline-block', background:'#f8fafc', border:'1px solid var(--color-border)', borderRadius:'var(--radius-card)', padding:'1.25rem 2rem', marginBottom:'2rem', minWidth:'16rem' }}>
-                  <div style={{ fontSize:'var(--text-caption)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', color:'var(--color-text-muted)', marginBottom:'0.5rem' }}>Referral Code</div>
-                  <div style={{ fontSize:'1.5rem', fontWeight:700, fontFamily:'monospace', letterSpacing:'0.12em', color:'#181d26' }}>{refCode}</div>
-                  {saved && <div style={{ marginTop:'0.5rem', fontSize:'var(--text-caption)', fontWeight:600, color:'#059669' }}>✓ Saved to your session</div>}
-                </div>
-              </>
-            ) : (
-              <>
-                <span style={{ display:'inline-block', background:'rgba(27,97,201,0.08)', color:'#1b61c9', border:'1px solid rgba(27,97,201,0.15)', borderRadius:'99px', padding:'0.375rem 1rem', fontSize:'var(--text-caption)', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:'1.5rem' }}>Welcome</span>
-                <h1 className="text-display" style={{ color:'#181d26', marginBottom:'1.25rem' }}>
-                  Welcome to<br /><span style={{ color:'#1b61c9' }}>Team AutoPilot ROI</span>
-                </h1>
-                <p className="text-body-lg" style={{ color:'var(--color-text-weak)', lineHeight:'var(--lh-relaxed)', maxWidth:'36rem', margin:'0 auto 2rem' }}>
-                  AutoPilot ROI is the structured onboarding system for the Aurum ecosystem. Start your journey with education, guided setup, and personal partner support.
-                </p>
-                <div style={{ display:'inline-block', background:'rgba(245,158,11,0.06)', border:'1px solid rgba(245,158,11,0.25)', borderRadius:'var(--radius-md)', padding:'0.875rem 1.5rem', marginBottom:'2rem', maxWidth:'28rem' }}>
-                  <p style={{ fontSize:'var(--text-body)', color:'#d97706' }}><strong>No referral code detected.</strong> If someone sent you a link, make sure you&apos;re using the full URL they shared.</p>
-                </div>
-              </>
-            )}
-            <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', gap:'0.875rem' }}>
-              <Link href="/start" style={{ display:'inline-flex', alignItems:'center', background:'linear-gradient(135deg,#2563eb 0%,#1b61c9 100%)', color:'#fff', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:700, fontSize:'var(--text-body)', textDecoration:'none', boxShadow:'0 4px 16px rgba(27,97,201,0.4)' }}>Start Onboarding →</Link>
-              <Link href="/university" style={{ display:'inline-flex', alignItems:'center', background:'#fff', border:'1.5px solid var(--color-border)', color:'#181d26', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:600, fontSize:'var(--text-body)', textDecoration:'none' }}>Explore University</Link>
-            </div>
-          </div>
-        </section>
+  // Wrapped in Suspense for client-only useSearchParams,
+  // so we can show the saved indicator whenever a refCode is present.
+  const saved = !!refCode
 
-        {/* Feature cards */}
-        <section className="section-box">
-          <div className="container-xl section-padding">
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(min(100%,18rem),1fr))', gap:'1.25rem', maxWidth:'56rem', margin:'0 auto' }}>
-              {[
-                { icon:'🎓', title:'Full Education', desc:'Videos, guides, and due diligence before you invest anything.' },
-                { icon:'🤝', title:'Personal Support', desc:'A dedicated partner walks you through every step.' },
-                { icon:'🔗', title:'Correct Placement', desc:"Your referral code ensures you're placed in the right team position." },
-                { icon:'📊', title:'Readiness Score', desc:'Know exactly where you stand before committing.' },
-              ].map(item => (
-                <div key={item.title} style={{ background:'#fff', border:'1px solid var(--color-border)', borderRadius:'var(--radius-card)', padding:'1.5rem', transition:'box-shadow 200ms ease,transform 200ms ease' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow='var(--shadow-card-hover)'; (e.currentTarget as HTMLElement).style.transform='translateY(-2px)' }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow='none'; (e.currentTarget as HTMLElement).style.transform='translateY(0)' }}>
-                  <div style={{ fontSize:'2rem', marginBottom:'0.75rem' }}>{item.icon}</div>
-                  <h3 style={{ fontFamily:'var(--font-display)', fontWeight:700, fontSize:'var(--text-body-lg)', color:'#181d26', marginBottom:'0.5rem' }}>{item.title}</h3>
-                  <p style={{ fontSize:'var(--text-body)', color:'var(--color-text-muted)', lineHeight:'var(--lh-relaxed)' }}>{item.desc}</p>
+  return (
+    <PageShell>
+      <HeroBlue
+        eyebrow={refCode ? 'Referral code recognized' : 'Welcome'}
+        title={refCode
+          ? <>You&apos;ve been invited to<br />Team AutoPilot ROI.</>
+          : <>Welcome to<br />Team AutoPilot ROI.</>}
+        description={refCode
+          ? 'A partner from our team shared this link with you. Your referral has been saved \u2014 when you complete onboarding, the right partner will be notified and credited.'
+          : 'AutoPilot ROI is the structured onboarding system for the Aurum ecosystem. Start your journey with education, guided setup, and personal partner support.'}
+        ctas={[
+          { label: 'Start onboarding \u2192', href: '/start' },
+          { label: 'Explore Aurum University', href: '/university', variant: 'ghost' },
+        ]}
+      />
+
+      {/* Referral code receipt or no-referral notice */}
+      <SectionBox variant="white" padding="lg">
+        <div style={{ maxWidth: '40rem', margin: '0 auto', textAlign: 'center' }}>
+          {refCode ? (
+            <div style={{
+              display: 'inline-flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              background: '#f8fafc',
+              border: '1px solid var(--color-border)',
+              borderRadius: '1rem',
+              padding: '1.5rem 2.5rem',
+              minWidth: '18rem',
+            }}>
+              <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-text-muted)', marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>
+                Referral code
+              </div>
+              <div style={{ fontFamily: 'monospace', fontSize: '1.625rem', fontWeight: 700, letterSpacing: '0.12em', color: '#181d26' }}>
+                {refCode}
+              </div>
+              {saved && (
+                <div style={{ marginTop: '0.625rem', display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: 'var(--text-caption)', fontWeight: 600, color: '#059669' }}>
+                  <CheckCircleIcon className="w-4 h-4" /> Saved to your session
                 </div>
-              ))}
+              )}
             </div>
-          </div>
-        </section>
-      </div>
-    </div>
+          ) : (
+            <div style={{
+              background: 'rgba(245,158,11,0.06)',
+              border: '1px solid rgba(245,158,11,0.25)',
+              borderRadius: '0.875rem',
+              padding: '1rem 1.25rem',
+              maxWidth: '32rem',
+              margin: '0 auto',
+            }}>
+              <p style={{ fontSize: 'var(--text-body)', color: '#92400e', margin: 0, lineHeight: 1.55 }}>
+                <strong>No referral code detected.</strong> If someone sent you a link, make sure you&apos;re using the full URL they shared.
+              </p>
+            </div>
+          )}
+        </div>
+      </SectionBox>
+
+      {/* Features */}
+      <SectionBox variant="surface" padding="lg">
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
+          gap: '1.25rem',
+          maxWidth: '60rem',
+          margin: '0 auto',
+        }}>
+          {FEATURES.map((f) => (
+            <div key={f.title} style={{
+              background: '#ffffff',
+              border: '1px solid var(--color-border)',
+              borderRadius: '1rem',
+              padding: '1.5rem',
+            }}>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: '2.5rem', height: '2.5rem',
+                borderRadius: '0.625rem',
+                background: f.accent + '14',
+                color: f.accent,
+                marginBottom: '0.875rem',
+              }}>
+                <f.Icon className="w-5 h-5" />
+              </span>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'var(--text-body-lg)', color: '#181d26', marginBottom: '0.5rem' }}>
+                {f.title}
+              </h3>
+              <p style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-weak)', lineHeight: 1.6, margin: 0 }}>
+                {f.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </SectionBox>
+
+      <CTABand
+        eyebrow="Ready when you are"
+        title={<>Start with $100 in Trust Wallet.<br />Your partner is on standby.</>}
+        description="The whole onboarding takes 30\u201345 focused minutes. We\u2019ll walk you through every step."
+        ctas={[
+          { label: 'Begin Chapter 1 \u2192', href: '/start' },
+          { label: 'Read the FAQs', href: '/faqs', variant: 'ghost' },
+        ]}
+      />
+    </PageShell>
   )
 }
 
 export default function JoinPage() {
   return (
-    <Suspense fallback={<div className="page-bg" style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}><div style={{ width:'2rem', height:'2rem', borderRadius:'50%', border:'2px solid #1b61c9', borderTopColor:'transparent' }} /></div>}>
+    <Suspense fallback={<div className="page-bg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: '2rem', height: '2rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent' }} /></div>}>
       <JoinContent />
     </Suspense>
   )

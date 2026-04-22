@@ -1,61 +1,70 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { AutomationIcon, GrowthIcon, SecurityIcon, DataIcon, EcosystemIcon, ExchangeIcon, BankIcon, CardIcon, PartnerIcon } from '@/components/ui/Icons'
+import {
+  PageShell,
+  SectionBox,
+  SectionHeader,
+  HeroBlue,
+  CTABand,
+} from '@/components/sections'
+import {
+  AutomationIcon,
+  GrowthIcon,
+  SecurityIcon,
+  DataIcon,
+  EcosystemIcon,
+  BankIcon,
+  PartnerIcon,
+  CheckCircleIcon,
+  FlagIcon,
+  SparkleIcon,
+} from '@/components/ui/Icons'
 
 /* ═══════════════════════════════════════════════════════════════
    TRUST CHECK — 60-Second Opportunity Evaluator
-   
-   Educational trust-building tool. NOT fear-based.
-   Helps users evaluate ANY crypto/AI/income opportunity
-   using the same due diligence framework AutopilotROI
-   used when choosing to partner with Aurum Foundation.
-   
-   The logic is transparent. The scoring is honest.
-   When Aurum is evaluated, it scores well — because
-   it has real products, real tech, and verifiable proof.
+   Educational trust-building tool. Evaluates ANY opportunity
+   using AutopilotROI's due diligence framework.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ─── Quiz Questions ─── */
 interface QuizOption {
   label: string
   score: number
-  flag?: string // red/yellow flag text if selected
+  flag?: string
 }
 
 interface QuizQuestion {
   id: string
   category: string
-  categoryIcon: React.ReactNode
+  Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
   question: string
-  context: string // explains WHY this question matters
+  context: string
   options: QuizOption[]
-  weight: number // multiplier for this category
+  weight: number
 }
 
 const QUESTIONS: QuizQuestion[] = [
   {
     id: 'revenue',
-    category: 'Revenue Source',
-    categoryIcon: <BankIcon />,
+    category: 'Revenue source',
+    Icon: BankIcon,
     question: 'Where does the company make its money?',
     context: 'Legitimate businesses earn revenue from products, services, or technology — not from new users joining.',
-    weight: 1.4, // Weighted higher — this is the #1 red flag
+    weight: 1.4,
     options: [
       { label: 'Real products/services people pay for (trading tools, exchange fees, financial services)', score: 10 },
       { label: 'A mix of products and referral bonuses', score: 6 },
-      { label: 'It\'s unclear — mostly seems to come from new members joining', score: 2, flag: 'Revenue source unclear or dependent on recruitment' },
+      { label: 'It\u0027s unclear — mostly seems to come from new members joining', score: 2, flag: 'Revenue source unclear or dependent on recruitment' },
       { label: 'I have no idea where the money comes from', score: 0, flag: 'No verifiable revenue model' },
     ],
   },
   {
     id: 'sustainability',
     category: 'Sustainability',
-    categoryIcon: <GrowthIcon />,
+    Icon: GrowthIcon,
     question: 'Could this opportunity survive if no new people joined tomorrow?',
-    context: 'A sustainable business doesn\'t collapse without growth. Its products have standalone value.',
+    context: 'A sustainable business doesn\u0027t collapse without growth. Its products have standalone value.',
     weight: 1.3,
     options: [
       { label: 'Yes — the products/tech work independently of how many people join', score: 10 },
@@ -67,7 +76,7 @@ const QUESTIONS: QuizQuestion[] = [
   {
     id: 'transparency',
     category: 'Transparency',
-    categoryIcon: <DataIcon />,
+    Icon: DataIcon,
     question: 'Can you verify who runs it and how it works?',
     context: 'Real companies have verifiable leadership, registered entities, auditable technology, and clear documentation.',
     weight: 1.2,
@@ -75,13 +84,13 @@ const QUESTIONS: QuizQuestion[] = [
       { label: 'Yes — known team, registered company, public documentation, and verifiable tech', score: 10 },
       { label: 'Partially — some info is public but not everything', score: 5 },
       { label: 'Not really — the founders are anonymous or hard to find', score: 2, flag: 'Limited team transparency' },
-      { label: 'No — I can\'t verify anything about the company or team', score: 0, flag: 'No verifiable team or entity' },
+      { label: 'No — I can\u0027t verify anything about the company or team', score: 0, flag: 'No verifiable team or entity' },
     ],
   },
   {
     id: 'incentives',
-    category: 'Incentive Structure',
-    categoryIcon: <SecurityIcon />,
+    category: 'Incentive structure',
+    Icon: SecurityIcon,
     question: 'What are you rewarded for?',
     context: 'Healthy programs reward you for using the product. Risky ones reward you mainly for recruiting others.',
     weight: 1.0,
@@ -89,15 +98,15 @@ const QUESTIONS: QuizQuestion[] = [
       { label: 'Using the product — referrals are optional and secondary', score: 10 },
       { label: 'Both using the product and referring others, roughly equal', score: 7 },
       { label: 'Mostly referrals — the product seems secondary to recruitment', score: 3, flag: 'Referral-heavy incentive model' },
-      { label: 'Almost entirely recruiting — the \'product\' is the opportunity itself', score: 0, flag: 'Recruitment-as-product structure' },
+      { label: 'Almost entirely recruiting — the \u0027product\u0027 is the opportunity itself', score: 0, flag: 'Recruitment-as-product structure' },
     ],
   },
   {
     id: 'language',
-    category: 'Marketing Language',
-    categoryIcon: <EcosystemIcon />,
+    category: 'Marketing language',
+    Icon: EcosystemIcon,
     question: 'How does the opportunity describe itself?',
-    context: 'Legitimate businesses focus on what the product does. Risky ones focus on how much money you\'ll make.',
+    context: 'Legitimate businesses focus on what the product does. Risky ones focus on how much money you\u0027ll make.',
     weight: 1.0,
     options: [
       { label: 'Focuses on the technology, features, and real use cases', score: 10 },
@@ -108,100 +117,75 @@ const QUESTIONS: QuizQuestion[] = [
   },
 ]
 
-/* ─── Scoring Logic ─── */
 function calculateResults(answers: Record<string, number>, flags: string[]) {
   let weightedTotal = 0
   let maxPossible = 0
-
   QUESTIONS.forEach((q) => {
     const raw = answers[q.id] ?? 0
     weightedTotal += raw * q.weight
     maxPossible += 10 * q.weight
   })
-
-  // Normalize to 0-50 scale
   const score = Math.round((weightedTotal / maxPossible) * 50)
 
   let level: 'strong' | 'caution' | 'high-risk'
   let levelLabel: string
-  let levelColor: string
+  let levelColor: '#059669' | '#d97706' | '#dc2626'
+  let levelBg: string
   let explanation: string
 
   if (score >= 40) {
     level = 'strong'
-    levelLabel = 'Strong Opportunity'
-    levelColor = 'emerald'
-    explanation = 'This opportunity shows signs of a legitimate, product-driven business. Revenue appears to come from real activity, the model looks sustainable, and there\'s meaningful transparency. That said, always continue doing your own research — no evaluation tool replaces personal due diligence.'
+    levelLabel = 'Strong opportunity'
+    levelColor = '#059669'
+    levelBg = 'rgba(5,150,105,0.08)'
+    explanation = 'This opportunity shows signs of a legitimate, product-driven business. Revenue appears to come from real activity, the model looks sustainable, and there\u0027s meaningful transparency. That said, always continue doing your own research — no evaluation tool replaces personal due diligence.'
   } else if (score >= 25) {
     level = 'caution'
-    levelLabel = 'Proceed with Caution'
-    levelColor = 'amber'
+    levelLabel = 'Proceed with caution'
+    levelColor = '#d97706'
+    levelBg = 'rgba(217,119,6,0.08)'
     explanation = 'This opportunity has some positive indicators but also raises questions. There may be unclear revenue sources, heavy emphasis on recruitment, or limited transparency. Take time to verify claims independently before committing any funds.'
   } else {
     level = 'high-risk'
-    levelLabel = 'High Risk'
-    levelColor = 'red'
+    levelLabel = 'High risk'
+    levelColor = '#dc2626'
+    levelBg = 'rgba(220,38,38,0.08)'
     explanation = 'This opportunity shows multiple patterns commonly associated with unsustainable models. Revenue sources are unclear, growth-dependency is high, and verifiable information is limited. We strongly recommend extreme caution and independent research before proceeding.'
   }
 
-  return { score, level, levelLabel, levelColor, explanation, flags }
+  return { score, level, levelLabel, levelColor, levelBg, explanation, flags }
 }
 
-/* ─── Category breakdown for results ─── */
 function getCategoryScores(answers: Record<string, number>) {
   return QUESTIONS.map((q) => ({
     category: q.category,
-    icon: q.categoryIcon,
+    Icon: q.Icon,
     score: answers[q.id] ?? 0,
     max: 10,
     weight: q.weight,
   }))
 }
 
-/* ─── Aurum Self-Evaluation (Transparency) ─── */
 const AURUM_EVALUATION = {
   score: 43,
   breakdown: [
-    {
-      category: 'Revenue Source',
-      score: 9,
-      note: 'Aurum generates revenue through exchange trading fees, AI bot licensing, crypto card interchange fees, and neobank services. Products operate independently of member growth.',
-    },
-    {
-      category: 'Sustainability',
-      score: 9,
-      note: 'The trading exchange and AI bots function regardless of participant count. The technology has standalone utility in the market.',
-    },
-    {
-      category: 'Transparency',
-      score: 8,
-      note: 'Registered entity, public leadership, live product suite. Some areas are still expanding documentation, which is why this isn\'t a perfect 10.',
-    },
-    {
-      category: 'Incentive Structure',
-      score: 8,
-      note: 'Primary value comes from using the trading tools and financial products. Referral program exists but is secondary to the product experience.',
-    },
-    {
-      category: 'Marketing Language',
-      score: 9,
-      note: 'Focuses on technology, product features, and ecosystem development. Avoids income guarantees or unrealistic promises.',
-    },
+    { category: 'Revenue source',     score: 9, note: 'Aurum generates revenue through exchange trading fees, AI bot licensing, crypto card interchange fees, and neobank services. Products operate independently of member growth.' },
+    { category: 'Sustainability',     score: 9, note: 'The trading exchange and AI bots function regardless of participant count. The technology has standalone utility in the market.' },
+    { category: 'Transparency',       score: 8, note: 'Registered entity, public leadership, live product suite. Some areas are still expanding documentation, which is why this isn\u0027t a perfect 10.' },
+    { category: 'Incentive structure', score: 8, note: 'Primary value comes from using the trading tools and financial products. Referral program exists but is secondary to the product experience.' },
+    { category: 'Marketing language', score: 9, note: 'Focuses on technology, product features, and ecosystem development. Avoids income guarantees or unrealistic promises.' },
   ],
   totalNote: 'This is how AutopilotROI evaluated Aurum Foundation before choosing to partner. We applied the same framework you just used. No special scoring — just honest evaluation.',
 }
 
-/* ─── Rotating Quotes ─── */
 const QUOTES = [
   'The best investment you can make is in your own knowledge.',
-  'Due diligence isn\'t paranoia — it\'s wisdom.',
+  'Due diligence isn\u0027t paranoia — it\u0027s wisdom.',
   'Trust is earned through transparency, not promises.',
   'In a world of noise, clarity is the ultimate edge.',
   'Smart money asks questions before writing checks.',
   'The right opportunity welcomes scrutiny.',
 ]
-
-/* ─── Component ─── */
 
 const fadeAnim = {
   initial: { opacity: 0, y: 20 },
@@ -210,14 +194,13 @@ const fadeAnim = {
 }
 
 export default function EvaluatePage() {
-  const [phase, setPhase] = useState<'intro' | 'quiz' | 'results' | 'aurum'>('intro')
+  const [phase, setPhase] = useState<'intro' | 'quiz' | 'results'>('intro')
   const [currentQ, setCurrentQ] = useState(0)
   const [answers, setAnswers] = useState<Record<string, number>>({})
   const [flags, setFlags] = useState<string[]>([])
   const [showAurum, setShowAurum] = useState(false)
   const [quoteIndex, setQuoteIndex] = useState(0)
 
-  // Rotate quotes every 6 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setQuoteIndex((prev) => (prev + 1) % QUOTES.length)
@@ -244,513 +227,653 @@ export default function EvaluatePage() {
     setShowAurum(false)
   }
 
-  const results = phase === 'results' || phase === 'aurum' ? calculateResults(answers, flags) : null
-  const categories = phase === 'results' || phase === 'aurum' ? getCategoryScores(answers) : []
+  const results = phase === 'results' ? calculateResults(answers, flags) : null
+  const categories = phase === 'results' ? getCategoryScores(answers) : []
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)]">
-      {/* Success quote ticker — replaces the old duplicate header */}
-      <div className="border-b border-[var(--border-primary)] bg-[var(--bg-card)]/50 backdrop-blur-sm">
-        <div className="mx-auto max-w-5xl px-6 py-2.5 text-center">
+    <PageShell>
+
+      {/* ── 1. HERO ── */}
+      <HeroBlue
+        eyebrow="Free tool · 60 seconds"
+        title={<>Trust Check.<br />Evaluate any opportunity.</>}
+        description="Five questions. No sign-up. The same due diligence framework AutoPilot ROI used before partnering with Aurum Foundation."
+      />
+
+      {/* ── 2. ROTATING QUOTE TICKER ── */}
+      <SectionBox variant="white" padding="none">
+        <div style={{
+          padding: '1rem 1.5rem',
+          textAlign: 'center',
+          borderBottom: '1px solid var(--color-border-light)',
+        }}>
           <AnimatePresence mode="wait">
             <motion.p
               key={quoteIndex}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
+              exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.4 }}
-              className="text-xs sm:text-sm text-[var(--text-muted)] italic"
+              style={{
+                fontSize: 'var(--text-body)',
+                color: 'var(--color-text-muted)',
+                fontStyle: 'italic',
+                margin: 0,
+              }}
             >
               &ldquo;{QUOTES[quoteIndex]}&rdquo;
             </motion.p>
           </AnimatePresence>
         </div>
-      </div>
+      </SectionBox>
 
-      <div className="mx-auto max-w-3xl px-6 py-12 lg:py-16">
-        <AnimatePresence mode="wait">
-          {/* ═══════════════════════════════════════════════
-              PHASE: INTRO
-          ═══════════════════════════════════════════════ */}
-          {phase === 'intro' && (
-            <motion.div key="intro" {...fadeAnim} className="text-center">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-300 sm:text-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" /> Free Tool
-              </div>
+      {/* ── 3. QUIZ MACHINE ── */}
+      <SectionBox variant="white" padding="lg">
+        <div style={{ maxWidth: '44rem', margin: '0 auto' }}>
+          <AnimatePresence mode="wait">
 
-              <h1 className="font-[var(--font-sora)] text-4xl font-bold text-[var(--text-primary)] sm:text-5xl lg:text-6xl">
-                Trust Check
-                <span className="block mt-3 text-xl font-normal text-[var(--text-muted)] sm:text-2xl lg:text-3xl">
-                  Evaluate any opportunity in 60 seconds
-                </span>
-              </h1>
+            {/* PHASE: INTRO */}
+            {phase === 'intro' && (
+              <motion.div key="intro" {...fadeAnim} style={{ textAlign: 'center' }}>
+                <h2 className="text-display" style={{ color: '#181d26', marginBottom: '1rem' }}>
+                  Run any opportunity through our framework.
+                </h2>
+                <p className="text-body-lg" style={{ color: 'var(--color-text-weak)', maxWidth: '36rem', margin: '0 auto 2rem', lineHeight: 1.6 }}>
+                  Before you invest time or money into any crypto, AI, or passive income opportunity, run it through the same five questions we asked before partnering with Aurum.
+                </p>
 
-              <p className="mx-auto mt-8 max-w-2xl text-base text-[var(--text-secondary)] leading-relaxed sm:text-lg lg:text-xl">
-                Before you invest time or money into any crypto, AI, or passive income opportunity — run it through the same due diligence framework that AutopilotROI used when choosing to partner with Aurum Foundation.
-              </p>
-
-              <p className="mx-auto mt-4 max-w-xl text-sm text-[var(--text-muted)] sm:text-base">
-                5 questions. No sign-up required. Completely free.
-              </p>
-
-              {/* What this checks */}
-              <div className="mx-auto mt-10 grid max-w-xl gap-3 sm:grid-cols-5">
-                {QUESTIONS.map((q) => (
-                  <div key={q.id} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-3 text-center flex flex-col items-center">
-                    <span className="w-8 h-8 flex items-center justify-center text-blue-500 mb-1">{q.categoryIcon}</span>
-                    <div className="text-[10px] font-medium text-[var(--text-muted)]">{q.category}</div>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                onClick={() => setPhase('quiz')}
-                className="mt-10 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-8 py-4 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40 shimmer-hover"
-              >
-                Start Evaluation →
-              </button>
-
-              <p className="mt-4 text-xs text-[var(--text-muted)]">
-                No data is collected. This runs entirely in your browser.
-              </p>
-            </motion.div>
-          )}
-
-          {/* ═══════════════════════════════════════════════
-              PHASE: QUIZ
-          ═══════════════════════════════════════════════ */}
-          {phase === 'quiz' && (
-            <motion.div key={`quiz-${currentQ}`} {...fadeAnim}>
-              {/* Progress */}
-              <div className="mb-8">
-                <div className="flex items-center justify-between text-sm text-[var(--text-muted)] mb-2">
-                  <span>Question {currentQ + 1} of {QUESTIONS.length}</span>
-                  <span>{Math.round(((currentQ) / QUESTIONS.length) * 100)}%</span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-card)]">
-                  <motion.div
-                    className="h-full rounded-full bg-blue-500"
-                    animate={{ width: `${((currentQ) / QUESTIONS.length) * 100}%` }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-                {/* Step dots */}
-                <div className="mt-3 flex justify-between">
-                  {QUESTIONS.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-2 w-2 rounded-full transition ${
-                        i < currentQ ? 'bg-blue-500' :
-                        i === currentQ ? 'bg-blue-400 ring-4 ring-blue-400/20' :
-                        'bg-white/10'
-                      }`}
-                    />
+                {/* Category preview grid */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 8rem), 1fr))',
+                  gap: '0.75rem',
+                  margin: '0 auto 2.5rem',
+                  maxWidth: '36rem',
+                }}>
+                  {QUESTIONS.map((q) => (
+                    <div key={q.id} style={{
+                      background: '#f8fafc',
+                      border: '1px solid var(--color-border-light)',
+                      borderRadius: '0.75rem',
+                      padding: '0.875rem 0.5rem',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                    }}>
+                      <span style={{ color: '#1b61c9' }}><q.Icon className="w-5 h-5" /></span>
+                      <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--color-text-weak)', textAlign: 'center', lineHeight: 1.3 }}>
+                        {q.category}
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </div>
 
-              {/* Category badge */}
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-[var(--text-muted)]">
-                <span className="w-4 h-4 text-blue-400">{QUESTIONS[currentQ].categoryIcon}</span> {QUESTIONS[currentQ].category}
-              </div>
+                <button
+                  onClick={() => setPhase('quiz')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                    background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
+                    color: '#ffffff',
+                    padding: '1rem 2rem',
+                    borderRadius: 'var(--radius-btn)',
+                    fontFamily: 'var(--font-display)', fontWeight: 700,
+                    fontSize: 'var(--text-body-lg)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 20px rgba(27,97,201,0.4)',
+                    letterSpacing: '0.01em',
+                    transition: 'box-shadow 150ms ease, transform 150ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 28px rgba(27,97,201,0.55)'
+                    ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(27,97,201,0.4)'
+                    ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+                  }}
+                >
+                  Start evaluation →
+                </button>
 
-              {/* Question */}
-              <h2 className="font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)] sm:text-3xl">
-                {QUESTIONS[currentQ].question}
-              </h2>
+                <p style={{ marginTop: '1rem', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+                  No data is collected. This runs entirely in your browser.
+                </p>
+              </motion.div>
+            )}
 
-              {/* Context */}
-              <p className="mt-3 text-sm text-[var(--text-muted)] leading-relaxed">
-                <span className="text-blue-400 font-semibold">Why this matters:</span>{' '}
-                {QUESTIONS[currentQ].context}
-              </p>
+            {/* PHASE: QUIZ */}
+            {phase === 'quiz' && (
+              <motion.div key={`quiz-${currentQ}`} {...fadeAnim}>
+                {/* Progress */}
+                <div style={{ marginBottom: '2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginBottom: '0.5rem', fontFamily: 'var(--font-display)' }}>
+                    <span>Question {currentQ + 1} of {QUESTIONS.length}</span>
+                    <span>{Math.round((currentQ / QUESTIONS.length) * 100)}%</span>
+                  </div>
+                  <div style={{ height: '0.375rem', borderRadius: '99px', background: '#f1f5f9', overflow: 'hidden' }}>
+                    <motion.div
+                      style={{ height: '100%', borderRadius: '99px', background: '#1b61c9' }}
+                      animate={{ width: `${(currentQ / QUESTIONS.length) * 100}%` }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </div>
+                </div>
 
-              {/* Options */}
-              <div className="mt-8 space-y-3">
-                {QUESTIONS[currentQ].options.map((opt, i) => (
-                  <button
-                    key={i}
-                    onClick={() => selectAnswer(QUESTIONS[currentQ].id, opt.score, opt.flag)}
-                    className={`group w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-5 py-4 text-left transition-all hover:border-blue-500/40 hover:bg-blue-500/5 ${
-                      answers[QUESTIONS[currentQ].id] === opt.score ? 'border-blue-500 bg-blue-500/10' : ''
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition ${
-                        answers[QUESTIONS[currentQ].id] === opt.score
-                          ? 'border-blue-500 bg-blue-500 text-white'
-                          : 'border-white/20 text-white/20 group-hover:border-blue-400/40'
-                      }`}>
+                {/* Category badge */}
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                  background: 'rgba(27,97,201,0.08)',
+                  color: '#1b61c9',
+                  border: '1px solid rgba(27,97,201,0.2)',
+                  padding: '0.375rem 0.875rem',
+                  borderRadius: '99px',
+                  fontSize: '0.6875rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  marginBottom: '1.25rem',
+                  fontFamily: 'var(--font-display)',
+                }}>
+                  {(() => { const Q = QUESTIONS[currentQ]; return <Q.Icon className="w-4 h-4" /> })()}
+                  {QUESTIONS[currentQ].category}
+                </div>
+
+                <h2 className="text-display" style={{ color: '#181d26', marginBottom: '0.875rem', fontSize: 'clamp(1.5rem, 3vw, 2rem)' }}>
+                  {QUESTIONS[currentQ].question}
+                </h2>
+
+                <p style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-weak)', lineHeight: 1.6, marginBottom: '2rem' }}>
+                  <strong style={{ color: '#1b61c9', fontWeight: 700 }}>Why this matters:</strong>{' '}
+                  {QUESTIONS[currentQ].context}
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {QUESTIONS[currentQ].options.map((opt, i) => (
+                    <button
+                      key={i}
+                      onClick={() => selectAnswer(QUESTIONS[currentQ].id, opt.score, opt.flag)}
+                      style={{
+                        display: 'flex', alignItems: 'flex-start', gap: '0.875rem',
+                        width: '100%',
+                        textAlign: 'left',
+                        background: '#ffffff',
+                        border: '1.5px solid var(--color-border)',
+                        borderRadius: '0.75rem',
+                        padding: '1rem 1.25rem',
+                        cursor: 'pointer',
+                        transition: 'border-color 150ms ease, background 150ms ease, transform 150ms ease',
+                        fontFamily: 'var(--font-body)',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLElement).style.borderColor = '#1b61c9'
+                        ;(e.currentTarget as HTMLElement).style.background = 'rgba(27,97,201,0.04)'
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.borderColor = 'var(--color-border)'
+                        ;(e.currentTarget as HTMLElement).style.background = '#ffffff'
+                      }}
+                    >
+                      <span style={{
+                        flexShrink: 0,
+                        width: '1.75rem', height: '1.75rem',
+                        borderRadius: '50%',
+                        border: '1.5px solid var(--color-border)',
+                        color: 'var(--color-text-weak)',
+                        background: '#f8fafc',
+                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'var(--font-display)', fontWeight: 700,
+                        fontSize: '0.8125rem',
+                      }}>
                         {String.fromCharCode(65 + i)}
                       </span>
-                      <span className="text-sm text-[var(--text-secondary)] leading-relaxed group-hover:text-white">
+                      <span style={{ fontSize: 'var(--text-body)', color: '#181d26', lineHeight: 1.5 }}>
                         {opt.label}
                       </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* ═══════════════════════════════════════════════
-              PHASE: RESULTS
-          ═══════════════════════════════════════════════ */}
-          {(phase === 'results' || phase === 'aurum') && results && (
-            <motion.div key="results" {...fadeAnim} className="space-y-8">
-              {/* Score Header */}
-              <div className="text-center">
-                <div className={`mx-auto mb-4 flex h-28 w-28 items-center justify-center rounded-full border-4 ${
-                  results.levelColor === 'emerald' ? 'border-emerald-400/40 bg-emerald-500/10' :
-                  results.levelColor === 'amber' ? 'border-amber-400/40 bg-amber-500/10' :
-                  'border-red-400/40 bg-red-500/10'
-                }`}>
-                  <div className="text-center">
-                    <div className={`font-[var(--font-sora)] text-4xl font-black ${
-                      results.levelColor === 'emerald' ? 'text-emerald-400' :
-                      results.levelColor === 'amber' ? 'text-amber-400' :
-                      'text-red-400'
-                    }`}>
-                      {results.score}
-                    </div>
-                    <div className="text-xs text-[var(--text-muted)]">/50</div>
-                  </div>
-                </div>
-
-                <div className={`inline-block rounded-full px-4 py-1.5 text-sm font-bold ${
-                  results.levelColor === 'emerald' ? 'bg-emerald-500/15 text-emerald-400' :
-                  results.levelColor === 'amber' ? 'bg-amber-500/15 text-amber-400' :
-                  'bg-red-500/15 text-red-400'
-                }`}>
-                  {results.levelLabel}
-                </div>
-
-                <p className="mx-auto mt-6 max-w-xl text-sm text-[var(--text-secondary)] leading-relaxed">
-                  {results.explanation}
-                </p>
-              </div>
-
-              {/* Category Breakdown */}
-              <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6">
-                <h3 className="font-[var(--font-sora)] text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-5">
-                  Score Breakdown
-                </h3>
-                <div className="space-y-4">
-                  {categories.map((cat) => (
-                    <div key={cat.category}>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="flex items-center gap-2 text-sm text-[var(--text-primary)]">
-                          <span className="w-4 h-4 text-blue-500">{cat.icon}</span> {cat.category}
-                          {cat.weight > 1 && (
-                            <span className="text-[10px] text-[var(--text-muted)]">×{cat.weight}</span>
-                          )}
-                        </span>
-                        <span className={`text-sm font-bold ${
-                          cat.score >= 7 ? 'text-emerald-400' :
-                          cat.score >= 4 ? 'text-amber-400' :
-                          'text-red-400'
-                        }`}>
-                          {cat.score}/{cat.max}
-                        </span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-[var(--bg-card)]">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(cat.score / cat.max) * 100}%` }}
-                          transition={{ delay: 0.2, duration: 0.5 }}
-                          className={`h-2 rounded-full ${
-                            cat.score >= 7 ? 'bg-emerald-500' :
-                            cat.score >= 4 ? 'bg-amber-500' :
-                            'bg-red-500'
-                          }`}
-                        />
-                      </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
-              </div>
+              </motion.div>
+            )}
 
-              {/* Flags Detected */}
-              {flags.length > 0 && (
-                <div className="rounded-2xl border border-amber-400/20 bg-amber-500/5 p-6">
-                  <h3 className="flex items-center gap-2 font-[var(--font-sora)] text-sm font-semibold text-amber-400 uppercase tracking-wider mb-4">
-                    ⚡ Patterns Detected
+            {/* PHASE: RESULTS */}
+            {phase === 'results' && results && (
+              <motion.div key="results" {...fadeAnim} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+
+                {/* Score Header */}
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{
+                    width: '7rem', height: '7rem',
+                    margin: '0 auto 1.25rem',
+                    borderRadius: '50%',
+                    border: `4px solid ${results.levelColor}66`,
+                    background: results.levelBg,
+                    display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <div style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '2.25rem',
+                      fontWeight: 800,
+                      color: results.levelColor,
+                      lineHeight: 1,
+                    }}>
+                      {results.score}
+                    </div>
+                    <div style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginTop: '0.125rem' }}>/ 50</div>
+                  </div>
+
+                  <div style={{
+                    display: 'inline-block',
+                    background: results.levelBg,
+                    color: results.levelColor,
+                    border: `1px solid ${results.levelColor}44`,
+                    borderRadius: '99px',
+                    padding: '0.375rem 1rem',
+                    fontSize: 'var(--text-body)',
+                    fontWeight: 700,
+                    fontFamily: 'var(--font-display)',
+                    marginBottom: '1.25rem',
+                  }}>
+                    {results.levelLabel}
+                  </div>
+
+                  <p style={{ maxWidth: '36rem', margin: '0 auto', fontSize: 'var(--text-body)', color: 'var(--color-text-weak)', lineHeight: 1.65 }}>
+                    {results.explanation}
+                  </p>
+                </div>
+
+                {/* Category Breakdown */}
+                <div style={{
+                  background: '#f8fafc',
+                  border: '1px solid var(--color-border-light)',
+                  borderRadius: '1rem',
+                  padding: '1.5rem',
+                }}>
+                  <h3 style={{
+                    fontSize: '0.6875rem',
+                    fontWeight: 700,
+                    color: 'var(--color-text-muted)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    marginBottom: '1.25rem',
+                    fontFamily: 'var(--font-display)',
+                  }}>
+                    Score breakdown
                   </h3>
-                  <div className="space-y-2">
-                    {flags.map((flag, i) => (
-                      <div key={i} className="flex items-start gap-2 text-sm text-amber-200/70">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" />
-                        {flag}
-                      </div>
-                    ))}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {categories.map((cat) => {
+                      const color = cat.score >= 7 ? '#059669' : cat.score >= 4 ? '#d97706' : '#dc2626'
+                      return (
+                        <div key={cat.category}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--text-body)', color: '#181d26', fontFamily: 'var(--font-display)' }}>
+                              <span style={{ color: '#1b61c9' }}><cat.Icon className="w-4 h-4" /></span>
+                              {cat.category}
+                              {cat.weight > 1 && (
+                                <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
+                                  ×{cat.weight}
+                                </span>
+                              )}
+                            </span>
+                            <span style={{ fontSize: 'var(--text-body)', fontWeight: 800, color, fontFamily: 'var(--font-display)' }}>
+                              {cat.score}/{cat.max}
+                            </span>
+                          </div>
+                          <div style={{ height: '0.5rem', borderRadius: '99px', background: '#ffffff', border: '1px solid var(--color-border-light)', overflow: 'hidden' }}>
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(cat.score / cat.max) * 100}%` }}
+                              transition={{ delay: 0.2, duration: 0.5 }}
+                              style={{ height: '100%', background: color }}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
-              )}
 
-              {/* ── How Aurum Scores (Transparency Section) ── */}
-              <div className="rounded-2xl border border-blue-400/20 bg-blue-500/5 p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h3 className="font-[var(--font-sora)] text-base font-bold text-[var(--text-primary)]">
-                      See how we evaluated Aurum Foundation
+                {/* Flags */}
+                {flags.length > 0 && (
+                  <div style={{
+                    background: 'rgba(217,119,6,0.06)',
+                    border: '1px solid rgba(217,119,6,0.25)',
+                    borderRadius: '1rem',
+                    padding: '1.5rem',
+                  }}>
+                    <h3 style={{
+                      display: 'flex', alignItems: 'center', gap: '0.5rem',
+                      fontSize: '0.6875rem',
+                      fontWeight: 700,
+                      color: '#d97706',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      marginBottom: '1rem',
+                      fontFamily: 'var(--font-display)',
+                    }}>
+                      <FlagIcon className="w-4 h-4" />
+                      Patterns detected
                     </h3>
-                    <p className="mt-1 text-sm text-[var(--text-muted)]">
-                      AutopilotROI applied this exact framework before choosing to partner with Aurum. Here&apos;s how it scored — transparently, with notes on each category.
-                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {flags.map((flag, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: 'var(--text-body)', color: '#92400e', lineHeight: 1.5 }}>
+                          <span style={{ marginTop: '0.5rem', width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: '#d97706', flexShrink: 0 }} />
+                          {flag}
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                )}
+
+                {/* How Aurum scored */}
+                <div style={{
+                  background: 'rgba(27,97,201,0.04)',
+                  border: '1px solid rgba(27,97,201,0.2)',
+                  borderRadius: '1rem',
+                  padding: '1.5rem',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <h3 style={{
+                        fontFamily: 'var(--font-display)',
+                        fontSize: 'var(--text-body-lg)',
+                        fontWeight: 700,
+                        color: '#181d26',
+                        marginBottom: '0.375rem',
+                      }}>
+                        See how we evaluated Aurum Foundation
+                      </h3>
+                      <p style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-weak)', margin: 0, lineHeight: 1.55 }}>
+                        AutopilotROI applied this exact framework before choosing to partner with Aurum. Here&apos;s how it scored — transparently, with notes on each category.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowAurum(!showAurum)}
+                      style={{
+                        flexShrink: 0,
+                        background: '#1b61c9',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: 'var(--radius-btn)',
+                        padding: '0.625rem 1.125rem',
+                        fontFamily: 'var(--font-display)',
+                        fontWeight: 700,
+                        fontSize: 'var(--text-body)',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {showAurum ? 'Hide' : 'View'} evaluation
+                    </button>
+                  </div>
+
+                  <AnimatePresence>
+                    {showAurum && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <div style={{
+                          marginTop: '1.5rem',
+                          paddingTop: '1.5rem',
+                          borderTop: '1px solid rgba(27,97,201,0.15)',
+                          display: 'flex', flexDirection: 'column', gap: '1rem',
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                            <div style={{
+                              width: '4rem', height: '4rem',
+                              borderRadius: '50%',
+                              border: '2px solid rgba(5,150,105,0.4)',
+                              background: 'rgba(5,150,105,0.08)',
+                              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                              fontFamily: 'var(--font-display)',
+                              fontSize: '1.5rem',
+                              fontWeight: 800,
+                              color: '#059669',
+                            }}>
+                              {AURUM_EVALUATION.score}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 'var(--text-body)', fontWeight: 700, color: '#059669', fontFamily: 'var(--font-display)' }}>
+                                Strong opportunity
+                              </div>
+                              <div style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+                                Aurum Foundation · Evaluated by AutopilotROI
+                              </div>
+                            </div>
+                          </div>
+
+                          {AURUM_EVALUATION.breakdown.map((cat) => (
+                            <div key={cat.category} style={{
+                              background: '#ffffff',
+                              border: '1px solid var(--color-border-light)',
+                              borderRadius: '0.75rem',
+                              padding: '1rem 1.125rem',
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+                                <span style={{ fontSize: 'var(--text-body)', fontWeight: 700, color: '#181d26', fontFamily: 'var(--font-display)' }}>
+                                  {cat.category}
+                                </span>
+                                <span style={{ fontSize: 'var(--text-body)', fontWeight: 800, color: '#059669', fontFamily: 'var(--font-display)' }}>
+                                  {cat.score}/10
+                                </span>
+                              </div>
+                              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-weak)', lineHeight: 1.55, margin: 0 }}>
+                                {cat.note}
+                              </p>
+                            </div>
+                          ))}
+
+                          <div style={{
+                            background: '#ffffff',
+                            border: '1px solid var(--color-border-light)',
+                            borderRadius: '0.5rem',
+                            padding: '0.875rem 1rem',
+                          }}>
+                            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)', fontStyle: 'italic', lineHeight: 1.55, margin: 0 }}>
+                              {AURUM_EVALUATION.totalNote}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Restart + share */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
                   <button
-                    onClick={() => setShowAurum(!showAurum)}
-                    className="shrink-0 rounded-xl border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-300 transition hover:bg-blue-500/20"
+                    onClick={restart}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'var(--color-text-weak)',
+                      fontFamily: 'var(--font-display)',
+                      fontWeight: 600,
+                      fontSize: 'var(--text-body)',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
                   >
-                    {showAurum ? 'Hide' : 'View'} Evaluation
+                    ← Evaluate another
+                  </button>
+                  <button
+                    onClick={() => {
+                      const text = `I just evaluated a crypto opportunity using AutopilotROI's Trust Check tool. It scored ${results.score}/50 (${results.levelLabel}). Try it yourself:`
+                      const url = typeof window !== 'undefined' ? window.location.href : ''
+                      if (typeof navigator !== 'undefined' && navigator.share) {
+                        navigator.share({ title: 'Trust Check Results', text, url })
+                      } else if (typeof navigator !== 'undefined') {
+                        navigator.clipboard.writeText(`${text} ${url}`)
+                        alert('Results copied to clipboard!')
+                      }
+                    }}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#1b61c9',
+                      fontFamily: 'var(--font-display)',
+                      fontWeight: 600,
+                      fontSize: 'var(--text-body)',
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    <SparkleIcon className="w-4 h-4" />
+                    Share results
                   </button>
                 </div>
 
-                <AnimatePresence>
-                  {showAurum && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="mt-6 pt-6 border-t border-blue-400/10 space-y-5">
-                        {/* Aurum Score */}
-                        <div className="flex items-center gap-4">
-                          <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-emerald-400/40 bg-emerald-500/10">
-                            <span className="font-[var(--font-sora)] text-2xl font-black text-emerald-400">
-                              {AURUM_EVALUATION.score}
-                            </span>
-                          </div>
-                          <div>
-                            <div className="text-sm font-bold text-emerald-400">Strong Opportunity</div>
-                            <div className="text-xs text-[var(--text-muted)]">Aurum Foundation · Evaluated by AutopilotROI</div>
-                          </div>
-                        </div>
-
-                        {/* Category breakdown with notes */}
-                        {AURUM_EVALUATION.breakdown.map((cat) => (
-                          <div key={cat.category} className="rounded-xl bg-[var(--bg-card)] border border-[var(--border-primary)] p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-semibold text-[var(--text-primary)]">{cat.category}</span>
-                              <span className="text-sm font-bold text-emerald-400">{cat.score}/10</span>
-                            </div>
-                            <p className="text-xs text-[var(--text-muted)] leading-relaxed">{cat.note}</p>
-                          </div>
-                        ))}
-
-                        <div className="rounded-lg bg-[var(--bg-card)] border border-[var(--border-primary)] p-4">
-                          <p className="text-xs text-[var(--text-muted)] leading-relaxed italic">
-                            {AURUM_EVALUATION.totalNote}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* CTA — Value-first, not pushy */}
-              <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 text-center">
-                <h3 className="font-[var(--font-sora)] text-lg font-bold text-[var(--text-primary)]">
-                  Want to evaluate Aurum for yourself?
-                </h3>
-                <p className="mx-auto mt-2 max-w-lg text-sm text-[var(--text-muted)]">
-                  AutopilotROI provides a structured, step-by-step path to understand the Aurum ecosystem — with education, transparency, and real partner support. No pressure. No hype.
+                <p style={{ textAlign: 'center', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+                  This tool is for educational purposes only and does not constitute financial advice. Always conduct your own research before investing in any opportunity. No data from this evaluation is stored or transmitted.
                 </p>
-                <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                  <Link
-                    href="/products"
-                    className="btn-primary shimmer-hover" style={{ padding: '0.75rem 1.5rem', borderRadius: '0.75rem' }}
-                  >
-                    Explore the Products →
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="btn-outline shimmer-hover" style={{ padding: '0.75rem 1.5rem', borderRadius: '0.75rem' }}
-                  >
-                    Take the Readiness Quiz
-                  </Link>
-                </div>
-              </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </SectionBox>
 
-              {/* Share + Restart */}
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={restart}
-                  className="text-sm font-medium text-[var(--text-muted)] hover:text-white transition"
-                >
-                  ← Evaluate Another
-                </button>
-                <button
-                  onClick={() => {
-                    const text = `I just evaluated a crypto opportunity using AutopilotROI's Trust Check tool. It scored ${results.score}/50 (${results.levelLabel}). Try it yourself:`
-                    const url = typeof window !== 'undefined' ? window.location.href : ''
-                    if (navigator.share) {
-                      navigator.share({ title: 'Trust Check Results', text, url })
-                    } else {
-                      navigator.clipboard.writeText(`${text} ${url}`)
-                      alert('Results copied to clipboard!')
-                    }
-                  }}
-                  className="flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300 transition"
-                >
-                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                  </svg>
-                  Share Results
-                </button>
-              </div>
+      {/* ── 4. WHY WE CHOSE AURUM ── */}
+      <SectionBox variant="surface" padding="lg">
+        <SectionHeader
+          eyebrow="Our due diligence"
+          title={<>Why we chose Aurum.</>}
+        >
+          We evaluated dozens of opportunities using the same Trust Check framework above. Aurum Foundation wasn&apos;t just a good score — it was the best we found. Here&apos;s why.
+        </SectionHeader>
 
-              {/* Disclaimer */}
-              <p className="text-center text-xs text-[var(--text-muted)]">
-                This tool is for educational purposes only and does not constitute financial advice. Always conduct your own research before investing in any opportunity. No data from this evaluation is stored or transmitted.
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
+          gap: '1rem',
+        }}>
+          {[
+            { Icon: BankIcon,       title: 'Real revenue model',    desc: 'Aurum earns through exchange fees, AI bot subscriptions, NeoBank services, and card transactions — not through recruitment.', accent: '#059669' },
+            { Icon: DataIcon,       title: 'Fully transparent',     desc: 'Named CEO (Bryan Benson, ex-Binance), registered in Hong Kong (Cert #77289699), public team with verifiable LinkedIn profiles.', accent: '#1b61c9' },
+            { Icon: SecurityIcon,   title: '3 international licenses', desc: 'Regulated across multiple jurisdictions. Contracts with leading exchanges for secure, compliant custodial services.', accent: '#7c3aed' },
+            { Icon: AutomationIcon, title: '5 real tech products',  desc: 'EX-AI Bot, Zeus AI Bot, NeoBank, Exchange, and Crypto Cards — all functional, all generating real value.', accent: '#0891b2' },
+            { Icon: EcosystemIcon,  title: 'Global media coverage', desc: 'Featured in Forbes, Entrepreneur, Cointelegraph, Benzinga, Bitcoin.com, Crypto.news, and Hackernoon.', accent: '#d97706' },
+            { Icon: PartnerIcon,    title: '18,000+ active partners', desc: '$30M+ assets under management. A growing global ecosystem — measurable traction, not a promise.', accent: '#dc2626' },
+          ].map((item) => (
+            <div
+              key={item.title}
+              style={{
+                background: '#ffffff',
+                border: '1px solid var(--color-border)',
+                borderTop: `3px solid ${item.accent}`,
+                borderRadius: '0.875rem',
+                padding: '1.5rem',
+                transition: 'transform 200ms ease, box-shadow 200ms ease',
+              }}
+            >
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                width: '2.5rem', height: '2.5rem',
+                borderRadius: '0.625rem',
+                background: `${item.accent}14`,
+                color: item.accent,
+                marginBottom: '0.875rem',
+              }}>
+                <item.Icon className="w-5 h-5" />
+              </span>
+              <h3 style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 'var(--text-body-lg)',
+                fontWeight: 700,
+                color: '#181d26',
+                marginBottom: '0.5rem',
+              }}>
+                {item.title}
+              </h3>
+              <p style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-weak)', lineHeight: 1.6, margin: 0 }}>
+                {item.desc}
               </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            </div>
+          ))}
+        </div>
+      </SectionBox>
 
-      {/* ═══════════════════════════════════════════════
-          WHY AUTOPILOTROI CHOSE AURUM
-      ═══════════════════════════════════════════════ */}
-      <div className="mx-auto max-w-5xl px-6 py-20 lg:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+      {/* ── 5. TEAM CREDIBILITY ── */}
+      <SectionBox variant="white" padding="lg">
+        <SectionHeader
+          eyebrow="Team"
+          title={<>Built by industry veterans.</>}
         >
-          <div className="text-center mb-12">
-            <span className="inline-block rounded-full border border-emerald-400/30 bg-emerald-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-emerald-300 mb-4">
-              Our Due Diligence
-            </span>
-            <h2 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)] sm:text-4xl lg:text-5xl tracking-tight">
-              Why We Chose <span className="text-emerald-400">Aurum</span>
-            </h2>
-            <p className="mt-4 mx-auto max-w-2xl text-lg leading-relaxed text-[var(--text-tertiary)]">
-              We evaluated dozens of opportunities using the same Trust Check framework above.
-              Aurum Foundation wasn&apos;t just a good score — it was the best we found. Here&apos;s why.
-            </p>
-          </div>
+          The team behind Aurum brings decades of leadership from Binance, global network development, and fintech.
+        </SectionHeader>
 
-          {/* Verification grid */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                icon: <BankIcon />,
-                title: 'Real Revenue Model',
-                desc: 'Aurum earns through exchange fees, AI bot subscriptions, Neo-Bank services, and card transactions — not through recruitment.',
-                color: 'emerald',
-              },
-              {
-                icon: <DataIcon />,
-                title: 'Fully Transparent',
-                desc: 'Named CEO (Bryan Benson, ex-Binance), registered in Hong Kong (Cert #77289699), public team with verifiable LinkedIn profiles.',
-                color: 'blue',
-              },
-              {
-                icon: <SecurityIcon />,
-                title: '3 International Licenses',
-                desc: 'Regulated across multiple jurisdictions. Contracts with leading exchanges for secure, compliant custodial services.',
-                color: 'blue',
-              },
-              {
-                icon: <AutomationIcon />,
-                title: '5 Real Tech Products',
-                desc: 'Ex-AI Bot, Zeus AI Bot, NeoBank, Exchange, and Crypto Cards — all functional, all generating real value.',
-                color: 'emerald',
-              },
-              {
-                icon: <EcosystemIcon />,
-                title: 'Global Media Coverage',
-                desc: 'Featured in Forbes, Entrepreneur, Cointelegraph, Benzinga, Bitcoin.com, Crypto.news, and Hackernoon.',
-                color: 'blue',
-              },
-              {
-                icon: <PartnerIcon />,
-                title: '18,000+ Active Partners',
-                desc: '$30M+ assets under management. A growing global ecosystem — not a promise, but measurable traction.',
-                color: 'emerald',
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className={`shimmer-hover rounded-2xl border p-6 transition hover:scale-[1.02] ${
-                  item.color === 'emerald'
-                    ? 'border-emerald-500/20 bg-emerald-500/5'
-                    : 'border-blue-500/20 bg-blue-500/5'
-                }`}
-              >
-                <div className="w-8 h-8 text-blue-500 mb-3">{item.icon}</div>
-                <h3 className="font-[var(--font-sora)] text-base font-bold text-[var(--text-primary)] mb-2">{item.title}</h3>
-                <p className="text-sm leading-relaxed text-[var(--text-tertiary)]">{item.desc}</p>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 18rem), 1fr))',
+          gap: '1.25rem',
+        }}>
+          {[
+            {
+              name: 'Bryan Benson',
+              role: 'Chief Executive Officer',
+              bio: 'Web3 expert with 27 years of experience. Previously led Binance\u0027s expansion in Latin America. Responsible for strategic growth and bridging traditional and decentralized finance.',
+            },
+            {
+              name: 'Shane Morand',
+              role: 'Chief Network Dev Officer',
+              bio: 'Global business leader with decades of experience in network development and large-scale growth systems. Leads scalable systems and long-term ecosystem growth strategy.',
+            },
+            {
+              name: 'Ahmad Zen',
+              role: 'Co-Founder & Marketing Director',
+              bio: '15+ years of expertise in network marketing and cryptocurrency. Proven track record driving campaigns across fintech and blockchain sectors, boosting Aurum\u0027s global growth.',
+            },
+          ].map((person) => (
+            <div
+              key={person.name}
+              style={{
+                background: '#f8fafc',
+                border: '1px solid var(--color-border-light)',
+                borderRadius: '1rem',
+                padding: '1.75rem 1.5rem',
+                textAlign: 'center',
+              }}
+            >
+              <div style={{
+                width: '4rem', height: '4rem',
+                margin: '0 auto 1rem',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, rgba(27,97,201,0.15) 0%, rgba(8,145,178,0.15) 100%)',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                color: '#1b61c9',
+              }}>
+                <PartnerIcon className="w-7 h-7" />
               </div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
+              <h4 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', fontWeight: 800, color: '#181d26', marginBottom: '0.25rem' }}>
+                {person.name}
+              </h4>
+              <p style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#1b61c9', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.875rem', fontFamily: 'var(--font-display)' }}>
+                {person.role}
+              </p>
+              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-weak)', lineHeight: 1.6, margin: 0 }}>
+                {person.bio}
+              </p>
+            </div>
+          ))}
+        </div>
 
-      {/* ═══════════════════════════════════════════════
-          TEAM CREDIBILITY
-      ═══════════════════════════════════════════════ */}
-      <div className="mx-auto max-w-5xl px-6 pb-20 lg:px-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-center mb-10">
-            <h3 className="font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)] sm:text-3xl tracking-tight">
-              Built by Industry Veterans
-            </h3>
-            <p className="mt-3 text-[var(--text-tertiary)] text-base">
-              The team behind Aurum brings decades of leadership from Binance, global network development, and fintech.
-            </p>
-          </div>
+        <p style={{ marginTop: '2rem', textAlign: 'center', fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+          <CheckCircleIcon className="w-4 h-4" /> Full team bios and LinkedIn profiles are publicly available and independently verifiable.
+        </p>
+      </SectionBox>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              {
-                name: 'Bryan Benson',
-                role: 'Chief Executive Officer',
-                bio: 'Web3 expert with 27 years of experience. Previously led Binance\'s expansion in Latin America. Responsible for strategic growth and bridging traditional and decentralized finance.',
-                icon: <PartnerIcon />,
-              },
-              {
-                name: 'Shane Morand',
-                role: 'Chief Network Dev Officer',
-                bio: 'Global business leader with decades of experience in network development and large-scale growth systems. Leads scalable systems and long-term ecosystem growth strategy.',
-                icon: <PartnerIcon />,
-              },
-              {
-                name: 'Ahmad Zen',
-                role: 'Co-Founder & Marketing Director',
-                bio: '15+ years of expertise in network marketing and cryptocurrency. Proven track record driving campaigns across fintech and blockchain sectors, boosting Aurum\'s global growth.',
-                icon: <PartnerIcon />,
-              },
-            ].map((person) => (
-              <div
-                key={person.name}
-                className="shimmer-hover flex flex-col items-center rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 text-center shadow-[var(--card-shadow,none)] transition hover:border-[var(--border-accent)]"
-              >
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500/30 to-cyan-500/30 text-blue-400 p-4">
-                  {person.icon}
-                </div>
-                <h4 className="font-[var(--font-sora)] text-lg font-bold text-[var(--text-primary)]">{person.name}</h4>
-                <p className="text-xs font-semibold uppercase tracking-widest text-[var(--accent-primary)] mt-1">{person.role}</p>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--text-tertiary)]">{person.bio}</p>
-              </div>
-            ))}
-          </div>
+      {/* ── 6. CLOSING CTA ── */}
+      <CTABand
+        eyebrow="Want to evaluate Aurum yourself?"
+        title={<>Use the framework.<br />Then dig into the products.</>}
+        description="No pressure, no hype. Browse the products, run our calculator, and read every FAQ before you decide."
+        ctas={[
+          { label: 'Explore the products →', href: '/products' },
+          { label: 'Estimate your returns', href: '/calculator', variant: 'ghost' },
+        ]}
+      />
 
-          <p className="mt-8 text-center text-xs text-[var(--text-muted)]">
-            Full team bios and LinkedIn profiles are publicly available and independently verifiable.
-          </p>
-        </motion.div>
-      </div>
-    </div>
+    </PageShell>
   )
 }

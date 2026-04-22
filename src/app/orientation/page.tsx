@@ -10,14 +10,23 @@ import {
   calculateReadiness,
   type ReadinessResult,
 } from '@/lib/readiness'
+import {
+  FlagIcon,
+  SparkleIcon,
+  GrowthIcon,
+  CheckCircleIcon,
+} from '@/components/ui/Icons'
+import type { ComponentType } from 'react'
 
-const tierColors = {
-  beginner: { bg: 'bg-amber-500/15', border: 'border-amber-400/30', text: 'text-amber-300', bar: 'bg-amber-500' },
-  intermediate: { bg: 'bg-blue-500/15', border: 'border-blue-400/30', text: 'text-blue-300', bar: 'bg-blue-500' },
-  advanced: { bg: 'bg-emerald-500/15', border: 'border-emerald-400/30', text: 'text-emerald-300', bar: 'bg-emerald-500' },
+type IconCmp = ComponentType<{ className?: string; strokeWidth?: number }>
+
+const TIER_THEME: Record<'beginner' | 'intermediate' | 'advanced', {
+  bg: string; border: string; text: string; bar: string; Icon: IconCmp; label: string
+}> = {
+  beginner:     { bg: 'rgba(245,158,11,0.10)', border: 'rgba(245,158,11,0.30)', text: '#d97706', bar: '#f59e0b', Icon: FlagIcon,    label: 'Beginner' },
+  intermediate: { bg: 'rgba(27,97,201,0.10)',  border: 'rgba(27,97,201,0.30)',  text: '#1b61c9', bar: '#3b82f6', Icon: SparkleIcon, label: 'Intermediate' },
+  advanced:     { bg: 'rgba(5,150,105,0.10)',  border: 'rgba(5,150,105,0.30)',  text: '#059669', bar: '#10b981', Icon: GrowthIcon,  label: 'Advanced' },
 }
-
-const tierEmoji = { beginner: '🌱', intermediate: '⚡', advanced: '🚀' }
 
 interface LeadInfo {
   id: string
@@ -36,18 +45,14 @@ export default function OrientationPage() {
 
   const totalSteps = READINESS_QUESTIONS.length
   const currentQuestion = READINESS_QUESTIONS[currentStep]
-  const progress = result
-    ? 100
-    : Math.round((currentStep / totalSteps) * 100)
+  const progress = result ? 100 : Math.round((currentStep / totalSteps) * 100)
 
-  // Load lead info from localStorage (set during signup)
   useEffect(() => {
     const stored = localStorage.getItem('autopilotroi-lead')
     if (stored) {
       try {
         setLead(JSON.parse(stored))
       } catch {
-        // If no lead data, redirect back to signup
         router.push('/signup')
       }
     } else {
@@ -55,31 +60,23 @@ export default function OrientationPage() {
     }
   }, [router])
 
-  const selectAnswer = useCallback(
-    (value: string) => {
-      const newAnswers = { ...answers, [currentQuestion.key]: value }
-      setAnswers(newAnswers)
+  const selectAnswer = useCallback((value: string) => {
+    const newAnswers = { ...answers, [currentQuestion.key]: value }
+    setAnswers(newAnswers)
 
-      // Auto-advance after a short delay
-      setTimeout(() => {
-        if (currentStep < totalSteps - 1) {
-          setCurrentStep((s) => s + 1)
-        } else {
-          // Calculate result
-          const readinessResult = calculateReadiness(newAnswers)
-          setResult(readinessResult)
-          saveResult(newAnswers, readinessResult)
-        }
-      }, 300)
-    },
-    [answers, currentStep, totalSteps, currentQuestion]
-  )
+    setTimeout(() => {
+      if (currentStep < totalSteps - 1) {
+        setCurrentStep((s) => s + 1)
+      } else {
+        const readinessResult = calculateReadiness(newAnswers)
+        setResult(readinessResult)
+        saveResult(newAnswers, readinessResult)
+      }
+    }, 300)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answers, currentStep, totalSteps, currentQuestion])
 
-  async function saveResult(
-    allAnswers: Record<string, string>,
-    readinessResult: ReadinessResult
-  ) {
-    // Always save to localStorage
+  async function saveResult(allAnswers: Record<string, string>, readinessResult: ReadinessResult) {
     localStorage.setItem(
       'autopilotroi-readiness',
       JSON.stringify({
@@ -89,7 +86,6 @@ export default function OrientationPage() {
       })
     )
 
-    // Update lead in the database via API
     if (lead?.id) {
       try {
         await fetch('/api/leads/assess', {
@@ -110,8 +106,6 @@ export default function OrientationPage() {
 
   async function handleSubmitConfirm() {
     setSubmitted(true)
-
-    // Send email notifications via API route
     try {
       await fetch('/api/notify', {
         method: 'POST',
@@ -124,53 +118,46 @@ export default function OrientationPage() {
         }),
       })
     } catch (err) {
-      // Don't block the UI — notifications are best-effort
       console.error('Notification error:', err)
     }
-
-    // Redirect to waiting room after brief delay
-    setTimeout(() => {
-      router.push('/waiting-room')
-    }, 2000)
+    setTimeout(() => router.push('/waiting-room'), 2000)
   }
 
-  const colors = result ? tierColors[result.tier] : tierColors.beginner
+  const theme = result ? TIER_THEME[result.tier] : TIER_THEME.beginner
 
   if (!lead) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+      <div className="page-bg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent' }} />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="page-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Logo bar */}
-      <div className="flex items-center justify-center py-6">
-        <Link href="/">
-          <Logo size={40} showText />
-        </Link>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+        <Link href="/"><Logo size={40} showText /></Link>
       </div>
 
       {/* Welcome message */}
       {currentStep === 0 && !result && (
-        <div className="mx-auto max-w-2xl px-6 mb-2">
-          <p className="text-center text-sm text-[var(--text-muted)]">
-            Welcome, <span className="text-blue-400 font-medium">{lead.name}</span> — let&apos;s assess your readiness.
+        <div style={{ maxWidth: '36rem', margin: '0 auto 0.5rem', padding: '0 1.5rem' }}>
+          <p style={{ textAlign: 'center', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)' }}>
+            Welcome, <span style={{ color: '#1b61c9', fontWeight: 600 }}>{lead.name}</span> &mdash; let&apos;s assess your readiness.
           </p>
         </div>
       )}
 
       {/* Progress bar */}
-      <div className="mx-auto w-full max-w-2xl px-6">
-        <div className="flex items-center justify-between text-sm text-[var(--text-tertiary)] mb-2">
+      <div style={{ width: '100%', maxWidth: '36rem', margin: '0 auto', padding: '0 1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)', marginBottom: '0.5rem' }}>
           <span>Readiness Assessment</span>
-          <span>{progress}%</span>
+          <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 700 }}>{progress}%</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-[var(--bg-card)]">
+        <div style={{ height: '0.5rem', width: '100%', overflow: 'hidden', borderRadius: '999px', background: '#fff', border: '1px solid var(--color-border)' }}>
           <motion.div
-            className="h-full rounded-full bg-blue-500"
+            style={{ height: '100%', borderRadius: '999px', background: '#1b61c9' }}
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.4 }}
@@ -178,12 +165,11 @@ export default function OrientationPage() {
         </div>
       </div>
 
-      {/* Content area */}
-      <div className="flex flex-1 items-center justify-center px-6 py-12">
-        <div className="w-full max-w-2xl">
+      {/* Content */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem' }}>
+        <div style={{ width: '100%', maxWidth: '36rem' }}>
           <AnimatePresence mode="wait">
             {!result ? (
-              /* ── Question Card ── */
               <motion.div
                 key={`question-${currentStep}`}
                 initial={{ opacity: 0, x: 40 }}
@@ -191,108 +177,165 @@ export default function OrientationPage() {
                 exit={{ opacity: 0, x: -40 }}
                 transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               >
-                <p className="mb-2 text-sm font-medium text-blue-400">
+                <p style={{ marginBottom: '0.5rem', fontSize: 'var(--text-body)', fontWeight: 500, color: '#1b61c9' }}>
                   Question {currentStep + 1} of {totalSteps}
                 </p>
-                <h2 className="mb-2 font-[var(--font-sora)] text-2xl font-bold text-[var(--text-primary)] lg:text-3xl">
+                <h2 style={{
+                  marginBottom: '0.5rem',
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  fontSize: '1.625rem', lineHeight: 1.25,
+                  color: '#181d26',
+                }}>
                   {currentQuestion.question}
                 </h2>
-                <p className="mb-8 text-[var(--text-tertiary)]">
+                <p style={{ marginBottom: '2rem', color: 'var(--color-text-muted)' }}>
                   {currentQuestion.description}
                 </p>
 
-                <div className="space-y-3">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {currentQuestion.options.map((option) => {
-                    const isSelected =
-                      answers[currentQuestion.key] === option.value
+                    const isSelected = answers[currentQuestion.key] === option.value
                     return (
                       <button
                         key={option.value}
                         onClick={() => selectAnswer(option.value)}
-                        className={`w-full rounded-xl border p-4 text-left transition-all duration-200 ${
-                          isSelected
-                            ? 'border-blue-500 bg-blue-500/15 text-[var(--text-primary)]'
-                            : 'border-[var(--border-primary)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:border-blue-500/50 hover:bg-[var(--bg-card-hover)]'
-                        }`}
+                        style={{
+                          width: '100%',
+                          borderRadius: '0.75rem',
+                          border: `1px solid ${isSelected ? '#1b61c9' : 'var(--color-border)'}`,
+                          background: isSelected ? 'rgba(27,97,201,0.10)' : '#fff',
+                          color: isSelected ? '#181d26' : 'var(--color-text-weak)',
+                          padding: '1rem',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          fontWeight: 500,
+                          fontSize: 'var(--text-body)',
+                        }}
                       >
-                        <span className="font-medium">{option.label}</span>
+                        {option.label}
                       </button>
                     )
                   })}
                 </div>
 
-                {/* Back button */}
                 {currentStep > 0 && (
                   <button
                     onClick={() => setCurrentStep((s) => s - 1)}
-                    className="mt-6 text-sm text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition"
+                    style={{
+                      marginTop: '1.5rem',
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      fontSize: 'var(--text-body)', color: 'var(--color-text-muted)',
+                      padding: 0,
+                    }}
                   >
-                    ← Previous question
+                    \u2190 Previous question
                   </button>
                 )}
               </motion.div>
             ) : !submitted ? (
-              /* ── Results ── */
               <motion.div
                 key="results"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
-                className="text-center"
+                style={{ textAlign: 'center' }}
               >
-                <div className="mb-6 text-6xl">{tierEmoji[result.tier]}</div>
-                <h2 className="mb-2 font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: '4rem', height: '4rem', borderRadius: '999px',
+                  background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text,
+                  marginBottom: '1.5rem',
+                }}>
+                  <theme.Icon className="w-7 h-7" />
+                </div>
+                <h2 style={{
+                  marginBottom: '0.5rem',
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  fontSize: '1.875rem', color: '#181d26',
+                }}>
                   Your Readiness Score
                 </h2>
 
-                {/* Score circle */}
-                <div className="mx-auto my-8 flex h-40 w-40 items-center justify-center rounded-full border-4 border-blue-500/30 bg-[var(--bg-card)]">
+                <div style={{
+                  margin: '2rem auto',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: '10rem', height: '10rem',
+                  borderRadius: '999px',
+                  background: '#fff',
+                  border: `4px solid ${theme.bar}55`,
+                  boxShadow: '0 8px 24px rgba(15,23,42,0.06)',
+                }}>
                   <div>
-                    <div className="font-[var(--font-sora)] text-5xl font-bold text-[var(--text-primary)]">
+                    <div style={{
+                      fontFamily: 'var(--font-display)', fontWeight: 700,
+                      fontSize: '3rem', color: '#181d26', lineHeight: 1,
+                    }}>
                       {result.score}
                     </div>
-                    <div className="text-sm text-[var(--text-muted)]">out of 100</div>
+                    <div style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>out of 100</div>
                   </div>
                 </div>
 
-                {/* Tier badge */}
-                <div
-                  className={`mx-auto mb-4 inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold ${colors.bg} ${colors.border} border ${colors.text}`}
-                >
-                  {tierEmoji[result.tier]} {result.tierLabel}
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                  margin: '0 auto 1rem',
+                  borderRadius: '999px', padding: '0.5rem 1.25rem',
+                  fontSize: 'var(--text-body)', fontWeight: 600,
+                  background: theme.bg, border: `1px solid ${theme.border}`, color: theme.text,
+                }}>
+                  <theme.Icon className="w-4 h-4" />
+                  {result.tierLabel}
                 </div>
 
-                <p className="mx-auto max-w-md text-[var(--text-secondary)] leading-relaxed">
+                <p style={{ margin: '0 auto', maxWidth: '28rem', color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)' }}>
                   {result.tierDescription}
                 </p>
 
                 <button
                   onClick={handleSubmitConfirm}
-                  className="mt-8 inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(180deg,#3b82f6_0%,#2563eb_100%)] px-8 py-3.5 font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:shadow-blue-600/40"
+                  className="btn btn-primary-lg shimmer-hover"
+                  style={{ marginTop: '2rem' }}
                 >
-                  Submit & Continue →
+                  Submit & Continue \u2192
                 </button>
               </motion.div>
             ) : (
-              /* ── Redirecting to Waiting Room ── */
               <motion.div
                 key="confirmed"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="text-center"
+                style={{ textAlign: 'center' }}
               >
-                <div className="mb-6 text-6xl">✅</div>
-                <h2 className="mb-4 font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
-                  Assessment Complete!
+                <div style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  width: '4rem', height: '4rem', borderRadius: '999px',
+                  background: 'rgba(16,185,129,0.15)', color: '#059669',
+                  marginBottom: '1.5rem',
+                }}>
+                  <CheckCircleIcon className="w-8 h-8" />
+                </div>
+                <h2 style={{
+                  marginBottom: '1rem',
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  fontSize: '1.875rem', color: '#181d26',
+                }}>
+                  Assessment Complete
                 </h2>
 
-                <div className="mx-auto max-w-md rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6">
-                  <p className="text-[var(--text-secondary)] leading-relaxed">
+                <div style={{
+                  margin: '0 auto', maxWidth: '28rem',
+                  borderRadius: '1rem',
+                  border: '1px solid var(--color-border)',
+                  background: '#fff',
+                  padding: '1.5rem',
+                }}>
+                  <p style={{ color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)', margin: 0 }}>
                     Your partner has been notified. Redirecting you to the Learning Center...
                   </p>
-                  <div className="mt-4 flex justify-center">
-                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+                  <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent' }} />
                   </div>
                 </div>
               </motion.div>

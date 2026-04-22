@@ -8,74 +8,20 @@ import VideoModal from '@/components/ui/VideoModal'
 import YouTubeThumbnail from '@/components/ui/YouTubeThumbnail'
 import { trackEvent, EVENTS } from '@/lib/analytics'
 import PersonalizedPath from '@/components/sections/PersonalizedPath'
+import { PageShell, SectionBox, CTABand } from '@/components/sections'
+import { CheckCircleIcon, PlayCircleIcon, SparkleIcon } from '@/components/ui/Icons'
 
-/* ─── Curated Aurum University Video Library ─── */
+/* Curated Aurum University Video Library */
 /* All IDs verified live via YouTube oembed API on 2026-04-13 */
 const WAITING_ROOM_VIDEOS = [
-  {
-    id: 'MmAnR4YAPv4',
-    title: 'Aurum Platform Overview',
-    description: 'Learn what Aurum Foundation is and how the full ecosystem works.',
-    category: 'Getting Started',
-    duration: '15:22',
-    priority: 1,
-  },
-  {
-    id: 'CRuZqkc8sh4',
-    title: 'AI Trading Bots vs Aurum: The Key Difference',
-    description: 'What sets Aurum\'s AI trading apart from generic trading bots in the market.',
-    category: 'Trading & Bots',
-    duration: '12:30',
-    priority: 2,
-  },
-  {
-    id: 'X1TO-hC1Geg',
-    title: 'Aurum Account Registration + Bot Activation',
-    description: 'Step-by-step guide to creating your Aurum account and activating the EX-AI Bot.',
-    category: 'Getting Started',
-    duration: '14:00',
-    priority: 3,
-  },
-  {
-    id: 'hgPSheoUs_s',
-    title: 'VPN Required? U.S. & Canada Access Rules',
-    description: 'Important access requirements for members in the United States and Canada.',
-    category: 'Wallets & Security',
-    duration: '7:15',
-    priority: 4,
-  },
-  {
-    id: 'GJEK3wOjlyQ',
-    title: 'Aurum Packages and Percentages',
-    description: 'Complete overview of all investment packages and their return percentages.',
-    category: 'Getting Started',
-    duration: '18:00',
-    priority: 5,
-  },
-  {
-    id: 'K8qYdD1sC7w',
-    title: 'Two-Factor Authentication Setup',
-    description: 'Why 2FA is critical and how to enable it before your first deposit.',
-    category: 'Wallets & Security',
-    duration: '6:42',
-    priority: 6,
-  },
-  {
-    id: '1BI9_YikUKc',
-    title: 'Compounding Strategies: Plan A vs Plan B',
-    description: 'Choose the right strategy — compound or take daily profits.',
-    category: 'Trading & Bots',
-    duration: '22:15',
-    priority: 7,
-  },
-  {
-    id: 'xc97Nr3G3vU',
-    title: 'Gold Tokenization Partnership | Clinq.Gold',
-    description: 'Aurum\'s real-world asset tokenization partnership with Sierra Leone.',
-    category: 'Products',
-    duration: '11:20',
-    priority: 8,
-  },
+  { id: 'MmAnR4YAPv4', title: 'Aurum Platform Overview',                      description: 'Learn what Aurum Foundation is and how the full ecosystem works.',                              category: 'Getting Started',     duration: '15:22', priority: 1 },
+  { id: 'CRuZqkc8sh4', title: 'AI Trading Bots vs Aurum: The Key Difference', description: 'What sets Aurum\u0027s AI trading apart from generic trading bots in the market.',              category: 'Trading & Bots',      duration: '12:30', priority: 2 },
+  { id: 'X1TO-hC1Geg', title: 'Aurum Account Registration + Bot Activation',  description: 'Step-by-step guide to creating your Aurum account and activating the EX-AI Bot.',           category: 'Getting Started',     duration: '14:00', priority: 3 },
+  { id: 'hgPSheoUs_s', title: 'VPN Required? U.S. & Canada Access Rules',     description: 'Important access requirements for members in the United States and Canada.',                  category: 'Wallets & Security',  duration: '7:15',  priority: 4 },
+  { id: 'GJEK3wOjlyQ', title: 'Aurum Packages and Percentages',                description: 'Complete overview of all investment packages and their return percentages.',                  category: 'Getting Started',     duration: '18:00', priority: 5 },
+  { id: 'K8qYdD1sC7w', title: 'Two-Factor Authentication Setup',              description: 'Why 2FA is critical and how to enable it before your first deposit.',                          category: 'Wallets & Security',  duration: '6:42',  priority: 6 },
+  { id: '1BI9_YikUKc', title: 'Compounding Strategies: Plan A vs Plan B',     description: 'Choose the right strategy \u2014 compound or take daily profits.',                              category: 'Trading & Bots',      duration: '22:15', priority: 7 },
+  { id: 'xc97Nr3G3vU', title: 'Gold Tokenization Partnership | Clinq.Gold',   description: 'Aurum\u0027s real-world asset tokenization partnership with Sierra Leone.',                     category: 'Products',            duration: '11:20', priority: 8 },
 ]
 
 const CATEGORIES = ['All', 'Getting Started', 'Trading & Bots', 'Wallets & Security', 'Products']
@@ -83,22 +29,18 @@ const CATEGORIES = ['All', 'Getting Started', 'Trading & Bots', 'Wallets & Secur
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   show: (i: number = 0) => ({
-    opacity: 1,
-    y: 0,
+    opacity: 1, y: 0,
     transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
   }),
 }
 
-interface LeadInfo {
-  id: string
-  name: string
-  email: string
-}
+interface LeadInfo  { id: string; name: string; email: string }
+interface ReadinessData { score: number; tier: string; tierLabel: string }
 
-interface ReadinessData {
-  score: number
-  tier: string
-  tierLabel: string
+const TIER_CHIPS: Record<string, { bg: string; color: string; border: string }> = {
+  beginner:     { bg: 'rgba(245,158,11,0.08)', color: '#b45309', border: 'rgba(245,158,11,0.25)' },
+  intermediate: { bg: 'rgba(27,97,201,0.08)',  color: '#1b61c9', border: 'rgba(27,97,201,0.20)' },
+  advanced:     { bg: 'rgba(16,185,129,0.10)', color: '#059669', border: 'rgba(16,185,129,0.25)' },
 }
 
 export default function WaitingRoomPage() {
@@ -109,18 +51,12 @@ export default function WaitingRoomPage() {
 
   useEffect(() => {
     const storedLead = localStorage.getItem('autopilotroi-lead')
-    if (storedLead) {
-      try { setLead(JSON.parse(storedLead)) } catch { /* ignore */ }
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (storedLead) { try { setLead(JSON.parse(storedLead)) } catch {} }
     const storedReadiness = localStorage.getItem('autopilotroi-readiness')
-    if (storedReadiness) {
-      try { setReadiness(JSON.parse(storedReadiness)) } catch { /* ignore */ }
-    }
+    if (storedReadiness) { try { setReadiness(JSON.parse(storedReadiness)) } catch {} }
     const storedWatched = localStorage.getItem('autopilotroi-watched')
-    if (storedWatched) {
-      try { setWatchedVideos(new Set(JSON.parse(storedWatched))) } catch { /* ignore */ }
-    }
-    // Track page view
+    if (storedWatched) { try { setWatchedVideos(new Set(JSON.parse(storedWatched))) } catch {} }
     trackEvent(EVENTS.WAITING_ROOM_VIEW)
   }, [])
 
@@ -137,167 +73,237 @@ export default function WaitingRoomPage() {
     : WAITING_ROOM_VIDEOS.filter(v => v.category === activeCategory)
 
   const watchProgress = Math.round((watchedVideos.size / WAITING_ROOM_VIDEOS.length) * 100)
-
-  const tierConfig = {
-    beginner: { emoji: '🌱', color: 'text-amber-400', bg: 'bg-amber-500/15', border: 'border-amber-400/30' },
-    intermediate: { emoji: '⚡', color: 'text-blue-400', bg: 'bg-blue-500/15', border: 'border-blue-400/30' },
-    advanced: { emoji: '🚀', color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-400/30' },
-  }
-
-  const tier = readiness?.tier as keyof typeof tierConfig || 'beginner'
-  const tc = tierConfig[tier]
+  const tier = (readiness?.tier as keyof typeof TIER_CHIPS) || 'beginner'
+  const chip = TIER_CHIPS[tier]
 
   return (
-    <div className="page-bg">
-      {/* Header Bar */}
-      <header className="sticky top-0 z-50" style={{ borderBottom: '1px solid #e0e2e6', background: '#fff' }}>
-        <div className="container-xl" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0.75rem 1.5rem' }}>
-          <Link href="/">
-            <Logo size={32} showText />
-          </Link>
+    <PageShell>
+      {/* Sticky header bar — authenticated chrome */}
+      <header style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid var(--color-border)', background: '#fff' }}>
+        <div className="container-xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem' }}>
+          <Link href="/"><Logo size={32} showText /></Link>
           {readiness && (
-            <div className="flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold"
-              style={{
-                background: tier === 'advanced' ? 'rgba(16,185,129,0.1)' : tier === 'intermediate' ? 'rgba(27,97,201,0.08)' : 'rgba(245,158,11,0.08)',
-                color: tier === 'advanced' ? '#059669' : tier === 'intermediate' ? '#1b61c9' : '#b45309',
-                border: `1px solid ${tier === 'advanced' ? 'rgba(16,185,129,0.25)' : tier === 'intermediate' ? 'rgba(27,97,201,0.2)' : 'rgba(245,158,11,0.25)'}`,
-              }}>
-              {tc.emoji} {readiness.tierLabel} — {readiness.score}/100
-            </div>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.375rem',
+              borderRadius: '99px',
+              padding: '0.25rem 0.75rem',
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              background: chip.bg,
+              color: chip.color,
+              border: '1px solid ' + chip.border,
+            }}>
+              <SparkleIcon className="w-3.5 h-3.5" /> {readiness.tierLabel} \u2014 {readiness.score}/100
+            </span>
           )}
         </div>
       </header>
 
-      {/* ── Hero Banner ── */}
-      <section data-dark className="relative overflow-hidden bg-[#061238] px-6 py-16 text-center text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(59,130,246,0.15)_0%,transparent_60%)]" />
+      {/* Hero (custom dark — branded welcome) */}
+      <section style={{ position: 'relative', overflow: 'hidden', background: '#061238', padding: '4rem 1.5rem', textAlign: 'center', color: '#fff' }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 60%)' }} />
 
-        <div className="relative z-10 mx-auto max-w-3xl">
+        <div style={{ position: 'relative', zIndex: 10, maxWidth: '48rem', margin: '0 auto' }}>
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}>
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-blue-300">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+              borderRadius: '99px', border: '1px solid rgba(96,165,250,0.30)',
+              background: 'rgba(59,130,246,0.10)', padding: '0.375rem 1rem',
+              fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase',
+              letterSpacing: '0.1em', color: '#93c5fd', marginBottom: '1rem',
+            }}>
+              <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: '#60a5fa' }} />
               Learning Center
-            </div>
+            </span>
           </motion.div>
 
-          <motion.h1 variants={fadeUp} initial="hidden" animate="show" custom={1} className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-            Welcome{lead ? `, ${lead.name.split(' ')[0]}` : ''}! 🎉
+          <motion.h1
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={1}
+            className="text-display"
+            style={{ color: '#fff', marginBottom: '1rem' }}
+          >
+            Welcome{lead ? ', ' + lead.name.split(' ')[0] : ''}.
           </motion.h1>
 
-          <motion.p variants={fadeUp} initial="hidden" animate="show" custom={2} className="mx-auto mt-4 max-w-xl text-blue-100/60 leading-relaxed">
+          <motion.p
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={2}
+            className="text-body-lg"
+            style={{ maxWidth: '34rem', margin: '0 auto', color: 'rgba(191,219,254,0.7)', lineHeight: 1.6 }}
+          >
             Your assessment is complete and your partner has been notified. While you wait, explore these videos to learn about the Aurum ecosystem.
           </motion.p>
 
-          {/* Status Card */}
-          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3} className="mx-auto mt-8 grid max-w-lg gap-3 sm:grid-cols-3">
-            <div className="rounded-xl border border-blue-400/20 bg-white/5 p-4 backdrop-blur-sm">
-              <div className="text-xs text-blue-300/60 uppercase tracking-widest mb-1">Status</div>
-              <div className="flex items-center gap-2 text-sm font-semibold text-emerald-400">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                Partner Notified
+          {/* Status grid */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={3}
+            style={{ marginTop: '2rem', display: 'grid', gap: '0.75rem', maxWidth: '32rem', margin: '2rem auto 0', gridTemplateColumns: 'repeat(auto-fit, minmax(8rem, 1fr))' }}
+          >
+            {[
+              { label: 'Status',        value: 'Partner Notified', valueColor: '#34d399', dot: true },
+              { label: 'Next Step',     value: 'Check Your Email', valueColor: '#e0e7ff' },
+              { label: 'Videos Watched', value: watchedVideos.size + '/' + WAITING_ROOM_VIDEOS.length, valueColor: '#e0e7ff' },
+            ].map(s => (
+              <div key={s.label} style={{
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(96,165,250,0.2)',
+                background: 'rgba(255,255,255,0.05)',
+                padding: '0.875rem 1rem',
+                backdropFilter: 'blur(4px)',
+              }}>
+                <div style={{ fontSize: '0.6875rem', color: 'rgba(147,197,253,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem' }}>{s.label}</div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', fontWeight: 600, color: s.valueColor }}>
+                  {s.dot && <span style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', background: '#34d399' }} />}
+                  {s.value}
+                </div>
               </div>
-            </div>
-            <div className="rounded-xl border border-blue-400/20 bg-white/5 p-4 backdrop-blur-sm">
-              <div className="text-xs text-blue-300/60 uppercase tracking-widest mb-1">Next Step</div>
-              <div className="text-sm font-semibold text-[var(--text-primary)]">Check Your Email</div>
-            </div>
-            <div className="rounded-xl border border-blue-400/20 bg-white/5 p-4 backdrop-blur-sm">
-              <div className="text-xs text-blue-300/60 uppercase tracking-widest mb-1">Videos Watched</div>
-              <div className="text-sm font-semibold text-[var(--text-primary)]">{watchedVideos.size}/{WAITING_ROOM_VIDEOS.length}</div>
-            </div>
+            ))}
           </motion.div>
         </div>
       </section>
 
-      {/* ── Personalized Path ── */}
-      {readiness && (
-        <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} />
-      )}
+      {/* Personalized path */}
+      {readiness && <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} />}
 
-      {/* Learning Progress */}
-      <div className="container-xl" style={{ padding:'2rem 1.5rem 0.5rem' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.5rem' }}>
-          <span className="text-sm font-semibold" style={{ color: '#181d26' }}>Learning Progress</span>
-          <span className="text-sm font-bold" style={{ color: '#1b61c9' }}>{watchProgress}%</span>
+      {/* Progress + filters + grid */}
+      <SectionBox variant="white" padding="lg">
+        {/* Progress */}
+        <div style={{ maxWidth: '60rem', margin: '0 auto 2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#181d26' }}>Learning Progress</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1b61c9' }}>{watchProgress}%</span>
+          </div>
+          <div style={{ height: '0.5rem', width: '100%', overflow: 'hidden', borderRadius: '99px', background: 'var(--color-border)' }}>
+            <motion.div
+              style={{ height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #1b61c9, #06b6d4)' }}
+              initial={{ width: 0 }}
+              animate={{ width: watchProgress + '%' }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            />
+          </div>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: '#e0e2e6' }}>
-          <motion.div
-            className="h-full rounded-full"
-            style={{ background: 'linear-gradient(90deg, #1b61c9, #06b6d4)' }}
-            initial={{ width: 0 }}
-            animate={{ width: `${watchProgress}%` }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          />
-        </div>
-      </div>
 
-      {/* Category Filters */}
-      <div className="container-xl" style={{ paddingTop:'1rem', paddingBottom:'1rem', paddingLeft:'1.5rem', paddingRight:'1.5rem' }}>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => (
-            <button key={cat} onClick={() => setActiveCategory(cat)}
-              className="rounded-full px-4 py-2 text-sm font-semibold transition-all"
+        {/* Category filters */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '2rem', justifyContent: 'center' }}>
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
               style={{
+                borderRadius: '99px',
+                padding: '0.4375rem 1rem',
+                fontSize: '0.875rem',
+                fontWeight: 600,
                 background: activeCategory === cat ? '#1b61c9' : '#fff',
-                color: activeCategory === cat ? '#fff' : 'rgba(4,14,32,0.6)',
-                border: activeCategory === cat ? '1px solid #1b61c9' : '1px solid #e0e2e6',
-              }}>
+                color: activeCategory === cat ? '#fff' : 'var(--color-text-weak)',
+                border: activeCategory === cat ? '1px solid #1b61c9' : '1px solid var(--color-border)',
+                cursor: 'pointer',
+                transition: 'all 150ms ease',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
               {cat}
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Video Grid */}
-      <div className="container-xl" style={{ paddingBottom:'5rem', paddingLeft:'1.5rem', paddingRight:'1.5rem', paddingTop:'0.5rem' }}>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {/* Video grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 16rem), 1fr))',
+          gap: '1.25rem',
+        }}>
           {filteredVideos.map((video, i) => (
             <motion.div key={video.id} variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} custom={i * 0.08}>
-              <VideoModal videoUrl={`https://www.youtube.com/watch?v=${video.id}`} ctaLabel="Ready to Get Started? →" ctaHref="/signup">
-                <div className="group cursor-pointer overflow-hidden rounded-2xl transition-all hover:shadow-lg"
-                  style={{ background: '#fff', border: '1px solid #e0e2e6' }}
-                  onClick={() => markWatched(video.id)}>
-                  <div className="relative aspect-video overflow-hidden" style={{ background: '#0f172a' }}>
+              <VideoModal videoUrl={'https://www.youtube.com/watch?v=' + video.id} ctaLabel="Ready to Get Started? \u2192" ctaHref="/signup">
+                <div
+                  style={{
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    borderRadius: 'var(--radius-card)',
+                    background: '#fff',
+                    border: '1px solid var(--color-border)',
+                    transition: 'box-shadow 200ms ease, transform 200ms ease',
+                  }}
+                  onClick={() => markWatched(video.id)}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-card-hover)'
+                    ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none'
+                    ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+                  }}
+                >
+                  <div style={{ position: 'relative', aspectRatio: '16/9', overflow: 'hidden', background: '#0f172a' }}>
                     <YouTubeThumbnail videoId={video.id} title={video.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/40">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-600 shadow-lg transition-transform group-hover:scale-110">
-                        <svg viewBox="0 0 24 24" className="h-5 w-5 ml-0.5 fill-white"><path d="M8 5.14v14l11-7-11-7z" /></svg>
+                    <div style={{
+                      position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(0,0,0,0.20)', color: '#0f172a',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '3rem', height: '3rem', borderRadius: '50%', background: '#dc2626', boxShadow: '0 4px 16px rgba(0,0,0,0.25)', color: '#fff' }}>
+                        <PlayCircleIcon className="w-5 h-5" />
                       </div>
                     </div>
-                    <div className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">{video.duration}</div>
+                    <div style={{ position: 'absolute', bottom: '0.5rem', right: '0.5rem', borderRadius: '0.25rem', background: 'rgba(0,0,0,0.8)', padding: '0.125rem 0.375rem', fontSize: '0.6875rem', fontWeight: 500, color: '#fff' }}>{video.duration}</div>
                     {watchedVideos.has(video.id) && (
-                      <div className="absolute top-2 right-2 rounded-full bg-emerald-500 p-1">
-                        <svg className="h-3 w-3 fill-white" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', borderRadius: '50%', background: '#10b981', padding: '0.25rem', color: '#fff', display: 'inline-flex' }}>
+                        <CheckCircleIcon className="w-3 h-3" />
                       </div>
                     )}
-                    <div className="absolute top-2 left-2 rounded-full px-2 py-0.5 text-[0.6rem] font-semibold text-white" style={{ background: 'rgba(27,97,201,0.9)' }}>{video.category}</div>
+                    <div style={{ position: 'absolute', top: '0.5rem', left: '0.5rem', borderRadius: '99px', padding: '0.125rem 0.5rem', fontSize: '0.625rem', fontWeight: 600, color: '#fff', background: 'rgba(27,97,201,0.9)' }}>{video.category}</div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="mb-1 text-sm font-bold line-clamp-2 transition-colors group-hover:text-blue-600" style={{ color: '#181d26' }}>{video.title}</h3>
-                    <p className="text-xs line-clamp-2 leading-relaxed" style={{ color: 'rgba(4,14,32,0.5)' }}>{video.description}</p>
+                  <div style={{ padding: '1rem' }}>
+                    <h3 style={{
+                      marginBottom: '0.25rem',
+                      fontSize: '0.875rem',
+                      fontWeight: 700,
+                      color: '#181d26',
+                      lineHeight: 1.4,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}>{video.title}</h3>
+                    <p style={{
+                      fontSize: '0.75rem',
+                      lineHeight: 1.55,
+                      color: 'var(--color-text-muted)',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                    }}>{video.description}</p>
                   </div>
                 </div>
               </VideoModal>
             </motion.div>
           ))}
         </div>
-      </div>
+      </SectionBox>
 
-      {/* Bottom CTA */}
-      <section className="section-box" style={{ textAlign:'center' }}>
-        <div className="container-xl section-padding">
-          <h2 style={{ fontFamily:'var(--font-display)', fontWeight:800, fontSize:'clamp(1.25rem,3vw,1.75rem)', color:'#181d26', letterSpacing:'-0.02em', marginBottom:'0.75rem' }}>What Happens Next?</h2>
-          <p style={{ maxWidth:'36rem', margin:'0 auto 1.75rem', lineHeight:'var(--lh-relaxed)', color:'var(--color-text-weak)', fontSize:'var(--text-body)' }}>
-            Your partner will review your assessment and send you a personalized onboarding link via email.
-            Keep an eye on your inbox for <span style={{ fontWeight:600, color:'#1b61c9' }}>{lead?.email}</span>.
-          </p>
-          <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'center', gap:'0.875rem' }}>
-            <Link href="/university" style={{ display:'inline-flex', alignItems:'center', background:'linear-gradient(135deg,#2563eb 0%,#1b61c9 100%)', color:'#fff', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:700, fontSize:'var(--text-body)', textDecoration:'none', boxShadow:'0 4px 16px rgba(27,97,201,0.35)' }}>Explore Full University →</Link>
-            <Link href="/" style={{ display:'inline-flex', alignItems:'center', background:'#fff', border:'1.5px solid var(--color-border)', color:'#181d26', padding:'0.875rem 2rem', borderRadius:'var(--radius-btn)', fontFamily:'var(--font-display)', fontWeight:600, fontSize:'var(--text-body)', textDecoration:'none' }}>Back to Home</Link>
-          </div>
-        </div>
-      </section>
-    </div>
+      <CTABand
+        eyebrow="What happens next?"
+        title={<>Your partner is reviewing<br />your assessment.</>}
+        description={lead?.email
+          ? 'Watch your inbox at ' + lead.email + ' for a personalized onboarding link from your AutoPilot ROI partner.'
+          : 'Watch your inbox for a personalized onboarding link from your AutoPilot ROI partner.'}
+        ctas={[
+          { label: 'Explore Aurum University \u2192', href: '/university' },
+          { label: 'Back to home', href: '/', variant: 'ghost' },
+        ]}
+      />
+    </PageShell>
   )
 }
