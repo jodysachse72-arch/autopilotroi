@@ -104,18 +104,45 @@
   --shadow-section:
     0 1px 8px rgba(0,0,0,0.04);
 
-  /* ── Backend compat aliases ───────────────────────────────────
-     Many admin + dashboard pages were authored against an earlier
-     token naming scheme. Map those names to the canonical v2 tokens
-     so existing pages render correctly without a sweeping rename. */
-  --text-primary:    var(--color-text);          /* #181d26 */
-  --text-muted:      var(--color-text-weak);     /* rgba(24,29,38,0.65) */
-  --text-tertiary:   var(--color-text-muted);    /* rgba(24,29,38,0.42) */
-  --border-primary:  var(--color-border);        /* #e0e2e6 */
-  --bg-card:         #ffffff;
-  --bg-surface:      var(--color-surface);       /* #f8fafc */
-  --bg-page:         var(--color-page);          /* #eef0f4 */
+  /* ── FULL LEGACY ALIAS BRIDGE ─────────────────────────────────
+     Admin + dashboard pages were authored against the pre-rebuild
+     token naming scheme. This complete mapping ensures ALL legacy
+     var(--name) references resolve correctly.
+     ─────────────────────────────────────────────────────────── */
+
+  /* Font aliases */
+  --font-sora:          'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-sans:          'Inter', -apple-system, sans-serif;
+
+  /* Background aliases */
+  --bg-primary:         #f8fafc;
+  --bg-secondary:       #f0f2f7;
+  --bg-section:         #f8fafc;
+  --bg-card:            #ffffff;
+  --bg-card-hover:      #f8fafc;
+  --bg-surface:         #f8fafc;
+  --bg-page:            #f0f2f7;
+
+  /* Text aliases */
+  --text-primary:       #181d26;
+  --text-secondary:     rgba(4, 14, 32, 0.72);
+  --text-muted:         rgba(4, 14, 32, 0.58);
+  --text-tertiary:      rgba(4, 14, 32, 0.45);
+
+  /* Border aliases */
+  --border-primary:     #e0e2e6;
+  --border-secondary:   #eef0f4;
+  --border-accent:      rgba(27, 97, 201, 0.35);
+
+  /* Accent aliases */
+  --accent-primary:     #1b61c9;
+  --accent-secondary:   #1550aa;
+
+  /* Shadow aliases */
+  --card-shadow:        0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(15,48,106,0.05);
+  --shadow-hover:       0 4px 20px rgba(0,0,0,0.10), 0 2px 8px rgba(45,127,249,0.18);
 }
+
 
 /* ── Base reset ─────────────────────────────────────────────────── */
 *, *::before, *::after {
