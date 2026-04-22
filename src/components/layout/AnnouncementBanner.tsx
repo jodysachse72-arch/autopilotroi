@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { X } from 'lucide-react'
 
 /* ═══════════════════════════════════════════════════════════════
    ANNOUNCEMENT BANNER — Site-wide top bar
-   Message is stored in localStorage so admins can edit it
-   from the Feature Toggles page. Controlled by feature flag.
+   Message stored in localStorage. Feature-flag controlled.
+   Dismissal is persisted — stays gone after page refresh.
    ═══════════════════════════════════════════════════════════════ */
 
 const STORAGE_KEY = 'autopilotroi-announcement'
-const DEFAULT_MESSAGE = '🚀 Welcome to AutopilotROI — Your AI-powered finance onboarding platform is live!'
+const DISMISSED_KEY = 'autopilotroi-announcement-dismissed'
+const DEFAULT_MESSAGE = '🚀 AutopilotROI is live — AI-powered finance onboarding for your partners.'
 
 export function getAnnouncementMessage(): string {
   if (typeof window === 'undefined') return DEFAULT_MESSAGE
@@ -23,27 +25,23 @@ export function setAnnouncementMessage(msg: string) {
 
 export default function AnnouncementBanner() {
   const [message, setMessage] = useState<string | null>(null)
-  const [dismissed, setDismissed] = useState(false)
-  const [enabled, setEnabled] = useState(false)
+  const [visible, setVisible] = useState(false)
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- reads localStorage after mount; SSR-safe hydration pattern
   useEffect(() => {
-    // Check feature flag
     try {
       const flags = localStorage.getItem('autopilotroi-feature-flags')
       if (flags) {
         const parsed = JSON.parse(flags)
-        if (parsed.announcementBanner === false) {
-          setEnabled(false)
-          return
-        }
+        if (parsed.announcementBanner === false) return
       }
     } catch {}
-    setEnabled(true)
 
-    // Load message
+    if (localStorage.getItem(DISMISSED_KEY) === 'true') return
+
     setMessage(getAnnouncementMessage())
+    setVisible(true)
 
-    // Listen for updates from admin panel
     const handleUpdate = () => setMessage(getAnnouncementMessage())
     window.addEventListener('announcement-update', handleUpdate)
     window.addEventListener('storage', handleUpdate)
@@ -53,20 +51,36 @@ export default function AnnouncementBanner() {
     }
   }, [])
 
-  if (!enabled || !message || dismissed) return null
+  function dismiss() {
+    try { localStorage.setItem(DISMISSED_KEY, 'true') } catch {}
+    setVisible(false)
+  }
+
+  if (!visible || !message) return null
 
   return (
     <div
-      className="relative z-[60] bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 text-white text-center px-10"
-      style={{ minHeight: '56px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      className="relative z-[60] flex items-center justify-center px-10"
+      style={{
+        minHeight: '36px',
+        background: '#0f172a',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+      }}
     >
-      <p style={{ fontSize: '0.9375rem', fontWeight: 600, letterSpacing: '0.02em' }}>{message}</p>
+      <span
+        className="mr-2 inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400"
+        aria-hidden
+      />
+      <p style={{ fontSize: '0.8125rem', fontWeight: 500, color: 'rgba(255,255,255,0.72)', letterSpacing: '0.01em' }}>
+        {message}
+      </p>
       <button
-        onClick={() => setDismissed(true)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition text-xl leading-none"
+        onClick={dismiss}
+        className="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded transition hover:bg-white/10"
         aria-label="Dismiss announcement"
+        style={{ color: 'rgba(255,255,255,0.4)' }}
       >
-        ×
+        <X className="h-3 w-3" strokeWidth={2.5} />
       </button>
     </div>
   )

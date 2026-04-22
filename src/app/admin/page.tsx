@@ -160,46 +160,42 @@ const quickActions: QuickActionTile[] = [
 export default function AdminDashboard() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      {/* System health banner */}
+      {/* System health banner — compact single row */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="be-card be-card--padded relative overflow-hidden"
+        className="be-card relative overflow-hidden"
         style={{
           background: 'linear-gradient(120deg, #0b1220 0%, #1f2a44 70%, #312e81 100%)',
           border: 'none',
           color: '#fff',
+          padding: '14px 20px',
         }}
       >
         <div
-          className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(248,113,113,0.30) 0%, transparent 70%)', filter: 'blur(28px)' }}
+          className="pointer-events-none absolute -right-14 -top-14 h-48 w-48 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(248,113,113,0.25) 0%, transparent 70%)', filter: 'blur(24px)' }}
           aria-hidden
         />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="inline-flex items-center gap-1.5 shrink-0 text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
               All systems operational
             </div>
-            <h2 className="mt-1.5 text-2xl font-bold tracking-tight">
+            <h2 className="text-[1.125rem] font-bold tracking-tight truncate">
               System Overview
             </h2>
-            <p className="mt-1 text-sm text-white/70 max-w-md">
-              Today, 12 new signups, 8 prospects awaiting triage, 3 partners promoted this week.
-            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/admin/prospects"
-              className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition"
-              style={{ background: '#fff', color: '#0b1220', boxShadow: '0 6px 16px rgba(0,0,0,0.18)' }}
-            >
-              <Inbox className="h-4 w-4" strokeWidth={2.4} />
-              Triage queue
-            </Link>
-          </div>
+          <Link
+            href="/admin/prospects"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition hover:opacity-90"
+            style={{ background: '#fff', color: '#0b1220', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+          >
+            <Inbox className="h-3.5 w-3.5" strokeWidth={2.4} />
+            Triage queue
+          </Link>
         </div>
       </motion.div>
 
@@ -263,11 +259,11 @@ export default function AdminDashboard() {
           </div>
 
           <div className="px-5 pb-5">
-            <div className="relative">
-              {/* Vertical timeline rail */}
+            <div className="relative pl-[38px]">
+              {/* Solid timeline rail */}
               <div
-                className="absolute left-[19px] top-2 bottom-2 w-px"
-                style={{ background: 'linear-gradient(180deg, var(--color-border) 0%, transparent 100%)' }}
+                className="absolute left-[19px] top-4 bottom-4 w-[2px] rounded-full"
+                style={{ background: 'var(--color-border, #e6e8ec)' }}
                 aria-hidden
               />
               <ul className="space-y-3">
@@ -337,7 +333,7 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.15 + i * 0.06 }}
-                className="px-5 py-3.5 transition hover:bg-slate-50/60"
+                className="px-5 py-3 transition hover:bg-slate-50/60"
               >
                 <div className="flex items-center gap-3">
                   <span
@@ -352,29 +348,29 @@ export default function AdminDashboard() {
                       <p className="text-sm font-semibold truncate" style={{ color: '#0b1220' }}>{p.name}</p>
                       <StatusBadge tone={scoreTone(p.score)}>{p.score}/100</StatusBadge>
                     </div>
-                    <div className="mt-0.5 flex items-center gap-2 text-[11px]" style={{ color: 'rgba(4,14,32,0.55)' }}>
+                    <div className="mt-0.5 flex items-center gap-1.5 text-[11px]" style={{ color: 'rgba(4,14,32,0.55)' }}>
                       <span className="truncate">{p.source}</span>
                       <span style={{ color: 'rgba(4,14,32,0.3)' }}>•</span>
-                      <span className="font-mono">waited {p.waited}</span>
+                      <span className="font-mono shrink-0">waited {p.waited}</span>
                     </div>
                   </div>
-                </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <button
-                    type="button"
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-semibold transition"
-                    style={{ background: '#1b61c9', color: '#fff' }}
-                  >
-                    <UserPlus className="h-3 w-3" strokeWidth={2.5} />
-                    Assign
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex items-center justify-center rounded-md border px-3 py-1.5 text-[11px] font-semibold transition hover:bg-slate-50"
-                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
-                  >
-                    Skip
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition hover:opacity-90"
+                      style={{ background: '#1b61c9', color: '#fff' }}
+                    >
+                      <UserPlus className="h-3 w-3" strokeWidth={2.5} />
+                      Assign
+                    </button>
+                    <button
+                      type="button"
+                      className="text-[11px] font-medium transition hover:opacity-60"
+                      style={{ color: 'rgba(4,14,32,0.45)' }}
+                    >
+                      Skip
+                    </button>
+                  </div>
                 </div>
               </motion.li>
             ))}
@@ -402,10 +398,10 @@ export default function AdminDashboard() {
                   href={tile.href}
                   className="be-card be-card--interactive block relative overflow-hidden group"
                 >
-                  {/* Decorative gradient corner */}
+                  {/* Decorative gradient corner — softened */}
                   <div
                     className="absolute -right-8 -top-8 h-28 w-28 rounded-full transition-transform duration-300 group-hover:scale-110"
-                    style={{ background: tile.gradient, opacity: 0.85 }}
+                    style={{ background: tile.gradient, opacity: 0.45 }}
                     aria-hidden
                   />
                   <div className="relative">
@@ -434,8 +430,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Insight strip — what's trending */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      {/* Insight strip — weekly highlights */}
+      <div>
+        <SectionHeader title="This week" subtitle="Performance highlights" />
+        <div className="grid gap-4 sm:grid-cols-3">
         <div className="be-card be-card--padded flex items-start gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(16,185,129,0.10)', color: '#059669' }}>
             <TrendingUp className="h-[18px] w-[18px]" strokeWidth={2.2} />
@@ -465,6 +463,7 @@ export default function AdminDashboard() {
             <div className="text-sm font-semibold mt-0.5" style={{ color: '#0b1220' }}>Aurum University 2.0</div>
             <p className="text-[11.5px] mt-0.5" style={{ color: 'rgba(4,14,32,0.55)' }}>Targeted for May 15</p>
           </div>
+        </div>
         </div>
       </div>
     </div>

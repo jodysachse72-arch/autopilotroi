@@ -3,22 +3,17 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 /* ═══════════════════════════════════════════════════════════════
    PARTNER ONBOARDING WIZARD — 3-step Welcome for new partners
-   Shows once, dismissed permanently via localStorage.
-
-   Hydration model:
-   - SSR + first client paint: nothing rendered (mounted=false)
-   - After mount: read localStorage, then either reveal banner or
-     stay hidden — no flash either way because we never paint the
-     "wrong" state.
-   - Dismissal is animated via AnimatePresence wrapping the
-     conditional, not the component root.
+   Collapsed by default after first visit (thin progress strip).
+   Expands/collapses on click. Dismissed permanently via localStorage.
    ═══════════════════════════════════════════════════════════════ */
 
 const STORAGE_KEY = 'autopilotroi-partner-onboarded'
 const STEPS_KEY = STORAGE_KEY + '-steps'
+const COLLAPSED_KEY = STORAGE_KEY + '-collapsed'
 
 interface WizardStep {
   id: string
@@ -57,23 +52,30 @@ const steps: WizardStep[] = [
 ]
 
 export default function PartnerOnboardingWizard() {
-  // mounted gates everything until after hydration so we never
-  // render a state that disagrees with localStorage
   const [mounted, setMounted] = useState(false)
   const [dismissed, setDismissed] = useState(true)
+  const [collapsed, setCollapsed] = useState(true)
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- sync localStorage to React state on mount; SSR-safe
   useEffect(() => {
-    // Reading localStorage requires the browser, so it has to happen
-    // after mount. Three setState calls inside one effect are fine —
-    // React batches them into a single render.
     const wasDismissed = localStorage.getItem(STORAGE_KEY) === 'true'
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync localStorage to React state on mount
     setDismissed(wasDismissed)
+
+    // First ever visit → expand; returning visits → collapsed
+    const savedCollapsed = localStorage.getItem(COLLAPSED_KEY)
+    if (savedCollapsed === null) {
+      setCollapsed(false)
+      try { localStorage.setItem(COLLAPSED_KEY, 'false') } catch {}
+    } else {
+      setCollapsed(savedCollapsed !== 'false')
+    }
+
     try {
       const saved = localStorage.getItem(STEPS_KEY)
       if (saved) setCompletedSteps(JSON.parse(saved))
     } catch {}
+
     setMounted(true)
   }, [])
 
@@ -82,7 +84,6 @@ export default function PartnerOnboardingWizard() {
       const next = [...new Set([...prev, stepId])]
       try { localStorage.setItem(STEPS_KEY, JSON.stringify(next)) } catch {}
       if (next.length === steps.length) {
-        // Auto-dismiss after celebrating completion
         setTimeout(() => dismiss(), 1500)
       }
       return next
@@ -94,6 +95,14 @@ export default function PartnerOnboardingWizard() {
     setDismissed(true)
   }
 
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev
+      try { localStorage.setItem(COLLAPSED_KEY, String(next)) } catch {}
+      return next
+    })
+  }
+
   const visible = mounted && !dismissed
   const progress = Math.round((completedSteps.length / steps.length) * 100)
 
@@ -102,90 +111,118 @@ export default function PartnerOnboardingWizard() {
       {visible && (
         <motion.div
           key="partner-onboarding"
-          initial={{ opacity: 0, y: 12, height: 0 }}
-          animate={{ opacity: 1, y: 0, height: 'auto' }}
-          exit={{ opacity: 0, y: -8, height: 0, marginBottom: 0 }}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           style={{ overflow: 'hidden' }}
         >
           <div
-            className="rounded-2xl p-6 mb-6"
-            style={{ background: '#eff6ff', border: '1px solid #bfdbfe' }}
+            className="be-card overflow-hidden"
+            style={{ border: '1px solid #bfdbfe', marginBottom: '0' }}
           >
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-lg font-bold" style={{ color: '#181d26' }}>
-                  🚀 Welcome! Let&apos;s get you started
-                </h3>
-                <p className="mt-1 text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
-                  Complete these 3 steps to start building your referral network.
-                </p>
-              </div>
-              <button
-                onClick={dismiss}
-                className="text-xs transition hover:opacity-70"
-                style={{ color: 'rgba(4,14,32,0.45)' }}
-              >
-                Dismiss ×
-              </button>
-            </div>
-
-            {/* Progress bar */}
-            <div className="mb-5">
-              <div className="flex justify-between text-[10px] mb-1" style={{ color: 'rgba(4,14,32,0.45)' }}>
-                <span>{completedSteps.length}/{steps.length} completed</span>
-                <span>{progress}%</span>
-              </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#e0e2e6' }}>
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: 'linear-gradient(90deg, #1b61c9, #10b981)' }}
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-            </div>
-
-            {/* Steps */}
-            <div className="grid gap-3 sm:grid-cols-3">
-              {steps.map((step) => {
-                const isDone = completedSteps.includes(step.id)
-                return (
-                  <div
-                    key={step.id}
-                    className="rounded-xl border p-4 transition"
-                    style={{
-                      background: isDone ? '#f0fdf4' : '#fff',
-                      border: isDone ? '1px solid #bbf7d0' : '1px solid #e0e2e6',
-                    }}
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">{isDone ? '✅' : step.icon}</span>
-                      <h4 className="text-sm font-semibold" style={{
-                        color: isDone ? '#15803d' : '#181d26',
-                        textDecoration: isDone ? 'line-through' : 'none',
-                      }}>
-                        {step.title}
-                      </h4>
-                    </div>
-                    <p className="text-xs mb-3" style={{ color: 'rgba(4,14,32,0.55)' }}>{step.description}</p>
-                    {isDone ? (
-                      <span className="text-[10px] font-semibold uppercase" style={{ color: '#15803d' }}>Done!</span>
-                    ) : (
-                      <Link
-                        href={step.href}
-                        onClick={() => markDone(step.id)}
-                        className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
-                        style={{ background: '#1b61c9' }}
-                      >
-                        {step.cta} →
-                      </Link>
-                    )}
+            {/* Collapsed header strip — always visible */}
+            <button
+              type="button"
+              onClick={toggleCollapsed}
+              className="w-full flex items-center gap-3 px-4 py-2.5 transition hover:bg-blue-50/60"
+              style={{ background: '#f0f7ff' }}
+              aria-expanded={!collapsed}
+              aria-label={collapsed ? 'Expand setup checklist' : 'Collapse setup checklist'}
+            >
+              <span className="text-sm shrink-0" aria-hidden>🚀</span>
+              <div className="flex-1 min-w-0 flex items-center gap-3">
+                <span className="text-[13px] font-semibold shrink-0" style={{ color: '#0b1220' }}>
+                  Partner setup
+                </span>
+                <div className="flex items-center gap-2 min-w-0">
+                  {/* Inline progress bar */}
+                  <div className="h-1 w-24 rounded-full overflow-hidden shrink-0" style={{ background: '#dbeafe' }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ background: 'linear-gradient(90deg, #1b61c9, #10b981)' }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.5 }}
+                    />
                   </div>
-                )
-              })}
-            </div>
+                  <span className="text-[11px] font-medium shrink-0" style={{ color: 'rgba(4,14,32,0.5)' }}>
+                    {completedSteps.length}/{steps.length} complete
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {!collapsed && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => { e.stopPropagation(); dismiss() }}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); dismiss() } }}
+                    className="text-[11px] font-medium px-2 py-0.5 rounded transition hover:bg-blue-100 cursor-pointer"
+                    style={{ color: 'rgba(4,14,32,0.4)' }}
+                    aria-label="Dismiss setup wizard"
+                  >
+                    Dismiss
+                  </span>
+                )}
+                {collapsed
+                  ? <ChevronDown className="h-3.5 w-3.5 shrink-0" style={{ color: 'rgba(4,14,32,0.35)' }} strokeWidth={2.2} />
+                  : <ChevronUp className="h-3.5 w-3.5 shrink-0" style={{ color: 'rgba(4,14,32,0.35)' }} strokeWidth={2.2} />
+                }
+              </div>
+            </button>
+
+            {/* Expandable step grid */}
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  key="wizard-body"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <div className="p-4 grid gap-3 sm:grid-cols-3" style={{ borderTop: '1px solid #bfdbfe' }}>
+                    {steps.map((step) => {
+                      const isDone = completedSteps.includes(step.id)
+                      return (
+                        <div
+                          key={step.id}
+                          className="rounded-xl p-4 transition"
+                          style={{
+                            background: isDone ? '#f0fdf4' : '#fff',
+                            border: isDone ? '1px solid #bbf7d0' : '1px solid #e0e2e6',
+                          }}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-lg">{isDone ? '✅' : step.icon}</span>
+                            <h4 className="text-sm font-semibold" style={{
+                              color: isDone ? '#15803d' : '#181d26',
+                              textDecoration: isDone ? 'line-through' : 'none',
+                            }}>
+                              {step.title}
+                            </h4>
+                          </div>
+                          <p className="text-xs mb-3" style={{ color: 'rgba(4,14,32,0.55)' }}>{step.description}</p>
+                          {isDone ? (
+                            <span className="text-[10px] font-semibold uppercase" style={{ color: '#15803d' }}>Done!</span>
+                          ) : (
+                            <Link
+                              href={step.href}
+                              onClick={() => markDone(step.id)}
+                              className="inline-flex items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
+                              style={{ background: '#1b61c9' }}
+                            >
+                              {step.cta} →
+                            </Link>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </motion.div>
       )}

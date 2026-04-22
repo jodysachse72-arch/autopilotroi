@@ -227,7 +227,7 @@ function Funnel({ segments }: FunnelProps) {
         const w = widthPct(seg.count)
         const conversionFromPrev = i === 0 || segments[i - 1].count === 0
           ? null
-          : Math.round((seg.count / segments[i - 1].count) * 100)
+          : Math.min(100, Math.round((seg.count / segments[i - 1].count) * 100))
         return (
           <div key={seg.status} className="flex items-center gap-3">
             <div className="w-24 shrink-0 text-right">
@@ -338,14 +338,43 @@ function buildAttentionItems(leads: Lead[]): AttentionItem[] {
   return items.slice(0, 3)
 }
 
-/* ── Generate plausible sparkline data based on current value ── */
-function genSpark(seed: number, peak: number, len = 14): number[] {
+/* ── Generate varied sparkline shapes per metric ── */
+function genSpark(
+  seed: number,
+  peak: number,
+  shape: 'rise' | 'flat' | 'zigzag' | 'dip-rise' = 'rise',
+  len = 14
+): number[] {
   const data: number[] = []
-  let v = peak * 0.4
-  for (let i = 0; i < len; i++) {
-    const noise = (Math.sin(seed + i * 1.7) + Math.cos(seed * 0.3 + i * 0.9)) * 0.5
-    v = Math.max(0, v + noise * (peak * 0.15) + (peak * 0.04))
-    data.push(Math.round(v))
+  switch (shape) {
+    case 'rise': {
+      let v = peak * 0.3
+      for (let i = 0; i < len; i++) {
+        v = Math.max(0, v + peak * 0.05 + Math.sin(seed + i * 1.3) * peak * 0.1)
+        data.push(Math.round(v))
+      }
+      break
+    }
+    case 'flat': {
+      for (let i = 0; i < len; i++) {
+        data.push(Math.max(0, Math.round(peak * 0.85 + Math.sin(seed + i * 2.1) * peak * 0.12)))
+      }
+      break
+    }
+    case 'zigzag': {
+      for (let i = 0; i < len; i++) {
+        data.push(Math.max(0, Math.round(peak * 0.6 + Math.sin(seed + i * 1.9) * peak * 0.3)))
+      }
+      break
+    }
+    case 'dip-rise': {
+      for (let i = 0; i < len; i++) {
+        const t = i / (len - 1)
+        const v = peak * 0.5 + Math.sin(t * Math.PI) * peak * -0.22 + t * peak * 0.4
+        data.push(Math.max(0, Math.round(v + Math.sin(seed + i * 1.5) * peak * 0.07)))
+      }
+      break
+    }
   }
   data[data.length - 1] = peak
   return data
@@ -384,10 +413,10 @@ export default function DashboardOverview() {
   )
 
   const sparkData = useMemo(() => ({
-    total: genSpark(1, Math.max(stats.total, 1)),
-    avgScore: genSpark(2, Math.max(stats.avgScore, 1)),
-    pipeline: genSpark(3, Math.max(stats.assessed + stats.onboarding, 1)),
-    conversion: genSpark(4, Math.max(stats.conversionRate, 1)),
+    total:      genSpark(1, Math.max(stats.total, 1),                          'rise'),
+    avgScore:   genSpark(2, Math.max(stats.avgScore, 1),                       'flat'),
+    pipeline:   genSpark(3, Math.max(stats.assessed + stats.onboarding, 1),   'zigzag'),
+    conversion: genSpark(4, Math.max(stats.conversionRate, 1),                'dip-rise'),
   }), [stats.total, stats.avgScore, stats.assessed, stats.onboarding, stats.conversionRate])
 
   let filtered = filter === 'all' ? leads : leads.filter(l => l.status === filter)
@@ -410,51 +439,42 @@ export default function DashboardOverview() {
     <div className="mx-auto max-w-6xl space-y-6">
       <PartnerOnboardingWizard />
 
-      {/* Welcome banner */}
+      {/* Welcome banner — compact single row */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         <div
-          className="be-card be-card--padded relative overflow-hidden"
+          className="be-card relative overflow-hidden"
           style={{
             background: 'linear-gradient(135deg, #0b1220 0%, #1b3556 60%, #1b61c9 100%)',
             border: 'none',
             color: '#fff',
+            padding: '14px 20px',
           }}
         >
           <div
-            className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(96,165,250,0.45) 0%, transparent 70%)', filter: 'blur(20px)' }}
+            className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full"
+            style={{ background: 'radial-gradient(circle, rgba(96,165,250,0.4) 0%, transparent 70%)', filter: 'blur(18px)' }}
             aria-hidden
           />
-          <div
-            className="pointer-events-none absolute -left-10 -bottom-20 h-48 w-48 rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(167,139,250,0.30) 0%, transparent 70%)', filter: 'blur(24px)' }}
-            aria-hidden
-          />
-          <div className="relative flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <div className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">
+          <div className="relative flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="inline-flex items-center gap-1.5 shrink-0 text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
                 <span className={`h-1.5 w-1.5 rounded-full ${isLive ? 'bg-emerald-400' : 'bg-amber-400'}`} />
-                {isLive ? 'Live data' : 'Demo data'}
+                {isLive ? 'Live' : 'Demo'}
               </div>
-              <h2 className="mt-1.5 text-2xl font-bold tracking-tight">
+              <h2 className="text-[1.125rem] font-bold tracking-tight truncate">
                 Welcome back, Partner
               </h2>
-              <p className="mt-1 text-sm text-white/70 max-w-md">
-                {isLive
-                  ? 'Your pipeline is connected and tracking in real time.'
-                  : 'Connect Supabase to see your real leads. Demo numbers below.'}
-              </p>
             </div>
             <Link
               href="/dashboard/links"
-              className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition"
-              style={{ background: '#fff', color: '#0b1220', boxShadow: '0 6px 16px rgba(0,0,0,0.18)' }}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition hover:opacity-90"
+              style={{ background: '#fff', color: '#0b1220', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
             >
-              <Link2 className="h-4 w-4" strokeWidth={2.4} />
+              <Link2 className="h-3.5 w-3.5" strokeWidth={2.4} />
               Generate referral link
             </Link>
           </div>
