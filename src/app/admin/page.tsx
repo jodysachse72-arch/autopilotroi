@@ -160,28 +160,28 @@ const quickActions: QuickActionTile[] = [
 export default function AdminDashboard() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      {/* System health banner — compact single row */}
+      {/* System health banner — brand blue */}
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="be-card relative overflow-hidden"
         style={{
-          background: 'linear-gradient(120deg, #0b1220 0%, #1f2a44 70%, #312e81 100%)',
+          background: 'linear-gradient(120deg, #1550aa 0%, #1b61c9 55%, #2d7ff9 100%)',
           border: 'none',
           color: '#fff',
           padding: '14px 20px',
         }}
       >
         <div
-          className="pointer-events-none absolute -right-14 -top-14 h-48 w-48 rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(248,113,113,0.25) 0%, transparent 70%)', filter: 'blur(24px)' }}
+          className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)', filter: 'blur(20px)' }}
           aria-hidden
         />
         <div className="relative flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="inline-flex items-center gap-1.5 shrink-0 text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 shrink-0 text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: 'rgba(255,255,255,0.70)' }}>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300 animate-pulse" />
               All systems operational
             </div>
             <h2 className="text-[1.125rem] font-bold tracking-tight truncate">
@@ -191,13 +191,14 @@ export default function AdminDashboard() {
           <Link
             href="/admin/prospects"
             className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition hover:opacity-90"
-            style={{ background: '#fff', color: '#0b1220', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+            style={{ background: 'rgba(255,255,255,0.18)', color: '#fff', border: '1px solid rgba(255,255,255,0.25)' }}
           >
             <Inbox className="h-3.5 w-3.5" strokeWidth={2.4} />
             Triage queue
           </Link>
         </div>
       </motion.div>
+
 
       {/* System stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

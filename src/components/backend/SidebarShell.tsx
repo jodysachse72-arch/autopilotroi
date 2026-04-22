@@ -7,12 +7,11 @@ import { LogoIcon } from '@/components/ui/Logo'
 
 /* ═══════════════════════════════════════════════════════════════
    SIDEBARSHELL — Shared sidebar for admin + dashboard.
-   Premium slate gradient rail with Lucide icons + active accent bar.
-   Hover/active styles in globals.css under .be-sidebar-link
+   Blue brand rail (#1b61c9) matching the original design.
+   Hover/active styles defined inline for clarity.
    ═══════════════════════════════════════════════════════════════ */
 
 export interface SidebarSection {
-  /** Optional uppercase section header rendered above its links */
   label?: string
   links: readonly SidebarLink[]
 }
@@ -22,24 +21,17 @@ export interface SidebarLink {
   label: string
   href: string
   icon: LucideIcon
-  /** Active iff pathname === href (default: prefix match with boundary) */
   exact?: boolean
-  /** Optional small badge text shown on the right (e.g. "3", "New") */
   badge?: string
-  /** Tone for the badge — default "neutral" */
   badgeTone?: 'neutral' | 'red' | 'blue' | 'green'
 }
 
 export interface SidebarShellProps {
   pathname: string
-  /** Either a flat list of links or grouped sections */
   links?: readonly SidebarLink[]
   sections?: readonly SidebarSection[]
-  /** Sub-brand label e.g. "Admin Panel" or "Partner Hub" */
   brandLabel: string
-  /** Optional dot-color shown next to brandLabel */
   brandAccent?: string
-  /** Called when any link is clicked (used to close mobile drawer) */
   onClose?: () => void
 }
 
@@ -49,10 +41,10 @@ function isActiveLink(pathname: string, link: SidebarLink): boolean {
 }
 
 const BADGE_TONES: Record<NonNullable<SidebarLink['badgeTone']>, { bg: string; color: string }> = {
-  neutral: { bg: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.85)' },
-  red:     { bg: 'rgba(239,68,68,0.18)',   color: '#fca5a5' },
-  blue:    { bg: 'rgba(59,130,246,0.22)',  color: '#93c5fd' },
-  green:   { bg: 'rgba(34,197,94,0.18)',   color: '#86efac' },
+  neutral: { bg: 'rgba(255,255,255,0.18)', color: '#ffffff' },
+  red:     { bg: 'rgba(254,202,202,0.25)', color: '#fecaca' },
+  blue:    { bg: 'rgba(191,219,254,0.25)', color: '#bfdbfe' },
+  green:   { bg: 'rgba(167,243,208,0.25)', color: '#a7f3d0' },
 }
 
 function LinkItem({
@@ -64,23 +56,17 @@ function LinkItem({
   const tone = BADGE_TONES[link.badgeTone ?? 'neutral']
   return (
     <Link
-      key={link.href}
       id={link.id}
       href={link.href}
       onClick={onClose}
+      className="be-sidebar-link group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm"
       data-active={active || undefined}
-      className="be-sidebar-link group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[0.875rem]"
     >
-      {/* Left accent rail when active */}
-      <span
-        aria-hidden
-        className="be-sidebar-link__accent"
-      />
-      <Icon className="be-sidebar-link__icon h-[18px] w-[18px] shrink-0" strokeWidth={2} />
+      <Icon className="be-sidebar-link__icon h-[17px] w-[17px] shrink-0" strokeWidth={1.9} />
       <span className="flex-1 truncate">{link.label}</span>
       {link.badge && (
         <span
-          className="rounded-md px-1.5 py-[2px] text-[10px] font-bold leading-none"
+          className="rounded-full px-1.5 py-[1px] text-[10px] font-bold leading-none"
           style={{ background: tone.bg, color: tone.color }}
         >
           {link.badge}
@@ -98,7 +84,6 @@ export default function SidebarShell({
   brandAccent,
   onClose,
 }: SidebarShellProps) {
-  // Normalize to sections
   const allSections: readonly SidebarSection[] = sections
     ? sections
     : links
@@ -108,14 +93,17 @@ export default function SidebarShell({
   return (
     <div className="be-sidebar flex h-full flex-col">
       {/* ── Brand ── */}
-      <div className="flex h-[4.8rem] shrink-0 items-center gap-3 px-5 border-b border-white/[0.06]">
-        <Link href="/" className="flex items-center gap-2.5 group/brand" onClick={onClose}>
-          <span className="be-sidebar-logo flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
-            <LogoIcon size={22} />
+      <div className="flex h-[4.5rem] shrink-0 items-center gap-3 px-5 border-b border-white/[0.12]">
+        <Link href="/" className="flex items-center gap-2.5" onClick={onClose}>
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.22)' }}
+          >
+            <LogoIcon size={20} />
           </span>
           <div className="leading-none">
-            <div className="font-bold text-white text-[1.05rem] tracking-tight">AutopilotROI</div>
-            <div className="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/60 flex items-center gap-1.5">
+            <div className="font-bold text-white text-[1rem] tracking-tight">AutopilotROI</div>
+            <div className="mt-0.5 flex items-center gap-1.5 text-[0.625rem] font-bold uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.65)' }}>
               {brandAccent && (
                 <span
                   className="inline-block h-1.5 w-1.5 rounded-full"
@@ -130,11 +118,14 @@ export default function SidebarShell({
       </div>
 
       {/* ── Nav ── */}
-      <nav className="flex-1 overflow-y-auto px-3 py-4">
+      <nav className="flex-1 overflow-y-auto px-3 py-3">
         {allSections.map((section, sIdx) => (
           <div key={sIdx} className={sIdx > 0 ? 'mt-5' : ''}>
             {section.label && (
-              <div className="px-3 pb-2 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-white/40">
+              <div
+                className="px-3 pb-1.5 pt-1 text-[0.6rem] font-bold uppercase tracking-[0.16em]"
+                style={{ color: 'rgba(255,255,255,0.45)' }}
+              >
                 {section.label}
               </div>
             )}
@@ -152,11 +143,20 @@ export default function SidebarShell({
         ))}
       </nav>
 
-      {/* ── Footer (back to site) ── */}
-      <div className="shrink-0 border-t border-white/[0.06] p-3">
+      {/* ── Footer ── */}
+      <div className="shrink-0 border-t border-white/[0.12] p-3">
         <Link
           href="/"
-          className="be-sidebar-back flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium"
+          className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition"
+          style={{ color: 'rgba(255,255,255,0.60)' }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.10)'
+            ;(e.currentTarget as HTMLElement).style.color = '#ffffff'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = 'transparent'
+            ;(e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.60)'
+          }}
         >
           <span className="flex items-center gap-2">
             <span className="text-base leading-none">←</span> Back to site

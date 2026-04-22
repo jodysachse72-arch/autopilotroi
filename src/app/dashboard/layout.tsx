@@ -86,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, [])
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#f4f6fa' }}>
+    <div className="min-h-screen flex" style={{ background: '#f0f2f7' }}>
       <aside className="hidden lg:flex w-[15.5rem] flex-col shrink-0">
         <SidebarShell
           pathname={pathname}
@@ -252,7 +252,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <main className="flex-1 p-5 lg:p-7 overflow-x-hidden">
+        <main className="flex-1 overflow-x-hidden" style={{ padding: '1.25rem 1.5rem 2rem' }}>
           <Breadcrumbs />
           {children}
         </main>
