@@ -1,191 +1,194 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Link from 'next/link'
+import {
+  StatCard,
+  Card,
+  ActionCard,
+  SectionHeader,
+  StatusBadge,
+} from '@/components/backend'
+
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN DASHBOARD — at-a-glance overview.
+   Refactored onto backend primitives so style lives in CSS, not
+   inline classes against non-existent CSS variables.
+   ═══════════════════════════════════════════════════════════════ */
 
 const systemStats = [
-  { label: 'Total Users', value: '142', change: '+12 this week', icon: '👥' },
-  { label: 'Active Partners', value: '23', change: '+3 this month', icon: '🤝' },
-  { label: 'Pending Prospects', value: '8', change: '5 unassigned', icon: '⏳' },
-  { label: 'Completed Onboardings', value: '97', change: '68% conversion', icon: '✅' },
+  { label: 'Total Users',            value: '142', delta: '+12 this week',  trend: 'up' as const,   icon: '👥' },
+  { label: 'Active Partners',        value: '23',  delta: '+3 this month',  trend: 'up' as const,   icon: '🤝' },
+  { label: 'Pending Prospects',      value: '8',   delta: '5 unassigned',   trend: 'flat' as const, icon: '⏳' },
+  { label: 'Completed Onboardings',  value: '97',  delta: '68% conversion', trend: 'up' as const,   icon: '✅' },
 ]
 
 const recentActivity = [
-  { action: 'New prospect signed up', user: 'alex@example.com', time: '2 min ago', type: 'signup' },
-  { action: 'Readiness assessment completed', user: 'sarah@example.com', time: '15 min ago', type: 'assessment' },
-  { action: 'Partner promoted', user: 'james@example.com', time: '1 hour ago', type: 'promotion' },
-  { action: 'Onboarding completed', user: 'maria@example.com', time: '3 hours ago', type: 'complete' },
-  { action: 'New prospect signed up', user: 'lisa@example.com', time: '5 hours ago', type: 'signup' },
+  { action: 'New prospect signed up',          user: 'alex@example.com',   time: '2 min ago',  type: 'signup'     as const },
+  { action: 'Readiness assessment completed',  user: 'sarah@example.com',  time: '15 min ago', type: 'assessment' as const },
+  { action: 'Partner promoted',                user: 'james@example.com',  time: '1 hour ago', type: 'promotion'  as const },
+  { action: 'Onboarding completed',            user: 'maria@example.com',  time: '3 hours ago',type: 'complete'   as const },
+  { action: 'New prospect signed up',          user: 'lisa@example.com',   time: '5 hours ago',type: 'signup'     as const },
 ]
 
 const unassignedProspects = [
-  { name: 'John Doe', email: 'john@example.com', score: 42, tier: 'intermediate', date: '2026-04-11' },
-  { name: 'Emma Brown', email: 'emma@example.com', score: 18, tier: 'beginner', date: '2026-04-11' },
-  { name: 'Mike Johnson', email: 'mike@example.com', score: 73, tier: 'advanced', date: '2026-04-10' },
+  { name: 'John Doe',     email: 'john@example.com',  score: 42 },
+  { name: 'Emma Brown',   email: 'emma@example.com',  score: 18 },
+  { name: 'Mike Johnson', email: 'mike@example.com',  score: 73 },
 ]
 
-const activityIcons: Record<string, string> = {
-  signup: '🆕',
+type ActivityType = 'signup' | 'assessment' | 'promotion' | 'complete'
+const activityIcons: Record<ActivityType, string> = {
+  signup:     '🆕',
   assessment: '📋',
-  promotion: '⬆️',
-  complete: '✅',
+  promotion:  '⬆️',
+  complete:   '✅',
+}
+
+function scoreTone(score: number): 'green' | 'amber' | 'red' {
+  if (score >= 60) return 'green'
+  if (score >= 30) return 'amber'
+  return 'red'
 }
 
 export default function AdminDashboard() {
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-6">
       {/* System stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {systemStats.map((stat, i) => (
           <motion.div
             key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
-            className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5"
+            transition={{ delay: i * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="text-2xl">{stat.icon}</div>
-            <div className="mt-2 font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
-              {stat.value}
-            </div>
-            <div className="mt-1 text-sm text-[var(--text-muted)]">{stat.label}</div>
-            <div className="mt-1 text-xs text-blue-400">{stat.change}</div>
+            <StatCard
+              label={stat.label}
+              value={stat.value}
+              delta={stat.delta}
+              trend={stat.trend}
+              icon={stat.icon}
+            />
           </motion.div>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recent activity */}
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden">
-          <div className="border-b border-[var(--border-primary)] px-6 py-4">
-            <h3 className="font-[var(--font-sora)] text-lg font-semibold text-[var(--text-primary)]">
-              Recent Activity
-            </h3>
-          </div>
-          <div className="divide-y divide-[var(--border-primary)]">
+      {/* Two-column: Recent activity + Unassigned prospects */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card padding="flush">
+          <SectionHeader
+            title="Recent Activity"
+            className="px-5 pt-5 mb-0"
+          />
+          <ul className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
             {recentActivity.map((item, i) => (
-              <div key={i} className="flex items-center gap-4 px-6 py-4">
-                <span className="text-lg">{activityIcons[item.type]}</span>
+              <li key={i} className="flex items-center gap-3 px-5 py-3">
+                <span className="text-base leading-none" aria-hidden>
+                  {activityIcons[item.type]}
+                </span>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-[var(--text-primary)]">
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
                     {item.action}
-                  </div>
-                  <div className="text-xs text-[var(--text-muted)] truncate">
+                  </p>
+                  <p className="text-xs truncate" style={{ color: 'var(--color-text-weak)' }}>
                     {item.user}
-                  </div>
+                  </p>
                 </div>
-                <div className="text-xs text-[var(--text-muted)] whitespace-nowrap">
+                <span className="text-xs whitespace-nowrap" style={{ color: 'var(--color-text-muted)' }}>
                   {item.time}
-                </div>
-              </div>
+                </span>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </Card>
 
-        {/* Unassigned prospects */}
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden">
-          <div className="flex items-center justify-between border-b border-[var(--border-primary)] px-6 py-4">
-            <h3 className="font-[var(--font-sora)] text-lg font-semibold text-[var(--text-primary)]">
-              ⚠️ Unassigned Prospects
-            </h3>
-            <Link
-              href="/admin/prospects"
-              className="text-sm text-blue-400 hover:text-blue-300 transition"
-            >
-              View all →
-            </Link>
-          </div>
-          <div className="divide-y divide-[var(--border-primary)]">
+        <Card padding="flush">
+          <SectionHeader
+            title="⚠️ Unassigned Prospects"
+            actions={
+              <a
+                href="/admin/prospects"
+                className="text-xs font-semibold"
+                style={{ color: 'var(--color-blue)' }}
+              >
+                View all →
+              </a>
+            }
+            className="px-5 pt-5 mb-0"
+          />
+          <ul className="divide-y" style={{ borderColor: 'var(--color-border)' }}>
             {unassignedProspects.map((p, i) => (
-              <div key={i} className="flex items-center justify-between px-6 py-4">
-                <div>
-                  <div className="text-sm font-medium text-[var(--text-primary)]">
+              <li key={i} className="flex items-center justify-between gap-3 px-5 py-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>
                     {p.name}
-                  </div>
-                  <div className="text-xs text-[var(--text-muted)]">{p.email}</div>
+                  </p>
+                  <p className="text-xs truncate" style={{ color: 'var(--color-text-weak)' }}>
+                    {p.email}
+                  </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-sm text-[var(--text-primary)]">
-                    {p.score}/100
-                  </span>
-                  <button className="rounded-lg bg-blue-500/15 px-3 py-1.5 text-xs font-semibold text-blue-400 transition hover:bg-blue-500/25">
+                <div className="flex items-center gap-2 shrink-0">
+                  <StatusBadge tone={scoreTone(p.score)}>{p.score}/100</StatusBadge>
+                  <button
+                    type="button"
+                    className="be-btn be-btn--secondary be-btn--sm"
+                  >
                     Assign
                   </button>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </Card>
       </div>
 
       {/* Quick links */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        <Link
-          href="/admin/partners"
-          className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 transition hover:border-blue-500/30"
-        >
-          <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-blue-400 transition">
-            🤝 Manage Partners
-          </h3>
-          <p className="mt-1 text-sm text-[var(--text-tertiary)]">
-            Add, edit, and manage referral partners
-          </p>
-        </Link>
-        <Link
-          href="/admin/prospects"
-          className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 transition hover:border-blue-500/30"
-        >
-          <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-blue-400 transition">
-            👥 Prospect Queue
-          </h3>
-          <p className="mt-1 text-sm text-[var(--text-tertiary)]">
-            View, filter, and assign prospects
-          </p>
-        </Link>
-        <Link
-          href="/studio"
-          className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 transition hover:border-blue-500/30"
-        >
-          <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-blue-400 transition">
-            🎨 CMS Studio
-          </h3>
-          <p className="mt-1 text-sm text-[var(--text-tertiary)]">
-            Edit homepage, blog, university content
-          </p>
-        </Link>
-        <Link
-          href="/admin/roadmap"
-          className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 transition hover:border-emerald-500/30"
-        >
-          <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-emerald-400 transition">
-            📊 Strategy & Roadmap
-          </h3>
-          <p className="mt-1 text-sm text-[var(--text-tertiary)]">
-            Competitive analysis, cost savings, phase plan
-          </p>
-        </Link>
-        <Link
-          href="/admin/changelog"
-          className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 transition hover:border-purple-500/30"
-        >
-          <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-purple-400 transition">
-            📝 Changelog
-          </h3>
-          <p className="mt-1 text-sm text-[var(--text-tertiary)]">
-            Complete history of everything built
-          </p>
-        </Link>
-        <Link
-          href="/admin/checklist"
-          className="group rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6 transition hover:border-amber-500/30"
-        >
-          <h3 className="font-[var(--font-sora)] font-semibold text-[var(--text-primary)] group-hover:text-amber-400 transition">
-            ✅ Launch Checklist
-          </h3>
-          <p className="mt-1 text-sm text-[var(--text-tertiary)]">
-            Interactive pre-launch and phase checklists
-          </p>
-        </Link>
+      <div>
+        <h2 className="be-section-title mb-3">Quick actions</h2>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <ActionCard
+            href="/admin/partners"
+            icon="🤝"
+            title="Manage Partners"
+            description="Add, edit, and manage referral partners."
+            cta="Open partners"
+          />
+          <ActionCard
+            href="/admin/prospects"
+            icon="👥"
+            title="Prospect Queue"
+            description="View, filter, and assign prospects."
+            cta="Open queue"
+          />
+          <ActionCard
+            href="/studio"
+            icon="🎨"
+            title="CMS Studio"
+            description="Edit homepage, blog, and university content."
+            cta="Open studio"
+          />
+          <ActionCard
+            href="/admin/roadmap"
+            icon="🗺️"
+            title="Strategy & Roadmap"
+            description="Competitive analysis, cost savings, phase plan."
+            cta="See roadmap"
+          />
+          <ActionCard
+            href="/admin/changelog"
+            icon="📝"
+            title="Changelog"
+            description="Complete history of everything built."
+            cta="See changes"
+          />
+          <ActionCard
+            href="/admin/checklist"
+            icon="✅"
+            title="Launch Checklist"
+            description="Interactive pre-launch and phase checklists."
+            cta="Open checklist"
+          />
+        </div>
       </div>
     </div>
   )

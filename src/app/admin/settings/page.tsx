@@ -2,10 +2,18 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  StatCard,
+  StatusBadge,
+  FormButton,
+  type StatusTone,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    SYSTEM INTEGRATIONS — Credential Vault & Status Dashboard
-   
+
    Shows all platform integrations with:
    - Live connection status (env var detection)
    - Editable credential fields (saved to localStorage)
@@ -13,12 +21,21 @@ import { motion, AnimatePresence } from 'framer-motion'
    - Documentation links for each service
    ═══════════════════════════════════════════════════════════════ */
 
+type IntegrationCategory =
+  | 'hosting'
+  | 'database'
+  | 'email'
+  | 'cms'
+  | 'analytics'
+  | 'security'
+  | 'support'
+
 interface EnvField {
   key: string
   label: string
   placeholder: string
   required: boolean
-  sensitive?: boolean // masks the value
+  sensitive?: boolean
   hint?: string
 }
 
@@ -29,7 +46,7 @@ interface Integration {
   description: string
   docsUrl: string
   dashboardUrl?: string
-  category: 'hosting' | 'database' | 'email' | 'cms' | 'analytics' | 'security'
+  category: IntegrationCategory
   envFields: EnvField[]
 }
 
@@ -119,7 +136,7 @@ const INTEGRATIONS: Integration[] = [
     description: 'Live chat widget for visitor support. Routes conversations to your helpdesk team.',
     docsUrl: 'https://docs.thrivedesk.com/',
     dashboardUrl: 'https://app.thrivedesk.com/',
-    category: 'support' as Integration['category'],
+    category: 'support',
     envFields: [
       { key: 'NEXT_PUBLIC_THRIVEDESK_WIDGET_ID', label: 'Widget ID', placeholder: 'wp_xxxxxxxxxx', required: true, hint: 'ThriveDesk → Settings → Assistant → Installation → Widget ID' },
     ],
@@ -132,26 +149,32 @@ function loadVault(): Record<string, string> {
   if (typeof window === 'undefined') return {}
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
-  } catch { return {} }
+  } catch {
+    return {}
+  }
 }
 
 function saveVault(vault: Record<string, string>) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(vault))
-  } catch { /* storage full */ }
+  } catch {
+    /* storage full */
+  }
 }
 
-const categoryLabels: Record<string, string> = {
-  hosting: '🌐 Hosting & Deployment',
-  database: '🗄️ Database & Auth',
-  email: '✉️ Email',
-  cms: '🎨 Content Management',
+const categoryLabels: Record<IntegrationCategory, string> = {
+  hosting:   '🌐 Hosting & Deployment',
+  database:  '🗄️ Database & Auth',
+  email:     '✉️ Email',
+  cms:       '🎨 Content Management',
   analytics: '📈 Analytics & Monitoring',
-  security: '🔒 Security',
-  support: '💬 Support & Helpdesk',
+  security:  '🔒 Security',
+  support:   '💬 Support & Helpdesk',
 }
 
-const categoryOrder = ['hosting', 'database', 'email', 'cms', 'analytics', 'security', 'support']
+const categoryOrder: IntegrationCategory[] = [
+  'hosting', 'database', 'email', 'cms', 'analytics', 'security', 'support',
+]
 
 export default function SettingsPage() {
   const [vault, setVault] = useState<Record<string, string>>({})
@@ -160,141 +183,146 @@ export default function SettingsPage() {
   const [savedFlash, setSavedFlash] = useState(false)
   const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>({})
 
-  useEffect(() => { setVault(loadVault()) }, [])
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from localStorage on mount
+    setVault(loadVault())
+  }, [])
 
   const updateField = useCallback((key: string, value: string) => {
-    setVault(prev => {
+    setVault((prev) => {
       const next = { ...prev, [key]: value }
       saveVault(next)
       return next
     })
   }, [])
 
-  function copyToClipboard(key: string, value: string) {
+  const copyToClipboard = useCallback((key: string, value: string) => {
     navigator.clipboard.writeText(value)
     setCopiedKey(key)
     setTimeout(() => setCopiedKey(null), 2000)
-  }
+  }, [])
 
-  function copyAllAsEnv(integration: Integration) {
+  const copyAllAsEnv = useCallback((integration: Integration) => {
     const lines = integration.envFields
-      .map(f => `${f.key}=${vault[f.key] || f.placeholder}`)
+      .map((f) => `${f.key}=${vault[f.key] || f.placeholder}`)
       .join('\n')
     navigator.clipboard.writeText(lines)
     setSavedFlash(true)
     setTimeout(() => setSavedFlash(false), 2000)
-  }
+  }, [vault])
 
-  function toggleSensitive(key: string) {
-    setShowSensitive(prev => ({ ...prev, [key]: !prev[key] }))
-  }
+  const toggleSensitive = useCallback((key: string) => {
+    setShowSensitive((prev) => ({ ...prev, [key]: !prev[key] }))
+  }, [])
 
-  // Group integrations by category
-  const grouped = categoryOrder.map(cat => ({
-    category: cat,
-    label: categoryLabels[cat],
-    items: INTEGRATIONS.filter(i => i.category === cat),
-  })).filter(g => g.items.length > 0)
+  const grouped = categoryOrder
+    .map((cat) => ({
+      category: cat,
+      label: categoryLabels[cat],
+      items: INTEGRATIONS.filter((i) => i.category === cat),
+    }))
+    .filter((g) => g.items.length > 0)
 
-  // Calculate overall status
-  const totalRequired = INTEGRATIONS.flatMap(i => i.envFields.filter(f => f.required)).length
-  const configuredCount = INTEGRATIONS.flatMap(i => i.envFields.filter(f => f.required && vault[f.key])).length
+  const totalRequired = INTEGRATIONS.flatMap((i) =>
+    i.envFields.filter((f) => f.required)
+  ).length
+  const configuredCount = INTEGRATIONS.flatMap((i) =>
+    i.envFields.filter((f) => f.required && vault[f.key])
+  ).length
+  const setupPct = totalRequired > 0
+    ? Math.round((configuredCount / totalRequired) * 100)
+    : 0
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)] tracking-tight">
-          System Integrations
-        </h1>
-        <p className="mt-2 text-[var(--text-muted)]">
-          Manage API keys, project IDs, and integration credentials. Values are saved locally in your browser.
-        </p>
-      </motion.div>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <SectionHeader
+        title="System Integrations"
+        subtitle="Manage API keys, project IDs, and integration credentials. Values are saved locally in your browser."
+      />
 
-      {/* Status Overview */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="grid gap-4 sm:grid-cols-3"
-      >
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 text-center">
-          <div className="text-3xl font-bold text-[var(--text-primary)]">{INTEGRATIONS.length}</div>
-          <div className="text-sm text-[var(--text-muted)]">Services</div>
-        </div>
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 text-center">
-          <div className={`text-3xl font-bold ${configuredCount === totalRequired ? 'text-emerald-400' : 'text-amber-400'}`}>
-            {configuredCount}/{totalRequired}
-          </div>
-          <div className="text-sm text-[var(--text-muted)]">Required Fields Set</div>
-        </div>
-        <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-5 text-center">
-          <div className="text-3xl font-bold text-blue-400">
-            {Math.round((configuredCount / totalRequired) * 100) || 0}%
-          </div>
-          <div className="text-sm text-[var(--text-muted)]">Setup Complete</div>
-        </div>
-      </motion.div>
+      {/* ── Overview ── */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label="Services" value={INTEGRATIONS.length} icon="🔌" />
+        <StatCard
+          label="Required Fields Set"
+          value={`${configuredCount}/${totalRequired}`}
+          delta={configuredCount === totalRequired ? 'All configured' : 'Some missing'}
+          trend={configuredCount === totalRequired ? 'up' : 'down'}
+        />
+        <StatCard
+          label="Setup Complete"
+          value={`${setupPct}%`}
+          icon="✅"
+          trend={setupPct === 100 ? 'up' : 'flat'}
+        />
+      </div>
 
-      {/* Integration Groups */}
+      {/* ── Integration Groups ── */}
       {grouped.map((group, gi) => (
-        <motion.div
+        <motion.section
           key={group.category}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 + gi * 0.05 }}
+          transition={{ delay: Math.min(gi * 0.04, 0.2) }}
         >
-          <h2 className="mb-4 font-[var(--font-sora)] text-lg font-bold text-[var(--text-primary)]">
+          <h2
+            className="mb-3 text-lg font-bold"
+            style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+          >
             {group.label}
           </h2>
           <div className="space-y-3">
             {group.items.map((integration) => {
               const isExpanded = expandedId === integration.id
-              const requiredFields = integration.envFields.filter(f => f.required)
-              const configuredFields = requiredFields.filter(f => vault[f.key])
-              const allConfigured = configuredFields.length === requiredFields.length && requiredFields.length > 0
+              const requiredFields = integration.envFields.filter((f) => f.required)
+              const configuredFields = requiredFields.filter((f) => vault[f.key])
+              const allConfigured =
+                requiredFields.length > 0 &&
+                configuredFields.length === requiredFields.length
+              const statusTone: StatusTone = allConfigured ? 'green' : 'amber'
+              const statusLabel = allConfigured
+                ? '● Connected'
+                : `${configuredFields.length}/${requiredFields.length} Set`
 
               return (
-                <div
-                  key={integration.id}
-                  className={`rounded-2xl border transition-colors ${
-                    isExpanded
-                      ? 'border-blue-500/30 bg-blue-500/[0.03]'
-                      : 'border-[var(--border-primary)] bg-[var(--bg-card)]'
-                  }`}
-                >
-                  {/* Collapsed header */}
+                <Card key={integration.id} padding="flush">
                   <button
                     onClick={() => setExpandedId(isExpanded ? null : integration.id)}
                     className="flex w-full items-center gap-4 p-5 text-left"
                   >
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10 text-xl">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-xl text-xl"
+                      style={{ background: '#f0f4fb' }}
+                    >
                       {integration.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-semibold text-[var(--text-primary)]">{integration.name}</h3>
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                          allConfigured
-                            ? 'bg-emerald-500/20 text-emerald-400'
-                            : 'bg-amber-500/20 text-amber-400'
-                        }`}>
-                          {allConfigured ? '● Connected' : `${configuredFields.length}/${requiredFields.length} Set`}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-semibold" style={{ color: '#181d26' }}>
+                          {integration.name}
+                        </h3>
+                        <StatusBadge tone={statusTone}>{statusLabel}</StatusBadge>
                       </div>
-                      <p className="text-sm text-[var(--text-muted)] truncate">{integration.description}</p>
+                      <p
+                        className="mt-0.5 text-sm truncate"
+                        style={{ color: 'rgba(4,14,32,0.55)' }}
+                      >
+                        {integration.description}
+                      </p>
                     </div>
                     <svg
-                      className={`h-5 w-5 text-[var(--text-muted)] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                      fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+                      className={`h-5 w-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      style={{ color: 'rgba(4,14,32,0.5)' }}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
 
-                  {/* Expanded fields */}
-                  <AnimatePresence>
+                  <AnimatePresence initial={false}>
                     {isExpanded && (
                       <motion.div
                         initial={{ height: 0, opacity: 0 }}
@@ -303,73 +331,101 @@ export default function SettingsPage() {
                         transition={{ duration: 0.2 }}
                         className="overflow-hidden"
                       >
-                        <div className="border-t border-[var(--border-primary)] px-5 pb-5 pt-4 space-y-4">
-                          {integration.envFields.map((field) => (
-                            <div key={field.key}>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <label className="text-sm font-semibold text-[var(--text-secondary)]">
-                                  {field.label}
-                                  {field.required && <span className="ml-1 text-red-400">*</span>}
-                                </label>
-                                <code className="text-[10px] font-mono text-[var(--text-muted)] bg-white/5 px-2 py-0.5 rounded">
-                                  {field.key}
-                                </code>
-                              </div>
-                              <div className="flex gap-2">
-                                <div className="relative flex-1">
-                                  <input
-                                    type={field.sensitive && !showSensitive[field.key] ? 'password' : 'text'}
-                                    value={vault[field.key] || ''}
-                                    onChange={(e) => updateField(field.key, e.target.value)}
-                                    placeholder={field.placeholder}
-                                    className="w-full rounded-lg border border-[var(--border-primary)] bg-[var(--bg-body)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)]/40 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-mono transition"
-                                  />
-                                  {field.sensitive && (
-                                    <button
-                                      onClick={() => toggleSensitive(field.key)}
-                                      className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition"
-                                      title={showSensitive[field.key] ? 'Hide' : 'Show'}
-                                    >
-                                      {showSensitive[field.key] ? '🙈' : '👁️'}
-                                    </button>
-                                  )}
+                        <div
+                          className="px-5 pb-5 pt-4 space-y-4"
+                          style={{ borderTop: '1px solid #e0e2e6' }}
+                        >
+                          {integration.envFields.map((field) => {
+                            const showVal = !field.sensitive || showSensitive[field.key]
+                            return (
+                              <div key={field.key}>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <label
+                                    className="text-sm font-semibold"
+                                    style={{ color: '#181d26' }}
+                                    htmlFor={`field-${field.key}`}
+                                  >
+                                    {field.label}
+                                    {field.required && (
+                                      <span className="ml-1" style={{ color: '#dc2626' }}>*</span>
+                                    )}
+                                  </label>
+                                  <code
+                                    className="text-[10px] font-mono px-2 py-0.5 rounded"
+                                    style={{
+                                      color: 'rgba(4,14,32,0.55)',
+                                      background: '#f0f2f5',
+                                    }}
+                                  >
+                                    {field.key}
+                                  </code>
                                 </div>
-                                <button
-                                  onClick={() => copyToClipboard(field.key, vault[field.key] || '')}
-                                  disabled={!vault[field.key]}
-                                  className={`flex-shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition ${
-                                    copiedKey === field.key
-                                      ? 'bg-emerald-500/20 text-emerald-400'
-                                      : 'bg-white/10 text-[var(--text-muted)] hover:bg-white/15 hover:text-[var(--text-primary)] disabled:opacity-30 disabled:cursor-not-allowed'
-                                  }`}
-                                >
-                                  {copiedKey === field.key ? '✓' : '📋'}
-                                </button>
+                                <div className="flex gap-2">
+                                  <div className="relative flex-1">
+                                    <input
+                                      id={`field-${field.key}`}
+                                      type={showVal ? 'text' : 'password'}
+                                      value={vault[field.key] || ''}
+                                      onChange={(e) => updateField(field.key, e.target.value)}
+                                      placeholder={field.placeholder}
+                                      className="be-input font-mono"
+                                    />
+                                    {field.sensitive && (
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleSensitive(field.key)}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-xs transition"
+                                        style={{ color: 'rgba(4,14,32,0.5)' }}
+                                        title={showSensitive[field.key] ? 'Hide' : 'Show'}
+                                      >
+                                        {showSensitive[field.key] ? '🙈' : '👁️'}
+                                      </button>
+                                    )}
+                                  </div>
+                                  <FormButton
+                                    variant={copiedKey === field.key ? 'secondary' : 'ghost'}
+                                    size="sm"
+                                    onClick={() =>
+                                      copyToClipboard(field.key, vault[field.key] || '')
+                                    }
+                                    disabled={!vault[field.key]}
+                                  >
+                                    {copiedKey === field.key ? '✓' : '📋'}
+                                  </FormButton>
+                                </div>
+                                {field.hint && (
+                                  <p
+                                    className="mt-1 text-[11px]"
+                                    style={{ color: 'rgba(4,14,32,0.45)' }}
+                                  >
+                                    {field.hint}
+                                  </p>
+                                )}
                               </div>
-                              {field.hint && (
-                                <p className="mt-1 text-[11px] text-[var(--text-muted)]/60">{field.hint}</p>
-                              )}
-                            </div>
-                          ))}
+                            )
+                          })}
 
-                          {/* Action buttons */}
-                          <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-[var(--border-primary)]">
-                            <button
+                          <div
+                            className="flex flex-wrap items-center gap-3 pt-3"
+                            style={{ borderTop: '1px solid #e0e2e6' }}
+                          >
+                            <FormButton
+                              variant={savedFlash ? 'secondary' : 'primary'}
+                              size="sm"
                               onClick={() => copyAllAsEnv(integration)}
-                              className={`rounded-lg px-4 py-2 text-xs font-semibold transition ${
-                                savedFlash
-                                  ? 'bg-emerald-500/20 text-emerald-400'
-                                  : 'bg-blue-500/15 text-blue-400 hover:bg-blue-500/25'
-                              }`}
                             >
                               {savedFlash ? '✓ Copied!' : '📋 Copy All as .env'}
-                            </button>
+                            </FormButton>
                             {integration.dashboardUrl && (
                               <a
                                 href={integration.dashboardUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="rounded-lg bg-white/5 px-4 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-white/10 hover:text-[var(--text-primary)] transition"
+                                className="rounded-lg px-3 py-1.5 text-xs font-medium transition"
+                                style={{
+                                  border: '1px solid #e0e2e6',
+                                  color: 'rgba(4,14,32,0.69)',
+                                }}
                               >
                                 Open Dashboard ↗
                               </a>
@@ -378,7 +434,11 @@ export default function SettingsPage() {
                               href={integration.docsUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="rounded-lg bg-white/5 px-4 py-2 text-xs font-medium text-[var(--text-muted)] hover:bg-white/10 hover:text-[var(--text-primary)] transition"
+                              className="rounded-lg px-3 py-1.5 text-xs font-medium transition"
+                              style={{
+                                border: '1px solid #e0e2e6',
+                                color: 'rgba(4,14,32,0.69)',
+                              }}
                             >
                               Docs ↗
                             </a>
@@ -387,35 +447,38 @@ export default function SettingsPage() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </Card>
               )
             })}
           </div>
-        </motion.div>
+        </motion.section>
       ))}
 
-      {/* Environment Info */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-6"
-      >
-        <h2 className="mb-4 font-[var(--font-sora)] text-lg font-bold text-[var(--text-primary)]">
+      {/* ── How This Works ── */}
+      <Card>
+        <h2
+          className="mb-4 text-lg font-bold"
+          style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+        >
           💡 How This Works
         </h2>
-        <div className="space-y-3 text-sm text-[var(--text-muted)]">
+        <div className="space-y-3 text-sm" style={{ color: 'rgba(4,14,32,0.69)' }}>
           <p>
-            <strong className="text-[var(--text-secondary)]">Saved locally</strong> — Your credentials are stored in your browser&apos;s localStorage. They are NOT sent to any server.
+            <strong style={{ color: '#181d26' }}>Saved locally</strong> — Your credentials are
+            stored in your browser&apos;s localStorage. They are NOT sent to any server.
           </p>
           <p>
-            <strong className="text-[var(--text-secondary)]">For Vercel deployment</strong> — Use the &quot;Copy All as .env&quot; button to copy your credentials, then paste them into your Vercel project&apos;s Environment Variables settings.
+            <strong style={{ color: '#181d26' }}>For Vercel deployment</strong> — Use the
+            &quot;Copy All as .env&quot; button to copy your credentials, then paste them into
+            your Vercel project&apos;s Environment Variables settings.
           </p>
           <p>
-            <strong className="text-[var(--text-secondary)]">Required fields</strong> — Fields marked with <span className="text-red-400">*</span> are required for that integration to function. Optional fields add extra functionality.
+            <strong style={{ color: '#181d26' }}>Required fields</strong> — Fields marked with{' '}
+            <span style={{ color: '#dc2626' }}>*</span> are required for that integration to
+            function. Optional fields add extra functionality.
           </p>
         </div>
-      </motion.div>
+      </Card>
     </div>
   )
 }

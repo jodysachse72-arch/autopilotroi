@@ -1,18 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  StatusBadge,
+  FormButton,
+  type StatusTone,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    EMAIL TEMPLATE MANAGER
-   
+
    Visual preview of all system email templates.
-   Shows subject lines, triggers, and live HTML rendering
-   with sample data. View-only with Copy HTML option.
-   
-   NOTE: The email HTML templates are intentionally dark — that is
-   the actual email design sent to prospects/partners. The admin
-   UI shell around them is light-mode design system.
+   Shows subject lines, triggers, and live HTML rendering with
+   sample data. View-only with Copy HTML option.
+
+   NOTE: The email HTML templates are intentionally dark — that
+   is the actual email design sent to prospects/partners. Only
+   the admin shell around them is light-mode design system.
    ═══════════════════════════════════════════════════════════════ */
 
 const SITE_URL = 'https://autopilotroi.com'
@@ -24,11 +31,13 @@ const sampleLead = {
   tier: 'Intermediate',
 }
 
+type EmailType = 'transactional' | 'drip'
+
 interface EmailTemplate {
   id: string
   name: string
   subject: string
-  type: 'transactional' | 'drip'
+  type: EmailType
   trigger: string
   timing: string
   description: string
@@ -232,72 +241,86 @@ const templates: EmailTemplate[] = [
   },
 ]
 
+const typeToneMap: Record<EmailType, StatusTone> = {
+  transactional: 'blue',
+  drip: 'purple',
+}
+
+interface TimelineStep {
+  day: string
+  color: string
+  label: string
+}
+
+const timelineSteps: TimelineStep[] = [
+  { day: 'Signup', color: '#1b61c9', label: 'Welcome + Partner Notify' },
+  { day: 'Day 1',  color: '#60a5fa', label: 'Profile review' },
+  { day: 'Day 2',  color: '#60a5fa', label: '3 videos' },
+  { day: 'Day 3',  color: '#fbbf24', label: 'Quick question' },
+  { day: 'Day 5',  color: '#f59e0b', label: 'Social proof' },
+  { day: 'Day 7',  color: '#ef4444', label: 'Final call' },
+]
+
 export default function EmailsPage() {
   const [previewId, setPreviewId] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  const previewEmail = templates.find(t => t.id === previewId)
+  const previewEmail = templates.find((t) => t.id === previewId)
 
-  function copyHtml(id: string, html: string) {
+  const copyHtml = useCallback((id: string, html: string) => {
     navigator.clipboard.writeText(html)
     setCopiedId(id)
     setTimeout(() => setCopiedId(null), 2000)
-  }
+  }, [])
 
-  const transactional = templates.filter(t => t.type === 'transactional')
-  const drip = templates.filter(t => t.type === 'drip')
+  const transactional = templates.filter((t) => t.type === 'transactional')
+  const drip = templates.filter((t) => t.type === 'drip')
 
   return (
     <div className="mx-auto max-w-6xl space-y-8">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[#181d26] tracking-tight">
-          Email Templates
-        </h1>
-        <p className="mt-2 text-[rgba(4,14,32,0.55)]">
-          Preview all system emails. 2 transactional + 5 drip re-engagement emails in the automated sequence.
-        </p>
-      </motion.div>
+      <SectionHeader
+        title="Email Templates"
+        subtitle="Preview all system emails. 2 transactional + 5 drip re-engagement emails in the automated sequence."
+      />
 
-      {/* Drip Sequence Timeline */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="rounded-2xl border border-[#e0e2e6] bg-white p-6"
-      >
-        <h2 className="mb-4 font-[var(--font-sora)] text-lg font-bold text-[#181d26]">
+      {/* ── Drip Sequence Timeline ── */}
+      <Card>
+        <h2
+          className="mb-4 text-lg font-bold"
+          style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+        >
           📬 Drip Sequence Timeline
         </h2>
         <div className="flex items-center gap-1 overflow-x-auto pb-2">
-          {[
-            { day: 'Signup', color: 'bg-[#1b61c9]', label: 'Welcome + Partner Notify' },
-            { day: 'Day 1', color: 'bg-blue-400', label: 'Profile review' },
-            { day: 'Day 2', color: 'bg-blue-400', label: '3 videos' },
-            { day: 'Day 3', color: 'bg-amber-400', label: 'Quick question' },
-            { day: 'Day 5', color: 'bg-amber-500', label: 'Social proof' },
-            { day: 'Day 7', color: 'bg-red-500', label: 'Final call' },
-          ].map((step, i) => (
+          {timelineSteps.map((step, i) => (
             <div key={step.day} className="flex items-center">
               <div className="flex flex-col items-center min-w-[100px]">
-                <div className={`h-3 w-3 rounded-full ${step.color}`} />
-                <div className="mt-1.5 text-xs font-bold text-[#181d26]">{step.day}</div>
-                <div className="mt-0.5 text-[10px] text-[rgba(4,14,32,0.45)] text-center leading-tight">{step.label}</div>
+                <div className="h-3 w-3 rounded-full" style={{ background: step.color }} />
+                <div className="mt-1.5 text-xs font-bold" style={{ color: '#181d26' }}>{step.day}</div>
+                <div
+                  className="mt-0.5 text-[10px] text-center leading-tight"
+                  style={{ color: 'rgba(4,14,32,0.45)' }}
+                >
+                  {step.label}
+                </div>
               </div>
-              {i < 5 && (
-                <div className="h-0.5 w-8 bg-[#e0e2e6] -mt-5" />
+              {i < timelineSteps.length - 1 && (
+                <div className="h-0.5 w-8 -mt-5" style={{ background: '#e0e2e6' }} />
               )}
             </div>
           ))}
         </div>
-        <p className="mt-4 text-xs text-[rgba(4,14,32,0.45)]">
+        <p className="mt-4 text-xs" style={{ color: 'rgba(4,14,32,0.45)' }}>
           ✅ CAN-SPAM compliant — all emails include unsubscribe links and List-Unsubscribe headers.
         </p>
-      </motion.div>
+      </Card>
 
-      {/* Transactional Emails */}
-      <div>
-        <h2 className="mb-4 font-[var(--font-sora)] text-xl font-bold text-[#181d26]">
+      {/* ── Transactional Emails ── */}
+      <section>
+        <h2
+          className="mb-4 text-xl font-bold"
+          style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+        >
           ⚡ Transactional Emails
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -312,11 +335,14 @@ export default function EmailsPage() {
             />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Drip Emails */}
-      <div>
-        <h2 className="mb-4 font-[var(--font-sora)] text-xl font-bold text-[#181d26]">
+      {/* ── Drip Emails ── */}
+      <section>
+        <h2
+          className="mb-4 text-xl font-bold"
+          style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+        >
           💧 Drip Re-Engagement Sequence
         </h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -331,9 +357,9 @@ export default function EmailsPage() {
             />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Preview Modal */}
+      {/* ── Preview Modal ── */}
       <AnimatePresence>
         {previewEmail && (
           <motion.div
@@ -347,37 +373,42 @@ export default function EmailsPage() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#e0e2e6] bg-white shadow-2xl"
-              onClick={e => e.stopPropagation()}
+              className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl shadow-2xl"
+              style={{ background: '#ffffff', border: '1px solid #e0e2e6' }}
+              onClick={(e) => e.stopPropagation()}
             >
-              {/* Modal header */}
-              <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl bg-white border-b border-[#e0e2e6] px-5 py-4">
+              <div
+                className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl px-5 py-4"
+                style={{ background: '#ffffff', borderBottom: '1px solid #e0e2e6' }}
+              >
                 <div>
-                  <h3 className="text-sm font-bold text-[#181d26]">{previewEmail.name}</h3>
-                  <p className="text-xs text-[rgba(4,14,32,0.45)] mt-0.5">Subject: {previewEmail.subject}</p>
+                  <h3 className="text-sm font-bold" style={{ color: '#181d26' }}>
+                    {previewEmail.name}
+                  </h3>
+                  <p className="text-xs mt-0.5" style={{ color: 'rgba(4,14,32,0.45)' }}>
+                    Subject: {previewEmail.subject}
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <FormButton
+                    variant={copiedId === previewEmail.id ? 'secondary' : 'ghost'}
+                    size="sm"
                     onClick={() => copyHtml(previewEmail.id, previewEmail.html)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                      copiedId === previewEmail.id
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-[#f0f2f5] text-[rgba(4,14,32,0.55)] hover:bg-[#e8edf5]'
-                    }`}
                   >
                     {copiedId === previewEmail.id ? '✓ Copied!' : '📋 Copy HTML'}
-                  </button>
-                  <button
-                    onClick={() => setPreviewId(null)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f0f2f5] text-[rgba(4,14,32,0.55)] hover:bg-[#e0e2e6] transition text-sm"
-                  >
+                  </FormButton>
+                  <FormButton variant="ghost" size="sm" onClick={() => setPreviewId(null)}>
                     ✕
-                  </button>
+                  </FormButton>
                 </div>
               </div>
-              {/* Email render — on purpose dark bg, simulating inbox */}
-              <div className="p-4 bg-[#f1f5f9] rounded-b-2xl">
-                <p className="text-center text-[10px] text-[rgba(4,14,32,0.35)] mb-3 uppercase tracking-wider">Email Preview (actual dark email design)</p>
+              <div className="p-4 rounded-b-2xl" style={{ background: '#f1f5f9' }}>
+                <p
+                  className="text-center text-[10px] mb-3 uppercase tracking-wider"
+                  style={{ color: 'rgba(4,14,32,0.35)' }}
+                >
+                  Email Preview (actual dark email design)
+                </p>
                 <div dangerouslySetInnerHTML={{ __html: previewEmail.html }} />
               </div>
             </motion.div>
@@ -388,69 +419,63 @@ export default function EmailsPage() {
   )
 }
 
-// ── Email Card Component ──
-function EmailCard({
-  email,
-  index,
-  onPreview,
-  onCopy,
-  isCopied,
-}: {
+/* ── Email Card ─────────────────────────────────────────────── */
+interface EmailCardProps {
   email: EmailTemplate
   index: number
   onPreview: () => void
   onCopy: () => void
   isCopied: boolean
-}) {
+}
+
+function EmailCard({ email, index, onPreview, onCopy, isCopied }: EmailCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 + index * 0.05 }}
-      className="rounded-2xl border border-[#e0e2e6] bg-white p-5 transition hover:border-[#1b61c9]/30 hover:shadow-sm"
+      transition={{ delay: Math.min(0.05 + index * 0.04, 0.25) }}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-            email.type === 'transactional'
-              ? 'bg-blue-100 text-blue-700'
-              : 'bg-purple-100 text-purple-700'
-          }`}>
-            {email.type}
-          </span>
-          <span className="text-[10px] font-medium text-[rgba(4,14,32,0.40)]">{email.timing}</span>
+      <Card>
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <StatusBadge tone={typeToneMap[email.type]}>
+              {email.type.toUpperCase()}
+            </StatusBadge>
+            <span
+              className="text-[10px] font-medium"
+              style={{ color: 'rgba(4,14,32,0.40)' }}
+            >
+              {email.timing}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <h3 className="text-sm font-bold text-[#181d26] mb-1">{email.name}</h3>
-      <p className="text-xs text-[rgba(4,14,32,0.55)] mb-1">
-        <strong className="text-[rgba(4,14,32,0.69)]">Subject:</strong> {email.subject}
-      </p>
-      <p className="text-xs text-[rgba(4,14,32,0.55)] mb-1">
-        <strong className="text-[rgba(4,14,32,0.69)]">Trigger:</strong> {email.trigger}
-      </p>
-      <p className="text-xs leading-relaxed text-[rgba(4,14,32,0.45)] mb-4">
-        {email.description}
-      </p>
+        <h3 className="text-sm font-bold mb-1" style={{ color: '#181d26' }}>
+          {email.name}
+        </h3>
+        <p className="text-xs mb-1" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          <strong style={{ color: 'rgba(4,14,32,0.69)' }}>Subject:</strong> {email.subject}
+        </p>
+        <p className="text-xs mb-1" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          <strong style={{ color: 'rgba(4,14,32,0.69)' }}>Trigger:</strong> {email.trigger}
+        </p>
+        <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(4,14,32,0.45)' }}>
+          {email.description}
+        </p>
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={onPreview}
-          className="rounded-lg bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs font-semibold text-[#1b61c9] hover:bg-blue-100 transition"
-        >
-          👁 Preview
-        </button>
-        <button
-          onClick={onCopy}
-          className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-            isCopied
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-[#f0f2f5] text-[rgba(4,14,32,0.55)] hover:bg-[#e8edf5]'
-          }`}
-        >
-          {isCopied ? '✓ Copied' : '📋 HTML'}
-        </button>
-      </div>
+        <div className="flex items-center gap-2">
+          <FormButton variant="primary" size="sm" onClick={onPreview}>
+            👁 Preview
+          </FormButton>
+          <FormButton
+            variant={isCopied ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={onCopy}
+          >
+            {isCopied ? '✓ Copied' : '📋 HTML'}
+          </FormButton>
+        </div>
+      </Card>
     </motion.div>
   )
 }

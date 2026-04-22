@@ -1,48 +1,56 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { FormField, FormInput, FormButton } from '@/components/backend'
 
-/* ── Input field shared style ── */
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  borderRadius: '10px',
-  border: '1.5px solid #e0e2e6',
-  padding: '0.75rem 1rem',
-  fontSize: '0.95rem',
-  color: '#181d26',
-  background: '#fff',
-  outline: 'none',
-  transition: 'border-color 0.15s',
+/* ═══════════════════════════════════════════════════════════════
+   LOGIN — uses backend form primitives.
+   Demo accounts short-circuit Supabase if env not configured.
+   ═══════════════════════════════════════════════════════════════ */
+
+interface DemoAccount {
+  password: string
+  role: 'admin' | 'partner'
+  name: string
 }
 
-const DEMO_ACCOUNTS: Record<string, { password: string; role: string; name: string }> = {
+const DEMO_ACCOUNTS: Record<string, DemoAccount> = {
   'admin@autopilotroi.com':   { password: 'Admin2026!',   role: 'admin',   name: 'Admin User' },
   'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
 }
+
+const TEST_ACCOUNTS = [
+  { icon: '🛡️', label: 'Admin',   cred: 'admin@autopilotroi.com / Admin2026!' },
+  { icon: '🤝', label: 'Partner', cred: 'partner@autopilotroi.com / Partner2026!' },
+] as const
 
 function LoginForm() {
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
+  const [remember, setRemember] = useState(true)
   const router       = useRouter()
   const searchParams = useSearchParams()
   const redirect     = searchParams.get('redirect') || '/'
 
   const isConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    // Demo accounts
     const demo = DEMO_ACCOUNTS[email.toLowerCase()]
     if (demo) {
-      if (demo.password !== password) { setError('Invalid password. Please try again.'); setLoading(false); return }
+      if (demo.password !== password) {
+        setError('Invalid password. Please try again.')
+        setLoading(false)
+        return
+      }
       localStorage.setItem('autopilotroi-demo-user', JSON.stringify({ email, role: demo.role, name: demo.name }))
       router.push(demo.role === 'admin' ? '/admin' : '/dashboard')
       return
@@ -57,7 +65,11 @@ function LoginForm() {
     try {
       const supabase = createClient()
       const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
-      if (loginError) { setError(loginError.message); setLoading(false); return }
+      if (loginError) {
+        setError(loginError.message)
+        setLoading(false)
+        return
+      }
 
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
@@ -71,7 +83,7 @@ function LoginForm() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [email, password, isConfigured, redirect, router])
 
   return (
     <div className="w-full max-w-md">
@@ -86,85 +98,95 @@ function LoginForm() {
           Log in to your AutopilotROI account
         </p>
 
-        {/* Test accounts */}
         <div
           className="mb-6 rounded-xl p-4"
           style={{ background: 'rgba(27,97,201,0.05)', border: '1px solid rgba(27,97,201,0.15)' }}
         >
           <p className="text-xs font-bold mb-2" style={{ color: '#1b61c9' }}>📋 Test Accounts</p>
           <div className="space-y-1.5">
-            {[
-              { icon: '🛡️', label: 'Admin',   cred: 'admin@autopilotroi.com / Admin2026!' },
-              { icon: '🤝', label: 'Partner', cred: 'partner@autopilotroi.com / Partner2026!' },
-            ].map(a => (
-              <div key={a.label} className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs" style={{ background: '#fff', border: '1px solid #e0e2e6' }}>
+            {TEST_ACCOUNTS.map(a => (
+              <button
+                key={a.label}
+                type="button"
+                onClick={() => {
+                  const [demoEmail, demoPass] = a.cred.split(' / ')
+                  setEmail(demoEmail)
+                  setPassword(demoPass)
+                }}
+                className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition hover:shadow-sm"
+                style={{ background: '#fff', border: '1px solid #e0e2e6' }}
+                title="Click to fill credentials"
+              >
                 <span className="font-medium" style={{ color: '#181d26' }}>{a.icon} {a.label}</span>
                 <span style={{ color: '#1b61c9', fontFamily: 'monospace' }}>{a.cred}</span>
-              </div>
+              </button>
             ))}
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold mb-1.5" style={{ color: '#181d26' }}>
-              Email Address
-            </label>
-            <input
-              id="email" type="email" required value={email}
+          <FormField label="Email Address" htmlFor="email" required>
+            <FormInput
+              id="email"
+              type="email"
+              required
+              value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com"
-              style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = '#1b61c9')}
-              onBlur={e  => (e.target.style.borderColor = '#e0e2e6')}
+              autoComplete="email"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label htmlFor="login-password" className="block text-sm font-semibold mb-1.5" style={{ color: '#181d26' }}>
-              Password
-            </label>
-            <input
-              id="login-password" type="password" required value={password}
+          <FormField label="Password" htmlFor="login-password" required>
+            <FormInput
+              id="login-password"
+              type="password"
+              required
+              value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Enter your password"
-              style={inputStyle}
-              onFocus={e => (e.target.style.borderColor = '#1b61c9')}
-              onBlur={e  => (e.target.style.borderColor = '#e0e2e6')}
+              autoComplete="current-password"
             />
-          </div>
+          </FormField>
 
           {error && (
-            <div className="rounded-lg px-4 py-3 text-sm" style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c' }}>
+            <div
+              className="rounded-lg px-4 py-3 text-sm"
+              style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c' }}
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" defaultChecked className="h-4 w-4 rounded accent-blue-600" />
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={e => setRemember(e.target.checked)}
+                className="h-4 w-4 rounded accent-blue-600"
+              />
               <span className="text-xs" style={{ color: 'rgba(4,14,32,0.5)' }}>Remember me</span>
             </label>
-            <Link href="/forgot-password" className="text-xs font-semibold" style={{ color: '#1b61c9' }}>
+            <Link href="/forgot-password" className="text-xs font-semibold hover:underline" style={{ color: '#1b61c9' }}>
               Forgot password?
             </Link>
           </div>
 
-          <button
+          <FormButton
             type="submit"
-            disabled={loading}
-            className="w-full rounded-xl py-3.5 font-bold text-white transition disabled:opacity-50"
-            style={{ background: '#1b61c9', fontSize: '0.95rem', letterSpacing: '-0.01em' }}
-            onMouseEnter={e => !loading && ((e.currentTarget as HTMLButtonElement).style.background = '#254fad')}
-            onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = '#1b61c9')}
+            variant="primary"
+            loading={loading}
+            className="w-full justify-center"
           >
             {loading ? 'Logging in…' : 'Log In →'}
-          </button>
+          </FormButton>
         </form>
 
         <p className="mt-6 text-center text-sm" style={{ color: 'rgba(4,14,32,0.5)' }}>
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="font-semibold" style={{ color: '#1b61c9' }}>
+          <Link href="/signup" className="font-semibold hover:underline" style={{ color: '#1b61c9' }}>
             Start Here
           </Link>
         </p>

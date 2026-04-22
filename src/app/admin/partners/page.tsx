@@ -1,7 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Card,
+  SectionHeader,
+  EmptyState,
+  DataTable,
+  StatusBadge,
+  Toolbar,
+  FormField,
+  FormInput,
+  FormRow,
+  FormButton,
+  type DataColumn,
+} from '@/components/backend'
+
+/* ─────────────────────────────────────────────
+   ADMIN — Partner Management
+   Refactored to use backend primitives.
+   ───────────────────────────────────────────── */
 
 interface Partner {
   id: string
@@ -14,20 +32,26 @@ interface Partner {
   created_at: string
 }
 
+interface PartnerForm {
+  name: string
+  email: string
+  referral_code: string
+  phone: string
+  telegram: string
+}
+
+const EMPTY_FORM: PartnerForm = { name: '', email: '', referral_code: '', phone: '', telegram: '' }
+
 export default function AdminPartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ name: '', email: '', referral_code: '', phone: '', telegram: '' })
+  const [form, setForm] = useState<PartnerForm>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
-  useEffect(() => {
-    fetchPartners()
-  }, [])
-
-  async function fetchPartners() {
+  const fetchPartners = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/partners')
       if (res.ok) {
@@ -39,31 +63,31 @@ export default function AdminPartnersPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchPartners()
+  }, [fetchPartners])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSaving(true)
     setError('')
     setSuccess('')
-
     try {
       const res = await fetch('/api/admin/partners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-
       const data = await res.json()
-
       if (!res.ok) {
         setError(data.error || 'Failed to create partner')
         setSaving(false)
         return
       }
-
       setSuccess(`Partner "${form.name}" created with code: ${form.referral_code}`)
-      setForm({ name: '', email: '', referral_code: '', phone: '', telegram: '' })
+      setForm(EMPTY_FORM)
       setShowForm(false)
       fetchPartners()
     } catch {
@@ -86,158 +110,214 @@ export default function AdminPartnersPage() {
     }
   }
 
-  return (
-    <div className="mx-auto max-w-5xl space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[#181d26]">Partner Management</h1>
-          <p className="mt-2 text-[rgba(4,14,32,0.55)]">Add, manage, and track referral partners</p>
+  const columns: DataColumn<Partner>[] = [
+    {
+      key: 'partner',
+      header: 'Partner',
+      render: (p) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold" style={{ color: '#181d26' }}>{p.name}</span>
+          <span className="text-xs" style={{ color: 'rgba(4,14,32,0.5)' }}>{p.email}</span>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="rounded-xl bg-[#1b61c9] px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+      ),
+    },
+    {
+      key: 'code',
+      header: 'Referral Code',
+      render: (p) => (
+        <code
+          className="rounded px-2 py-1 text-xs font-medium"
+          style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9' }}
         >
-          {showForm ? 'Cancel' : '+ Add Partner'}
-        </button>
-      </div>
+          {p.referral_code}
+        </code>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (p) => (
+        <StatusBadge tone={p.is_active ? 'green' : 'red'}>
+          {p.is_active ? 'Active' : 'Inactive'}
+        </StatusBadge>
+      ),
+    },
+    {
+      key: 'joined',
+      header: 'Joined',
+      render: (p) => (
+        <span className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          {new Date(p.created_at).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right',
+      render: (p) => (
+        <FormButton
+          variant={p.is_active ? 'danger' : 'secondary'}
+          size="sm"
+          onClick={() => toggleActive(p.id, p.is_active)}
+        >
+          {p.is_active ? 'Deactivate' : 'Reactivate'}
+        </FormButton>
+      ),
+    },
+  ]
 
-      {/* Messages */}
+  return (
+    <div className="mx-auto max-w-6xl space-y-6">
+      <SectionHeader
+        title="Partner Management"
+        subtitle="Add, manage, and track referral partners"
+        actions={
+          <FormButton
+            variant={showForm ? 'secondary' : 'primary'}
+            onClick={() => setShowForm((v) => !v)}
+          >
+            {showForm ? 'Cancel' : '+ Add Partner'}
+          </FormButton>
+        }
+      />
+
+      {/* Inline messages */}
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div
+          className="rounded-lg px-4 py-3 text-sm"
+          style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#b91c1c' }}
+          role="alert"
+        >
           {error}
         </div>
       )}
       {success && (
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+        <div
+          className="rounded-lg px-4 py-3 text-sm"
+          style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#047857' }}
+          role="status"
+        >
           {success}
         </div>
       )}
 
-      {/* Add Partner Form */}
-      {showForm && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-[#e0e2e6] bg-white p-6"
-        >
-          <h2 className="mb-4 text-lg font-bold text-[#181d26]">New Partner</h2>
-          <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-sm font-medium text-[rgba(4,14,32,0.69)]">Full Name *</label>
-              <input
-                required
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full rounded-xl border border-[#e0e2e6] bg-[#f8fafc] px-4 py-3 text-[#181d26] outline-none focus:border-[#1b61c9] transition"
-                placeholder="Jane Smith"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-[rgba(4,14,32,0.69)]">Email *</label>
-              <input
-                required
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full rounded-xl border border-[#e0e2e6] bg-[#f8fafc] px-4 py-3 text-[#181d26] outline-none focus:border-[#1b61c9] transition"
-                placeholder="jane@email.com"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-[rgba(4,14,32,0.69)]">Referral Code *</label>
-              <input
-                required
-                value={form.referral_code}
-                onChange={(e) => setForm({ ...form, referral_code: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '') })}
-                className="w-full rounded-xl border border-[#e0e2e6] bg-[#f8fafc] px-4 py-3 text-[#181d26] outline-none focus:border-[#1b61c9] transition"
-                placeholder="jane-smith"
-              />
-              <p className="mt-1 text-xs text-[rgba(4,14,32,0.45)]">Used in: autopilotroi.com/signup?ref={form.referral_code || 'code'}</p>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-[rgba(4,14,32,0.69)]">Phone</label>
-              <input
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                className="w-full rounded-xl border border-[#e0e2e6] bg-[#f8fafc] px-4 py-3 text-[#181d26] outline-none focus:border-[#1b61c9] transition"
-                placeholder="+1 555-123-4567"
-              />
-            </div>
-            <div className="sm:col-span-2 flex justify-end">
-              <button
-                type="submit"
-                disabled={saving}
-                className="rounded-xl bg-[#1b61c9] px-8 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
-              >
-                {saving ? 'Creating...' : 'Create Partner'}
-              </button>
-            </div>
-          </form>
-        </motion.div>
-      )}
+      {/* New partner form */}
+      <AnimatePresence initial={false}>
+        {showForm && (
+          <motion.div
+            key="partner-form"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+          >
+            <Card padding="lg">
+              <h3 className="be-section-title mb-4">New Partner</h3>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <FormRow>
+                  <FormField label="Full Name" htmlFor="p-name" required>
+                    <FormInput
+                      id="p-name"
+                      required
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      placeholder="Jane Smith"
+                    />
+                  </FormField>
+                  <FormField label="Email" htmlFor="p-email" required>
+                    <FormInput
+                      id="p-email"
+                      required
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      placeholder="jane@email.com"
+                    />
+                  </FormField>
+                </FormRow>
+                <FormRow>
+                  <FormField
+                    label="Referral Code"
+                    htmlFor="p-code"
+                    required
+                    help={`Used in: autopilotroi.com/signup?ref=${form.referral_code || 'code'}`}
+                  >
+                    <FormInput
+                      id="p-code"
+                      required
+                      value={form.referral_code}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          referral_code: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ''),
+                        })
+                      }
+                      placeholder="jane-smith"
+                    />
+                  </FormField>
+                  <FormField label="Phone" htmlFor="p-phone">
+                    <FormInput
+                      id="p-phone"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      placeholder="+1 555-123-4567"
+                    />
+                  </FormField>
+                </FormRow>
+                <div className="flex justify-end gap-2">
+                  <FormButton variant="ghost" onClick={() => setShowForm(false)}>
+                    Cancel
+                  </FormButton>
+                  <FormButton type="submit" loading={saving} variant="primary">
+                    {saving ? 'Creating…' : 'Create Partner'}
+                  </FormButton>
+                </div>
+              </form>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Partners Table */}
+      {/* Toolbar + count */}
+      <Toolbar
+        left={
+          <span className="text-xs" style={{ color: 'rgba(4,14,32,0.55)' }}>
+            {loading ? 'Loading…' : `${partners.length} partner${partners.length === 1 ? '' : 's'}`}
+          </span>
+        }
+      />
+
+      {/* Table */}
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1b61c9] border-t-transparent" />
-        </div>
+        <Card>
+          <div className="flex items-center justify-center py-16">
+            <div
+              className="h-8 w-8 animate-spin rounded-full"
+              style={{ border: '2px solid #1b61c9', borderTopColor: 'transparent' }}
+            />
+          </div>
+        </Card>
       ) : partners.length === 0 ? (
-        <div className="rounded-2xl border border-[#e0e2e6] bg-white p-12 text-center">
-          <p className="text-[rgba(4,14,32,0.55)]">No partners yet. Click &quot;+ Add Partner&quot; to get started.</p>
-        </div>
+        <Card>
+          <EmptyState
+            icon="🤝"
+            title="No partners yet"
+            description='Click "+ Add Partner" to invite your first referral partner.'
+            action={
+              <FormButton variant="primary" onClick={() => setShowForm(true)}>
+                + Add Partner
+              </FormButton>
+            }
+          />
+        </Card>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-[#e0e2e6] bg-white">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-[#e0e2e6] bg-[#f8fafc]">
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[rgba(4,14,32,0.45)]">Partner</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[rgba(4,14,32,0.45)]">Referral Code</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[rgba(4,14,32,0.45)]">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[rgba(4,14,32,0.45)]">Joined</th>
-                <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-[rgba(4,14,32,0.45)]">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {partners.map((p) => (
-                <tr key={p.id} className="border-b border-[#f0f2f5] hover:bg-[#f8fafc] transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-[#181d26]">{p.name}</div>
-                    <div className="text-xs text-[rgba(4,14,32,0.45)]">{p.email}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <code className="rounded bg-blue-50 px-2 py-1 text-xs text-[#1b61c9] font-medium">{p.referral_code}</code>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-                      p.is_active
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${p.is_active ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                      {p.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-[rgba(4,14,32,0.55)]">
-                    {new Date(p.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => toggleActive(p.id, p.is_active)}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                        p.is_active
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                          : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                      }`}
-                    >
-                      {p.is_active ? 'Deactivate' : 'Reactivate'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable
+          columns={columns}
+          rows={partners}
+          rowKey={(p) => p.id}
+          emptyState="No partners match your filters."
+        />
       )}
     </div>
   )

@@ -1,17 +1,43 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  StatCard,
+  StatusBadge,
+  DataTable,
+  type DataColumn,
+  type StatusTone,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    COST ANALYSIS — Dev Team vs Antigravity AI
+   Shows phase roadmap, item-level cost comparison, and a
+   competitive scorecard across UX/perf categories.
    ═══════════════════════════════════════════════════════════════ */
 
-const phases = [
+type PhaseStatus = 'complete' | 'active' | 'planned'
+
+interface PhaseItem {
+  feature: string
+  devHours: number
+  devRate: number
+  aiHours: number
+}
+
+interface Phase {
+  id: string
+  name: string
+  status: PhaseStatus
+  items: PhaseItem[]
+}
+
+const phases: Phase[] = [
   {
     id: 'phase1',
     name: 'Phase 1: LAUNCH',
-    status: 'complete' as const,
-    color: 'blue',
+    status: 'complete',
     items: [
       { feature: 'Core onboarding flow + readiness quiz', devHours: 40, devRate: 150, aiHours: 3 },
       { feature: 'Bot protection (Turnstile)', devHours: 8, devRate: 150, aiHours: 0.5 },
@@ -39,8 +65,7 @@ const phases = [
   {
     id: 'phase2',
     name: 'Phase 2: GROWTH',
-    status: 'complete' as const,
-    color: 'emerald',
+    status: 'complete',
     items: [
       { feature: 'Social proof / testimonial section', devHours: 12, devRate: 125, aiHours: 1 },
       { feature: 'Partner referral link generator + QR', devHours: 16, devRate: 150, aiHours: 1 },
@@ -55,8 +80,7 @@ const phases = [
   {
     id: 'phase3',
     name: 'Phase 3: SCALE',
-    status: 'active' as const,
-    color: 'amber',
+    status: 'active',
     items: [
       { feature: 'Leaderboard + achievement badges', devHours: 24, devRate: 150, aiHours: 2 },
       { feature: 'AI chatbot (FAQ + lead capture)', devHours: 40, devRate: 175, aiHours: 4 },
@@ -76,8 +100,7 @@ const phases = [
   {
     id: 'phase4',
     name: 'Phase 4: MOAT',
-    status: 'planned' as const,
-    color: 'purple',
+    status: 'planned',
     items: [
       { feature: 'AI-personalized onboarding engine', devHours: 60, devRate: 200, aiHours: 6 },
       { feature: 'Video completion-based scoring', devHours: 20, devRate: 175, aiHours: 2 },
@@ -89,26 +112,103 @@ const phases = [
   },
 ]
 
-const scorecard = [
-  { category: 'Hero Clarity', current: 7, max: 10, grade: 'B' },
-  { category: 'Visual Hierarchy', current: 6, max: 10, grade: 'C+' },
-  { category: 'Typography', current: 7, max: 10, grade: 'B' },
-  { category: 'Color System', current: 7, max: 10, grade: 'B' },
-  { category: 'Social Proof', current: 7, max: 10, grade: 'B' },
-  { category: 'Motion & Animation', current: 8, max: 10, grade: 'A-' },
-  { category: 'Trust & Credibility', current: 7, max: 10, grade: 'B' },
-  { category: 'CTA Strategy', current: 6, max: 10, grade: 'C+' },
-  { category: 'Mobile', current: 8, max: 10, grade: 'A-' },
-  { category: 'Performance', current: 6, max: 10, grade: 'C+' },
-  { category: 'Content Depth', current: 7, max: 10, grade: 'B' },
-  { category: 'Infrastructure', current: 8, max: 10, grade: 'A-' },
+interface ScoreEntry {
+  category: string
+  current: number
+  max: number
+  grade: string
+}
+
+const scorecard: ScoreEntry[] = [
+  { category: 'Hero Clarity',        current: 7, max: 10, grade: 'B'  },
+  { category: 'Visual Hierarchy',    current: 6, max: 10, grade: 'C+' },
+  { category: 'Typography',          current: 7, max: 10, grade: 'B'  },
+  { category: 'Color System',        current: 7, max: 10, grade: 'B'  },
+  { category: 'Social Proof',        current: 7, max: 10, grade: 'B'  },
+  { category: 'Motion & Animation',  current: 8, max: 10, grade: 'A-' },
+  { category: 'Trust & Credibility', current: 7, max: 10, grade: 'B'  },
+  { category: 'CTA Strategy',        current: 6, max: 10, grade: 'C+' },
+  { category: 'Mobile',              current: 8, max: 10, grade: 'A-' },
+  { category: 'Performance',         current: 6, max: 10, grade: 'C+' },
+  { category: 'Content Depth',       current: 7, max: 10, grade: 'B'  },
+  { category: 'Infrastructure',      current: 8, max: 10, grade: 'A-' },
 ]
 
 const AI_COST_PER_HOUR = 0 // Antigravity included in subscription
 
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
+const statusToneMap: Record<PhaseStatus, StatusTone> = {
+  complete: 'blue',
+  active:   'green',
+  planned:  'neutral',
 }
+
+const statusLabelMap: Record<PhaseStatus, string> = {
+  complete: '✅ Complete',
+  active:   '🔨 In Progress',
+  planned:  '📋 Planned',
+}
+
+function formatCurrency(n: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(n)
+}
+
+function gradeColor(grade: string): string {
+  if (grade.startsWith('A')) return '#059669' // emerald
+  if (grade.startsWith('B')) return '#1b61c9'
+  if (grade.startsWith('C')) return '#b45309' // amber
+  return '#b91c1c'
+}
+
+interface PhaseItemRow extends PhaseItem {
+  devCost: number
+  saved: number
+}
+
+const phaseColumns: ReadonlyArray<DataColumn<PhaseItemRow>> = [
+  {
+    key: 'feature',
+    header: 'Feature',
+    render: (row) => <span style={{ color: 'rgba(4,14,32,0.69)' }}>{row.feature}</span>,
+  },
+  {
+    key: 'devHours',
+    header: 'Dev Hours',
+    align: 'right',
+    render: (row) => <span style={{ color: 'rgba(4,14,32,0.45)' }}>{row.devHours}h</span>,
+  },
+  {
+    key: 'devRate',
+    header: 'Dev Rate',
+    align: 'right',
+    render: (row) => <span style={{ color: 'rgba(4,14,32,0.45)' }}>${row.devRate}/h</span>,
+  },
+  {
+    key: 'devCost',
+    header: 'Dev Cost',
+    align: 'right',
+    render: (row) => <span style={{ color: '#dc2626' }}>{formatCurrency(row.devCost)}</span>,
+  },
+  {
+    key: 'aiHours',
+    header: 'Our Time',
+    align: 'right',
+    render: (row) => <span style={{ color: '#059669' }}>{row.aiHours}h</span>,
+  },
+  {
+    key: 'saved',
+    header: 'You Saved',
+    align: 'right',
+    render: (row) => (
+      <span className="font-semibold" style={{ color: '#1b61c9' }}>
+        {formatCurrency(row.saved)}
+      </span>
+    ),
+  },
+]
 
 export default function RoadmapPage() {
   const allPhases = phases.map((phase) => {
@@ -125,150 +225,136 @@ export default function RoadmapPage() {
   const grandSavings = grandDevTotal - grandAiTotal
   const grandDevHours = allPhases.reduce((s, p) => s + p.devHoursTotal, 0)
   const grandAiHours = allPhases.reduce((s, p) => s + p.aiHoursTotal, 0)
-
-  const statusColors = {
-    complete: 'bg-blue-100 text-blue-700 border-blue-200',
-    active: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    planned: 'bg-[#f0f2f5] text-[rgba(4,14,32,0.45)] border-[#e0e2e6]',
-  }
-
-  const statusLabels = { complete: '✅ Complete', active: '🔨 In Progress', planned: '📋 Planned' }
+  const fasterPct = grandDevHours > 0
+    ? Math.round(((grandDevHours - grandAiHours) / grandDevHours) * 100)
+    : 0
 
   return (
-    <div className="mx-auto max-w-6xl space-y-10">
-      {/* Header */}
-      <div>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
-          AutopilotROI Strategy Roadmap
-        </h1>
-        <p className="mt-2 text-[var(--text-muted)]">
-          Competitive positioning, phase roadmap, and cost analysis vs. traditional dev teams.
-        </p>
-      </div>
+    <div className="mx-auto max-w-6xl space-y-8">
+      <SectionHeader
+        title="AutopilotROI Strategy Roadmap"
+        subtitle="Competitive positioning, phase roadmap, and cost analysis vs. traditional dev teams."
+      />
 
-      {/* Grand Total Savings Banner */}
+      {/* ── Grand Total Banner ── */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-blue-50 p-8"
+        transition={{ duration: 0.3 }}
+        className="relative overflow-hidden rounded-2xl"
+        style={{
+          background: 'linear-gradient(120deg, rgba(16,185,129,0.08), rgba(27,97,201,0.08))',
+          border: '1px solid rgba(16,185,129,0.25)',
+        }}
       >
-        <div className="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-emerald-200/40 blur-3xl" />
-        <div className="relative grid gap-6 sm:grid-cols-4">
-          <div>
-            <div className="text-xs uppercase tracking-wider text-emerald-700/70">Dev Team Cost</div>
-            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-[#181d26]">{formatCurrency(grandDevTotal)}</div>
-            <div className="text-sm text-[rgba(4,14,32,0.45)]">{grandDevHours} hours</div>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-wider text-blue-700/70">Our Cost</div>
-            <div className="mt-1 font-[var(--font-sora)] text-lg font-bold bg-gradient-to-r from-[#1b61c9] via-purple-600 to-cyan-600 bg-clip-text text-transparent">Antigravity + Google Ultra + Jody</div>
-            <div className="text-sm font-bold bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent">= Priceless</div>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-wider text-emerald-700/70">Total Savings</div>
-            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-emerald-700">{formatCurrency(grandSavings)}</div>
-            <div className="text-sm text-emerald-600">100% saved</div>
-          </div>
-          <div>
-            <div className="text-xs uppercase tracking-wider text-amber-700/70">Time Saved</div>
-            <div className="mt-1 font-[var(--font-sora)] text-3xl font-bold text-amber-600">{Math.round(grandDevHours / 8)}→{Math.round(grandAiHours / 8)} days</div>
-            <div className="text-sm text-amber-600">{Math.round(((grandDevHours - grandAiHours) / grandDevHours) * 100)}% faster</div>
-          </div>
+        <div className="absolute -top-4 -right-4 h-32 w-32 rounded-full" style={{ background: 'rgba(16,185,129,0.18)', filter: 'blur(48px)' }} />
+        <div className="relative grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard label="Dev Team Cost" value={formatCurrency(grandDevTotal)} delta={`${grandDevHours} hours`} trend="down" />
+          <StatCard
+            label="Our Cost"
+            value="Priceless"
+            delta="Antigravity + Google Ultra + Jody"
+            trend="up"
+          />
+          <StatCard label="Total Savings" value={formatCurrency(grandSavings)} delta="100% saved" trend="up" />
+          <StatCard
+            label="Time Saved"
+            value={`${Math.round(grandDevHours / 8)} → ${Math.round(grandAiHours / 8)} days`}
+            delta={`${fasterPct}% faster`}
+            trend="up"
+          />
         </div>
       </motion.div>
 
-      {/* Competitive Scorecard */}
-      <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden">
-        <div className="border-b border-[var(--border-primary)] px-6 py-4">
-          <h2 className="font-[var(--font-sora)] text-lg font-semibold text-[var(--text-primary)]">
+      {/* ── Competitive Scorecard ── */}
+      <Card padding="flush">
+        <div className="px-6 py-4" style={{ borderBottom: '1px solid #e0e2e6' }}>
+          <h2 className="text-lg font-semibold" style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}>
             Competitive Scorecard
           </h2>
-          <p className="text-sm text-[var(--text-muted)]">vs. best-in-class crypto onboarding funnels (2026)</p>
+          <p className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+            vs. best-in-class crypto onboarding funnels (2026)
+          </p>
         </div>
         <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
-          {scorecard.map((s) => (
-            <div key={s.category} className="rounded-xl border border-[#e0e2e6] bg-white p-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-[#181d26]">{s.category}</span>
-                <span className={`text-sm font-bold ${
-                  s.grade.startsWith('A') ? 'text-emerald-700' :
-                  s.grade.startsWith('B') ? 'text-[#1b61c9]' :
-                  s.grade.startsWith('C') ? 'text-amber-700' : 'text-red-700'
-                }`}>{s.grade}</span>
+          {scorecard.map((s) => {
+            const color = gradeColor(s.grade)
+            const pct = (s.current / s.max) * 100
+            return (
+              <div
+                key={s.category}
+                className="rounded-xl p-4"
+                style={{ background: '#ffffff', border: '1px solid #e0e2e6' }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium" style={{ color: '#181d26' }}>{s.category}</span>
+                  <span className="text-sm font-bold" style={{ color }}>{s.grade}</span>
+                </div>
+                <div className="h-2 w-full rounded-full" style={{ background: '#f0f2f5' }}>
+                  <div
+                    className="h-2 rounded-full transition-all"
+                    style={{ width: `${pct}%`, background: color }}
+                  />
+                </div>
+                <div className="mt-1 text-xs" style={{ color: 'rgba(4,14,32,0.45)' }}>
+                  {s.current}/{s.max} features
+                </div>
               </div>
-              <div className="h-2 w-full rounded-full bg-[#f0f2f5]">
-                <div
-                  className={`h-2 rounded-full transition-all ${
-                    s.grade.startsWith('A') ? 'bg-emerald-500' :
-                    s.grade.startsWith('B') ? 'bg-[#1b61c9]' :
-                    s.grade.startsWith('C') ? 'bg-amber-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${(s.current / s.max) * 100}%` }}
-                />
-              </div>
-              <div className="mt-1 text-xs text-[rgba(4,14,32,0.45)]">{s.current}/{s.max} features</div>
-            </div>
-          ))}
+            )
+          })}
         </div>
-      </div>
+      </Card>
 
-      {/* Phase Breakdown */}
-      {allPhases.map((phase, phaseIdx) => (
-        <motion.div
-          key={phase.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: phaseIdx * 0.1 }}
-          className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden"
-        >
-          {/* Phase Header */}
-          <div className="flex flex-wrap items-center justify-between border-b border-[#e0e2e6] px-6 py-4 gap-3 bg-[#f8fafc]">
-            <div className="flex items-center gap-3">
-              <h2 className="font-[var(--font-sora)] text-lg font-bold text-[#181d26]">{phase.name}</h2>
-              <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusColors[phase.status]}`}>
-                {statusLabels[phase.status]}
-              </span>
-            </div>
-            <div className="flex gap-4 text-xs">
-              <span className="text-[rgba(4,14,32,0.45)]">Dev: <span className="text-red-600 font-semibold">{formatCurrency(phase.devTotal)}</span></span>
-              <span className="text-[rgba(4,14,32,0.45)]">Our: <span className="text-emerald-700 font-semibold italic">Priceless</span></span>
-              <span className="text-[rgba(4,14,32,0.45)]">Saved: <span className="text-[#1b61c9] font-semibold">{formatCurrency(phase.savings)}</span></span>
-            </div>
-          </div>
+      {/* ── Phase Breakdown ── */}
+      {allPhases.map((phase, phaseIdx) => {
+        const rows: PhaseItemRow[] = phase.items.map((item) => {
+          const devCost = item.devHours * item.devRate
+          const aiCost = item.aiHours * AI_COST_PER_HOUR
+          return { ...item, devCost, saved: devCost - aiCost }
+        })
 
-          {/* Items Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wider text-[rgba(4,14,32,0.40)] border-b border-[#e0e2e6]">
-                  <th className="px-6 py-3">Feature</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">Dev Hours</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">Dev Rate</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">Dev Cost</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">Our Time</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">You Saved</th>
-                </tr>
-              </thead>
-              <tbody>
-                {phase.items.map((item, i) => {
-                  const devCost = item.devHours * item.devRate
-                  const aiCost = item.aiHours * AI_COST_PER_HOUR
-                  return (
-                    <tr key={i} className="border-t border-[#f0f2f5] hover:bg-[#f8fafc] transition-colors">
-                      <td className="px-6 py-3 text-[rgba(4,14,32,0.69)]">{item.feature}</td>
-                      <td className="px-4 py-3 text-right text-[rgba(4,14,32,0.45)]">{item.devHours}h</td>
-                      <td className="px-4 py-3 text-right text-[rgba(4,14,32,0.45)]">${item.devRate}/h</td>
-                      <td className="px-4 py-3 text-right text-red-600">{formatCurrency(devCost)}</td>
-                      <td className="px-4 py-3 text-right text-emerald-700">{item.aiHours}h</td>
-                      <td className="px-4 py-3 text-right font-semibold text-[#1b61c9]">{formatCurrency(devCost - aiCost)}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </motion.div>
-      ))}
+        return (
+          <motion.div
+            key={phase.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: Math.min(phaseIdx * 0.05, 0.2) }}
+          >
+            <Card padding="flush">
+              <div
+                className="flex flex-wrap items-center justify-between gap-3 px-6 py-4"
+                style={{ borderBottom: '1px solid #e0e2e6', background: '#f8fafc' }}
+              >
+                <div className="flex items-center gap-3">
+                  <h2 className="text-lg font-bold" style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}>
+                    {phase.name}
+                  </h2>
+                  <StatusBadge tone={statusToneMap[phase.status]}>
+                    {statusLabelMap[phase.status]}
+                  </StatusBadge>
+                </div>
+                <div className="flex flex-wrap gap-4 text-xs">
+                  <span style={{ color: 'rgba(4,14,32,0.45)' }}>
+                    Dev: <span className="font-semibold" style={{ color: '#dc2626' }}>{formatCurrency(phase.devTotal)}</span>
+                  </span>
+                  <span style={{ color: 'rgba(4,14,32,0.45)' }}>
+                    Our: <span className="font-semibold italic" style={{ color: '#059669' }}>Priceless</span>
+                  </span>
+                  <span style={{ color: 'rgba(4,14,32,0.45)' }}>
+                    Saved: <span className="font-semibold" style={{ color: '#1b61c9' }}>{formatCurrency(phase.savings)}</span>
+                  </span>
+                </div>
+              </div>
+
+              <DataTable
+                columns={phaseColumns}
+                rows={rows}
+                rowKey={(_r, i) => `${phase.id}-${i}`}
+              />
+            </Card>
+          </motion.div>
+        )
+      })}
     </div>
   )
 }

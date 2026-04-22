@@ -1,8 +1,18 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useCallback } from 'react'
+
+/* ═══════════════════════════════════════════════════════════════
+   MAINTENANCE — soft outage page with status, ETA, contact.
+   Stays self-contained: no nav, no auth checks, no API calls.
+   ═══════════════════════════════════════════════════════════════ */
 
 export default function MaintenancePage() {
+  const handleRefresh = useCallback(() => {
+    if (typeof window !== 'undefined') window.location.reload()
+  }, [])
+
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#f8fafc' }}>
       <div className="mx-auto max-w-lg px-6 text-center">
@@ -46,9 +56,36 @@ export default function MaintenancePage() {
           <div className="text-lg font-bold" style={{ color: '#181d26' }}>Less than 30 minutes</div>
         </motion.div>
 
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+          <button
+            type="button"
+            onClick={handleRefresh}
+            className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+            style={{ background: '#1b61c9' }}
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a8 8 0 0114-3M20 15a8 8 0 01-14 3" />
+            </svg>
+            Try Again
+          </button>
+          <a
+            href="https://status.autopilotroi.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition hover:bg-slate-50"
+            style={{ background: '#fff', border: '1px solid #e0e2e6', color: '#181d26' }}
+          >
+            View Status Page
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </motion.div>
+
         <p className="text-sm" style={{ color: 'rgba(4,14,32,0.45)' }}>
           Need urgent help?{' '}
-          <a href="mailto:support@autopilotroi.com" className="font-semibold" style={{ color: '#1b61c9' }}>
+          <a href="mailto:support@autopilotroi.com" className="font-semibold hover:underline" style={{ color: '#1b61c9' }}>
             support@autopilotroi.com
           </a>
         </p>

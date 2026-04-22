@@ -2,6 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  StatusBadge,
+  type StatusTone,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    INTERACTIVE CHECKLIST — Pre-launch + Per-phase checklists
@@ -19,6 +25,7 @@ interface CheckSection {
   title: string
   phase: string
   icon: string
+  tone?: StatusTone
   items: CheckItem[]
 }
 
@@ -28,6 +35,7 @@ const sections: CheckSection[] = [
     title: 'Critical — Before Go-Live',
     phase: 'Pre-Launch',
     icon: '🔴',
+    tone: 'red',
     items: [
       { id: 'env-turnstile-site', label: 'Set NEXT_PUBLIC_TURNSTILE_SITE_KEY in Vercel', detail: 'dash.cloudflare.com → Turnstile' },
       { id: 'env-turnstile-secret', label: 'Set TURNSTILE_SECRET_KEY in Vercel', detail: 'Server-side secret from Cloudflare' },
@@ -52,6 +60,7 @@ const sections: CheckSection[] = [
     title: 'Important — Before Launch',
     phase: 'Pre-Launch',
     icon: '🟡',
+    tone: 'amber',
     items: [
       { id: 'plausible-goals', label: 'Set up Plausible goals', detail: 'signup_submitted, quiz_completed, video_watched, cta_clicked' },
       { id: 'sentry-dsn', label: 'Configure Sentry DSN', detail: 'sentry.io → Project → Client Keys' },
@@ -71,6 +80,7 @@ const sections: CheckSection[] = [
     title: 'Phase 2: GROWTH Features',
     phase: 'Phase 2',
     icon: '🟢',
+    tone: 'green',
     items: [
       { id: 'p2-social-proof', label: 'Add social proof / testimonials to homepage', detail: 'Testimonial carousel + activity counter' },
       { id: 'p2-exit-intent', label: 'Implement exit-intent popup', detail: 'Soft capture for leaving visitors' },
@@ -87,6 +97,7 @@ const sections: CheckSection[] = [
     title: 'Partner Import & Management',
     phase: 'Priority',
     icon: '🤝',
+    tone: 'purple',
     items: [
       { id: 'pi-csv-import', label: 'Build CSV bulk partner import tool', detail: 'Admin → Partners → Import CSV with name, email, ref code, phone, tier' },
       { id: 'pi-manual-add', label: 'Build manual "Add Partner" form in Admin', detail: 'Single partner entry with all fields — name, email, ref code, phone, upline' },
@@ -105,6 +116,7 @@ const sections: CheckSection[] = [
     title: 'Phase 3: SCALE Features',
     phase: 'Phase 3',
     icon: '🔵',
+    tone: 'blue',
     items: [
       { id: 'p3-leaderboard', label: 'Build leaderboard + achievement badges', detail: 'Partner gamification system' },
       { id: 'p3-partner-reg', label: 'Partner self-registration flow', detail: 'Apply, auto-approve or queue' },
@@ -120,6 +132,7 @@ const sections: CheckSection[] = [
     title: 'Post-Launch Operations',
     phase: 'Post-Launch',
     icon: '⚙️',
+    tone: 'neutral',
     items: [
       { id: 'pl-rate-limit-assess', label: 'Rate limit /api/leads/assess', detail: 'Prevent assessment spam' },
       { id: 'pl-rate-limit-notify', label: 'Rate limit /api/notify', detail: 'Prevent notification flooding' },
@@ -139,10 +152,15 @@ export default function ChecklistPage() {
   const [checked, setChecked] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      try { setChecked(JSON.parse(saved)) } catch { /* ignore */ }
+    let next: Record<string, boolean> = {}
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) next = JSON.parse(saved) as Record<string, boolean>
+    } catch {
+      /* ignore */
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from localStorage on mount
+    setChecked(next)
   }, [])
 
   const toggle = useCallback((id: string) => {
@@ -154,43 +172,37 @@ export default function ChecklistPage() {
   }, [])
 
   const totalItems = sections.reduce((s, sec) => s + sec.items.length, 0)
-  const completedItems = sections.reduce((s, sec) => s + sec.items.filter((i) => checked[i.id]).length, 0)
+  const completedItems = sections.reduce(
+    (s, sec) => s + sec.items.filter((i) => checked[i.id]).length,
+    0
+  )
   const progressPercent = Math.round((completedItems / totalItems) * 100)
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
-      <div>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[#181d26]">
-          Launch Checklist
-        </h1>
-        <p className="mt-2 text-[rgba(4,14,32,0.55)]">
-          Interactive checklist — progress is saved locally.
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <SectionHeader
+        title="Launch Checklist"
+        subtitle="Interactive checklist — progress is saved locally."
+      />
 
-      {/* Progress Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-[#e0e2e6] bg-white p-6"
-      >
+      {/* Progress */}
+      <Card>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-medium text-[#181d26]">
-            Overall Progress
-          </span>
-          <span className="text-sm text-[rgba(4,14,32,0.55)]">
+          <span className="text-sm font-medium" style={{ color: '#181d26' }}>Overall Progress</span>
+          <span className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
             {completedItems}/{totalItems} ({progressPercent}%)
           </span>
         </div>
-        <div className="h-3 w-full rounded-full bg-[#f0f2f5] overflow-hidden">
+        <div className="h-3 w-full rounded-full overflow-hidden" style={{ background: '#f0f2f5' }}>
           <motion.div
-            className="h-3 rounded-full bg-gradient-to-r from-[#1b61c9] to-emerald-500"
+            className="h-3 rounded-full"
+            style={{ background: 'linear-gradient(90deg, #1b61c9, #10b981)' }}
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           />
         </div>
-      </motion.div>
+      </Card>
 
       {/* Sections */}
       {sections.map((section, sIdx) => {
@@ -201,53 +213,60 @@ export default function ChecklistPage() {
         return (
           <motion.div
             key={section.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: sIdx * 0.05 }}
-            className={`rounded-2xl border overflow-hidden transition-colors ${
-              sectionDone
-                ? 'border-emerald-300 bg-emerald-50'
-                : 'border-[#e0e2e6] bg-white'
-            }`}
+            transition={{ delay: Math.min(sIdx * 0.04, 0.25) }}
           >
-            <div className="flex items-center justify-between border-b border-[#e0e2e6] px-6 py-4">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">{section.icon}</span>
-                <div>
-                  <h2 className="font-[var(--font-sora)] text-base font-bold text-[#181d26]">{section.title}</h2>
-                  <span className="text-xs text-[rgba(4,14,32,0.45)]">{section.phase}</span>
-                </div>
-              </div>
-              <span className={`text-sm font-semibold ${sectionDone ? 'text-emerald-600' : 'text-[rgba(4,14,32,0.45)]'}`}>
-                {sectionComplete}/{sectionTotal}
-              </span>
-            </div>
-
-            <div className="divide-y divide-[#f0f2f5]">
-              {section.items.map((item) => (
-                <label
-                  key={item.id}
-                  className="flex cursor-pointer items-start gap-4 px-6 py-4 hover:bg-[#f8fafc] transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={!!checked[item.id]}
-                    onChange={() => toggle(item.id)}
-                    className="mt-0.5 h-5 w-5 rounded border-[#c8ccd4] accent-[#1b61c9]"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className={`text-sm font-medium transition-colors ${
-                      checked[item.id] ? 'text-[rgba(4,14,32,0.35)] line-through' : 'text-[#181d26]'
-                    }`}>
-                      {item.label}
-                    </div>
-                    {item.detail && (
-                      <div className="mt-0.5 text-xs text-[rgba(4,14,32,0.45)]">{item.detail}</div>
-                    )}
+            <Card padding="flush" className={sectionDone ? 'be-card--success' : ''}>
+              <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid #e0e2e6' }}>
+                <div className="flex items-center gap-3">
+                  <span className="text-xl" aria-hidden>{section.icon}</span>
+                  <div>
+                    <h2 className="font-[var(--font-sora)] text-base font-bold" style={{ color: '#181d26' }}>
+                      {section.title}
+                    </h2>
+                    <span className="text-xs" style={{ color: 'rgba(4,14,32,0.45)' }}>{section.phase}</span>
                   </div>
-                </label>
-              ))}
-            </div>
+                  {sectionDone && <StatusBadge tone="green">Complete</StatusBadge>}
+                </div>
+                <span
+                  className="text-sm font-semibold"
+                  style={{ color: sectionDone ? '#047857' : 'rgba(4,14,32,0.45)' }}
+                >
+                  {sectionComplete}/{sectionTotal}
+                </span>
+              </div>
+
+              <div className="divide-y" style={{ borderColor: '#f0f2f5' }}>
+                {section.items.map((item) => (
+                  <label
+                    key={item.id}
+                    className="flex cursor-pointer items-start gap-4 px-6 py-4 hover:bg-[#f8fafc] transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!!checked[item.id]}
+                      onChange={() => toggle(item.id)}
+                      className="mt-0.5 h-5 w-5 rounded"
+                      style={{ borderColor: '#c8ccd4', accentColor: '#1b61c9' }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className={`text-sm font-medium transition-colors ${checked[item.id] ? 'line-through' : ''}`}
+                        style={{ color: checked[item.id] ? 'rgba(4,14,32,0.35)' : '#181d26' }}
+                      >
+                        {item.label}
+                      </div>
+                      {item.detail && (
+                        <div className="mt-0.5 text-xs" style={{ color: 'rgba(4,14,32,0.45)' }}>
+                          {item.detail}
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </Card>
           </motion.div>
         )
       })}

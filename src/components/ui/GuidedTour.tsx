@@ -50,6 +50,10 @@ function getStorageKey(tourId: string) {
   return `autopilotroi-tour-${tourId}`
 }
 
+function getSessionKey(tourId: string) {
+  return `autopilotroi-tour-${tourId}-session`
+}
+
 export function useTour(tourId: string) {
   const [active, setActive] = useState(false)
 
@@ -62,6 +66,7 @@ export function useTour(tourId: string) {
 
   const reset = useCallback(() => {
     localStorage.removeItem(getStorageKey(tourId))
+    sessionStorage.removeItem(getSessionKey(tourId))
   }, [tourId])
 
   return { active, start, stop, hasCompleted, reset }
@@ -103,11 +108,20 @@ export default function GuidedTour({
   }, [])
 
   // Auto-start logic
+  // - forceShow always wins (manual replay from "Tour" button)
+  // - autoStart fires AT MOST once per browser session (sessionStorage gate)
+  // - and never fires again after the user has dismissed/completed it (localStorage gate)
   useEffect(() => {
     if (!autoStart && !forceShow) return
-    const completed = localStorage.getItem(getStorageKey(tourId))
-    if (completed === 'done' && !forceShow) return
-    // Reset to step 0 when force-starting
+    if (!forceShow) {
+      const completed = localStorage.getItem(getStorageKey(tourId))
+      if (completed === 'done') return
+      const seenThisSession = sessionStorage.getItem(getSessionKey(tourId))
+      if (seenThisSession === '1') return
+      sessionStorage.setItem(getSessionKey(tourId), '1')
+    }
+    // Reset to step 0 when starting
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync tour state to localStorage/sessionStorage on mount
     setCurrentStep(0)
     // Small delay to let page render
     const timer = setTimeout(() => setActive(true), 800)
@@ -151,6 +165,33 @@ export default function GuidedTour({
     }
   }, [active, step, currentStep])
 
+  const handleComplete = useCallback(() => {
+    setShowConfetti(true)
+    localStorage.setItem(getStorageKey(tourId), 'done')
+    setTimeout(() => {
+      setShowConfetti(false)
+      setActive(false)
+      onComplete?.()
+    }, 2500)
+  }, [tourId, onComplete])
+
+  const handleSkip = useCallback(() => {
+    setActive(false)
+    localStorage.setItem(getStorageKey(tourId), 'done')
+  }, [tourId])
+
+  const handleNext = useCallback(() => {
+    if (isLast) {
+      handleComplete()
+    } else {
+      setCurrentStep((s) => s + 1)
+    }
+  }, [isLast, handleComplete])
+
+  const handlePrev = useCallback(() => {
+    if (currentStep > 0) setCurrentStep((s) => s - 1)
+  }, [currentStep])
+
   // Keyboard navigation
   useEffect(() => {
     if (!active) return
@@ -161,34 +202,7 @@ export default function GuidedTour({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  })
-
-  function handleNext() {
-    if (isLast) {
-      handleComplete()
-    } else {
-      setCurrentStep((s) => s + 1)
-    }
-  }
-
-  function handlePrev() {
-    if (currentStep > 0) setCurrentStep((s) => s - 1)
-  }
-
-  function handleSkip() {
-    setActive(false)
-    localStorage.setItem(getStorageKey(tourId), 'done')
-  }
-
-  function handleComplete() {
-    setShowConfetti(true)
-    localStorage.setItem(getStorageKey(tourId), 'done')
-    setTimeout(() => {
-      setShowConfetti(false)
-      setActive(false)
-      onComplete?.()
-    }, 2500)
-  }
+  }, [active, handleSkip, handleNext, handlePrev])
 
   if (!active) return null
 
@@ -433,33 +447,37 @@ export default function GuidedTour({
               </p>
             </motion.div>
 
-            {/* Particle confetti */}
-            {Array.from({ length: 30 }).map((_, i) => (
-              <motion.div
-                key={i}
-                initial={{
-                  opacity: 1,
-                  x: '50vw',
-                  y: '50vh',
-                  scale: 0,
-                }}
-                animate={{
-                  opacity: 0,
-                  x: `${20 + Math.random() * 60}vw`,
-                  y: `${10 + Math.random() * 80}vh`,
-                  scale: 1,
-                  rotate: Math.random() * 720,
-                }}
-                transition={{
-                  duration: 1.5 + Math.random(),
-                  ease: 'easeOut',
-                }}
-                className="fixed h-3 w-3 rounded-sm"
-                style={{
-                  background: ['#3b82f6', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'][i % 6],
-                }}
-              />
-            ))}
+            {/* Particle confetti — deterministic seeded values keep render pure (React 19 rule) */}
+            {Array.from({ length: 30 }).map((_, i) => {
+              // simple LCG-style hash so each i yields stable but varied numbers in [0, 1)
+              const rand = (n: number) => ((Math.sin(i * 9301 + n * 49297) * 233280) % 1 + 1) % 1
+              return (
+                <motion.div
+                  key={i}
+                  initial={{
+                    opacity: 1,
+                    x: '50vw',
+                    y: '50vh',
+                    scale: 0,
+                  }}
+                  animate={{
+                    opacity: 0,
+                    x: `${20 + rand(1) * 60}vw`,
+                    y: `${10 + rand(2) * 80}vh`,
+                    scale: 1,
+                    rotate: rand(3) * 720,
+                  }}
+                  transition={{
+                    duration: 1.5 + rand(4),
+                    ease: 'easeOut',
+                  }}
+                                   className="fixed h-3 w-3 rounded-sm"
+                  style={{
+                    background: ['#3b82f6', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'][i % 6],
+                  }}
+                  />
+              )
+            })}
           </motion.div>
         )}
       </AnimatePresence>

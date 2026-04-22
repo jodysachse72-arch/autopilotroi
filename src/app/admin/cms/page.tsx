@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import type { JSONContent } from '@tiptap/react'
@@ -10,15 +10,24 @@ import {
   type CmsPost, type CmsPostSummary, type CmsRevision,
 } from '@/lib/cms/service'
 import { useToast } from '@/components/ui/Toast'
+import {
+  Card,
+  FormButton,
+  FormField,
+  FormInput,
+  FormSelect,
+  FormTextarea,
+  FormRow,
+  StatusBadge,
+  type StatusTone,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    CONTENT EDITOR  (/admin/cms)
    3-panel layout: List | Tiptap Editor | Meta
-   
    Data: Supabase cms_posts / cms_revisions / cms_media
    Editor: Tiptap (rich text — bold, headings, images, YouTube…)
-   
-   To migrate to Payload CMS: only change src/lib/cms/service.ts
+   To migrate to Payload CMS: change src/lib/cms/service.ts only.
    ═══════════════════════════════════════════════════════════════ */
 
 // Lazy-load Tiptap (it's heavy — no SSR)
@@ -35,6 +44,7 @@ const RichEditor = dynamic(() => import('@/components/cms/RichEditor'), {
 })
 
 type Tab = 'blog' | 'faq' | 'video' | 'page_copy'
+type PostStatus = 'published' | 'draft' | 'scheduled'
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: 'blog',      label: 'Blog Posts',   icon: '📝' },
@@ -43,17 +53,29 @@ const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: 'page_copy', label: 'Page Copy',    icon: '🏠' },
 ]
 
-const STATUS_STYLES = {
-  published: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  draft:     'bg-amber-50  text-amber-700  border-amber-200',
-  scheduled: 'bg-blue-50   text-blue-700   border-blue-200',
+const statusToneMap: Record<PostStatus, StatusTone> = {
+  published: 'green',
+  draft:     'amber',
+  scheduled: 'blue',
 }
 
-const BLOG_CATEGORIES = ['education','product-updates','announcements','partner-resources','market-insights']
-const FAQ_CATEGORIES  = ['general','products','getting-started','payments','partners']
+const BLOG_CATEGORIES = ['education', 'product-updates', 'announcements', 'partner-resources', 'market-insights']
+const FAQ_CATEGORIES  = ['general', 'products', 'getting-started', 'payments', 'partners']
+
+const HOW_IT_WORKS = [
+  { step: '1', label: 'Choose a content type', detail: 'Use the Blog / FAQs / Videos / Page Copy tabs above' },
+  { step: '2', label: 'Create or select a post', detail: 'Click any item in the left panel, or press "+ New"' },
+  { step: '3', label: 'Write, save, publish', detail: 'Body auto-saves as you type. Hit Publish to go live.' },
+] as const
+
+const CONTENT_MAP = [
+  { icon: '📝', tab: 'Blog Posts', url: '/blog  ·  /blog/[slug]', note: 'Title + excerpt on list. Full rich-text body on post page.' },
+  { icon: '❓', tab: 'FAQs',       url: '/faqs',                  note: 'Title = question. Body (rich text) = answer in accordion.' },
+  { icon: '🎬', tab: 'Videos',     url: '/university  or  /media', note: 'Set the "Section" field to choose which page it appears on.' },
+  { icon: '🏠', tab: 'Page Copy',  url: 'Homepage, Products…',    note: 'Slug = page key (e.g. "homepage"). Key-value meta fields.' },
+] as const
 
 // ── Empty post template per type ─────────────────────────────
-
 function newPost(type: Tab): Partial<CmsPost> {
   const base = { type, status: 'draft' as const, sort_order: 0, meta: {} }
   if (type === 'blog')  return { ...base, title: 'Untitled Post', slug: '', meta: { category: 'education', author: 'Barry Goss', featured: false } }
@@ -63,25 +85,26 @@ function newPost(type: Tab): Partial<CmsPost> {
 }
 
 // ── Main page ────────────────────────────────────────────────
-
 export default function ContentEditorPage() {
-  const [activeTab, setActiveTab]         = useState<Tab>('blog')
-  const [posts, setPosts]                 = useState<CmsPostSummary[]>([])
-  const [selectedId, setSelectedId]       = useState<string | null>(null)
-  const [selected, setSelected]           = useState<CmsPost | null>(null)
-  const [revisions, setRevisions]         = useState<CmsRevision[]>([])
-  const [showRevisions, setShowRevisions] = useState(false)
-  const [isSaving, setIsSaving]           = useState(false)
-  const [isLoading, setIsLoading]         = useState(true)
-  const [isNew, setIsNew]                 = useState(false)
-  const [draft, setDraft]                 = useState<Partial<CmsPost>>({})
-  const [bodyJson, setBodyJson]           = useState<JSONContent | null>(null)
-  const [bodyHtml, setBodyHtml]           = useState<string>('')
-  const autoSaveTimer                     = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [activeTab, setActiveTab]           = useState<Tab>('blog')
+  const [posts, setPosts]                   = useState<CmsPostSummary[]>([])
+  const [selectedId, setSelectedId]         = useState<string | null>(null)
+  const [selected, setSelected]             = useState<CmsPost | null>(null)
+  const [revisions, setRevisions]           = useState<CmsRevision[]>([])
+  const [showRevisions, setShowRevisions]   = useState(false)
+  const [isSaving, setIsSaving]             = useState(false)
+  const [isLoading, setIsLoading]           = useState(true)
+  const [isNew, setIsNew]                   = useState(false)
+  const [draft, setDraft]                   = useState<Partial<CmsPost>>({})
+  const [bodyJson, setBodyJson]             = useState<JSONContent | null>(null)
+  const [bodyHtml, setBodyHtml]             = useState<string>('')
+  const autoSaveTimer                       = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
-  const { toast, ToastContainer }         = useToast()
+  const { toast, ToastContainer }           = useToast()
 
-  // Load list
+  const activeTabMeta = useMemo(() => TABS.find(t => t.key === activeTab), [activeTab])
+
+  // Load list when tab changes
   const loadList = useCallback(async () => {
     setIsLoading(true)
     const data = await listPosts({ type: activeTab })
@@ -136,14 +159,14 @@ export default function ContentEditorPage() {
         const created = await createPost({
           ...newPost(activeTab),
           ...draft,
-          body:      bodyJson ?? null,
-          body_html: bodyHtml || null,
-          type:      activeTab,
-          status:    draft.status ?? 'draft',
+          body:       bodyJson ?? null,
+          body_html:  bodyHtml || null,
+          type:       activeTab,
+          status:     draft.status ?? 'draft',
           sort_order: draft.sort_order ?? 0,
-          meta:      draft.meta ?? {},
-          slug:      draft.slug ?? null,
-          title:     draft.title ?? null,
+          meta:       draft.meta ?? {},
+          slug:       draft.slug ?? null,
+          title:      draft.title ?? null,
           created_by: null,
           publish_at: null,
         })
@@ -208,40 +231,46 @@ export default function ContentEditorPage() {
     }
     setShowRevisions(false)
     toast('Version restored', 'success')
-  }, [selectedId])
+  }, [selectedId, toast])
 
   const handleImageUpload = useCallback(async (file: File): Promise<string> => {
     const media = await uploadMedia(file, '')
     return media.public_url
   }, [])
 
-  const startNew = () => {
+  const startNew = useCallback(() => {
     setIsNew(true)
     setSelectedId(null)
     setSelected(null)
     setBodyJson(null)
     setBodyHtml('')
     setDraft(newPost(activeTab) as Partial<CmsPost>)
-  }
+  }, [activeTab])
 
-  const hasEditor = selected !== null || isNew
-  const currentStatus = (draft.status ?? 'draft') as keyof typeof STATUS_STYLES
+  const hasEditor     = selected !== null || isNew
+  const currentStatus = (draft.status ?? 'draft') as PostStatus
+  const dotClass      = currentStatus === 'published' ? 'bg-emerald-500 animate-pulse'
+                      : currentStatus === 'scheduled' ? 'bg-blue-500'
+                      : 'bg-amber-500'
 
   return (
     <div className="flex h-[calc(100vh-80px)] flex-col">
 
-      {/* Top bar */}
+      {/* ─── Top bar ─────────────────────────────────────── */}
       <div className="flex shrink-0 items-center justify-between border-b border-[#e0e2e6] bg-white px-6 py-3">
         <div>
           <h1 className="font-[var(--font-sora)] text-xl font-bold text-[#181d26]">Content Editor</h1>
-          <p className="text-xs text-[rgba(4,14,32,0.40)]">Supabase-backed · changes auto-save · {posts.length} {activeTab === 'blog' ? 'posts' : activeTab === 'faq' ? 'FAQs' : activeTab === 'video' ? 'videos' : 'entries'}</p>
+          <p className="text-xs text-[rgba(4,14,32,0.40)]">
+            Supabase-backed · changes auto-save · {posts.length} {activeTab === 'blog' ? 'posts' : activeTab === 'faq' ? 'FAQs' : activeTab === 'video' ? 'videos' : 'entries'}
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          {/* Auto-save status */}
           <AnimatePresence>
             {autoSaveStatus !== 'idle' && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="flex items-center gap-1.5 text-xs text-[rgba(4,14,32,0.45)]">
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5 text-xs text-[rgba(4,14,32,0.45)]"
+              >
                 {autoSaveStatus === 'saving'
                   ? <><div className="h-3 w-3 animate-spin rounded-full border border-[#1b61c9] border-t-transparent" /> Saving…</>
                   : <><span className="text-emerald-500">✓</span> Saved</>}
@@ -251,113 +280,138 @@ export default function ContentEditorPage() {
 
           {hasEditor && selected && (
             <>
-              <button onClick={() => { setShowRevisions(!showRevisions) }}
-                className="rounded-xl border border-[#e0e2e6] bg-white px-3 py-1.5 text-xs font-medium text-[rgba(4,14,32,0.55)] hover:bg-[#f8fafc]">
+              <FormButton
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowRevisions(s => !s)}
+              >
                 🕐 History {revisions.length > 0 && `(${revisions.length})`}
-              </button>
-              <button onClick={handleDelete}
-                className="rounded-xl border border-red-200 px-3 py-1.5 text-xs font-medium text-red-500 hover:bg-red-50">
+              </FormButton>
+              <FormButton
+                variant="danger"
+                size="sm"
+                onClick={handleDelete}
+              >
                 🗑️ Delete
-              </button>
+              </FormButton>
             </>
           )}
 
           {hasEditor && (
             <>
-              <button onClick={handleSave} disabled={isSaving}
-                className="rounded-xl border border-[#e0e2e6] bg-white px-4 py-1.5 text-xs font-semibold text-[#181d26] transition hover:bg-[#f8fafc] disabled:opacity-50">
+              <FormButton
+                variant="secondary"
+                size="sm"
+                loading={isSaving}
+                onClick={handleSave}
+              >
                 {isSaving ? 'Saving…' : '💾 Save'}
-              </button>
+              </FormButton>
               {currentStatus !== 'published' ? (
-                <button onClick={handlePublish} disabled={isSaving || isNew}
-                  className="rounded-xl bg-[#1b61c9] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1550aa] disabled:opacity-40">
+                <FormButton
+                  variant="primary"
+                  size="sm"
+                  loading={isSaving}
+                  disabled={isNew}
+                  onClick={handlePublish}
+                >
                   🚀 Publish
-                </button>
+                </FormButton>
               ) : (
-                <button onClick={handleUnpublish}
-                  className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-100">
+                <FormButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleUnpublish}
+                >
                   ↩ Unpublish
-                </button>
+                </FormButton>
               )}
             </>
           )}
         </div>
       </div>
 
-      {/* Type tabs */}
+      {/* ─── Type tabs ───────────────────────────────────── */}
       <div className="flex shrink-0 gap-0 border-b border-[#e0e2e6] bg-[#f8fafc]">
         {TABS.map((tab) => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium transition border-b-2 ${
               activeTab === tab.key
                 ? 'border-[#1b61c9] text-[#1b61c9] bg-white'
                 : 'border-transparent text-[rgba(4,14,32,0.50)] hover:text-[#181d26]'
-            }`}>
+            }`}
+          >
             <span>{tab.icon}</span> {tab.label}
           </button>
         ))}
       </div>
 
-      {/* 3-panel body */}
+      {/* ─── 3-panel body ────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* ── LEFT: Post List ────────────────────────────── */}
+        {/* ── LEFT: Post list ──────────────────────────── */}
         <aside className="flex w-72 shrink-0 flex-col border-r border-[#e0e2e6] bg-white overflow-y-auto">
           <div className="flex items-center justify-between border-b border-[#e0e2e6] px-4 py-3">
-            <span className="text-xs font-semibold text-[rgba(4,14,32,0.45)] uppercase tracking-widest">{TABS.find(t=>t.key===activeTab)?.label}</span>
-            <button onClick={startNew}
-              className="rounded-lg bg-[#1b61c9] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1550aa]">
-              + New
-            </button>
+            <span className="text-xs font-semibold text-[rgba(4,14,32,0.45)] uppercase tracking-widest">
+              {activeTabMeta?.label}
+            </span>
+            <FormButton variant="primary" size="sm" onClick={startNew}>+ New</FormButton>
           </div>
 
           {isLoading ? (
             <div className="flex flex-1 items-center justify-center">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#1b61c9] border-t-transparent" />
             </div>
-          ) : posts.length === 0 ? (
+          ) : posts.length === 0 && !isNew ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-              <span className="text-3xl">{TABS.find(t => t.key === activeTab)?.icon}</span>
+              <span className="text-3xl">{activeTabMeta?.icon}</span>
               <p className="text-sm text-[rgba(4,14,32,0.45)]">No {activeTab === 'faq' ? 'FAQs' : 'posts'} yet</p>
-              <button onClick={startNew} className="rounded-lg bg-[#1b61c9] px-4 py-2 text-xs font-semibold text-white">Create First</button>
+              <FormButton variant="primary" size="sm" onClick={startNew}>Create first</FormButton>
             </div>
           ) : (
             <div className="flex-1 divide-y divide-[#f0f2f7]">
-              {/* New post placeholder in list */}
               {isNew && (
                 <div className="flex items-start gap-3 bg-blue-50 px-4 py-3">
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold text-[#1b61c9]">{draft.title || 'New Post'}</div>
                     <div className="text-[10px] text-[rgba(4,14,32,0.40)] mt-0.5">Unsaved draft</div>
                   </div>
-                  <span className="text-[10px] rounded-full border px-1.5 py-0.5 bg-amber-50 text-amber-700 border-amber-200">draft</span>
+                  <StatusBadge tone="amber">draft</StatusBadge>
                 </div>
               )}
-              {posts.map((post) => (
-                <button key={post.id} onClick={() => { setSelectedId(post.id); setIsNew(false) }}
-                  className={`w-full flex items-start gap-3 px-4 py-3 text-left transition hover:bg-[#f8fafc] ${selectedId === post.id && !isNew ? 'bg-blue-50/60 border-l-2 border-[#1b61c9]' : ''}`}>
-                  <div className="flex-1 min-w-0">
-                    <div className={`text-sm font-medium truncate ${selectedId === post.id && !isNew ? 'text-[#1b61c9]' : 'text-[#181d26]'}`}>
-                      {post.title || 'Untitled'}
+              {posts.map((post) => {
+                const isSelected = selectedId === post.id && !isNew
+                return (
+                  <button
+                    key={post.id}
+                    onClick={() => { setSelectedId(post.id); setIsNew(false) }}
+                    className={`w-full flex items-start gap-3 px-4 py-3 text-left transition hover:bg-[#f8fafc] ${
+                      isSelected ? 'bg-blue-50/60 border-l-2 border-[#1b61c9]' : ''
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-sm font-medium truncate ${isSelected ? 'text-[#1b61c9]' : 'text-[#181d26]'}`}>
+                        {post.title || 'Untitled'}
+                      </div>
+                      <div className="text-[10px] text-[rgba(4,14,32,0.35)] mt-0.5 truncate">
+                        {(post.meta?.category as string) ?? (post.meta?.youtubeId as string) ?? '—'} · {new Date(post.updated_at).toLocaleDateString()}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-[rgba(4,14,32,0.35)] mt-0.5 truncate">
-                      {post.meta?.category ?? post.meta?.youtubeId ?? '—'} · {new Date(post.updated_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <span className={`shrink-0 text-[10px] rounded-full border px-1.5 py-0.5 font-semibold ${STATUS_STYLES[post.status]}`}>
-                    {post.status}
-                  </span>
-                </button>
-              ))}
+                    <StatusBadge tone={statusToneMap[post.status as PostStatus]}>{post.status}</StatusBadge>
+                  </button>
+                )
+              })}
             </div>
           )}
         </aside>
 
-        {/* ── CENTER: Editor ─────────────────────────────── */}
+        {/* ── CENTER: Editor ────────────────────────────── */}
         <main className="flex flex-1 flex-col overflow-y-auto bg-[#f8fafc]">
           {!hasEditor ? (
             <div className="flex flex-1 flex-col overflow-y-auto">
-              <div className="m-6 rounded-2xl border border-[#e0e2e6] bg-white p-8 shadow-sm">
+              <Card padding="lg" className="m-6 shadow-sm">
 
                 <div className="mb-6 flex items-start gap-4">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#1b61c9]">
@@ -374,16 +428,12 @@ export default function ContentEditorPage() {
                 <div className="mb-6">
                   <h3 className="mb-3 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">How it works</h3>
                   <div className="grid gap-2 sm:grid-cols-3">
-                    {[
-                      { step: '1', label: 'Choose a content type', detail: 'Use the Blog / FAQs / Videos / Page Copy tabs above' },
-                      { step: '2', label: 'Create or select a post', detail: 'Click any item in the left panel, or press "+ New"' },
-                      { step: '3', label: 'Write, save, publish', detail: 'Body auto-saves as you type. Hit Publish to go live.' },
-                    ].map(s => (
-                      <div key={s.step} className="rounded-xl border border-[#e0e2e6] p-4">
+                    {HOW_IT_WORKS.map(s => (
+                      <Card key={s.step} padding="lg">
                         <div className="mb-2 flex h-6 w-6 items-center justify-center rounded-full bg-[#1b61c9] text-xs font-bold text-white">{s.step}</div>
                         <div className="text-sm font-semibold text-[#181d26]">{s.label}</div>
                         <div className="mt-1 text-xs text-[rgba(4,14,32,0.50)]">{s.detail}</div>
-                      </div>
+                      </Card>
                     ))}
                   </div>
                 </div>
@@ -400,12 +450,7 @@ export default function ContentEditorPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#f0f2f7]">
-                        {[
-                          { icon: '📝', tab: 'Blog Posts', url: '/blog  ·  /blog/[slug]',        note: 'Title + excerpt on list. Full rich-text body on post page.' },
-                          { icon: '❓', tab: 'FAQs',       url: '/faqs',                          note: 'Title = question. Body (rich text) = answer in accordion.' },
-                          { icon: '🎬', tab: 'Videos',     url: '/university  or  /media',        note: 'Set the "Section" field to choose which page it appears on.' },
-                          { icon: '🏠', tab: 'Page Copy',  url: 'Homepage, Products…',           note: 'Slug = page key (e.g. "homepage"). Key-value meta fields.' },
-                        ].map(r => (
+                        {CONTENT_MAP.map(r => (
                           <tr key={r.tab}>
                             <td className="px-4 py-3 font-medium text-[#181d26]">{r.icon} {r.tab}</td>
                             <td className="px-4 py-3 font-mono text-xs text-[#1b61c9]">{r.url}</td>
@@ -418,7 +463,7 @@ export default function ContentEditorPage() {
                 </div>
 
                 <div className="mb-6 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-[#e0e2e6] p-4">
+                  <Card padding="lg">
                     <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Draft → Published workflow</h3>
                     <ol className="space-y-1.5 text-xs text-[rgba(4,14,32,0.65)]">
                       <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">1.</span> Create or select a post from the left panel</li>
@@ -427,8 +472,8 @@ export default function ContentEditorPage() {
                       <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">4.</span> Press <strong className="text-[#181d26]">💾 Save</strong> to persist metadata</li>
                       <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">5.</span> Press <strong className="text-[#181d26]">🚀 Publish</strong> — appears on site in ~60 s</li>
                     </ol>
-                  </div>
-                  <div className="rounded-xl border border-[#e0e2e6] p-4 space-y-3">
+                  </Card>
+                  <Card padding="lg" className="space-y-3">
                     <div>
                       <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Version History</h3>
                       <p className="text-xs text-[rgba(4,14,32,0.65)]">Every save creates a snapshot. Click <strong className="text-[#181d26]">🕐 History</strong> in the top bar to browse and restore any previous version.</p>
@@ -441,21 +486,20 @@ export default function ContentEditorPage() {
                       <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Rich Text Toolbar</h3>
                       <p className="text-xs text-[rgba(4,14,32,0.65)]">H1/H2/H3 · Bold · Italic · Underline · Lists · Quote · Code · Link · Align · Highlight · HR · Undo/Redo</p>
                     </div>
-                  </div>
+                  </Card>
                 </div>
 
                 <div className="flex justify-center">
-                  <button onClick={startNew}
-                    className="rounded-xl bg-[#1b61c9] px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#1550aa]">
-                    + Create New {TABS.find(t => t.key === activeTab)?.label.slice(0, -1) || 'Post'}
-                  </button>
+                  <FormButton variant="primary" onClick={startNew}>
+                    + Create new {activeTabMeta?.label.slice(0, -1) || 'Post'}
+                  </FormButton>
                 </div>
-              </div>
+              </Card>
             </div>
           ) : (
             <div className="flex flex-col gap-5 p-6">
 
-              {/* Title */}
+              {/* Title — kept as a custom oversized input for editorial feel */}
               <input
                 type="text"
                 value={draft.title ?? ''}
@@ -485,7 +529,7 @@ export default function ContentEditorPage() {
                   content={bodyJson}
                   contentHtml={bodyHtml}
                   placeholder={
-                    activeTab === 'faq' ? 'Write the answer…'
+                    activeTab === 'faq'  ? 'Write the answer…'
                     : activeTab === 'blog' ? 'Start writing your post…'
                     : 'Edit page copy…'
                   }
@@ -497,77 +541,79 @@ export default function ContentEditorPage() {
 
               {/* Video-specific fields */}
               {activeTab === 'video' && (
-                <div className="space-y-3 rounded-2xl border border-[#e0e2e6] bg-white p-5 shadow-sm">
-                  <h3 className="text-sm font-semibold text-[#181d26]">Video Details</h3>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="col-span-2">
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">YouTube URL or ID</label>
-                      <input type="text"
-                        value={draft.meta?.youtubeId as string ?? ''}
-                        onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, youtubeId: e.target.value } }))}
-                        placeholder="https://youtube.com/watch?v=... or dQw4w9WgXcQ"
-                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
-                    {draft.meta?.youtubeId && (
-                      <div className="col-span-2">
-                        <img
-                          src={`https://i.ytimg.com/vi/${String(draft.meta.youtubeId).replace(/.*[?&]v=/, '').split('&')[0]}/hqdefault.jpg`}
-                          alt="Thumbnail preview"
-                          className="rounded-xl border border-[#e0e2e6] max-h-40 object-cover"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Duration</label>
-                      <input type="text"
-                        value={draft.meta?.duration as string ?? ''}
+                <Card padding="lg" className="space-y-4 shadow-sm">
+                  <h3 className="text-sm font-semibold text-[#181d26]">Video details</h3>
+
+                  <FormField label="YouTube URL or ID">
+                    <FormInput
+                      type="text"
+                      value={(draft.meta?.youtubeId as string) ?? ''}
+                      onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, youtubeId: e.target.value } }))}
+                      placeholder="https://youtube.com/watch?v=… or dQw4w9WgXcQ"
+                    />
+                  </FormField>
+
+                  {draft.meta?.youtubeId ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={`https://i.ytimg.com/vi/${String(draft.meta.youtubeId).replace(/.*[?&]v=/, '').split('&')[0]}/hqdefault.jpg`}
+                      alt="Thumbnail preview"
+                      className="rounded-xl border border-[#e0e2e6] max-h-40 object-cover"
+                    />
+                  ) : null}
+
+                  <FormRow cols={3}>
+                    <FormField label="Duration">
+                      <FormInput
+                        type="text"
+                        value={(draft.meta?.duration as string) ?? ''}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, duration: e.target.value } }))}
                         placeholder="12:30"
-                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Category</label>
-                      <input type="text"
-                        value={draft.meta?.category as string ?? ''}
+                      />
+                    </FormField>
+                    <FormField label="Category">
+                      <FormInput
+                        type="text"
+                        value={(draft.meta?.category as string) ?? ''}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, category: e.target.value } }))}
                         placeholder="Overview"
-                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Section</label>
-                      <select
-                        value={draft.meta?.section as string ?? 'university'}
+                      />
+                    </FormField>
+                    <FormField label="Section">
+                      <FormSelect
+                        value={(draft.meta?.section as string) ?? 'university'}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, section: e.target.value as 'university' | 'media' } }))}
-                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]">
+                      >
                         <option value="university">University</option>
                         <option value="media">Media</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Display order</label>
-                      <input type="number"
-                        value={draft.sort_order ?? 0}
-                        onChange={(e) => setDraft(d => ({ ...d, sort_order: parseInt(e.target.value) || 0 }))}
-                        className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Description</label>
-                    <textarea
+                      </FormSelect>
+                    </FormField>
+                  </FormRow>
+
+                  <FormField label="Display order">
+                    <FormInput
+                      type="number"
+                      value={draft.sort_order ?? 0}
+                      onChange={(e) => setDraft(d => ({ ...d, sort_order: parseInt(e.target.value) || 0 }))}
+                    />
+                  </FormField>
+
+                  <FormField label="Description">
+                    <FormTextarea
                       value={(draft.body_html ?? '') as string}
                       onChange={(e) => setBodyHtml(e.target.value)}
                       rows={3}
                       placeholder="Brief description of the video…"
-                      className="w-full rounded-xl border border-[#e0e2e6] px-4 py-2.5 text-sm text-[#181d26] outline-none focus:border-[#1b61c9] resize-none" />
-                  </div>
-                </div>
+                    />
+                  </FormField>
+                </Card>
               )}
 
             </div>
           )}
         </main>
 
-        {/* ── RIGHT: Meta Panel ──────────────────────────── */}
+        {/* ── RIGHT: Meta panel ─────────────────────────── */}
         <AnimatePresence>
           {hasEditor && (
             <motion.aside
@@ -581,70 +627,83 @@ export default function ContentEditorPage() {
                 {/* Status */}
                 <div className="p-4 space-y-3">
                   <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">Status</div>
-                  <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${STATUS_STYLES[currentStatus]}`}>
-                    <span className={`h-1.5 w-1.5 rounded-full ${currentStatus === 'published' ? 'bg-emerald-500 animate-pulse' : currentStatus === 'scheduled' ? 'bg-blue-500' : 'bg-amber-500'}`} />
-                    {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
+                  <div className="flex items-center gap-2">
+                    <span className={`h-1.5 w-1.5 rounded-full ${dotClass}`} aria-hidden />
+                    <StatusBadge tone={statusToneMap[currentStatus]}>{currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}</StatusBadge>
                   </div>
                   {currentStatus !== 'published' ? (
-                    <button onClick={handlePublish} disabled={isSaving || isNew}
-                      className="w-full rounded-xl bg-[#1b61c9] py-2 text-xs font-semibold text-white hover:bg-[#1550aa] disabled:opacity-40 transition">
-                      🚀 Publish Now
-                    </button>
+                    <FormButton
+                      variant="primary"
+                      size="sm"
+                      loading={isSaving}
+                      disabled={isNew}
+                      onClick={handlePublish}
+                      className="w-full justify-center"
+                    >
+                      🚀 Publish now
+                    </FormButton>
                   ) : (
-                    <button onClick={handleUnpublish}
-                      className="w-full rounded-xl border border-amber-200 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-50 transition">
-                      ↩ Move to Draft
-                    </button>
+                    <FormButton
+                      variant="secondary"
+                      size="sm"
+                      onClick={handleUnpublish}
+                      className="w-full justify-center"
+                    >
+                      ↩ Move to draft
+                    </FormButton>
                   )}
                 </div>
 
                 {/* Blog meta */}
                 {activeTab === 'blog' && (
                   <div className="p-4 space-y-3">
-                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">Post Settings</div>
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">Post settings</div>
 
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Author</label>
-                      <input type="text"
-                        value={draft.meta?.author as string ?? ''}
+                    <FormField label="Author">
+                      <FormInput
+                        type="text"
+                        value={(draft.meta?.author as string) ?? ''}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, author: e.target.value } }))}
-                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
+                      />
+                    </FormField>
 
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Category</label>
-                      <select
-                        value={draft.meta?.category as string ?? 'education'}
+                    <FormField label="Category">
+                      <FormSelect
+                        value={(draft.meta?.category as string) ?? 'education'}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, category: e.target.value } }))}
-                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]">
-                        {BLOG_CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/-/g, ' ')}</option>)}
-                      </select>
-                    </div>
+                      >
+                        {BLOG_CATEGORIES.map(c => (
+                          <option key={c} value={c}>{c.replace(/-/g, ' ')}</option>
+                        ))}
+                      </FormSelect>
+                    </FormField>
 
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Excerpt</label>
-                      <textarea
-                        value={draft.meta?.excerpt as string ?? ''}
+                    <FormField label="Excerpt">
+                      <FormTextarea
+                        value={(draft.meta?.excerpt as string) ?? ''}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, excerpt: e.target.value } }))}
                         rows={3}
                         placeholder="Short summary for post cards…"
-                        className="w-full resize-none rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
+                      />
+                    </FormField>
 
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Publish Date</label>
-                      <input type="date"
-                        value={draft.meta?.publishedAt as string ?? ''}
+                    <FormField label="Publish date">
+                      <FormInput
+                        type="date"
+                        value={(draft.meta?.publishedAt as string) ?? ''}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, publishedAt: e.target.value } }))}
-                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
+                      />
+                    </FormField>
 
-                    <label className="flex items-center gap-2.5 cursor-pointer">
-                      <div
+                    <label className="flex items-center gap-2.5 cursor-pointer pt-1">
+                      <button
+                        type="button"
                         onClick={() => setDraft(d => ({ ...d, meta: { ...d.meta, featured: !d.meta?.featured } }))}
-                        className={`relative h-5 w-9 rounded-full transition-colors ${draft.meta?.featured ? 'bg-[#1b61c9]' : 'bg-[#e0e2e6]'}`}>
-                        <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${draft.meta?.featured ? 'translate-x-4' : 'translate-x-0.5'}`} />
-                      </div>
+                        aria-pressed={!!draft.meta?.featured}
+                        className={`relative h-5 w-9 rounded-full transition-colors ${draft.meta?.featured ? 'bg-[#1b61c9]' : 'bg-[#e0e2e6]'}`}
+                      >
+                        <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${draft.meta?.featured ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                      </button>
                       <span className="text-xs font-medium text-[rgba(4,14,32,0.65)]">Featured post</span>
                     </label>
                   </div>
@@ -653,44 +712,45 @@ export default function ContentEditorPage() {
                 {/* FAQ meta */}
                 {activeTab === 'faq' && (
                   <div className="p-4 space-y-3">
-                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">FAQ Settings</div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Category</label>
-                      <select
-                        value={draft.meta?.category as string ?? 'general'}
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">FAQ settings</div>
+                    <FormField label="Category">
+                      <FormSelect
+                        value={(draft.meta?.category as string) ?? 'general'}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, category: e.target.value } }))}
-                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]">
-                        {FAQ_CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/-/g, ' ')}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium text-[rgba(4,14,32,0.55)]">Sort Order</label>
-                      <input type="number"
+                      >
+                        {FAQ_CATEGORIES.map(c => (
+                          <option key={c} value={c}>{c.replace(/-/g, ' ')}</option>
+                        ))}
+                      </FormSelect>
+                    </FormField>
+                    <FormField label="Sort order">
+                      <FormInput
+                        type="number"
                         value={draft.sort_order ?? 0}
                         onChange={(e) => setDraft(d => ({ ...d, sort_order: parseInt(e.target.value) || 0 }))}
-                        className="w-full rounded-xl border border-[#e0e2e6] px-3 py-2 text-xs text-[#181d26] outline-none focus:border-[#1b61c9]" />
-                    </div>
+                      />
+                    </FormField>
                   </div>
                 )}
 
                 {/* SEO preview (blog only) */}
                 {activeTab === 'blog' && draft.title && (
                   <div className="p-4 space-y-2">
-                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">SEO Preview</div>
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)]">SEO preview</div>
                     <div className="rounded-xl border border-[#e0e2e6] bg-[#f8fafc] p-3 space-y-1">
                       <div className="text-[11px] text-emerald-600 truncate">autopilotroi.com › blog › {draft.slug || 'post-slug'}</div>
                       <div className="text-sm font-semibold text-[#1a0dab] line-clamp-2 leading-tight">{draft.title}</div>
-                      {draft.meta?.excerpt && (
+                      {draft.meta?.excerpt ? (
                         <div className="text-[11px] text-[rgba(4,14,32,0.55)] line-clamp-3 leading-relaxed">{draft.meta.excerpt as string}</div>
-                      )}
+                      ) : null}
                     </div>
                   </div>
                 )}
 
-                {/* Version history pill */}
-                {revisions.length > 0 && (
+                {/* Version history */}
+                {(showRevisions || revisions.length > 0) && revisions.length > 0 && (
                   <div className="p-4">
-                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)] mb-3">Version History</div>
+                    <div className="text-xs font-semibold uppercase tracking-widest text-[rgba(4,14,32,0.35)] mb-3">Version history</div>
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {revisions.map((rev) => (
                         <div key={rev.id} className="flex items-center justify-between gap-2 rounded-xl border border-[#e0e2e6] bg-[#f8fafc] px-3 py-2">
@@ -698,10 +758,9 @@ export default function ContentEditorPage() {
                             <div className="text-[11px] font-semibold text-[#181d26]">{rev.label || 'Auto-save'}</div>
                             <div className="text-[10px] text-[rgba(4,14,32,0.40)]">{new Date(rev.created_at).toLocaleString()}</div>
                           </div>
-                          <button onClick={() => handleRestore(rev)}
-                            className="rounded-lg border border-[#1b61c9]/20 bg-blue-50 px-2 py-1 text-[10px] font-semibold text-[#1b61c9] hover:bg-blue-100 transition">
+                          <FormButton variant="ghost" size="sm" onClick={() => handleRestore(rev)}>
                             Restore
-                          </button>
+                          </FormButton>
                         </div>
                       ))}
                     </div>

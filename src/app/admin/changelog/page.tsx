@@ -1,20 +1,30 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  StatusBadge,
+  type StatusTone,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    CHANGELOG — Everything built, tracked by date and phase
    ═══════════════════════════════════════════════════════════════ */
 
+type ChangeType = 'feature' | 'fix' | 'improvement' | 'security' | 'infrastructure' | 'design'
+
+interface ChangeItem {
+  title: string
+  description: string
+  type: ChangeType
+  files?: string[]
+}
+
 interface ChangeEntry {
   date: string
   phase: string
-  items: {
-    title: string
-    description: string
-    type: 'feature' | 'fix' | 'improvement' | 'security' | 'infrastructure' | 'design'
-    files?: string[]
-  }[]
+  items: ChangeItem[]
 }
 
 const changelog: ChangeEntry[] = [
@@ -27,7 +37,7 @@ const changelog: ChangeEntry[] = [
       { title: 'Leaderboard Mobile Responsive', description: 'Top-3 podium stacks single-column on mobile (was hard grid-cols-3). Fixed hardcoded white text to use theme CSS variables.', type: 'fix', files: ['src/app/dashboard/leaderboard/page.tsx'] },
       { title: 'Admin Quick Links Grid', description: 'Quick links now go 1-col mobile → 2-col tablet → 3-col desktop instead of hard 3-col.', type: 'improvement', files: ['src/app/admin/page.tsx'] },
       { title: 'Onboarding Rewrite — Accordion UI', description: 'Replaced wizard-style stepper with clean accordion-based layout grouped into 3 phases: Preparation → Account Setup → Go Live. 8 steps in correct order with 2FA required before funding. Advanced path is a grouped checklist. Progress persists to localStorage.', type: 'feature', files: ['src/app/onboarding/page.tsx'] },
-      { title: 'Onboarding Typography Overhaul', description: "Bumped all text sizes for readability: titles 3xl→4xl, body sm→base, numbered steps larger, container widened from max-w-3xl to max-w-4xl.", type: 'design', files: ['src/app/onboarding/page.tsx'] },
+      { title: 'Onboarding Typography Overhaul', description: 'Bumped all text sizes for readability: titles 3xl→4xl, body sm→base, numbered steps larger, container widened from max-w-3xl to max-w-4xl.', type: 'design', files: ['src/app/onboarding/page.tsx'] },
       { title: 'Dead Video Sweep — 12 IDs Replaced', description: 'Replaced all 12 dead YouTube video IDs across Waiting Room, Onboarding, and Setup pages with verified-live alternatives from Aurum channel.', type: 'fix', files: ['src/app/onboarding/page.tsx', 'src/app/waiting-room/page.tsx'] },
     ],
   },
@@ -127,69 +137,74 @@ const changelog: ChangeEntry[] = [
   },
 ]
 
-const typeConfig: Record<string, { label: string; bg: string; text: string }> = {
-  feature: { label: '✨ Feature', bg: 'bg-blue-100', text: 'text-blue-700' },
-  fix: { label: '🐛 Fix', bg: 'bg-amber-100', text: 'text-amber-700' },
-  improvement: { label: '⚡ Improvement', bg: 'bg-cyan-100', text: 'text-cyan-700' },
-  security: { label: '🔒 Security', bg: 'bg-red-100', text: 'text-red-700' },
-  infrastructure: { label: '🏗️ Infrastructure', bg: 'bg-purple-100', text: 'text-purple-700' },
-  design: { label: '🎨 Design', bg: 'bg-pink-100', text: 'text-pink-700' },
+const typeMeta: Record<ChangeType, { label: string; tone: StatusTone }> = {
+  feature:        { label: '✨ Feature',        tone: 'blue' },
+  fix:            { label: '🐛 Fix',            tone: 'amber' },
+  improvement:    { label: '⚡ Improvement',    tone: 'blue' },
+  security:       { label: '🔒 Security',       tone: 'red' },
+  infrastructure: { label: '🏗️ Infrastructure', tone: 'purple' },
+  design:         { label: '🎨 Design',         tone: 'purple' },
 }
 
 export default function ChangelogPage() {
   const totalFeatures = changelog.reduce((s, e) => s + e.items.length, 0)
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
-      <div>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[#181d26]">
-          Changelog
-        </h1>
-        <p className="mt-2 text-[rgba(4,14,32,0.55)]">
-          {totalFeatures} features, fixes, and improvements shipped. Updated every session.
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <SectionHeader
+        title="Changelog"
+        subtitle={`${totalFeatures} features, fixes, and improvements shipped — updated every session`}
+      />
 
       {/* Timeline */}
-      <div className="relative space-y-10 pl-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-[#e0e2e6]">
+      <div className="relative space-y-8 pl-8 before:absolute before:left-3 before:top-2 before:bottom-2 before:w-px before:bg-[#e0e2e6]">
         {changelog.map((entry, eIdx) => (
           <motion.div
             key={`${entry.date}-${eIdx}`}
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: eIdx * 0.06 }}
+            transition={{ delay: Math.min(eIdx * 0.04, 0.3) }}
           >
             {/* Date marker */}
-            <div className="relative flex items-center gap-3 mb-4">
-              <div className="absolute -left-8 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full bg-[#1b61c9] ring-4 ring-[#f8fafc]" />
-              <h2 className="font-[var(--font-sora)] text-xl font-bold text-[#181d26]">{entry.date}</h2>
-              <span className="rounded-full bg-[#e8edf5] px-3 py-1 text-xs text-[#1b61c9] font-medium">{entry.phase}</span>
+            <div className="relative flex flex-wrap items-center gap-3 mb-3">
+              <span
+                className="absolute -left-8 top-1/2 -translate-y-1/2 h-2.5 w-2.5 rounded-full"
+                style={{ background: '#1b61c9', boxShadow: '0 0 0 4px #f8fafc' }}
+                aria-hidden
+              />
+              <h2 className="be-section-title">{entry.date}</h2>
+              <StatusBadge tone="blue">{entry.phase}</StatusBadge>
             </div>
 
             {/* Items */}
             <div className="space-y-3">
               {entry.items.map((item, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl border border-[#e0e2e6] bg-white px-5 py-4 hover:border-[#1b61c9]/30 hover:bg-[#f8fafc] transition-colors"
-                >
+                <Card key={i} className="be-card--interactive">
                   <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${typeConfig[item.type].bg} ${typeConfig[item.type].text}`}>
-                      {typeConfig[item.type].label}
+                    <StatusBadge tone={typeMeta[item.type].tone}>
+                      {typeMeta[item.type].label}
+                    </StatusBadge>
+                    <span className="text-sm font-semibold" style={{ color: '#181d26' }}>
+                      {item.title}
                     </span>
-                    <span className="text-sm font-semibold text-[#181d26]">{item.title}</span>
                   </div>
-                  <p className="text-sm text-[rgba(4,14,32,0.55)]">{item.description}</p>
+                  <p className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+                    {item.description}
+                  </p>
                   {item.files && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {item.files.map((f) => (
-                        <code key={f} className="rounded bg-[#f0f2f5] px-2 py-0.5 text-xs text-[rgba(4,14,32,0.55)]">
+                        <code
+                          key={f}
+                          className="rounded px-2 py-0.5 text-xs"
+                          style={{ background: 'rgba(15,23,42,0.05)', color: 'rgba(4,14,32,0.55)' }}
+                        >
                           {f}
                         </code>
                       ))}
                     </div>
                   )}
-                </div>
+                </Card>
               ))}
             </div>
           </motion.div>

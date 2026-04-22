@@ -1,7 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  Toolbar,
+  FilterPill,
+  StatusBadge,
+  EmptyState,
+  FormInput,
+  FormButton,
+  type StatusTone,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    ADMIN AUDIT LOG — Tracks who changed what, when
@@ -11,15 +22,14 @@ import { motion } from 'framer-motion'
 export interface AuditEvent {
   id: string
   timestamp: string
-  actor: string        // email or name
-  action: string       // 'toggle_feature' | 'edit_banner' | 'add_partner' | etc.
-  category: string     // 'feature' | 'partner' | 'system' | 'auth'
-  detail: string       // human-readable description
+  actor: string
+  action: string
+  category: 'feature' | 'partner' | 'auth' | 'system' | string
+  detail: string
 }
 
 const STORAGE_KEY = 'autopilotroi-audit-log'
 
-// Seed demo data on first visit
 const DEMO_EVENTS: AuditEvent[] = [
   { id: '1', timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), actor: 'admin@autopilotroi.com', action: 'toggle_feature', category: 'feature', detail: 'Turned ON "Announcement Banner"' },
   { id: '2', timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), actor: 'admin@autopilotroi.com', action: 'edit_banner', category: 'feature', detail: 'Updated banner message to "Welcome to AutopilotROI!"' },
@@ -31,11 +41,11 @@ const DEMO_EVENTS: AuditEvent[] = [
   { id: '8', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), actor: 'admin@autopilotroi.com', action: 'update_settings', category: 'system', detail: 'Updated Supabase credentials in Integration Vault' },
 ]
 
-const categoryConfig: Record<string, { label: string; color: string; icon: string }> = {
-  feature: { label: 'Feature', color: 'text-blue-400 bg-blue-500/15', icon: '🎛️' },
-  partner: { label: 'Partner', color: 'text-emerald-400 bg-emerald-500/15', icon: '🤝' },
-  auth:    { label: 'Auth', color: 'text-amber-400 bg-amber-500/15', icon: '🔑' },
-  system:  { label: 'System', color: 'text-purple-400 bg-purple-500/15', icon: '⚙️' },
+const categoryConfig: Record<string, { label: string; tone: StatusTone; icon: string }> = {
+  feature: { label: 'Feature', tone: 'blue',   icon: '🎛️' },
+  partner: { label: 'Partner', tone: 'green',  icon: '🤝' },
+  auth:    { label: 'Auth',    tone: 'amber',  icon: '🔑' },
+  system:  { label: 'System',  tone: 'purple', icon: '⚙️' },
 }
 
 function timeAgo(iso: string): string {
@@ -49,24 +59,28 @@ function timeAgo(iso: string): string {
   return `${days}d ago`
 }
 
+const FILTER_KEYS = ['all', 'feature', 'partner', 'auth', 'system'] as const
+type FilterKey = (typeof FILTER_KEYS)[number]
+
 export default function AuditLogPage() {
   const [events, setEvents] = useState<AuditEvent[]>([])
-  const [filterCategory, setFilterCategory] = useState('all')
+  const [filterCategory, setFilterCategory] = useState<FilterKey>('all')
   const [search, setSearch] = useState('')
 
   useEffect(() => {
+    let next = DEMO_EVENTS
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) {
-        setEvents(JSON.parse(saved))
+        next = JSON.parse(saved) as AuditEvent[]
       } else {
-        // Seed demo data
         localStorage.setItem(STORAGE_KEY, JSON.stringify(DEMO_EVENTS))
-        setEvents(DEMO_EVENTS)
       }
     } catch {
-      setEvents(DEMO_EVENTS)
+      /* fall back to demo */
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing local state to a localStorage snapshot on mount
+    setEvents(next)
   }, [])
 
   const clearLog = useCallback(() => {
@@ -76,99 +90,99 @@ export default function AuditLogPage() {
     }
   }, [])
 
-  let filtered = filterCategory === 'all' ? events : events.filter(e => e.category === filterCategory)
-  if (search) {
-    const q = search.toLowerCase()
-    filtered = filtered.filter(e =>
-      e.detail.toLowerCase().includes(q) ||
-      e.actor.toLowerCase().includes(q) ||
-      e.action.toLowerCase().includes(q)
-    )
-  }
+  const filtered = useMemo(() => {
+    let rows = filterCategory === 'all' ? events : events.filter((e) => e.category === filterCategory)
+    if (search) {
+      const q = search.toLowerCase()
+      rows = rows.filter(
+        (e) =>
+          e.detail.toLowerCase().includes(q) ||
+          e.actor.toLowerCase().includes(q) ||
+          e.action.toLowerCase().includes(q)
+      )
+    }
+    return rows
+  }, [events, filterCategory, search])
+
+  const categoryCount = (k: FilterKey) =>
+    k === 'all' ? events.length : events.filter((e) => e.category === k).length
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
-          Audit Log
-        </h1>
-        <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Track who changed what, when. {events.length} events recorded.
-        </p>
-      </motion.div>
+      <SectionHeader
+        title="Audit Log"
+        subtitle={`Track who changed what, when — ${events.length} event${events.length === 1 ? '' : 's'} recorded`}
+        actions={
+          <FormButton variant="danger" size="sm" onClick={clearLog}>
+            Clear Log
+          </FormButton>
+        }
+      />
 
-      {/* Filters */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="flex flex-wrap items-center gap-3"
-      >
-        <input
-          type="text"
+      <div className="flex flex-col gap-3">
+        <FormInput
+          type="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search events..."
-          className="flex-1 min-w-[200px] rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-blue-500 transition"
+          placeholder="Search events, actors, or actions…"
+          aria-label="Search audit log"
         />
-        <div className="flex gap-2">
-          {['all', ...Object.keys(categoryConfig)].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilterCategory(cat)}
-              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-                filterCategory === cat
-                  ? 'bg-blue-600 text-white'
-                  : 'border border-[var(--border-primary)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'
-              }`}
-            >
-              {cat === 'all' ? 'All' : categoryConfig[cat]?.label || cat}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={clearLog}
-          className="rounded-lg border border-red-400/30 px-3 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/10 transition"
-        >
-          Clear Log
-        </button>
-      </motion.div>
 
-      {/* Events */}
-      <div className="space-y-2">
-        {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-12 text-center">
-            <span className="text-4xl">📋</span>
-            <p className="mt-3 text-sm text-[var(--text-muted)]">No events {search ? 'matching your search' : 'recorded yet'}</p>
-          </div>
-        ) : (
-          filtered.map((event, i) => {
+        <Toolbar
+          left={
+            <>
+              {FILTER_KEYS.map((cat) => (
+                <FilterPill
+                  key={cat}
+                  label={cat === 'all' ? 'All' : categoryConfig[cat]?.label || cat}
+                  count={categoryCount(cat)}
+                  active={filterCategory === cat}
+                  onClick={() => setFilterCategory(cat)}
+                />
+              ))}
+            </>
+          }
+        />
+      </div>
+
+      {filtered.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon="📋"
+            title={search ? 'No events match your search' : 'No events recorded yet'}
+            description={search ? 'Try adjusting your search or filter.' : 'Events will appear here as activity occurs.'}
+          />
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map((event, i) => {
             const config = categoryConfig[event.category] || categoryConfig.system
             return (
               <motion.div
                 key={event.id}
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="flex items-start gap-4 rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-5 py-4 hover:bg-[var(--bg-card-hover)] transition"
+                transition={{ delay: Math.min(i * 0.02, 0.2) }}
               >
-                <span className="mt-0.5 text-lg">{config.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[var(--text-primary)]">{event.detail}</p>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px]">
-                    <span className={`rounded-full px-2 py-0.5 font-semibold ${config.color}`}>
-                      {config.label}
-                    </span>
-                    <span className="text-[var(--text-muted)]">by {event.actor}</span>
-                    <span className="text-[var(--text-muted)]">•</span>
-                    <span className="text-[var(--text-muted)]">{timeAgo(event.timestamp)}</span>
+                <Card className="!p-0">
+                  <div className="flex items-start gap-4 px-5 py-4">
+                    <span className="mt-0.5 text-lg" aria-hidden>{config.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm" style={{ color: '#181d26' }}>{event.detail}</p>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-[11px]">
+                        <StatusBadge tone={config.tone}>{config.label}</StatusBadge>
+                        <span style={{ color: 'rgba(4,14,32,0.5)' }}>by {event.actor}</span>
+                        <span style={{ color: 'rgba(4,14,32,0.35)' }}>•</span>
+                        <span style={{ color: 'rgba(4,14,32,0.5)' }}>{timeAgo(event.timestamp)}</span>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </Card>
               </motion.div>
             )
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
     </div>
   )
 }
@@ -183,7 +197,8 @@ export function logAuditEvent(event: Omit<AuditEvent, 'id' | 'timestamp'>) {
       id: crypto.randomUUID(),
       timestamp: new Date().toISOString(),
     })
-    // Keep max 200 events
     localStorage.setItem(STORAGE_KEY, JSON.stringify(events.slice(0, 200)))
-  } catch { /* storage full */ }
+  } catch {
+    /* storage full */
+  }
 }

@@ -1,11 +1,19 @@
 'use client'
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useMemo, useCallback } from 'react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  EmptyState,
+  FormInput,
+  FilterPill,
+} from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
-   ADMIN GUIDE — Built-in documentation for non-technical admins
-   Searchable, categorized, written in plain English
+   ADMIN GUIDE — Built-in documentation for non-technical admins.
+   Searchable, categorized, written in plain English.
    ═══════════════════════════════════════════════════════════════ */
 
 interface Guide {
@@ -267,124 +275,146 @@ export default function AdminGuidePage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
   const [expandedGuide, setExpandedGuide] = useState<string | null>(null)
 
-  const filtered = guides.filter((g) => {
-    const matchesCategory = !activeCategory || g.category === activeCategory
-    const matchesSearch = !searchQuery || [g.title, g.category, ...g.content].some((s) =>
-      s.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    return matchesCategory && matchesSearch
-  })
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    return guides.filter((g) => {
+      const matchesCategory = !activeCategory || g.category === activeCategory
+      if (!matchesCategory) return false
+      if (!q) return true
+      return [g.title, g.category, ...g.content].some((s) => s.toLowerCase().includes(q))
+    })
+  }, [searchQuery, activeCategory])
+
+  const toggleGuide = useCallback((id: string) => {
+    setExpandedGuide((curr) => (curr === id ? null : id))
+  }, [])
+
+  const categoryCount = (cat: string) =>
+    guides.filter((g) => g.category === cat).length
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
-      <div>
-        <h1 className="font-[var(--font-sora)] text-3xl font-bold text-[var(--text-primary)]">
-          Admin Guide
-        </h1>
-        <p className="mt-2 text-[var(--text-muted)]">
-          Everything you need to know about running AutopilotROI. Written in plain English — no tech jargon.
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <SectionHeader
+        title="Admin Guide"
+        subtitle="Everything you need to know about running AutopilotROI. Written in plain English — no tech jargon."
+      />
 
-      {/* Search */}
-      <div className="relative">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search the guide... (try: feature toggles, drip emails, partner)"
-          className="w-full rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] px-4 py-3 pl-10 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] outline-none focus:border-blue-500 transition"
-        />
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
+      <FormInput
+        type="search"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        placeholder="Search the guide… (try: feature toggles, drip emails, partner)"
+        aria-label="Search admin guide"
+      />
 
-      {/* Category pills */}
       <div className="flex flex-wrap gap-2">
-        <button
+        <FilterPill
+          label="All"
+          count={guides.length}
+          active={!activeCategory}
           onClick={() => setActiveCategory(null)}
-          className={`rounded-full px-4 py-2 text-xs font-medium transition ${
-            !activeCategory ? 'bg-blue-600 text-white' : 'border border-[var(--border-primary)] text-[var(--text-secondary)]'
-          }`}
-        >
-          All ({guides.length})
-        </button>
+        />
         {categories.map((cat) => (
-          <button
+          <FilterPill
             key={cat}
+            label={cat}
+            count={categoryCount(cat)}
+            active={activeCategory === cat}
             onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
-            className={`rounded-full px-4 py-2 text-xs font-medium transition ${
-              activeCategory === cat ? 'bg-blue-600 text-white' : 'border border-[var(--border-primary)] text-[var(--text-secondary)]'
-            }`}
-          >
-            {cat} ({guides.filter((g) => g.category === cat).length})
-          </button>
+          />
         ))}
       </div>
 
-      {/* Guides */}
-      <div className="space-y-3">
-        {filtered.length === 0 ? (
-          <div className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] p-12 text-center">
-            <span className="text-3xl">🔍</span>
-            <p className="mt-3 text-[var(--text-muted)]">No guides match your search. Try different keywords.</p>
-          </div>
-        ) : (
-          filtered.map((guide) => {
+      {filtered.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon="🔍"
+            title="No guides match your search"
+            description="Try different keywords, or clear the search to see everything."
+          />
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((guide) => {
             const isExpanded = expandedGuide === guide.id
             return (
               <motion.div
                 key={guide.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-card)] overflow-hidden"
+                transition={{ duration: 0.2 }}
               >
-                <button
-                  onClick={() => setExpandedGuide(isExpanded ? null : guide.id)}
-                  className="flex w-full items-center justify-between px-6 py-4 text-left transition hover:bg-[var(--bg-card-hover)]"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{guide.icon}</span>
-                    <div>
-                      <div className="text-sm font-semibold text-[var(--text-primary)]">{guide.title}</div>
-                      <div className="text-xs text-[var(--text-muted)]">{guide.category}</div>
-                    </div>
-                  </div>
-                  <span className="text-sm text-[var(--text-muted)]">{isExpanded ? '▼' : '▶'}</span>
-                </button>
-
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    className="border-t border-[var(--border-primary)] px-6 py-5 space-y-3"
+                <Card padding="flush">
+                  <button
+                    onClick={() => toggleGuide(guide.id)}
+                    className="flex w-full items-center justify-between px-6 py-4 text-left transition hover:bg-[#f8fafc]"
                   >
-                    {guide.content.map((para, i) => (
-                      <p
-                        key={i}
-                        className="text-sm text-[var(--text-secondary)] leading-relaxed"
-                        dangerouslySetInnerHTML={{
-                          __html: para.replace(/\*\*(.+?)\*\*/g, '<strong class="text-[#181d26] font-semibold">$1</strong>'),
-                        }}
-                      />
-                    ))}
-                  </motion.div>
-                )}
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl" aria-hidden>{guide.icon}</span>
+                      <div>
+                        <div className="text-sm font-semibold" style={{ color: '#181d26' }}>
+                          {guide.title}
+                        </div>
+                        <div className="text-xs" style={{ color: 'rgba(4,14,32,0.5)' }}>
+                          {guide.category}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-sm" style={{ color: 'rgba(4,14,32,0.5)' }}>
+                      {isExpanded ? '▼' : '▶'}
+                    </span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div
+                          className="px-6 py-5 space-y-3"
+                          style={{ borderTop: '1px solid #e0e2e6' }}
+                        >
+                          {guide.content.map((para, i) => (
+                            <p
+                              key={i}
+                              className="text-sm leading-relaxed"
+                              style={{ color: 'rgba(4,14,32,0.69)' }}
+                              dangerouslySetInnerHTML={{
+                                __html: para.replace(
+                                  /\*\*(.+?)\*\*/g,
+                                  '<strong style="color:#181d26;font-weight:600;">$1</strong>'
+                                ),
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Card>
               </motion.div>
             )
-          })
-        )}
-      </div>
+          })}
+        </div>
+      )}
 
-      {/* Footer */}
-      <div className="rounded-xl border border-[#e0e2e6] bg-[#f8fafc] p-5 text-center">
-        <p className="text-sm text-[rgba(4,14,32,0.55)]">
+      <Card>
+        <p className="text-center text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
           Can&apos;t find what you need? Check the{' '}
-          <a href="/admin/features" className="text-[#1b61c9] hover:underline">Feature Toggles</a> page for detailed feature documentation, or the{' '}
-          <a href="/admin/checklist" className="text-[#1b61c9] hover:underline">Launch Checklist</a> for pre-go-live tasks.
+          <Link href="/admin/features" className="font-medium" style={{ color: '#1b61c9' }}>
+            Feature Toggles
+          </Link>{' '}
+          page for detailed feature documentation, or the{' '}
+          <Link href="/admin/checklist" className="font-medium" style={{ color: '#1b61c9' }}>
+            Launch Checklist
+          </Link>{' '}
+          for pre-go-live tasks.
         </p>
-      </div>
+      </Card>
     </div>
   )
 }
