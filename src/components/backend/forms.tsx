@@ -1,16 +1,15 @@
 'use client'
 
-import type { ReactNode, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import type { ReactNode, InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes } from 'react'
 
 /* ═══════════════════════════════════════════════════════════════
    BACKEND FORM PRIMITIVES
-   FormField · FormInput · FormSelect · FormTextarea · FormButton
-   CSS: src/styles/backend.css (.be-shell .be-input etc.)
+   Uses CSS vars + direct Tailwind classes matching old deployment.
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── FormField ─────────────────────────────────────────────────── */
 export interface FormFieldProps {
-  label?: string
+  label: string
   htmlFor?: string
   required?: boolean
   help?: string
@@ -21,49 +20,58 @@ export interface FormFieldProps {
 
 export function FormField({ label, htmlFor, required, help, error, children, className = '' }: FormFieldProps) {
   return (
-    <div className={`space-y-0 ${className}`.trim()}>
-      {label && (
-        <label htmlFor={htmlFor} className="be-label">
-          {label}
-          {required && <span className="ml-0.5" style={{ color: '#dc2626' }} aria-hidden>*</span>}
-        </label>
-      )}
+    <div className={`space-y-1.5 ${className}`.trim()}>
+      <label htmlFor={htmlFor} className="block text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+        {label}
+        {required && <span className="ml-1 text-red-500" aria-hidden>*</span>}
+      </label>
       {children}
-      {help  && !error && <p className="be-help">{help}</p>}
-      {error && <p className="be-error" role="alert">{error}</p>}
+      {error && <p className="text-xs font-medium text-red-600">{error}</p>}
+      {help && !error && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{help}</p>}
     </div>
   )
 }
 
-/* ── FormInput ─────────────────────────────────────────────────── */
-type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> & {
-  hasError?: boolean
-  className?: string
+/* ── Shared input style ────────────────────────────────────────── */
+const inputBase = [
+  'block w-full rounded-xl border px-3.5 py-2.5 text-sm transition-all',
+  'outline-none focus:ring-2',
+].join(' ')
+
+const inputStyle = {
+  borderColor: 'var(--border-primary)',
+  color: 'var(--text-primary)',
+  background: '#fff',
 }
 
-export function FormInput({ hasError, className = '', ...props }: InputProps) {
+/* ── FormInput ─────────────────────────────────────────────────── */
+export type FormInputProps = InputHTMLAttributes<HTMLInputElement> & { error?: boolean }
+
+export function FormInput({ error, className = '', ...props }: FormInputProps) {
   return (
     <input
       {...props}
-      aria-invalid={hasError || undefined}
-      className={`be-input ${className}`.trim()}
+      aria-invalid={error || undefined}
+      className={`${inputBase} ${error ? 'border-red-400 focus:ring-red-200' : 'focus:ring-blue-200'} ${className}`.trim()}
+      style={{ ...inputStyle, borderColor: error ? '#f87171' : 'var(--border-primary)' }}
     />
   )
 }
 
 /* ── FormSelect ────────────────────────────────────────────────── */
-type SelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className'> & {
-  hasError?: boolean
-  className?: string
-  children: ReactNode
-}
+export type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & { error?: boolean }
 
-export function FormSelect({ hasError, className = '', children, ...props }: SelectProps) {
+export function FormSelect({ error, className = '', children, ...props }: FormSelectProps) {
   return (
     <select
       {...props}
-      aria-invalid={hasError || undefined}
-      className={`be-select ${className}`.trim()}
+      aria-invalid={error || undefined}
+      className={`${inputBase} ${error ? 'border-red-400 focus:ring-red-200' : 'focus:ring-blue-200'} pr-9 ${className}`.trim()}
+      style={{ ...inputStyle, borderColor: error ? '#f87171' : 'var(--border-primary)',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23334155' d='M4 6l4 4 4-4'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem',
+        appearance: 'none',
+      }}
     >
       {children}
     </select>
@@ -71,65 +79,47 @@ export function FormSelect({ hasError, className = '', children, ...props }: Sel
 }
 
 /* ── FormTextarea ──────────────────────────────────────────────── */
-type TextareaProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'> & {
-  hasError?: boolean
-  className?: string
-}
+export type FormTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { error?: boolean }
 
-export function FormTextarea({ hasError, className = '', ...props }: TextareaProps) {
+export function FormTextarea({ error, className = '', ...props }: FormTextareaProps) {
   return (
     <textarea
       {...props}
-      aria-invalid={hasError || undefined}
-      className={`be-textarea ${className}`.trim()}
+      aria-invalid={error || undefined}
+      className={`${inputBase} min-h-[6rem] resize-y ${error ? 'border-red-400 focus:ring-red-200' : 'focus:ring-blue-200'} ${className}`.trim()}
+      style={{ ...inputStyle, borderColor: error ? '#f87171' : 'var(--border-primary)' }}
     />
   )
 }
 
 /* ── FormButton ────────────────────────────────────────────────── */
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
+type BtnVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
-export interface FormButtonProps {
-  children: ReactNode
-  type?: 'button' | 'submit' | 'reset'
-  variant?: ButtonVariant
-  size?: 'default' | 'sm'
+const btnBase = 'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed'
+
+const btnVariantStyles: Record<BtnVariant, React.CSSProperties> = {
+  primary:   { background: 'linear-gradient(135deg,#1b61c9,#2563eb)', color: '#fff', boxShadow: '0 1px 4px rgba(27,97,201,0.25)' },
+  secondary: { background: '#fff', color: 'var(--text-primary)', border: '1px solid var(--border-primary)' },
+  ghost:     { background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--border-primary)' },
+  danger:    { background: '#fff', color: '#dc2626', border: '1px solid #fecaca' },
+}
+
+export interface FormButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: BtnVariant
+  size?: 'sm' | 'md'
   loading?: boolean
-  disabled?: boolean
-  onClick?: () => void
-  className?: string
-  id?: string
 }
 
-const variantCls: Record<ButtonVariant, string> = {
-  primary:   'be-btn be-btn--primary',
-  secondary: 'be-btn be-btn--secondary',
-  ghost:     'be-btn be-btn--ghost',
-  danger:    'be-btn be-btn--danger',
-}
-
-export function FormButton({
-  children, type = 'button', variant = 'ghost', size, loading, disabled, onClick, className = '', id,
-}: FormButtonProps) {
-  const cls = [variantCls[variant], size === 'sm' ? 'be-btn--sm' : '', className].filter(Boolean).join(' ')
+export function FormButton({ variant = 'primary', size = 'md', loading, className = '', children, disabled, ...props }: FormButtonProps) {
+  const padding = size === 'sm' ? 'px-3 py-1.5 text-xs' : 'px-5 py-2.5 text-sm'
   return (
     <button
-      id={id}
-      type={type}
-      className={cls}
+      {...props}
       disabled={disabled || loading}
-      aria-busy={loading || undefined}
-      onClick={onClick}
+      className={`${btnBase} ${padding} ${className}`.trim()}
+      style={btnVariantStyles[variant]}
     >
-      {loading ? (
-        <>
-          <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          Loading…
-        </>
-      ) : children}
+      {loading ? 'Please wait…' : children}
     </button>
   )
 }

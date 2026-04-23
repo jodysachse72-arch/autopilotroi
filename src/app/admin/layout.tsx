@@ -41,8 +41,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="be-shell min-h-screen flex" style={{ background: '#f8fafc' }}>
 
       {/* ── Desktop sidebar ── */}
-      <aside className="hidden lg:flex w-[14.5rem] shrink-0 flex-col"
-        style={{ boxShadow: '2px 0 12px rgba(27,97,201,0.12)' }}>
+      <aside className="hidden lg:flex w-60 flex-col shrink-0 shadow-[2px_0_12px_rgba(27,97,201,0.15)]">
         <SidebarShell pathname={pathname} links={sidebarLinks} brandLabel="Admin" brandAccent="#f87171" />
       </aside>
 
@@ -56,7 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               onClick={() => setMobileOpen(false)} />
             <motion.aside initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
               transition={{ duration: 0.22, ease: [0.22,1,0.36,1] }}
-              className="fixed inset-y-0 left-0 z-50 w-[14.5rem] flex flex-col lg:hidden shadow-2xl">
+              className="fixed inset-y-0 left-0 z-50 w-60 flex flex-col lg:hidden shadow-2xl">
               <SidebarShell pathname={pathname} links={sidebarLinks}
                 brandLabel="Admin" brandAccent="#f87171" onClose={() => setMobileOpen(false)} />
             </motion.aside>

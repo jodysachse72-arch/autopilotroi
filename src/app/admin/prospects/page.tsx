@@ -46,11 +46,11 @@ export default function ProspectsPage() {
       <span className={`text-sm ${p.partner === 'Unassigned' ? 'italic' : ''}`}
         style={{ color: p.partner === 'Unassigned' ? '#dc2626' : '#334155' }}>{p.partner}</span>
     )},
-    { key: 'date',    header: 'Date',    field: 'date', align: 'right' },
-    { key: 'actions', header: '',        align: 'right', render: p => (
+    { key: 'date',    header: 'Date',    render: p => <span className="text-sm">{p.date}</span>, align: 'right' as const },
+    { key: 'actions', header: '',        align: 'right' as const, render: p => (
       <div className="flex gap-1.5">
-        <button className="be-btn be-btn--sm be-btn--ghost">View</button>
-        {p.partner === 'Unassigned' && <button className="be-btn be-btn--sm be-btn--primary">Assign</button>}
+        <button className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold border transition-colors" style={{ borderColor: '#e2e8f0', color: '#334155', background: '#fff' }}>View</button>
+        {p.partner === 'Unassigned' && <button className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold text-white" style={{ background: '#1b61c9' }}>Assign</button>}
       </div>
     )},
   ]
@@ -65,10 +65,9 @@ export default function ProspectsPage() {
             count={f==='All' ? PROSPECTS.length : PROSPECTS.filter(p=>p.stage===f).length}
             active={filter===f} onClick={() => setFilter(f)} />
         ))}
-        right={<input className="be-input" style={{ width: 200 }} placeholder="Search…" />}
+        right={<input className="block rounded-xl border px-3.5 py-2 text-sm" style={{ width: 200, borderColor: 'var(--border-primary)' }} placeholder="Search…" />}
       />
-      <DataTable columns={columns} rows={rows} rowKey={r=>r.id}
-        emptyState={<EmptyState icon="👥" title="No prospects found" />} />
+      <DataTable columns={columns} rows={rows} rowKey={r=>r.id} />
     </div>
   )
 }

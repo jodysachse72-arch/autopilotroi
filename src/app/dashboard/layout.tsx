@@ -45,8 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="be-shell min-h-screen flex" style={{ background: '#f8fafc' }}>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-[14.5rem] shrink-0 flex-col"
-        style={{ boxShadow: '2px 0 12px rgba(27,97,201,0.12)' }}>
+      <aside className="hidden lg:flex w-60 flex-col shrink-0 shadow-[2px_0_12px_rgba(27,97,201,0.15)]">
         <SidebarShell pathname={pathname} links={sidebarLinks} brandLabel="Partner Hub" />
       </aside>
 

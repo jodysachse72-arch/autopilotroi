@@ -41,16 +41,16 @@ export default function DashboardProspectsPage() {
       </div>
     )},
     { key: 'stage', header: 'Stage',   render: p => <StatusBadge tone={stageTone[p.stage]}>{p.stage}</StatusBadge> },
-    { key: 'date',  header: 'Date',    field: 'date', align: 'right' },
-    { key: 'actions', header: '', align: 'right', render: () => (
-      <button className="be-btn be-btn--sm be-btn--ghost">View</button>
+    { key: 'date',  header: 'Date',    render: p => <span className="text-sm">{p.date}</span>, align: 'right' as const },
+    { key: 'actions', header: '', align: 'right' as const, render: () => (
+      <button className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-semibold border" style={{ borderColor: '#e2e8f0', color: '#334155', background: '#fff' }}>View</button>
     )},
   ]
 
   return (
     <div className="space-y-5">
       <SectionHeader title="My Prospects" subtitle={`${MY_PROSPECTS.length} prospects in your pipeline`}
-        actions={<button className="be-btn be-btn--primary">+ Add Prospect</button>} />
+        actions={<button className="inline-flex items-center gap-1 rounded-xl px-4 py-2 text-sm font-semibold text-white" style={{ background: '#1b61c9' }}>+ Add Prospect</button>} />
       <Toolbar
         left={(['All','Applied','Invited','Evaluating','Completed'] as StageFilter[]).map(f => (
           <FilterPill key={f} label={f}

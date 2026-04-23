@@ -24,12 +24,12 @@ const columns: DataColumn<EmailTemplate>[] = [
     </div>
   )},
   { key: 'status',   header: 'Status',    render: e => <StatusBadge tone={statusTone[e.status]}>{e.status}</StatusBadge> },
-  { key: 'lastSent', header: 'Last Sent', field: 'lastSent' },
-  { key: 'opens',    header: 'Open Rate', render: e => <span className="text-sm font-semibold">{e.opens}</span>, align: 'right' },
-  { key: 'actions',  header: '',          align: 'right', render: () => (
+  { key: 'lastSent', header: 'Last Sent', render: e => <span className="text-sm">{e.lastSent}</span> },
+  { key: 'opens',    header: 'Open Rate', render: e => <span className="text-sm font-semibold">{e.opens}</span>, align: 'right' as const },
+  { key: 'actions',  header: '',          align: 'right' as const, render: () => (
     <div className="flex gap-1.5">
-      <button className="be-btn be-btn--sm be-btn--ghost">Edit</button>
-      <button className="be-btn be-btn--sm be-btn--primary">Send</button>
+      <button className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold border transition-colors" style={{ borderColor: '#e2e8f0', color: '#334155', background: '#fff' }}>Edit</button>
+      <button className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-white transition-colors" style={{ background: '#1b61c9' }}>Send</button>
     </div>
   )},
 ]
