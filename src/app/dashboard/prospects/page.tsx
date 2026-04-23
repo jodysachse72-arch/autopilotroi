@@ -1,159 +1,64 @@
 'use client'
 
-import { useMemo, useState, useCallback } from 'react'
-import {
-  SectionHeader,
-  DataTable,
-  FilterPill,
-  StatusBadge,
-  FormButton,
-  Toolbar,
-  type DataColumn,
-  type StatusTone,
-} from '@/components/backend'
+import { useState } from 'react'
+import { SectionHeader, DataTable, StatusBadge, FilterPill, Toolbar } from '@/components/backend'
+import type { DataColumn } from '@/components/backend'
 
-/* ═══════════════════════════════════════════════════════════════
-   PARTNER · PROSPECTS  (/dashboard/prospects)
-   List of prospects from a partner's referral activity.
-   Demo data only — replace with Supabase query.
-   ═══════════════════════════════════════════════════════════════ */
+interface Prospect { id: string; name: string; email: string; score: number; stage: string; date: string }
 
-type Tier   = 'beginner' | 'intermediate' | 'advanced'
-type Status = 'new' | 'assessed' | 'invited' | 'onboarding' | 'active'
-
-interface Prospect {
-  id: string
-  name: string
-  email: string
-  tier: Tier
-  score: number
-  status: Status
-  date: string
-}
-
-const DEMO_PROSPECTS: Prospect[] = [
-  { id: '1', name: 'Sarah Chen',     email: 'sarah@example.com',  tier: 'beginner',     score: 28, status: 'assessed',   date: '2026-04-10' },
-  { id: '2', name: 'James Wilson',   email: 'james@example.com',  tier: 'intermediate', score: 55, status: 'invited',    date: '2026-04-09' },
-  { id: '3', name: 'Maria Garcia',   email: 'maria@example.com',  tier: 'advanced',     score: 85, status: 'onboarding', date: '2026-04-08' },
-  { id: '4', name: 'Alex Thompson',  email: 'alex@example.com',   tier: 'beginner',     score: 15, status: 'new',        date: '2026-04-11' },
-  { id: '5', name: 'Lisa Park',      email: 'lisa@example.com',   tier: 'intermediate', score: 62, status: 'active',     date: '2026-04-07' },
+const MY_PROSPECTS: Prospect[] = [
+  { id:'1', name:'Alex Turner',    email:'alex@email.com',    score:72, stage:'Invited',    date:'Apr 22' },
+  { id:'2', name:'Priya Sharma',   email:'priya@email.com',   score:88, stage:'Completed',  date:'Apr 21' },
+  { id:'3', name:'Tom Baker',      email:'tom@email.com',     score:45, stage:'Applied',    date:'Apr 20' },
+  { id:'4', name:'Nina Patel',     email:'nina@email.com',    score:31, stage:'Evaluating', date:'Apr 19' },
+  { id:'5', name:'Sam Rodriguez',  email:'sam@email.com',     score:60, stage:'Invited',    date:'Apr 18' },
+  { id:'6', name:'Dana Kim',       email:'dana@email.com',    score:55, stage:'Evaluating', date:'Apr 17' },
 ]
 
-const STATUS_FILTERS: ReadonlyArray<'all' | Status> = ['all', 'new', 'assessed', 'invited', 'onboarding', 'active']
-
-const tierToneMap: Record<Tier, StatusTone> = {
-  beginner:     'amber',
-  intermediate: 'blue',
-  advanced:     'green',
+const stageTone: Record<string, 'blue'|'amber'|'green'|'neutral'> = {
+  Applied: 'neutral', Invited: 'blue', Evaluating: 'amber', Completed: 'green',
 }
 
-const statusToneMap: Record<Status, StatusTone> = {
-  new:        'purple',
-  assessed:   'amber',
-  invited:    'blue',
-  onboarding: 'blue',
-  active:     'green',
-}
+type StageFilter = 'All' | 'Applied' | 'Invited' | 'Evaluating' | 'Completed'
 
-export default function ProspectsPage() {
-  const [filter, setFilter] = useState<'all' | Status>('all')
+export default function DashboardProspectsPage() {
+  const [filter, setFilter] = useState<StageFilter>('All')
+  const rows = filter === 'All' ? MY_PROSPECTS : MY_PROSPECTS.filter(p => p.stage === filter)
 
-  const filtered = useMemo(
-    () => filter === 'all' ? DEMO_PROSPECTS : DEMO_PROSPECTS.filter(p => p.status === filter),
-    [filter],
-  )
-
-  const counts = useMemo(() => {
-    const acc: Partial<Record<'all' | Status, number>> = { all: DEMO_PROSPECTS.length }
-    for (const p of DEMO_PROSPECTS) acc[p.status] = (acc[p.status] ?? 0) + 1
-    return acc
-  }, [])
-
-  const handleSendLink = useCallback((p: Prospect) => {
-    // Demo only — wire up to email/Resend later
-    console.log('Send link to', p.email)
-  }, [])
-
-  const columns: ReadonlyArray<DataColumn<Prospect>> = [
-    {
-      key: 'name',
-      header: 'Name',
-      render: (p) => (
-        <div>
-          <div className="font-medium text-[#181d26]">{p.name}</div>
-          <div className="text-xs text-[rgba(4,14,32,0.45)]">{p.email}</div>
+  const columns: DataColumn<Prospect>[] = [
+    { key: 'name',  header: 'Prospect', render: p => (
+      <div>
+        <p className="text-sm font-semibold" style={{ color: '#0f172a' }}>{p.name}</p>
+        <p className="text-xs" style={{ color: 'rgba(15,23,42,0.50)' }}>{p.email}</p>
+      </div>
+    )},
+    { key: 'score', header: 'Score', render: p => (
+      <div className="flex items-center gap-2">
+        <div className="h-1.5 w-16 rounded-full overflow-hidden" style={{ background: '#e2e8f0' }}>
+          <div className="h-full rounded-full" style={{ width: `${p.score}%`, background: p.score >= 70 ? '#059669' : p.score >= 40 ? '#d97706' : '#dc2626' }} />
         </div>
-      ),
-    },
-    {
-      key: 'tier',
-      header: 'Readiness',
-      render: (p) => (
-        <StatusBadge tone={tierToneMap[p.tier]}>
-          <span className="capitalize">{p.tier}</span>
-        </StatusBadge>
-      ),
-    },
-    {
-      key: 'score',
-      header: 'Score',
-      render: (p) => <span className="font-mono text-[#181d26]">{p.score}/100</span>,
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (p) => (
-        <StatusBadge tone={statusToneMap[p.status]}>
-          <span className="capitalize">{p.status}</span>
-        </StatusBadge>
-      ),
-    },
-    {
-      key: 'date',
-      header: 'Date',
-      render: (p) => <span className="text-[rgba(4,14,32,0.55)]">{p.date}</span>,
-    },
-    {
-      key: 'action',
-      header: 'Action',
-      align: 'right',
-      render: (p) => (
-        <FormButton variant="secondary" size="sm" onClick={() => handleSendLink(p)}>
-          Send link
-        </FormButton>
-      ),
-    },
+        <span className="text-xs font-semibold">{p.score}/100</span>
+      </div>
+    )},
+    { key: 'stage', header: 'Stage',   render: p => <StatusBadge tone={stageTone[p.stage]}>{p.stage}</StatusBadge> },
+    { key: 'date',  header: 'Date',    field: 'date', align: 'right' },
+    { key: 'actions', header: '', align: 'right', render: () => (
+      <button className="be-btn be-btn--sm be-btn--ghost">View</button>
+    )},
   ]
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <SectionHeader
-        title="Prospects"
-        subtitle={`${filtered.length} prospect${filtered.length !== 1 ? 's' : ''}${filter !== 'all' ? ` · filtered by "${filter}"` : ''}`}
-      />
-
+    <div className="space-y-5">
+      <SectionHeader title="My Prospects" subtitle={`${MY_PROSPECTS.length} prospects in your pipeline`}
+        actions={<button className="be-btn be-btn--primary">+ Add Prospect</button>} />
       <Toolbar
-        left={
-          <>
-            {STATUS_FILTERS.map((s) => (
-              <FilterPill
-                key={s}
-                label={s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
-                active={filter === s}
-                count={counts[s]}
-                onClick={() => setFilter(s)}
-              />
-            ))}
-          </>
-        }
+        left={(['All','Applied','Invited','Evaluating','Completed'] as StageFilter[]).map(f => (
+          <FilterPill key={f} label={f}
+            count={f==='All' ? MY_PROSPECTS.length : MY_PROSPECTS.filter(p=>p.stage===f).length}
+            active={filter===f} onClick={() => setFilter(f)} />
+        ))}
       />
-
-      <DataTable<Prospect>
-        columns={columns}
-        rows={filtered}
-        rowKey={(p) => p.id}
-        emptyState="No prospects match this filter."
-      />
+      <DataTable columns={columns} rows={rows} rowKey={r => r.id} />
     </div>
   )
 }

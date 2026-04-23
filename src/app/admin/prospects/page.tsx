@@ -1,227 +1,74 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import {
-  SectionHeader,
-  Toolbar,
-  FilterPill,
-  StatusBadge,
-  DataTable,
-  FormButton,
-  type DataColumn,
-  type StatusTone,
-} from '@/components/backend'
+import { useState } from 'react'
+import { SectionHeader, DataTable, StatusBadge, FilterPill, Toolbar, EmptyState } from '@/components/backend'
+import type { DataColumn } from '@/components/backend'
 
-/* ─────────────────────────────────────────────
-   ADMIN — All Prospects
-   Refactored to use backend primitives.
-   ───────────────────────────────────────────── */
+interface Prospect { id: string; name: string; email: string; score: number; stage: string; partner: string; date: string }
 
-type Tier = 'beginner' | 'intermediate' | 'advanced'
-type Status = 'new' | 'assessed' | 'invited' | 'onboarding' | 'active'
-
-interface Prospect {
-  id: string
-  name: string
-  email: string
-  tier: Tier
-  score: number
-  status: Status
-  assignedTo: string | null
-  date: string
-}
-
-const allProspects: Prospect[] = [
-  { id: '1', name: 'Alex Thompson', email: 'alex@example.com',  tier: 'beginner',     score: 15, status: 'new',        assignedTo: null,            date: '2026-04-11' },
-  { id: '2', name: 'Sarah Chen',    email: 'sarah@example.com', tier: 'beginner',     score: 28, status: 'assessed',   assignedTo: 'Barry Goss',    date: '2026-04-10' },
-  { id: '3', name: 'James Wilson',  email: 'james@example.com', tier: 'intermediate', score: 55, status: 'invited',    assignedTo: 'Barry Goss',    date: '2026-04-09' },
-  { id: '4', name: 'Maria Garcia',  email: 'maria@example.com', tier: 'advanced',     score: 85, status: 'onboarding', assignedTo: 'Demo Partner',  date: '2026-04-08' },
-  { id: '5', name: 'John Doe',      email: 'john@example.com',  tier: 'intermediate', score: 42, status: 'new',        assignedTo: null,            date: '2026-04-11' },
-  { id: '6', name: 'Emma Brown',    email: 'emma@example.com',  tier: 'beginner',     score: 18, status: 'new',        assignedTo: null,            date: '2026-04-11' },
-  { id: '7', name: 'Mike Johnson',  email: 'mike@example.com',  tier: 'advanced',     score: 73, status: 'assessed',   assignedTo: null,            date: '2026-04-10' },
-  { id: '8', name: 'Lisa Park',     email: 'lisa@example.com',  tier: 'intermediate', score: 62, status: 'active',     assignedTo: 'Jane Smith',    date: '2026-04-07' },
+const PROSPECTS: Prospect[] = [
+  { id:'1', name:'Alex Turner',   email:'alex@email.com',   score:72, stage:'Invited',    partner:'Marcus J.',  date:'Apr 22' },
+  { id:'2', name:'Priya Sharma',  email:'priya@email.com',  score:88, stage:'Completed',  partner:'Sarah C.',   date:'Apr 21' },
+  { id:'3', name:'Tom Baker',     email:'tom@email.com',    score:45, stage:'Applied',    partner:'Unassigned', date:'Apr 21' },
+  { id:'4', name:'Nina Patel',    email:'nina@email.com',   score:31, stage:'Applied',    partner:'Unassigned', date:'Apr 20' },
+  { id:'5', name:'Sam Rodriguez', email:'sam@email.com',    score:60, stage:'Evaluating', partner:'David W.',   date:'Apr 19' },
+  { id:'6', name:'Chloe Wright',  email:'chloe@email.com',  score:92, stage:'Completed',  partner:'Jessica M.', date:'Apr 18' },
+  { id:'7', name:'Ben Foster',    email:'ben@email.com',    score:22, stage:'Applied',    partner:'Unassigned', date:'Apr 18' },
+  { id:'8', name:'Dana Kim',      email:'dana@email.com',   score:55, stage:'Invited',    partner:'Kevin L.',   date:'Apr 17' },
 ]
 
-const tierTone: Record<Tier, StatusTone> = {
-  beginner: 'amber',
-  intermediate: 'blue',
-  advanced: 'green',
+const stageTone: Record<string, 'blue'|'amber'|'green'|'neutral'> = {
+  Applied: 'neutral', Invited: 'blue', Evaluating: 'amber', Completed: 'green',
 }
+type StageFilter = 'All' | 'Applied' | 'Invited' | 'Evaluating' | 'Completed'
 
-const statusTone: Record<Status, StatusTone> = {
-  new: 'purple',
-  assessed: 'amber',
-  invited: 'blue',
-  onboarding: 'blue',
-  active: 'green',
-}
-
-const STATUS_FILTERS = ['all', 'new', 'assessed', 'invited', 'onboarding', 'active'] as const
-type StatusFilter = (typeof STATUS_FILTERS)[number]
-
-const ASSIGN_FILTERS = ['all', 'unassigned', 'assigned'] as const
-type AssignFilter = (typeof ASSIGN_FILTERS)[number]
-
-function scoreTone(score: number): StatusTone {
-  if (score >= 60) return 'green'
-  if (score >= 30) return 'amber'
-  return 'red'
-}
-
-export default function AdminProspectsPage() {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
-  const [assignFilter, setAssignFilter] = useState<AssignFilter>('all')
-
-  const filtered = useMemo(() => {
-    let rows = statusFilter === 'all' ? allProspects : allProspects.filter((p) => p.status === statusFilter)
-    if (assignFilter === 'unassigned') rows = rows.filter((p) => !p.assignedTo)
-    else if (assignFilter === 'assigned') rows = rows.filter((p) => !!p.assignedTo)
-    return rows
-  }, [statusFilter, assignFilter])
-
-  const statusCount = (s: StatusFilter) =>
-    s === 'all' ? allProspects.length : allProspects.filter((p) => p.status === s).length
-
-  const assignCount = (s: AssignFilter) => {
-    if (s === 'all') return allProspects.length
-    if (s === 'unassigned') return allProspects.filter((p) => !p.assignedTo).length
-    return allProspects.filter((p) => !!p.assignedTo).length
-  }
+export default function ProspectsPage() {
+  const [filter, setFilter] = useState<StageFilter>('All')
+  const rows = filter === 'All' ? PROSPECTS : PROSPECTS.filter(p => p.stage === filter)
 
   const columns: DataColumn<Prospect>[] = [
-    {
-      key: 'name',
-      header: 'Name',
-      render: (p) => (
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold" style={{ color: '#181d26' }}>{p.name}</span>
-          <span className="text-xs" style={{ color: 'rgba(4,14,32,0.5)' }}>{p.email}</span>
+    { key: 'name',    header: 'Prospect', render: p => (
+      <div>
+        <div className="text-sm font-semibold" style={{ color: '#0f172a' }}>{p.name}</div>
+        <div className="text-xs" style={{ color: 'rgba(15,23,42,0.50)' }}>{p.email}</div>
+      </div>
+    )},
+    { key: 'score',   header: 'Score', render: p => (
+      <div className="flex items-center gap-2">
+        <div className="h-1.5 w-16 rounded-full overflow-hidden" style={{ background: '#e2e8f0' }}>
+          <div className="h-full rounded-full" style={{ width: `${p.score}%`, background: p.score >= 70 ? '#059669' : p.score >= 40 ? '#d97706' : '#dc2626' }} />
         </div>
-      ),
-    },
-    {
-      key: 'tier',
-      header: 'Tier',
-      render: (p) => (
-        <StatusBadge tone={tierTone[p.tier]}>
-          <span className="capitalize">{p.tier}</span>
-        </StatusBadge>
-      ),
-    },
-    {
-      key: 'score',
-      header: 'Score',
-      render: (p) => (
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-sm" style={{ color: '#181d26' }}>{p.score}</span>
-          <span
-            className="inline-block h-1.5 w-12 rounded-full overflow-hidden"
-            style={{ background: 'rgba(15,23,42,0.08)' }}
-            aria-hidden
-          >
-            <span
-              className="block h-full rounded-full"
-              style={{
-                width: `${Math.min(100, Math.max(0, p.score))}%`,
-                background:
-                  scoreTone(p.score) === 'green'
-                    ? '#10b981'
-                    : scoreTone(p.score) === 'amber'
-                      ? '#f59e0b'
-                      : '#ef4444',
-              }}
-            />
-          </span>
-        </div>
-      ),
-    },
-    {
-      key: 'status',
-      header: 'Status',
-      render: (p) => (
-        <StatusBadge tone={statusTone[p.status]}>
-          <span className="capitalize">{p.status}</span>
-        </StatusBadge>
-      ),
-    },
-    {
-      key: 'assigned',
-      header: 'Assigned To',
-      render: (p) =>
-        p.assignedTo ? (
-          <span className="text-sm" style={{ color: 'rgba(4,14,32,0.7)' }}>{p.assignedTo}</span>
-        ) : (
-          <StatusBadge tone="amber" icon="⚠️">Unassigned</StatusBadge>
-        ),
-    },
-    {
-      key: 'date',
-      header: 'Date',
-      render: (p) => (
-        <span className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>{p.date}</span>
-      ),
-    },
-    {
-      key: 'action',
-      header: 'Action',
-      align: 'right',
-      render: (p) => (
-        <FormButton variant={p.assignedTo ? 'ghost' : 'primary'} size="sm">
-          {p.assignedTo ? 'View' : 'Assign'}
-        </FormButton>
-      ),
-    },
+        <span className="text-xs font-semibold">{p.score}/100</span>
+      </div>
+    )},
+    { key: 'stage',   header: 'Stage',   render: p => <StatusBadge tone={stageTone[p.stage]}>{p.stage}</StatusBadge> },
+    { key: 'partner', header: 'Partner', render: p => (
+      <span className={`text-sm ${p.partner === 'Unassigned' ? 'italic' : ''}`}
+        style={{ color: p.partner === 'Unassigned' ? '#dc2626' : '#334155' }}>{p.partner}</span>
+    )},
+    { key: 'date',    header: 'Date',    field: 'date', align: 'right' },
+    { key: 'actions', header: '',        align: 'right', render: p => (
+      <div className="flex gap-1.5">
+        <button className="be-btn be-btn--sm be-btn--ghost">View</button>
+        {p.partner === 'Unassigned' && <button className="be-btn be-btn--sm be-btn--primary">Assign</button>}
+      </div>
+    )},
   ]
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <SectionHeader
-        title="All Prospects"
-        subtitle={`${filtered.length} of ${allProspects.length} prospects shown`}
-      />
-
+    <div className="space-y-5">
+      <SectionHeader title="Prospect Queue" subtitle={`${PROSPECTS.length} total · ${PROSPECTS.filter(p=>p.partner==='Unassigned').length} unassigned`}
+        actions={<button className="be-btn be-btn--ghost">Export CSV</button>} />
       <Toolbar
-        left={
-          <>
-            {STATUS_FILTERS.map((s) => (
-              <FilterPill
-                key={s}
-                label={s === 'all' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
-                count={statusCount(s)}
-                active={statusFilter === s}
-                onClick={() => setStatusFilter(s)}
-              />
-            ))}
-          </>
-        }
-        right={
-          <>
-            {ASSIGN_FILTERS.map((s) => (
-              <FilterPill
-                key={s}
-                label={s === 'all' ? 'All' : s === 'unassigned' ? 'Unassigned' : 'Assigned'}
-                count={assignCount(s)}
-                active={assignFilter === s}
-                onClick={() => setAssignFilter(s)}
-              />
-            ))}
-          </>
-        }
+        left={(['All','Applied','Invited','Evaluating','Completed'] as StageFilter[]).map(f => (
+          <FilterPill key={f} label={f}
+            count={f==='All' ? PROSPECTS.length : PROSPECTS.filter(p=>p.stage===f).length}
+            active={filter===f} onClick={() => setFilter(f)} />
+        ))}
+        right={<input className="be-input" style={{ width: 200 }} placeholder="Search…" />}
       />
-
-      <motion.div
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-      >
-        <DataTable
-          columns={columns}
-          rows={filtered}
-          rowKey={(p) => p.id}
-          emptyState="No prospects match your filters."
-        />
-      </motion.div>
+      <DataTable columns={columns} rows={rows} rowKey={r=>r.id}
+        emptyState={<EmptyState icon="👥" title="No prospects found" />} />
     </div>
   )
 }

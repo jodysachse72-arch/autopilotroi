@@ -1,149 +1,85 @@
 'use client'
 
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
 import { SectionHeader, StatCard, Card } from '@/components/backend'
 
-/* ═══════════════════════════════════════════════════════════════
-   PARTNER · PERFORMANCE  (/dashboard/performance)
-   Conversion metrics, referral sources, milestones.
-   Demo data — wire to Supabase analytics later.
-   ═══════════════════════════════════════════════════════════════ */
-
-interface WeeklyPoint { week: string; leads: number; converted: number }
-interface SourceRow   { source: string; count: number; pct: number }
-interface Milestone   { target: number; label: string; reward: string; reached: boolean }
-
-const WEEKLY: WeeklyPoint[] = [
-  { week: 'W1', leads: 2,  converted: 0 },
-  { week: 'W2', leads: 5,  converted: 1 },
-  { week: 'W3', leads: 3,  converted: 1 },
-  { week: 'W4', leads: 8,  converted: 2 },
-  { week: 'W5', leads: 6,  converted: 2 },
-  { week: 'W6', leads: 12, converted: 4 },
+const stats = [
+  { label: 'Conversion Rate',    value: '33%',   delta: '+5% vs last month', trend: 'up'   as const, icon: '📈' },
+  { label: 'Avg. Score of Leads',value: '68',    delta: 'Above 60 threshold', trend: 'up'  as const, icon: '⭐' },
+  { label: 'Time to Convert',    value: '14d',   delta: '−2 days improved',   trend: 'up'  as const, icon: '⏱️' },
+  { label: 'Prospects This Month',value: '6',    delta: '+2 vs last month',   trend: 'up'  as const, icon: '👥' },
 ]
 
-const SOURCES: SourceRow[] = [
-  { source: 'WhatsApp',    count: 14, pct: 38 },
-  { source: 'Direct Link', count: 10, pct: 27 },
-  { source: 'Telegram',    count: 8,  pct: 22 },
-  { source: 'Email',       count: 3,  pct: 8  },
-  { source: 'QR Code',     count: 2,  pct: 5  },
+const funnel = [
+  { stage: 'Applied',    count: 18, pct: 100 },
+  { stage: 'Invited',    count: 12, pct: 67  },
+  { stage: 'Evaluating', count: 9,  pct: 50  },
+  { stage: 'Completed',  count: 6,  pct: 33  },
 ]
 
-const MILESTONES: Milestone[] = [
-  { target: 5,   label: 'First 5 leads', reward: 'Partner badge',         reached: true  },
-  { target: 10,  label: '10 leads',      reward: 'Priority support',      reached: true  },
-  { target: 25,  label: '25 leads',      reward: 'Early access features', reached: false },
-  { target: 50,  label: '50 leads',      reward: 'Custom landing page',   reached: false },
-  { target: 100, label: 'Century club',  reward: 'Revenue share boost',   reached: false },
+const monthly = [
+  { month: 'Jan', prospects: 2, completed: 1 },
+  { month: 'Feb', prospects: 3, completed: 1 },
+  { month: 'Mar', prospects: 4, completed: 2 },
+  { month: 'Apr', prospects: 6, completed: 2 },
 ]
 
 export default function PerformancePage() {
-  const totalLeads     = useMemo(() => WEEKLY.reduce((s, w) => s + w.leads, 0), [])
-  const totalConverted = useMemo(() => WEEKLY.reduce((s, w) => s + w.converted, 0), [])
-  const conversionRate = totalLeads > 0 ? Math.round((totalConverted / totalLeads) * 100) : 0
-  const maxLeads       = useMemo(() => Math.max(...WEEKLY.map(w => w.leads)), [])
+  const maxPct = Math.max(...monthly.map(m => m.prospects))
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      <SectionHeader
-        title="Performance"
-        subtitle="Track your referral growth, conversion rates, and milestones."
-      />
+    <div className="space-y-6">
+      <SectionHeader title="Performance" subtitle="Your conversion funnel, trends, and key metrics" />
 
-      {/* Top-level stats */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard label="Total leads"  value={totalLeads}             icon="👥" />
-        <StatCard label="Converted"    value={totalConverted}         icon="✅" />
-        <StatCard label="Conv. rate"   value={`${conversionRate}%`}   icon="📈" />
-        <StatCard label="Trend"        value="+42%"                   icon="🔥" delta="vs last month" trend="up" />
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {stats.map(s => <StatCard key={s.label} {...s} />)}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Weekly chart */}
-        <Card padding="lg">
-          <h3 className="font-[var(--font-sora)] text-sm font-semibold text-[rgba(4,14,32,0.45)] uppercase tracking-wider mb-6">
-            Weekly leads
-          </h3>
-          <div className="flex items-end gap-3 h-40">
-            {WEEKLY.map((w, i) => (
-              <div key={w.week} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-xs font-bold text-[#181d26]">{w.leads}</span>
-                <div className="w-full relative" style={{ height: '100px' }}>
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: `${(w.leads / maxLeads) * 100}%` }}
-                    transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
-                    className="absolute bottom-0 w-full rounded-t-md bg-blue-500/40"
-                  />
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: `${(w.converted / maxLeads) * 100}%` }}
-                    transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
-                    className="absolute bottom-0 w-full rounded-t-md bg-emerald-500/60"
-                  />
-                </div>
-                <span className="text-xs text-[rgba(4,14,32,0.45)]">{w.week}</span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 flex gap-4 justify-center text-xs text-[rgba(4,14,32,0.55)]">
-            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-blue-500/40" /> Leads</span>
-            <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-emerald-500/60" /> Converted</span>
-          </div>
-        </Card>
+      <div className="grid gap-4 lg:grid-cols-2">
 
-        {/* Top referral sources */}
-        <Card padding="lg">
-          <h3 className="font-[var(--font-sora)] text-sm font-semibold text-[rgba(4,14,32,0.45)] uppercase tracking-wider mb-6">
-            Top referral sources
-          </h3>
-          <div className="space-y-4">
-            {SOURCES.map((source) => (
-              <div key={source.source}>
+        {/* Funnel */}
+        <Card>
+          <h3 className="text-sm font-bold mb-4" style={{ color: '#0f172a' }}>Conversion Funnel</h3>
+          <div className="space-y-3">
+            {funnel.map(stage => (
+              <div key={stage.stage}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm font-medium text-[#181d26]">{source.source}</span>
-                  <span className="text-xs text-[rgba(4,14,32,0.55)]">{source.count} leads · {source.pct}%</span>
+                  <span className="text-sm font-medium" style={{ color: '#334155' }}>{stage.stage}</span>
+                  <span className="text-sm font-bold" style={{ color: '#0f172a' }}>{stage.count} <span className="text-xs font-normal" style={{ color: 'rgba(15,23,42,0.45)' }}>({stage.pct}%)</span></span>
                 </div>
-                <div className="h-2 w-full rounded-full bg-[#e8edf5]">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${source.pct}%` }}
-                    transition={{ delay: 0.3, duration: 0.5 }}
-                    className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400"
-                  />
+                <div className="h-2 rounded-full overflow-hidden" style={{ background: '#e2e8f0' }}>
+                  <div className="h-full rounded-full" style={{ width: `${stage.pct}%`, background: '#1b61c9' }} />
                 </div>
               </div>
             ))}
           </div>
         </Card>
-      </div>
 
-      {/* Milestones */}
-      <Card padding="lg">
-        <h3 className="font-[var(--font-sora)] text-sm font-semibold text-[rgba(4,14,32,0.45)] uppercase tracking-wider mb-6">
-          Partner milestones
-        </h3>
-        <div className="flex flex-wrap gap-4">
-          {MILESTONES.map((m) => (
-            <div
-              key={m.target}
-              className={`flex-1 min-w-[140px] rounded-xl border p-4 text-center transition ${
-                m.reached
-                  ? 'border-emerald-200 bg-emerald-50'
-                  : 'border-[#e0e2e6] bg-[#f8fafc] opacity-70'
-              }`}
-            >
-              <div className="text-2xl mb-1">{m.reached ? '🏆' : '🔒'}</div>
-              <div className={`text-sm font-bold ${m.reached ? 'text-emerald-700' : 'text-[rgba(4,14,32,0.45)]'}`}>
-                {m.label}
+        {/* Monthly chart */}
+        <Card>
+          <h3 className="text-sm font-bold mb-4" style={{ color: '#0f172a' }}>Monthly Prospects</h3>
+          <div className="flex items-end justify-around gap-3 h-36">
+            {monthly.map(m => (
+              <div key={m.month} className="flex flex-col items-center gap-1.5 flex-1">
+                <div className="flex items-end gap-1 w-full justify-center" style={{ height: '100px' }}>
+                  <div className="w-4 rounded-t"
+                    style={{ height: `${(m.prospects/maxPct)*100}%`, background: '#1b61c9', opacity: 0.9 }} title={`${m.prospects} prospects`} />
+                  <div className="w-4 rounded-t"
+                    style={{ height: `${(m.completed/maxPct)*100}%`, background: '#059669', opacity: 0.9 }} title={`${m.completed} completed`} />
+                </div>
+                <span className="text-xs" style={{ color: 'rgba(15,23,42,0.50)' }}>{m.month}</span>
               </div>
-              <div className="mt-1 text-xs text-[rgba(4,14,32,0.50)]">{m.reward}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 mt-3 justify-center">
+            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'rgba(15,23,42,0.55)' }}>
+              <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: '#1b61c9' }} />Prospects
+            </span>
+            <span className="flex items-center gap-1.5 text-xs" style={{ color: 'rgba(15,23,42,0.55)' }}>
+              <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: '#059669' }} />Completed
+            </span>
+          </div>
+        </Card>
+      </div>
     </div>
   )
 }

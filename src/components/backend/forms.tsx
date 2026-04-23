@@ -1,156 +1,135 @@
 'use client'
 
-import type {
-  ButtonHTMLAttributes,
-  InputHTMLAttributes,
-  ReactNode,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from 'react'
+import type { ReactNode, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
 
 /* ═══════════════════════════════════════════════════════════════
    BACKEND FORM PRIMITIVES
-   - FormField:   label + control + help/error
-   - FormInput:   <input>
-   - FormSelect:  <select>
-   - FormTextarea:<textarea>
-   - FormButton:  variant-aware button
-   Visual styles live in globals.css under .be-input / .be-btn.
+   FormField · FormInput · FormSelect · FormTextarea · FormButton
+   CSS: src/styles/backend.css (.be-shell .be-input etc.)
    ═══════════════════════════════════════════════════════════════ */
 
+/* ── FormField ─────────────────────────────────────────────────── */
 export interface FormFieldProps {
-  label: string
+  label?: string
   htmlFor?: string
+  required?: boolean
   help?: string
   error?: string
-  required?: boolean
   children: ReactNode
   className?: string
 }
 
-export function FormField({
-  label,
-  htmlFor,
-  help,
-  error,
-  required,
-  children,
-  className = '',
-}: FormFieldProps) {
+export function FormField({ label, htmlFor, required, help, error, children, className = '' }: FormFieldProps) {
   return (
-    <div className={className}>
-      <label htmlFor={htmlFor} className="be-label">
-        {label}
-        {required && <span style={{ color: '#dc2626' }} aria-hidden> *</span>}
-      </label>
+    <div className={`space-y-0 ${className}`.trim()}>
+      {label && (
+        <label htmlFor={htmlFor} className="be-label">
+          {label}
+          {required && <span className="ml-0.5" style={{ color: '#dc2626' }} aria-hidden>*</span>}
+        </label>
+      )}
       {children}
-      {error ? (
-        <p className="be-error" role="alert">{error}</p>
-      ) : help ? (
-        <p className="be-help">{help}</p>
-      ) : null}
+      {help  && !error && <p className="be-help">{help}</p>}
+      {error && <p className="be-error" role="alert">{error}</p>}
     </div>
   )
 }
 
-/* ── Bare inputs that already have backend styling ─────────────── */
-export type FormInputProps = InputHTMLAttributes<HTMLInputElement> & {
-  invalid?: boolean
+/* ── FormInput ─────────────────────────────────────────────────── */
+type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'className'> & {
+  hasError?: boolean
+  className?: string
 }
-export function FormInput({ className = '', invalid, ...rest }: FormInputProps) {
+
+export function FormInput({ hasError, className = '', ...props }: InputProps) {
   return (
     <input
+      {...props}
+      aria-invalid={hasError || undefined}
       className={`be-input ${className}`.trim()}
-      aria-invalid={invalid || undefined}
-      {...rest}
     />
   )
 }
 
-export type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
-  invalid?: boolean
+/* ── FormSelect ────────────────────────────────────────────────── */
+type SelectProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, 'className'> & {
+  hasError?: boolean
+  className?: string
+  children: ReactNode
 }
-export function FormSelect({ className = '', invalid, children, ...rest }: FormSelectProps) {
+
+export function FormSelect({ hasError, className = '', children, ...props }: SelectProps) {
   return (
     <select
+      {...props}
+      aria-invalid={hasError || undefined}
       className={`be-select ${className}`.trim()}
-      aria-invalid={invalid || undefined}
-      {...rest}
     >
       {children}
     </select>
   )
 }
 
-export type FormTextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  invalid?: boolean
+/* ── FormTextarea ──────────────────────────────────────────────── */
+type TextareaProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'> & {
+  hasError?: boolean
+  className?: string
 }
-export function FormTextarea({ className = '', invalid, ...rest }: FormTextareaProps) {
+
+export function FormTextarea({ hasError, className = '', ...props }: TextareaProps) {
   return (
     <textarea
+      {...props}
+      aria-invalid={hasError || undefined}
       className={`be-textarea ${className}`.trim()}
-      aria-invalid={invalid || undefined}
-      {...rest}
     />
   )
 }
 
-/* ── Form button (variant-aware) ───────────────────────────────── */
-export type FormButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
-export type FormButtonSize = 'md' | 'sm'
+/* ── FormButton ────────────────────────────────────────────────── */
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
 
-export interface FormButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: FormButtonVariant
-  size?: FormButtonSize
+export interface FormButtonProps {
+  children: ReactNode
+  type?: 'button' | 'submit' | 'reset'
+  variant?: ButtonVariant
+  size?: 'default' | 'sm'
   loading?: boolean
+  disabled?: boolean
+  onClick?: () => void
+  className?: string
+  id?: string
 }
 
-function variantClass(v: FormButtonVariant | undefined): string {
-  switch (v) {
-    case 'secondary': return 'be-btn be-btn--secondary'
-    case 'ghost':     return 'be-btn be-btn--ghost'
-    case 'danger':    return 'be-btn be-btn--danger'
-    default:          return 'be-btn be-btn--primary'
-  }
+const variantCls: Record<ButtonVariant, string> = {
+  primary:   'be-btn be-btn--primary',
+  secondary: 'be-btn be-btn--secondary',
+  ghost:     'be-btn be-btn--ghost',
+  danger:    'be-btn be-btn--danger',
 }
 
 export function FormButton({
-  variant = 'primary',
-  size = 'md',
-  loading,
-  className = '',
-  children,
-  disabled,
-  type = 'button',
-  ...rest
+  children, type = 'button', variant = 'ghost', size, loading, disabled, onClick, className = '', id,
 }: FormButtonProps) {
-  const sizeCls = size === 'sm' ? 'be-btn--sm' : ''
+  const cls = [variantCls[variant], size === 'sm' ? 'be-btn--sm' : '', className].filter(Boolean).join(' ')
   return (
     <button
+      id={id}
       type={type}
-      className={`${variantClass(variant)} ${sizeCls} ${className}`.trim()}
+      className={cls}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      {...rest}
+      onClick={onClick}
     >
-      {loading && (
-        <span
-          aria-hidden
-          className="inline-block h-3 w-3 rounded-full border-2 border-white/30 border-t-white animate-spin"
-        />
-      )}
-      {children}
+      {loading ? (
+        <>
+          <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          Loading…
+        </>
+      ) : children}
     </button>
   )
-}
-
-/* ── Form row helper for side-by-side fields ───────────────────── */
-export interface FormRowProps {
-  children: ReactNode
-  cols?: 2 | 3
-  className?: string
-}
-export function FormRow({ children, cols = 2, className = '' }: FormRowProps) {
-  const grid = cols === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
-  return <div className={`grid gap-4 ${grid} ${className}`.trim()}>{children}</div>
 }
