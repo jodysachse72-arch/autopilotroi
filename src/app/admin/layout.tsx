@@ -1,156 +1,171 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
-import GuidedTour from '@/components/ui/GuidedTour'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
-import CommandPalette from '@/components/ui/CommandPalette'
-import { ADMIN_TOUR } from '@/lib/tours'
-import { motion, AnimatePresence } from 'framer-motion'
-import { SidebarShell, type SidebarLink } from '@/components/backend'
+import * as React from 'react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
+import {
+  LayoutDashboard, Users, UserCircle, FileEdit, Mail, ToggleLeft,
+  Map, ClipboardList, CheckSquare, BookOpen, FolderOpen,
+  ClipboardCheck, Settings, ExternalLink, ChevronRight, LogOut, Shield
+} from 'lucide-react'
 
-/* ─────────────────────────────────────────────
-   ADMIN SHELL — uses shared SidebarShell.
-   Red dot accent next to "Admin Panel" sub-brand.
-   ───────────────────────────────────────────── */
+import {
+  Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
+  SidebarGroupLabel, SidebarHeader, SidebarMenu,
+  SidebarMenuButton, SidebarMenuItem, SidebarProvider,
+  SidebarRail, SidebarTrigger,
+} from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
+  BreadcrumbPage, BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 
-const sidebarLinks: SidebarLink[] = [
-  { id: 'admin-dashboard',  label: 'Dashboard',       href: '/admin',             icon: '📊', exact: true },
-  { id: 'admin-partners',   label: 'Partners',        href: '/admin/partners',    icon: '🤝' },
-  { id: 'admin-prospects',  label: 'Prospects',       href: '/admin/prospects',   icon: '👥' },
-  { id: 'admin-cms',        label: 'Content Editor',  href: '/admin/cms',         icon: '✏️' },
-  { id: 'admin-emails',     label: 'Emails',          href: '/admin/emails',      icon: '✉️' },
-  { id: 'admin-features',   label: 'Feature Flags',   href: '/admin/features',    icon: '🎛️' },
-  { id: 'admin-strategy',   label: 'Roadmap',         href: '/admin/roadmap',     icon: '🗺️' },
-  { id: 'admin-changelog',  label: 'Changelog',       href: '/admin/changelog',   icon: '📝' },
-  { id: 'admin-checklist',  label: 'Checklist',       href: '/admin/checklist',   icon: '✅' },
-  { id: 'admin-guide',      label: 'Platform Guide',  href: '/admin/guide',       icon: '📖' },
-  { id: 'admin-resources',  label: 'Resources',       href: '/admin/resources',   icon: '📚' },
-  { id: 'admin-audit',      label: 'Audit Log',       href: '/admin/audit',       icon: '📋' },
-  { id: 'admin-settings',   label: 'Integrations',    href: '/admin/settings',    icon: '⚙️' },
+const navItems = [
+  { id: 'admin-dashboard',  label: 'Dashboard',       href: '/admin',             icon: LayoutDashboard, exact: true },
+  { id: 'admin-partners',   label: 'Partners',        href: '/admin/partners',    icon: Users },
+  { id: 'admin-prospects',  label: 'Prospects',       href: '/admin/prospects',   icon: UserCircle },
+  { id: 'admin-cms',        label: 'Content Editor',  href: '/admin/cms',         icon: FileEdit },
+  { id: 'admin-emails',     label: 'Emails',          href: '/admin/emails',      icon: Mail },
+  { id: 'admin-features',   label: 'Feature Flags',   href: '/admin/features',    icon: ToggleLeft },
+  { id: 'admin-roadmap',    label: 'Roadmap',         href: '/admin/roadmap',     icon: Map },
+  { id: 'admin-changelog',  label: 'Changelog',       href: '/admin/changelog',   icon: ClipboardList },
+  { id: 'admin-checklist',  label: 'Checklist',       href: '/admin/checklist',   icon: CheckSquare },
+  { id: 'admin-guide',      label: 'Platform Guide',  href: '/admin/guide',       icon: BookOpen },
+  { id: 'admin-resources',  label: 'Resources',       href: '/admin/resources',   icon: FolderOpen },
+  { id: 'admin-audit',      label: 'Audit Log',       href: '/admin/audit',       icon: ClipboardCheck },
+  { id: 'admin-settings',   label: 'Integrations',    href: '/admin/settings',    icon: Settings },
 ]
+
+function isActive(pathname: string, href: string, exact?: boolean) {
+  return exact ? pathname === href : pathname.startsWith(href)
+}
+
+function getPageTitle(pathname: string) {
+  const item = navItems.find(n => isActive(pathname, n.href, n.exact))
+  return item?.label ?? 'Admin'
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const [showTour, setShowTour] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- close drawer when route changes (URL is the external source)
-  useEffect(() => { setMobileOpen(false) }, [pathname])
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false) }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
-  const toggleMobile = useCallback(() => setMobileOpen(prev => !prev), [])
+  const router = useRouter()
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#f8fafc' }}>
-      {/* ── Desktop Sidebar ── */}
-      <aside className="hidden lg:flex w-60 flex-col shrink-0 shadow-[2px_0_12px_rgba(27,97,201,0.15)]">
-        <SidebarShell
-          pathname={pathname}
-          links={sidebarLinks}
-          brandLabel="Admin Panel"
-          brandAccent="#f87171"
-        />
-      </aside>
+    <div className="admin-shell">
+      <SidebarProvider>
+        <Sidebar collapsible="icon" variant="sidebar">
+          {/* Brand Header */}
+          <SidebarHeader className="border-b border-sidebar-border">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton size="lg" onClick={() => router.push('/admin')}>
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                    <Shield className="size-4" />
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">AutopilotROI</span>
+                    <span className="truncate text-xs text-sidebar-foreground/60">Admin Panel</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarHeader>
 
-      {/* ── Mobile Drawer ── */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
-              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-y-0 left-0 z-50 w-64 lg:hidden shadow-2xl"
-            >
-              <SidebarShell
-                pathname={pathname}
-                links={sidebarLinks}
-                brandLabel="Admin Panel"
-                brandAccent="#f87171"
-                onClose={() => setMobileOpen(false)}
-              />
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+          {/* Nav */}
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+              <SidebarMenu>
+                {navItems.map((item) => {
+                  const active = isActive(pathname, item.href, item.exact)
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        isActive={active}
+                        tooltip={item.label}
+                        id={item.id}
+                        onClick={() => router.push(item.href)}
+                      >
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroup>
+          </SidebarContent>
 
-      {/* ── Main Content ── */}
-      <div className="flex flex-1 flex-col min-w-0">
-        {/* Top bar */}
-        <header
-          className="flex h-[4.8rem] shrink-0 items-center justify-between px-5 lg:px-8"
-          style={{ background: '#ffffff', borderBottom: '1px solid #e0e2e6', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
-        >
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleMobile}
-              className="flex lg:hidden h-9 w-9 items-center justify-center rounded-lg"
-              style={{ border: '1px solid #e0e2e6' }}
-              aria-label="Toggle navigation"
-            >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="text-lg font-bold" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>
-              System Administration
-            </h1>
-          </div>
+          {/* Footer */}
+          <SidebarFooter className="border-t border-sidebar-border">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton size="lg">
+                      <Avatar className="h-8 w-8 rounded-lg">
+                        <AvatarFallback className="rounded-lg bg-primary text-primary-foreground text-xs">AD</AvatarFallback>
+                      </Avatar>
+                      <div className="grid flex-1 text-left text-sm leading-tight">
+                        <span className="truncate font-semibold">Admin</span>
+                        <span className="truncate text-xs text-sidebar-foreground/60">admin@autopilotroi.com</span>
+                      </div>
+                      <ChevronRight className="ml-auto size-4" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent side="top" align="start" className="w-56">
+                    <DropdownMenuItem onClick={() => window.open('/', '_blank')}>
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      View Site
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => router.push('/login')}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
+          <SidebarRail />
+        </Sidebar>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
-              className="hidden sm:flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition"
-              style={{ border: '1px solid #e0e2e6', color: 'rgba(4,14,32,0.45)' }}
-              title="Quick search (Cmd+K)"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              <kbd className="font-mono">⌘K</kbd>
-            </button>
+        {/* Main content */}
+        <div className="flex flex-1 flex-col min-h-screen overflow-hidden bg-[oklch(0.98_0_0)]">
+          {/* Top bar */}
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{getPageTitle(pathname)}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <div className="ml-auto flex items-center gap-2">
+              <Badge variant="outline" className="text-xs font-medium text-primary border-primary/30 bg-primary/5">
+                Admin
+              </Badge>
+            </div>
+          </header>
 
-            <button
-              onClick={() => setShowTour(true)}
-              className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition"
-              style={{ border: '1px solid #e0e2e6', color: '#1b61c9' }}
-              title="Take a guided tour"
-            >
-              🗺️ Tour
-            </button>
-
-            <span
-              id="admin-badge"
-              className="rounded-full px-3 py-1 text-xs font-bold"
-              style={{ background: 'rgba(239,68,68,0.10)', color: '#dc2626' }}
-            >
-              Admin
-            </span>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 p-5 lg:p-8 overflow-x-hidden">
-          <Breadcrumbs />
-          {children}
-        </main>
-      </div>
-
-      <CommandPalette />
-      <GuidedTour
-        tourId="admin-panel"
-        steps={ADMIN_TOUR}
-        autoStart={true}
-        forceShow={showTour}
-        onComplete={() => setShowTour(false)}
-      />
+          {/* Page content */}
+          <main className="flex-1 overflow-auto p-4 sm:p-6">
+            {children}
+          </main>
+        </div>
+      </SidebarProvider>
     </div>
   )
 }

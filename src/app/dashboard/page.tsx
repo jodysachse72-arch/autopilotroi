@@ -1,9 +1,9 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { InfoTip } from '@/components/ui/Tooltip'
+import { InfoTip } from '@/components/ui/tooltip'
 import PartnerOnboardingWizard from '@/components/ui/PartnerOnboardingWizard'
 import {
   StatCard,
@@ -17,11 +17,11 @@ import {
   type StatusTone,
 } from '@/components/backend'
 
-/* ═══════════════════════════════════════════════════════════════
-   PARTNER DASHBOARD — Live lead tracking with pipeline.
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PARTNER DASHBOARD â€” Live lead tracking with pipeline.
    Refactored to use backend primitives + canonical CSS tokens.
    Falls back to demo data when /api/dashboard/leads is unavailable.
-   ═══════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 interface Lead {
   id: string
@@ -173,16 +173,16 @@ export default function DashboardOverview() {
           <div className="relative flex flex-wrap items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold" style={{ color: 'var(--color-text)', letterSpacing: '-0.015em' }}>
-                Welcome back, Partner 👋
+                Welcome back, Partner ðŸ‘‹
               </h2>
               <p className="mt-1 text-sm" style={{ color: 'var(--color-text-weak)' }}>
                 {isLive
-                  ? '🟢 Connected to live data'
-                  : '🟡 Showing demo data — configure Supabase for live tracking'}
+                  ? 'ðŸŸ¢ Connected to live data'
+                  : 'ðŸŸ¡ Showing demo data â€” configure Supabase for live tracking'}
               </p>
             </div>
             <Link href="/dashboard/links" className="be-btn be-btn--primary">
-              🔗 Generate Link
+              ðŸ”— Generate Link
             </Link>
           </div>
         </Card>
@@ -191,10 +191,10 @@ export default function DashboardOverview() {
       {/* Stats grid */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
-          { label: 'Total Leads',  value: String(stats.total),                       delta: `+${stats.thisWeek} this week`,    trend: 'up'   as const, icon: '👥', tip: 'Everyone who has filled out the signup form, whether or not they finished the quiz.' },
-          { label: 'Avg Score',    value: `${stats.avgScore}/100`,                   delta: 'readiness score',                  trend: 'flat' as const, icon: '📊', tip: 'The average readiness score across all your leads. Higher = more experienced with crypto.' },
-          { label: 'In Pipeline',  value: String(stats.assessed + stats.onboarding), delta: 'assessed + onboarding',            trend: 'flat' as const, icon: '🎯', tip: 'Leads who completed the quiz but haven\'t finished setting up their account yet. These need attention.' },
-          { label: 'Conversion',   value: `${stats.conversionRate}%`,                delta: `${stats.active} active members`,    trend: 'up'   as const, icon: '✅', tip: 'Percentage of leads that completed onboarding and are now active. Industry average is 10-20%.' },
+          { label: 'Total Leads',  value: String(stats.total),                       delta: `+${stats.thisWeek} this week`,    trend: 'up'   as const, icon: 'ðŸ‘¥', tip: 'Everyone who has filled out the signup form, whether or not they finished the quiz.' },
+          { label: 'Avg Score',    value: `${stats.avgScore}/100`,                   delta: 'readiness score',                  trend: 'flat' as const, icon: 'ðŸ“Š', tip: 'The average readiness score across all your leads. Higher = more experienced with crypto.' },
+          { label: 'In Pipeline',  value: String(stats.assessed + stats.onboarding), delta: 'assessed + onboarding',            trend: 'flat' as const, icon: 'ðŸŽ¯', tip: 'Leads who completed the quiz but haven\'t finished setting up their account yet. These need attention.' },
+          { label: 'Conversion',   value: `${stats.conversionRate}%`,                delta: `${stats.active} active members`,    trend: 'up'   as const, icon: 'âœ…', tip: 'Percentage of leads that completed onboarding and are now active. Industry average is 10-20%.' },
         ].map((stat, i) => (
           <motion.div
             key={stat.label}
@@ -224,7 +224,7 @@ export default function DashboardOverview() {
           <h3 className="be-section-title">Pipeline Funnel</h3>
           <InfoTip
             content="Shows where your leads are in the journey."
-            detail="New → Assessed (took the quiz) → Invited (you reached out) → Onboarding (setting up) → Active (using the platform). Ideally, most leads move right."
+            detail="New â†’ Assessed (took the quiz) â†’ Invited (you reached out) â†’ Onboarding (setting up) â†’ Active (using the platform). Ideally, most leads move right."
           />
         </div>
         <div className="flex items-end gap-2">
@@ -262,7 +262,7 @@ export default function DashboardOverview() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search…"
+                  placeholder="Searchâ€¦"
                   className="!w-44"
                 />
                 <FormSelect
@@ -406,7 +406,7 @@ export default function DashboardOverview() {
             Showing {filtered.length} of {leads.length} leads
           </span>
           <Link href="/dashboard/prospects" className="text-xs font-semibold" style={{ color: 'var(--color-blue)' }}>
-            View full list →
+            View full list â†’
           </Link>
         </div>
       </Card>
@@ -415,11 +415,14 @@ export default function DashboardOverview() {
       <div>
         <h2 className="be-section-title mb-3">Quick actions</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <ActionCard href="/dashboard/links"    icon="🔗" title="Referral Links"  description="Generate hot, cold, and page-specific links with QR codes." />
-          <ActionCard href="/dashboard/videos"   icon="🎬" title="Partner Videos"  description="Sales training, product deep dives, and social media strategy." />
-          <ActionCard href="/dashboard/settings" icon="⚙️" title="Profile Settings" description="Update your profile, social links, and notification preferences." />
+          <ActionCard href="/dashboard/links"    icon="ðŸ”—" title="Referral Links"  description="Generate hot, cold, and page-specific links with QR codes." />
+          <ActionCard href="/dashboard/videos"   icon="ðŸŽ¬" title="Partner Videos"  description="Sales training, product deep dives, and social media strategy." />
+          <ActionCard href="/dashboard/settings" icon="âš™ï¸" title="Profile Settings" description="Update your profile, social links, and notification preferences." />
         </div>
       </div>
     </div>
   )
 }
+
+
+

@@ -996,3 +996,46 @@ input, textarea, select {
 .be-pill--amber  { background: #fef3c7;               color: #b45309; }
 .be-pill--red    { background: #fef2f2;               color: #b91c1c; }
 .be-pill--purple { background: #f5f3ff;               color: #6d28d9; }
+
+
+/* ================================================================
+   SHADCN/UI DESIGN TOKENS — scoped to backend shells ONLY
+   These variables activate only inside .admin-shell and
+   .dashboard-shell wrappers. The marketing frontend is unaffected.
+   ================================================================ */
+
+.admin-shell,
+.dashboard-shell,
+.auth-shell {
+  /* Colors */
+  --background:            oklch(1 0 0);
+  --foreground:            oklch(0.145 0 0);
+  --card:                  oklch(1 0 0);
+  --card-foreground:       oklch(0.145 0 0);
+  --popover:               oklch(1 0 0);
+  --popover-foreground:    oklch(0.145 0 0);
+  /* Primary = AutopilotROI blue #1b61c9 */
+  --primary:               oklch(0.477 0.179 254.7);
+  --primary-foreground:    oklch(0.985 0 0);
+  --secondary:             oklch(0.97 0 0);
+  --secondary-foreground:  oklch(0.205 0 0);
+  --muted:                 oklch(0.97 0 0);
+  --muted-foreground:      oklch(0.556 0 0);
+  --accent:                oklch(0.95 0.01 254.7);
+  --accent-foreground:     oklch(0.205 0 0);
+  --destructive:           oklch(0.577 0.245 27.325);
+  --border:                oklch(0.922 0 0);
+  --input:                 oklch(0.922 0 0);
+  --ring:                  oklch(0.477 0.179 254.7);
+  /* Sidebar */
+  --sidebar:               oklch(0.18 0.04 254.7);
+  --sidebar-foreground:    oklch(0.88 0.01 254.7);
+  --sidebar-primary:       oklch(0.477 0.179 254.7);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent:        oklch(0.24 0.04 254.7);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border:        oklch(0.28 0.04 254.7);
+  --sidebar-ring:          oklch(0.477 0.179 254.7);
+  /* Radius */
+  --radius:                0.625rem;
+}

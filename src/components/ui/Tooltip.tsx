@@ -1,111 +1,97 @@
-'use client'
+"use client"
 
-import { useState, useRef, useEffect, type ReactNode } from 'react'
+import * as React from "react"
+import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 
-/* ═══════════════════════════════════════════════════════════════
-   TOOLTIP — Contextual help that appears on hover/focus
-   
-   Usage:
-   <Tooltip content="This explains what the button does">
-     <button>My Button</button>
-   </Tooltip>
-   
-   For longer explanations:
-   <Tooltip 
-     content="Short title"
-     detail="Longer explanation that appears below the title"
-   >
-     <span>Hover me</span>
-   </Tooltip>
-   ═══════════════════════════════════════════════════════════════ */
+import { cn } from "@/lib/utils"
 
-interface TooltipProps {
-  children: ReactNode
-  content: string
-  detail?: string
-  position?: 'top' | 'bottom' | 'left' | 'right'
-  maxWidth?: number
+function TooltipProvider({
+  delay = 0,
+  ...props
+}: TooltipPrimitive.Provider.Props) {
+  return (
+    <TooltipPrimitive.Provider
+      data-slot="tooltip-provider"
+      delay={delay}
+      {...props}
+    />
+  )
 }
 
-export default function Tooltip({ children, content, detail, position = 'top', maxWidth = 280 }: TooltipProps) {
-  const [visible, setVisible] = useState(false)
-  const [coords, setCoords] = useState({ top: 0, left: 0 })
-  const triggerRef = useRef<HTMLDivElement>(null)
-  const tooltipRef = useRef<HTMLDivElement>(null)
+function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
+  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+}
 
-  useEffect(() => {
-    if (!visible || !triggerRef.current || !tooltipRef.current) return
+function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
+  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+}
 
-    const trigger = triggerRef.current.getBoundingClientRect()
-    const tooltip = tooltipRef.current.getBoundingClientRect()
-
-    let top = 0
-    let left = 0
-
-    switch (position) {
-      case 'top':
-        top = trigger.top - tooltip.height - 8
-        left = trigger.left + trigger.width / 2 - tooltip.width / 2
-        break
-      case 'bottom':
-        top = trigger.bottom + 8
-        left = trigger.left + trigger.width / 2 - tooltip.width / 2
-        break
-      case 'left':
-        top = trigger.top + trigger.height / 2 - tooltip.height / 2
-        left = trigger.left - tooltip.width - 8
-        break
-      case 'right':
-        top = trigger.top + trigger.height / 2 - tooltip.height / 2
-        left = trigger.right + 8
-        break
-    }
-
-    // Keep within viewport
-    left = Math.max(8, Math.min(left, window.innerWidth - tooltip.width - 8))
-    top = Math.max(8, top)
-
-    setCoords({ top, left })
-  }, [visible, position])
-
+function TooltipContent({
+  className,
+  side = "top",
+  sideOffset = 4,
+  align = "center",
+  alignOffset = 0,
+  children,
+  ...props
+}: TooltipPrimitive.Popup.Props &
+  Pick<
+    TooltipPrimitive.Positioner.Props,
+    "align" | "alignOffset" | "side" | "sideOffset"
+  >) {
   return (
-    <>
-      <div
-        ref={triggerRef}
-        onMouseEnter={() => setVisible(true)}
-        onMouseLeave={() => setVisible(false)}
-        onFocus={() => setVisible(true)}
-        onBlur={() => setVisible(false)}
-        className="inline-flex"
+    <TooltipPrimitive.Portal>
+      <TooltipPrimitive.Positioner
+        align={align}
+        alignOffset={alignOffset}
+        side={side}
+        sideOffset={sideOffset}
+        className="isolate z-50"
       >
-        {children}
-      </div>
-
-      {visible && (
-        <div
-          ref={tooltipRef}
-          className="fixed z-[200] pointer-events-none animate-in fade-in zoom-in-95 duration-150"
-          style={{ top: coords.top, left: coords.left, maxWidth }}
+        <TooltipPrimitive.Popup
+          data-slot="tooltip-content"
+          className={cn(
+            "z-50 inline-flex w-fit max-w-xs origin-(--transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+            className
+          )}
+          {...props}
         >
-          <div className="rounded-lg bg-[#0c1a35] border border-white/10 px-3 py-2 shadow-xl shadow-black/30">
-            <p className="text-xs font-medium text-white leading-relaxed">{content}</p>
-            {detail && (
-              <p className="mt-1 text-[11px] text-white/50 leading-relaxed">{detail}</p>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+          {children}
+          <TooltipPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%-2px)] rotate-45 rounded-[2px] bg-foreground fill-foreground data-[side=bottom]:top-1 data-[side=inline-end]:top-1/2! data-[side=inline-end]:-left-1 data-[side=inline-end]:-translate-y-1/2 data-[side=inline-start]:top-1/2! data-[side=inline-start]:-right-1 data-[side=inline-start]:-translate-y-1/2 data-[side=left]:top-1/2! data-[side=left]:-right-1 data-[side=left]:-translate-y-1/2 data-[side=right]:top-1/2! data-[side=right]:-left-1 data-[side=right]:-translate-y-1/2 data-[side=top]:-bottom-2.5" />
+        </TooltipPrimitive.Popup>
+      </TooltipPrimitive.Positioner>
+    </TooltipPrimitive.Portal>
   )
 }
 
-/* ── Info Icon + Tooltip combo ── */
-export function InfoTip({ content, detail }: { content: string; detail?: string }) {
+// ─── InfoTip ─────────────────────────────────────────────────────
+// Accepts content (main text), detail (optional extended info), and children
+export function InfoTip({
+  content,
+  detail,
+  children,
+}: {
+  content?: string
+  detail?: string
+  children?: React.ReactNode
+}) {
+  const tipContent = content ?? (typeof children === 'string' ? children : undefined)
   return (
-    <Tooltip content={content} detail={detail}>
-      <span className="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full bg-white/5 text-[10px] text-white/30 hover:bg-white/10 hover:text-white/50 transition">
-        ?
-      </span>
-    </Tooltip>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger className="inline-flex cursor-help text-muted-foreground hover:text-foreground transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+          </svg>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-[240px]">
+          {tipContent && <p>{tipContent}</p>}
+          {detail && <p className="mt-1 opacity-80 text-[10px]">{detail}</p>}
+          {!tipContent && !detail && children}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }

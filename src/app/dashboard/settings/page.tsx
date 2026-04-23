@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -14,11 +14,11 @@ import {
   StatusBadge,
 } from '@/components/backend'
 
-/* ═══════════════════════════════════════════════════════════════
-   PARTNER · SETTINGS  (/dashboard/settings)
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PARTNER Â· SETTINGS  (/dashboard/settings)
    Personal info, password, social links, notification prefs.
    Persists to Supabase profiles table or localStorage in demo mode.
-   ═══════════════════════════════════════════════════════════════ */
+   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 interface ProfileData {
   fullName: string
@@ -60,12 +60,12 @@ const TIMEZONES = [
 ]
 
 const SOCIAL_FIELDS = [
-  { key: 'facebook',  label: 'Facebook',     placeholder: 'https://facebook.com/yourpage',     icon: '📘' },
-  { key: 'instagram', label: 'Instagram',    placeholder: 'https://instagram.com/yourhandle',  icon: '📸' },
-  { key: 'youtube',   label: 'YouTube',      placeholder: 'https://youtube.com/@yourchannel',  icon: '▶️' },
-  { key: 'linkedin',  label: 'LinkedIn',     placeholder: 'https://linkedin.com/in/yourprofile', icon: '💼' },
-  { key: 'twitter',   label: 'X / Twitter',  placeholder: 'https://x.com/yourhandle',          icon: '🐦' },
-  { key: 'tiktok',    label: 'TikTok',       placeholder: 'https://tiktok.com/@yourhandle',    icon: '🎵' },
+  { key: 'facebook',  label: 'Facebook',     placeholder: 'https://facebook.com/yourpage',     icon: 'ðŸ“˜' },
+  { key: 'instagram', label: 'Instagram',    placeholder: 'https://instagram.com/yourhandle',  icon: 'ðŸ“¸' },
+  { key: 'youtube',   label: 'YouTube',      placeholder: 'https://youtube.com/@yourchannel',  icon: 'â–¶ï¸' },
+  { key: 'linkedin',  label: 'LinkedIn',     placeholder: 'https://linkedin.com/in/yourprofile', icon: 'ðŸ’¼' },
+  { key: 'twitter',   label: 'X / Twitter',  placeholder: 'https://x.com/yourhandle',          icon: 'ðŸ¦' },
+  { key: 'tiktok',    label: 'TikTok',       placeholder: 'https://tiktok.com/@yourhandle',    icon: 'ðŸŽµ' },
 ] as const
 
 const NOTIFICATION_PREFS = [
@@ -82,7 +82,7 @@ const defaultProfile: ProfileData = {
   notifications: { email: true,  telegram: false, weeklyDigest: true, newLeadAlert: true },
 }
 
-/* ── Animated section card ────────────────────────────────────── */
+/* â”€â”€ Animated section card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function SectionCard({
   title, icon, delay = 0, children,
 }: {
@@ -116,7 +116,7 @@ export default function SettingsPage() {
   const [toast, setToast]           = useState<{ message: string; type: ToastType } | null>(null)
   const [isDemoMode, setIsDemoMode] = useState(false)
 
-  /* ── Load profile data ── */
+  /* â”€â”€ Load profile data â”€â”€ */
   const loadProfile = useCallback(async () => {
     const demoUser = localStorage.getItem('autopilotroi-demo-user')
     if (demoUser) {
@@ -156,7 +156,7 @@ export default function SettingsPage() {
         }
       }
     } catch {
-      // Supabase not configured — stay in default state
+      // Supabase not configured â€” stay in default state
     }
   }, [])
 
@@ -181,7 +181,7 @@ export default function SettingsPage() {
     setProfile(prev => ({ ...prev, notifications: { ...prev.notifications, [key]: value } }))
   }, [])
 
-  /* ── Save personal info ── */
+  /* â”€â”€ Save personal info â”€â”€ */
   const savePersonalInfo = useCallback(async () => {
     setSaving('personal')
     try {
@@ -217,7 +217,7 @@ export default function SettingsPage() {
     }
   }, [isDemoMode, profile, showToast])
 
-  /* ── Save social links ── */
+  /* â”€â”€ Save social links â”€â”€ */
   const saveSocialLinks = useCallback(async () => {
     setSaving('social')
     try {
@@ -245,7 +245,7 @@ export default function SettingsPage() {
     }
   }, [isDemoMode, profile.socialLinks, showToast])
 
-  /* ── Save notification prefs ── */
+  /* â”€â”€ Save notification prefs â”€â”€ */
   const saveNotifications = useCallback(async () => {
     setSaving('notifications')
     try {
@@ -273,7 +273,7 @@ export default function SettingsPage() {
     }
   }, [isDemoMode, profile.notifications, showToast])
 
-  /* ── Change password ── */
+  /* â”€â”€ Change password â”€â”€ */
   const changePassword = useCallback(async () => {
     if (passwords.newPassword !== passwords.confirmPassword) {
       showToast('New passwords do not match.', 'error')
@@ -312,13 +312,13 @@ export default function SettingsPage() {
 
       {isDemoMode && (
         <div className="flex items-center gap-2">
-          <StatusBadge tone="amber">🟡 Demo mode</StatusBadge>
+          <StatusBadge tone="amber">ðŸŸ¡ Demo mode</StatusBadge>
           <span className="text-xs text-[rgba(4,14,32,0.55)]">Changes are saved locally to this browser.</span>
         </div>
       )}
 
-      {/* ── Personal info ── */}
-      <SectionCard title="Personal information" icon="👤" delay={0.05}>
+      {/* â”€â”€ Personal info â”€â”€ */}
+      <SectionCard title="Personal information" icon="ðŸ‘¤" delay={0.05}>
         <div className="space-y-4">
           <FormRow>
             <FormField label="Full name" required>
@@ -365,7 +365,7 @@ export default function SettingsPage() {
             <FormField label="Timezone">
               <FormSelect
                 value={profile.timezone}
-                onChange={(e) => updateProfile('timezone', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateProfile('timezone', e.target.value)}
               >
                 {TIMEZONES.map(tz => (
                   <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
@@ -376,14 +376,14 @@ export default function SettingsPage() {
 
           <div className="flex justify-end pt-2">
             <FormButton variant="primary" loading={saving === 'personal'} onClick={savePersonalInfo}>
-              {saving === 'personal' ? 'Saving…' : 'Save personal info'}
+              {saving === 'personal' ? 'Savingâ€¦' : 'Save personal info'}
             </FormButton>
           </div>
         </div>
       </SectionCard>
 
-      {/* ── Security ── */}
-      <SectionCard title="Security" icon="🔒" delay={0.1}>
+      {/* â”€â”€ Security â”€â”€ */}
+      <SectionCard title="Security" icon="ðŸ”’" delay={0.1}>
         <div className="space-y-4">
           <FormField label="Current password">
             <FormInput
@@ -418,14 +418,14 @@ export default function SettingsPage() {
               disabled={!passwords.newPassword}
               onClick={changePassword}
             >
-              {saving === 'password' ? 'Updating…' : 'Update password'}
+              {saving === 'password' ? 'Updatingâ€¦' : 'Update password'}
             </FormButton>
           </div>
         </div>
       </SectionCard>
 
-      {/* ── Social links ── */}
-      <SectionCard title="Social links" icon="🌐" delay={0.15}>
+      {/* â”€â”€ Social links â”€â”€ */}
+      <SectionCard title="Social links" icon="ðŸŒ" delay={0.15}>
         <p className="text-xs text-[rgba(4,14,32,0.55)] mb-4">
           Add your social profiles so prospects can learn more about you. All fields are optional.
         </p>
@@ -443,13 +443,13 @@ export default function SettingsPage() {
         </FormRow>
         <div className="flex justify-end pt-4">
           <FormButton variant="primary" loading={saving === 'social'} onClick={saveSocialLinks}>
-            {saving === 'social' ? 'Saving…' : 'Save social links'}
+            {saving === 'social' ? 'Savingâ€¦' : 'Save social links'}
           </FormButton>
         </div>
       </SectionCard>
 
-      {/* ── Notifications ── */}
-      <SectionCard title="Notification preferences" icon="🔔" delay={0.2}>
+      {/* â”€â”€ Notifications â”€â”€ */}
+      <SectionCard title="Notification preferences" icon="ðŸ””" delay={0.2}>
         <div className="space-y-3">
           {NOTIFICATION_PREFS.map((pref) => (
             <div
@@ -478,13 +478,13 @@ export default function SettingsPage() {
           ))}
           <div className="flex justify-end pt-2">
             <FormButton variant="primary" loading={saving === 'notifications'} onClick={saveNotifications}>
-              {saving === 'notifications' ? 'Saving…' : 'Save preferences'}
+              {saving === 'notifications' ? 'Savingâ€¦' : 'Save preferences'}
             </FormButton>
           </div>
         </div>
       </SectionCard>
 
-      {/* ── Toast ── */}
+      {/* â”€â”€ Toast â”€â”€ */}
       <AnimatePresence>
         {toast && (
           <motion.div
@@ -497,10 +497,11 @@ export default function SettingsPage() {
                 : 'bg-red-600 text-white'
             }`}
           >
-            {toast.type === 'success' ? '✓' : '✕'} {toast.message}
+            {toast.type === 'success' ? 'âœ“' : 'âœ•'} {toast.message}
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   )
 }
+
