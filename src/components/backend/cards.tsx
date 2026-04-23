@@ -5,29 +5,39 @@ import type { ReactNode } from 'react'
 
 /* ═══════════════════════════════════════════════════════════════
    BACKEND CARD PRIMITIVES
-   All styling is handled by backend.css (.be-shell scope).
-   JSX uses .be-* class names — NO Tailwind padding/bg classes.
+   - Card:        plain content surface (default padding)
+   - StatCard:    label + big number + optional delta
+   - ActionCard:  clickable card that links somewhere with an icon
+   Visual styles live in globals.css under .be-card / .be-stat-*
+   so we never duplicate the visual contract across pages.
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Card ──────────────────────────────────────────────────────── */
+type Padding = 'default' | 'lg' | 'flush'
+
+function paddingClass(p: Padding | undefined): string {
+  if (p === 'lg') return 'be-card be-card--padded'
+  if (p === 'flush') return 'be-card be-card--flush'
+  return 'be-card'
+}
+
 export interface CardProps {
   children: ReactNode
-  padding?: 'default' | 'lg' | 'flush'
+  /** "default" = 1.25rem, "lg" = 1.5rem, "flush" = 0 */
+  padding?: Padding
   className?: string
   as?: 'div' | 'section' | 'article'
   id?: string
 }
 
-export function Card({ children, padding = 'default', className = '', as: Tag = 'div', id }: CardProps) {
-  const mod = padding === 'lg' ? 'be-card be-card--padded' : padding === 'flush' ? 'be-card be-card--flush' : 'be-card'
+export function Card({ children, padding, className = '', as: Tag = 'div', id }: CardProps) {
   return (
-    <Tag id={id} className={`${mod}${className ? ' ' + className : ''}`}>
+    <Tag id={id} className={`${paddingClass(padding)} ${className}`.trim()}>
       {children}
     </Tag>
   )
 }
 
-/* ── SectionHeader ─────────────────────────────────────────────── */
+/* ── Section header — matches Card width ──────────────────────── */
 export interface SectionHeaderProps {
   title: string
   subtitle?: string
@@ -37,17 +47,17 @@ export interface SectionHeaderProps {
 
 export function SectionHeader({ title, subtitle, actions, className = '' }: SectionHeaderProps) {
   return (
-    <div className={`be-toolbar${className ? ' ' + className : ''}`}>
+    <div className={`be-toolbar ${className}`.trim()}>
       <div>
         <h2 className="be-section-title">{title}</h2>
         {subtitle && <p className="be-section-sub">{subtitle}</p>}
       </div>
-      {actions && <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>{actions}</div>}
+      {actions && <div className="flex items-center gap-2 flex-wrap">{actions}</div>}
     </div>
   )
 }
 
-/* ── StatCard ──────────────────────────────────────────────────── */
+/* ── StatCard — label + value + optional delta ─────────────────── */
 export type StatTrend = 'up' | 'down' | 'flat'
 
 export interface StatCardProps {
@@ -55,95 +65,113 @@ export interface StatCardProps {
   value: ReactNode
   delta?: string
   trend?: StatTrend
-  icon?: string
+  icon?: ReactNode
+  /** Optional href makes the entire card clickable */
   href?: string
   className?: string
 }
 
-export function StatCard({ label, value, delta, trend, icon, href, className = '' }: StatCardProps) {
-  const deltaCls = trend === 'up' ? 'be-stat-delta be-stat-delta--up' :
-                   trend === 'down' ? 'be-stat-delta be-stat-delta--down' :
-                   'be-stat-delta be-stat-delta--flat'
-  const arrow = trend === 'up' ? '↑ ' : trend === 'down' ? '↓ ' : ''
+function trendClass(t: StatTrend | undefined): string {
+  if (t === 'up') return 'be-stat-delta be-stat-delta--up'
+  if (t === 'down') return 'be-stat-delta be-stat-delta--down'
+  return 'be-stat-delta be-stat-delta--flat'
+}
 
+function trendArrow(t: StatTrend | undefined): string {
+  if (t === 'up') return '↑'
+  if (t === 'down') return '↓'
+  return '·'
+}
+
+export function StatCard({ label, value, delta, trend, icon, href, className = '' }: StatCardProps) {
   const inner = (
     <>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem' }}>
+      <div className="flex items-start justify-between gap-3">
         <span className="be-stat-label">{label}</span>
-        {icon && <span style={{ fontSize: '1.25rem', lineHeight: 1, opacity: 0.75 }} aria-hidden>{icon}</span>}
+        {icon && <span className="text-base leading-none opacity-70" aria-hidden>{icon}</span>}
       </div>
       <div className="be-stat-value">{value}</div>
-      {delta && <div className={deltaCls}>{arrow}{delta}</div>}
+      {delta && (
+        <div className={trendClass(trend)}>
+          <span aria-hidden>{trendArrow(trend)}</span>
+          {delta}
+        </div>
+      )}
     </>
   )
 
-  if (href) return (
-    <Link href={href} className={`be-card be-card--interactive${className ? ' ' + className : ''}`} style={{ display: 'block' }}>
-      {inner}
-    </Link>
-  )
-  return <div className={`be-card${className ? ' ' + className : ''}`}>{inner}</div>
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={`be-card be-card--interactive block ${className}`.trim()}
+      >
+        {inner}
+      </Link>
+    )
+  }
+  return <div className={`be-card ${className}`.trim()}>{inner}</div>
 }
 
-/* ── ActionCard ────────────────────────────────────────────────── */
+/* ── ActionCard — icon + title + description, clickable ────────── */
 export interface ActionCardProps {
   href: string
   title: string
   description: string
-  icon: string
+  icon: ReactNode
   cta?: string
   external?: boolean
   className?: string
 }
 
-export function ActionCard({ href, title, description, icon, cta = 'Open', external, className = '' }: ActionCardProps) {
-  const cls = `be-card be-card--interactive${className ? ' ' + className : ''}`
+export function ActionCard({
+  href,
+  title,
+  description,
+  icon,
+  cta = 'Open',
+  external,
+  className = '',
+}: ActionCardProps) {
   const content = (
     <>
-      <div style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-        <span style={{
-          display: 'flex', height: '2.25rem', width: '2.25rem', flexShrink: 0,
-          alignItems: 'center', justifyContent: 'center', borderRadius: '0.5rem', fontSize: '1.25rem',
-          background: 'rgba(27,97,201,0.08)', border: '1px solid rgba(27,97,201,0.12)'
-        }} aria-hidden>{icon}</span>
-        <h3 style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a', margin: 0 }}>{title}</h3>
+      <div className="flex items-center gap-2.5 mb-2">
+        <span className="text-xl leading-none" aria-hidden>{icon}</span>
+        <h3 className="text-sm font-semibold" style={{ color: 'var(--color-text, #181d26)' }}>
+          {title}
+        </h3>
       </div>
-      <p style={{ marginBottom: '0.75rem', fontSize: '0.78125rem', lineHeight: 1.6, color: 'rgba(15,23,42,0.55)', marginTop: 0 }}>{description}</p>
-      <span style={{ fontSize: '0.78125rem', fontWeight: 600, color: '#1b61c9' }}>{cta} →</span>
+      <p className="text-xs mb-3" style={{ color: 'rgba(4,14,32,0.6)' }}>
+        {description}
+      </p>
+      <span className="text-xs font-semibold" style={{ color: 'var(--color-blue, #1b61c9)' }}>
+        {cta} →
+      </span>
     </>
   )
 
-  if (external) return <a href={href} target="_blank" rel="noopener noreferrer" className={cls} style={{ display: 'block', textDecoration: 'none' }}>{content}</a>
-  return <Link href={href} className={cls} style={{ display: 'block', textDecoration: 'none' }}>{content}</Link>
-}
-
-/* ── StatusBadge ───────────────────────────────────────────────── */
-type BadgeTone = 'blue' | 'green' | 'amber' | 'red' | 'purple' | 'neutral'
-
-const toneMap: Record<BadgeTone, string> = {
-  blue:    'be-pill be-pill--blue',
-  green:   'be-pill be-pill--green',
-  amber:   'be-pill be-pill--amber',
-  red:     'be-pill be-pill--red',
-  purple:  'be-pill be-pill--purple',
-  neutral: 'be-pill',
-}
-
-export interface StatusBadgeProps {
-  tone?: BadgeTone
-  children: ReactNode
-  className?: string
-}
-
-export function StatusBadge({ tone = 'neutral', children, className = '' }: StatusBadgeProps) {
+  if (external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`be-card be-card--interactive block ${className}`.trim()}
+      >
+        {content}
+      </a>
+    )
+  }
   return (
-    <span className={`${toneMap[tone]}${className ? ' ' + className : ''}`}>{children}</span>
+    <Link href={href} className={`be-card be-card--interactive block ${className}`.trim()}>
+      {content}
+    </Link>
   )
 }
 
-/* ── EmptyState ────────────────────────────────────────────────── */
+/* ── EmptyState — for tables, lists, empty dashboards ──────────── */
 export interface EmptyStateProps {
-  icon?: string
+  icon?: ReactNode
   title: string
   description?: string
   action?: ReactNode
@@ -152,11 +180,17 @@ export interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action, className = '' }: EmptyStateProps) {
   return (
-    <div className={`be-empty${className ? ' ' + className : ''}`}>
-      {icon && <div style={{ marginBottom: '0.75rem', fontSize: '2.25rem' }} aria-hidden>{icon}</div>}
-      <p style={{ fontWeight: 600, color: '#0f172a', margin: '0 0 0.25rem' }}>{title}</p>
-      {description && <p style={{ fontSize: '0.78125rem', color: 'rgba(15,23,42,0.55)', maxWidth: '18rem', margin: '0 auto' }}>{description}</p>}
-      {action && <div style={{ marginTop: '1rem' }}>{action}</div>}
+    <div className={`be-empty flex flex-col items-center justify-center text-center ${className}`.trim()}>
+      {icon && <div className="text-3xl mb-2" aria-hidden>{icon}</div>}
+      <p className="text-sm font-semibold" style={{ color: 'var(--color-text, #181d26)' }}>
+        {title}
+      </p>
+      {description && (
+        <p className="mt-1 text-xs max-w-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          {description}
+        </p>
+      )}
+      {action && <div className="mt-3">{action}</div>}
     </div>
   )
 }

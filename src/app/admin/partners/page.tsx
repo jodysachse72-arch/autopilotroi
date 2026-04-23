@@ -1,84 +1,324 @@
 'use client'
 
-import { useState } from 'react'
-import { SectionHeader, DataTable, StatusBadge, FilterPill, Toolbar, EmptyState } from '@/components/backend'
-import type { DataColumn } from '@/components/backend'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Card,
+  SectionHeader,
+  EmptyState,
+  DataTable,
+  StatusBadge,
+  Toolbar,
+  FormField,
+  FormInput,
+  FormRow,
+  FormButton,
+  type DataColumn,
+} from '@/components/backend'
+
+/* ─────────────────────────────────────────────
+   ADMIN — Partner Management
+   Refactored to use backend primitives.
+   ───────────────────────────────────────────── */
 
 interface Partner {
-  id: string; name: string; email: string; tier: string; prospects: number; score: number; status: 'active' | 'pending' | 'inactive'
+  id: string
+  name: string
+  email: string
+  referral_code: string
+  phone: string | null
+  telegram: string | null
+  is_active: boolean
+  created_at: string
 }
 
-const PARTNERS: Partner[] = [
-  { id: '1', name: 'Marcus Johnson',  email: 'marcus@email.com',  tier: 'Gold',   prospects: 24, score: 92, status: 'active'   },
-  { id: '2', name: 'Sarah Chen',      email: 'sarah@email.com',   tier: 'Silver', prospects: 11, score: 78, status: 'active'   },
-  { id: '3', name: 'David Williams',  email: 'david@email.com',   tier: 'Bronze', prospects: 6,  score: 61, status: 'active'   },
-  { id: '4', name: 'Jessica Martinez',email: 'jessica@email.com', tier: 'Gold',   prospects: 31, score: 95, status: 'active'   },
-  { id: '5', name: 'Ryan Thompson',   email: 'ryan@email.com',    tier: 'Silver', prospects: 8,  score: 72, status: 'pending'  },
-  { id: '6', name: 'Amanda Garcia',   email: 'amanda@email.com',  tier: 'Bronze', prospects: 3,  score: 55, status: 'pending'  },
-  { id: '7', name: 'Kevin Lee',       email: 'kevin@email.com',   tier: 'Gold',   prospects: 19, score: 88, status: 'active'   },
-  { id: '8', name: 'Lisa Davis',      email: 'lisa@email.com',    tier: 'Bronze', prospects: 1,  score: 40, status: 'inactive' },
-]
+interface PartnerForm {
+  name: string
+  email: string
+  referral_code: string
+  phone: string
+  telegram: string
+}
 
-const tierTone: Record<string, 'amber' | 'neutral' | 'blue'> = { Gold: 'amber', Silver: 'neutral', Bronze: 'blue' }
-const statusTone: Record<string, 'green' | 'amber' | 'neutral'> = { active: 'green', pending: 'amber', inactive: 'neutral' }
-type Filter = 'all' | 'active' | 'pending' | 'inactive'
+const EMPTY_FORM: PartnerForm = { name: '', email: '', referral_code: '', phone: '', telegram: '' }
 
-export default function PartnersPage() {
-  const [filter, setFilter] = useState<Filter>('all')
+export default function AdminPartnersPage() {
+  const [partners, setPartners] = useState<Partner[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState<PartnerForm>(EMPTY_FORM)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
-  const filtered = filter === 'all' ? PARTNERS : PARTNERS.filter(p => p.status === filter)
+  const fetchPartners = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/partners')
+      if (res.ok) {
+        const data = await res.json()
+        setPartners(data.partners || [])
+      }
+    } catch {
+      setError('Failed to load partners')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchPartners()
+  }, [fetchPartners])
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+    setError('')
+    setSuccess('')
+    try {
+      const res = await fetch('/api/admin/partners', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Failed to create partner')
+        setSaving(false)
+        return
+      }
+      setSuccess(`Partner "${form.name}" created with code: ${form.referral_code}`)
+      setForm(EMPTY_FORM)
+      setShowForm(false)
+      fetchPartners()
+    } catch {
+      setError('Network error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function toggleActive(partnerId: string, currentlyActive: boolean) {
+    try {
+      await fetch('/api/admin/partners', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: partnerId, is_active: !currentlyActive }),
+      })
+      fetchPartners()
+    } catch {
+      setError('Failed to update partner')
+    }
+  }
 
   const columns: DataColumn<Partner>[] = [
-    { key: 'name',      header: 'Partner',     render: p => (
-      <div>
-        <div className="text-sm font-semibold" style={{ color: '#0f172a' }}>{p.name}</div>
-        <div className="text-xs" style={{ color: 'rgba(15,23,42,0.50)' }}>{p.email}</div>
-      </div>
-    )},
-    { key: 'tier',      header: 'Tier',        render: p => <StatusBadge tone={tierTone[p.tier]}>{p.tier}</StatusBadge> },
-    { key: 'prospects', header: 'Prospects',   render: p => <span className="text-sm font-semibold">{p.prospects}</span>, align: 'right' },
-    { key: 'score',     header: 'Score',       render: p => (
-      <div className="flex items-center gap-2">
-        <div className="h-1.5 w-16 rounded-full overflow-hidden" style={{ background: '#e2e8f0' }}>
-          <div className="h-full rounded-full" style={{ width: `${p.score}%`, background: p.score >= 80 ? '#059669' : p.score >= 60 ? '#d97706' : '#dc2626' }} />
+    {
+      key: 'partner',
+      header: 'Partner',
+      render: (p) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-semibold" style={{ color: '#181d26' }}>{p.name}</span>
+          <span className="text-xs" style={{ color: 'rgba(4,14,32,0.5)' }}>{p.email}</span>
         </div>
-        <span className="text-xs font-medium">{p.score}</span>
-      </div>
-    )},
-    { key: 'status',    header: 'Status',      render: p => <StatusBadge tone={statusTone[p.status]}>{p.status}</StatusBadge> },
-    { key: 'actions',   header: '',            render: () => (
-      <div className="flex items-center gap-1.5">
-        <button className="be-btn be-btn--sm be-btn--ghost">View</button>
-        <button className="be-btn be-btn--sm be-btn--secondary">Edit</button>
-      </div>
-    ), align: 'right' },
+      ),
+    },
+    {
+      key: 'code',
+      header: 'Referral Code',
+      render: (p) => (
+        <code
+          className="rounded px-2 py-1 text-xs font-medium"
+          style={{ background: 'rgba(27,97,201,0.08)', color: '#1b61c9' }}
+        >
+          {p.referral_code}
+        </code>
+      ),
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      render: (p) => (
+        <StatusBadge tone={p.is_active ? 'green' : 'red'}>
+          {p.is_active ? 'Active' : 'Inactive'}
+        </StatusBadge>
+      ),
+    },
+    {
+      key: 'joined',
+      header: 'Joined',
+      render: (p) => (
+        <span className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          {new Date(p.created_at).toLocaleDateString()}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      align: 'right',
+      render: (p) => (
+        <FormButton
+          variant={p.is_active ? 'danger' : 'secondary'}
+          size="sm"
+          onClick={() => toggleActive(p.id, p.is_active)}
+        >
+          {p.is_active ? 'Deactivate' : 'Reactivate'}
+        </FormButton>
+      ),
+    },
   ]
 
   return (
-    <div className="space-y-5">
-      <SectionHeader title="Partners" subtitle={`${PARTNERS.length} total partners`}
-        actions={<button className="be-btn be-btn--primary">+ Add Partner</button>} />
+    <div className="mx-auto max-w-6xl space-y-6">
+      <SectionHeader
+        title="Partner Management"
+        subtitle="Add, manage, and track referral partners"
+        actions={
+          <FormButton
+            variant={showForm ? 'secondary' : 'primary'}
+            onClick={() => setShowForm((v) => !v)}
+          >
+            {showForm ? 'Cancel' : '+ Add Partner'}
+          </FormButton>
+        }
+      />
 
+      {/* Inline messages */}
+      {error && (
+        <div
+          className="rounded-lg px-4 py-3 text-sm"
+          style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#b91c1c' }}
+          role="alert"
+        >
+          {error}
+        </div>
+      )}
+      {success && (
+        <div
+          className="rounded-lg px-4 py-3 text-sm"
+          style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', color: '#047857' }}
+          role="status"
+        >
+          {success}
+        </div>
+      )}
+
+      {/* New partner form */}
+      <AnimatePresence initial={false}>
+        {showForm && (
+          <motion.div
+            key="partner-form"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+          >
+            <Card padding="lg">
+              <h3 className="be-section-title mb-4">New Partner</h3>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <FormRow>
+                  <FormField label="Full Name" htmlFor="p-name" required>
+                    <FormInput
+                      id="p-name"
+                      required
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      placeholder="Jane Smith"
+                    />
+                  </FormField>
+                  <FormField label="Email" htmlFor="p-email" required>
+                    <FormInput
+                      id="p-email"
+                      required
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      placeholder="jane@email.com"
+                    />
+                  </FormField>
+                </FormRow>
+                <FormRow>
+                  <FormField
+                    label="Referral Code"
+                    htmlFor="p-code"
+                    required
+                    help={`Used in: autopilotroi.com/signup?ref=${form.referral_code || 'code'}`}
+                  >
+                    <FormInput
+                      id="p-code"
+                      required
+                      value={form.referral_code}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          referral_code: e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ''),
+                        })
+                      }
+                      placeholder="jane-smith"
+                    />
+                  </FormField>
+                  <FormField label="Phone" htmlFor="p-phone">
+                    <FormInput
+                      id="p-phone"
+                      value={form.phone}
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      placeholder="+1 555-123-4567"
+                    />
+                  </FormField>
+                </FormRow>
+                <div className="flex justify-end gap-2">
+                  <FormButton variant="ghost" onClick={() => setShowForm(false)}>
+                    Cancel
+                  </FormButton>
+                  <FormButton type="submit" loading={saving} variant="primary">
+                    {saving ? 'Creating…' : 'Create Partner'}
+                  </FormButton>
+                </div>
+              </form>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toolbar + count */}
       <Toolbar
         left={
-          <>
-            {(['all','active','pending','inactive'] as Filter[]).map(f => (
-              <FilterPill key={f} label={f.charAt(0).toUpperCase()+f.slice(1)}
-                count={f === 'all' ? PARTNERS.length : PARTNERS.filter(p => p.status === f).length}
-                active={filter === f} onClick={() => setFilter(f)} />
-            ))}
-          </>
-        }
-        right={
-          <input className="be-input" style={{ width: 200 }} placeholder="Search partners…" />
+          <span className="text-xs" style={{ color: 'rgba(4,14,32,0.55)' }}>
+            {loading ? 'Loading…' : `${partners.length} partner${partners.length === 1 ? '' : 's'}`}
+          </span>
         }
       />
 
-      <DataTable
-        columns={columns} rows={filtered}
-        rowKey={r => r.id}
-        emptyState={<EmptyState icon="🤝" title="No partners found" description="Try adjusting the filters." />}
-      />
+      {/* Table */}
+      {loading ? (
+        <Card>
+          <div className="flex items-center justify-center py-16">
+            <div
+              className="h-8 w-8 animate-spin rounded-full"
+              style={{ border: '2px solid #1b61c9', borderTopColor: 'transparent' }}
+            />
+          </div>
+        </Card>
+      ) : partners.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon="🤝"
+            title="No partners yet"
+            description='Click "+ Add Partner" to invite your first referral partner.'
+            action={
+              <FormButton variant="primary" onClick={() => setShowForm(true)}>
+                + Add Partner
+              </FormButton>
+            }
+          />
+        </Card>
+      ) : (
+        <DataTable
+          columns={columns}
+          rows={partners}
+          rowKey={(p) => p.id}
+          emptyState="No partners match your filters."
+        />
+      )}
     </div>
   )
 }

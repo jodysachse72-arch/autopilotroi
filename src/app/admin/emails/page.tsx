@@ -1,45 +1,481 @@
 'use client'
 
-import { SectionHeader, DataTable, StatusBadge } from '@/components/backend'
-import type { DataColumn } from '@/components/backend'
+import { useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  SectionHeader,
+  Card,
+  StatusBadge,
+  FormButton,
+  type StatusTone,
+} from '@/components/backend'
 
-interface EmailTemplate { id: string; name: string; subject: string; status: 'Active'|'Draft'|'Paused'; lastSent: string; opens: string }
+/* ═══════════════════════════════════════════════════════════════
+   EMAIL TEMPLATE MANAGER
 
-const EMAILS: EmailTemplate[] = [
-  { id:'1', name:'Welcome Email',         subject:'Welcome to AutopilotROI!',            status:'Active', lastSent:'Apr 22', opens:'64%' },
-  { id:'2', name:'Assessment Reminder',   subject:'Complete your readiness assessment',   status:'Active', lastSent:'Apr 21', opens:'48%' },
-  { id:'3', name:'Invitation to Join',    subject:'You\'re invited to become a partner',  status:'Active', lastSent:'Apr 20', opens:'71%' },
-  { id:'4', name:'Onboarding Complete',   subject:'Congratulations! You\'re onboarded',  status:'Active', lastSent:'Apr 18', opens:'82%' },
-  { id:'5', name:'Weekly Digest',         subject:'Your weekly AutopilotROI summary',     status:'Paused', lastSent:'Apr 14', opens:'35%' },
-  { id:'6', name:'Re-engagement',         subject:'We miss you — come back!',            status:'Draft',  lastSent:'Never',  opens:'—'   },
+   Visual preview of all system email templates.
+   Shows subject lines, triggers, and live HTML rendering with
+   sample data. View-only with Copy HTML option.
+
+   NOTE: The email HTML templates are intentionally dark — that
+   is the actual email design sent to prospects/partners. Only
+   the admin shell around them is light-mode design system.
+   ═══════════════════════════════════════════════════════════════ */
+
+const SITE_URL = 'https://autopilotroi.com'
+
+const sampleLead = {
+  name: 'Sarah Thompson',
+  email: 'sarah@example.com',
+  score: 78,
+  tier: 'Intermediate',
+}
+
+type EmailType = 'transactional' | 'drip'
+
+interface EmailTemplate {
+  id: string
+  name: string
+  subject: string
+  type: EmailType
+  trigger: string
+  timing: string
+  description: string
+  html: string
+}
+
+// Email footer — dark because this is the actual email HTML
+const FOOTER = `
+  <div style="border-top: 1px solid #1e293b; margin-top: 32px; padding-top: 24px; text-align: center;">
+    <p style="color: #475569; font-size: 11px; margin: 0;">
+      <a href="${SITE_URL}/privacy" style="color: #60a5fa; text-decoration: underline;">Privacy</a>
+      &nbsp;·&nbsp;
+      <a href="mailto:support@autopilotroi.com?subject=Unsubscribe" style="color: #60a5fa; text-decoration: underline;">Unsubscribe</a>
+    </p>
+  </div>
+`
+
+const templates: EmailTemplate[] = [
+  {
+    id: 'partner-notify',
+    name: 'Partner Notification',
+    subject: `⚡ New Prospect: ${sampleLead.name} (${sampleLead.tier} — ${sampleLead.score}/100)`,
+    type: 'transactional',
+    trigger: 'Prospect completes readiness assessment',
+    timing: 'Immediate',
+    description: 'Sent to the assigned partner when a new prospect finishes the readiness quiz. Includes prospect details, score, and tier.',
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background: #0a1628; color: #e2e8f0; border-radius: 16px;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-size: 24px; color: #fff; margin: 0;">AutopilotROI</h1>
+        <p style="color: #64748b; margin: 4px 0 0;">Partner Notification</p>
+      </div>
+      <div style="background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <h2 style="font-size: 20px; color: #fff; margin: 0 0 16px;">New Prospect Assigned ⚡</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr><td style="padding: 8px 0; color: #94a3b8; font-size: 14px;">Name</td><td style="padding: 8px 0; color: #fff; font-weight: 600; text-align: right;">${sampleLead.name}</td></tr>
+          <tr><td style="padding: 8px 0; color: #94a3b8; font-size: 14px;">Email</td><td style="padding: 8px 0; color: #60a5fa; text-align: right;">${sampleLead.email}</td></tr>
+          <tr><td style="padding: 8px 0; color: #94a3b8; font-size: 14px;">Readiness Score</td><td style="padding: 8px 0; color: #fff; font-weight: 700; font-size: 18px; text-align: right;">${sampleLead.score}/100</td></tr>
+          <tr><td style="padding: 8px 0; color: #94a3b8; font-size: 14px;">Tier</td><td style="padding: 8px 0; text-align: right;"><span style="background: #1e3a5f; color: #60a5fa; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600;">⚡ ${sampleLead.tier}</span></td></tr>
+        </table>
+      </div>
+      <div style="text-align: center;">
+        <a href="${SITE_URL}/dashboard/prospects" style="display: inline-block; background: linear-gradient(180deg, #3b82f6, #2563eb); color: #fff; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">View in Dashboard →</a>
+      </div>
+      ${FOOTER}
+    </div>`,
+  },
+  {
+    id: 'prospect-welcome',
+    name: 'Prospect Welcome',
+    subject: `Welcome to AutopilotROI! Your readiness score: ${sampleLead.score}/100`,
+    type: 'transactional',
+    trigger: 'Prospect completes readiness assessment',
+    timing: 'Immediate',
+    description: 'Welcome email sent to the prospect with their readiness score, tier, and next steps.',
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 24px; background: #0a1628; color: #e2e8f0; border-radius: 16px;">
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 style="font-size: 24px; color: #fff; margin: 0;">AutopilotROI</h1>
+      </div>
+      <div style="text-align: center; margin-bottom: 24px;">
+        <p style="font-size: 18px; color: #fff;">Hey ${sampleLead.name} 👋</p>
+        <p style="color: #94a3b8;">Your readiness assessment is complete!</p>
+      </div>
+      <div style="background: #1e293b; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <div style="font-size: 48px; font-weight: 700; color: #fff;">${sampleLead.score}</div>
+        <div style="color: #64748b; margin-bottom: 12px;">out of 100</div>
+        <span style="background: #1e3a5f; color: #60a5fa; padding: 6px 16px; border-radius: 999px; font-size: 14px; font-weight: 600;">⚡ ${sampleLead.tier}</span>
+      </div>
+      <div style="background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+        <h3 style="color: #fff; margin: 0 0 8px;">What happens next?</h3>
+        <p style="color: #94a3b8; margin: 0; line-height: 1.6;">Your referring partner has been notified and will reach out to guide you through the onboarding process. In the meantime, explore Aurum University to get familiar with the ecosystem.</p>
+      </div>
+      <div style="text-align: center;">
+        <a href="${SITE_URL}/university" style="display: inline-block; background: linear-gradient(180deg, #3b82f6, #2563eb); color: #fff; padding: 12px 32px; border-radius: 12px; text-decoration: none; font-weight: 600; font-size: 14px;">Explore University →</a>
+      </div>
+      ${FOOTER}
+    </div>`,
+  },
+  {
+    id: 'drip-day1',
+    name: 'Drip: Day 1',
+    subject: 'Your partner is reviewing your profile',
+    type: 'drip',
+    trigger: '24 hours after signup, no partner contact',
+    timing: 'Day 1 (24h)',
+    description: 'First re-engagement nudge. Reassures the prospect their partner has been notified and links to University.',
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; border-radius: 12px; overflow: hidden;">
+      <div style="background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 40px 30px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Great Start, ${sampleLead.name}!</h1>
+      </div>
+      <div style="padding: 30px;">
+        <p style="line-height: 1.6; color: #94a3b8;">Your readiness assessment is complete and your assigned partner has been notified. They're reviewing your profile now.</p>
+        <div style="background: #1e293b; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+          <p style="color: #64748b; font-size: 13px; margin: 0 0 4px;">Your Readiness Score</p>
+          <p style="font-size: 36px; font-weight: bold; color: #60a5fa; margin: 0;">${sampleLead.score}/100</p>
+        </div>
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${SITE_URL}/university" style="display: inline-block; background: #3b82f6; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600;">Explore University →</a>
+        </div>
+        ${FOOTER}
+      </div>
+    </div>`,
+  },
+  {
+    id: 'drip-day2',
+    name: 'Drip: Day 2',
+    subject: '3 videos to get you started (2 min each)',
+    type: 'drip',
+    trigger: '48 hours after signup',
+    timing: 'Day 2 (48h)',
+    description: 'Content-driven follow-up pointing to the 3 most important beginner videos.',
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; border-radius: 12px; overflow: hidden;">
+      <div style="background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 40px 30px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Knowledge Is Power, ${sampleLead.name}</h1>
+      </div>
+      <div style="padding: 30px;">
+        <p style="line-height: 1.6; color: #94a3b8;">Here are 3 short videos that most successful members watch before their first conversation:</p>
+        <div style="margin: 24px 0;">
+          <div style="background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 12px;"><p style="margin: 0; font-weight: 600; color: #e2e8f0;">📺 How AI Trading Bots Actually Work</p><p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">2 min — Clear, no-jargon explanation</p></div>
+          <div style="background: #1e293b; border-radius: 8px; padding: 16px; margin-bottom: 12px;"><p style="margin: 0; font-weight: 600; color: #e2e8f0;">📺 Understanding Risk vs. Reward</p><p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">2 min — What to expect realistically</p></div>
+          <div style="background: #1e293b; border-radius: 8px; padding: 16px;"><p style="margin: 0; font-weight: 600; color: #e2e8f0;">📺 Your First 30 Days: A Walkthrough</p><p style="margin: 4px 0 0; font-size: 13px; color: #64748b;">3 min — Step-by-step getting started</p></div>
+        </div>
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${SITE_URL}/university" style="display: inline-block; background: #3b82f6; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600;">Watch Now →</a>
+        </div>
+        ${FOOTER}
+      </div>
+    </div>`,
+  },
+  {
+    id: 'drip-day3',
+    name: 'Drip: Day 3',
+    subject: 'Quick question for you',
+    type: 'drip',
+    trigger: '72 hours after signup',
+    timing: 'Day 3 (72h)',
+    description: 'Conversational check-in with common questions to reduce anxiety and prompt a reply.',
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; border-radius: 12px; overflow: hidden;">
+      <div style="background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 40px 30px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Hey ${sampleLead.name},</h1>
+      </div>
+      <div style="padding: 30px;">
+        <p style="line-height: 1.6; color: #94a3b8;">I noticed you haven't connected with your partner yet. Totally fine — everyone moves at their own pace.</p>
+        <p style="line-height: 1.6; color: #94a3b8;">Quick question: Is there anything specific you'd like to know before your call? Common questions include:</p>
+        <ul style="color: #94a3b8; line-height: 2;"><li>How much do I need to get started?</li><li>What are the actual risks involved?</li><li>How does the partner referral system work?</li></ul>
+        <p style="line-height: 1.6; color: #94a3b8;">Just reply to this email and we'll get you answers fast.</p>
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${SITE_URL}/faqs" style="display: inline-block; background: #3b82f6; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600;">Browse FAQs →</a>
+        </div>
+        ${FOOTER}
+      </div>
+    </div>`,
+  },
+  {
+    id: 'drip-day5',
+    name: 'Drip: Day 5',
+    subject: 'Others in your position are already seeing results',
+    type: 'drip',
+    trigger: '120 hours after signup',
+    timing: 'Day 5 (120h)',
+    description: 'Social proof nudge with a testimonial quote and progress indicator.',
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; border-radius: 12px; overflow: hidden;">
+      <div style="background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 40px 30px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Don't Fall Behind, ${sampleLead.name}</h1>
+      </div>
+      <div style="padding: 30px;">
+        <p style="line-height: 1.6; color: #94a3b8;">Since you took your assessment, 47 other people have already connected with their partner and started their onboarding.</p>
+        <div style="background: #1e293b; border-radius: 8px; padding: 20px; margin: 20px 0;">
+          <p style="color: #64748b; font-size: 13px; margin: 0 0 8px;">What other ${sampleLead.tier}-level members are saying:</p>
+          <p style="font-style: italic; color: #e2e8f0; margin: 0;">"I was nervous too, but my partner made it so easy. Wish I'd started sooner."</p>
+          <p style="color: #64748b; font-size: 13px; margin: 8px 0 0;">— Sarah K., Small Business Owner</p>
+        </div>
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${SITE_URL}/waiting-room" style="display: inline-block; background: #3b82f6; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600;">Continue Where You Left Off →</a>
+        </div>
+        ${FOOTER}
+      </div>
+    </div>`,
+  },
+  {
+    id: 'drip-day7',
+    name: 'Drip: Day 7 (Final)',
+    subject: 'Last call: Your partner spot is being reassigned',
+    type: 'drip',
+    trigger: '168 hours after signup',
+    timing: 'Day 7 (168h) — Final',
+    description: 'Urgency-based final re-engagement with reassignment warning. No more emails after this.',
+    html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #e2e8f0; border-radius: 12px; overflow: hidden;">
+      <div style="background: linear-gradient(135deg, #7f1d1d, #0f172a); padding: 40px 30px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px; color: #ffffff;">Final Reminder, ${sampleLead.name}</h1>
+      </div>
+      <div style="padding: 30px;">
+        <p style="line-height: 1.6; color: #94a3b8;">It's been a week since your assessment. Your assigned partner has been waiting to connect, but we'll need to reassign your spot if we don't hear back.</p>
+        <p style="line-height: 1.6; color: #94a3b8;">No pressure at all — if now isn't the right time, that's completely okay. But if you're still interested, this is the easiest way to get started:</p>
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${SITE_URL}/waiting-room" style="display: inline-block; background: #ef4444; color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600;">Keep My Spot →</a>
+        </div>
+        <p style="line-height: 1.6; color: #64748b; font-size: 13px; text-align: center;">After this, we won't email you again unless you reach out.</p>
+        ${FOOTER}
+      </div>
+    </div>`,
+  },
 ]
 
-const statusTone: Record<string, 'green'|'amber'|'neutral'> = { Active: 'green', Paused: 'amber', Draft: 'neutral' }
+const typeToneMap: Record<EmailType, StatusTone> = {
+  transactional: 'blue',
+  drip: 'purple',
+}
 
-const columns: DataColumn<EmailTemplate>[] = [
-  { key: 'name',     header: 'Template',  render: e => (
-    <div>
-      <p className="text-sm font-semibold" style={{ color: '#0f172a' }}>{e.name}</p>
-      <p className="text-xs" style={{ color: 'rgba(15,23,42,0.50)' }}>{e.subject}</p>
-    </div>
-  )},
-  { key: 'status',   header: 'Status',    render: e => <StatusBadge tone={statusTone[e.status]}>{e.status}</StatusBadge> },
-  { key: 'lastSent', header: 'Last Sent', render: e => <span className="text-sm">{e.lastSent}</span> },
-  { key: 'opens',    header: 'Open Rate', render: e => <span className="text-sm font-semibold">{e.opens}</span>, align: 'right' as const },
-  { key: 'actions',  header: '',          align: 'right' as const, render: () => (
-    <div className="flex gap-1.5">
-      <button className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold border transition-colors" style={{ borderColor: '#e2e8f0', color: '#334155', background: '#fff' }}>Edit</button>
-      <button className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-white transition-colors" style={{ background: '#1b61c9' }}>Send</button>
-    </div>
-  )},
+interface TimelineStep {
+  day: string
+  color: string
+  label: string
+}
+
+const timelineSteps: TimelineStep[] = [
+  { day: 'Signup', color: '#1b61c9', label: 'Welcome + Partner Notify' },
+  { day: 'Day 1',  color: '#60a5fa', label: 'Profile review' },
+  { day: 'Day 2',  color: '#60a5fa', label: '3 videos' },
+  { day: 'Day 3',  color: '#fbbf24', label: 'Quick question' },
+  { day: 'Day 5',  color: '#f59e0b', label: 'Social proof' },
+  { day: 'Day 7',  color: '#ef4444', label: 'Final call' },
 ]
 
 export default function EmailsPage() {
+  const [previewId, setPreviewId] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const previewEmail = templates.find((t) => t.id === previewId)
+
+  const copyHtml = useCallback((id: string, html: string) => {
+    navigator.clipboard.writeText(html)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
+  }, [])
+
+  const transactional = templates.filter((t) => t.type === 'transactional')
+  const drip = templates.filter((t) => t.type === 'drip')
+
   return (
-    <div className="space-y-5">
-      <SectionHeader title="Email Templates" subtitle="Manage transactional and marketing emails"
-        actions={<button className="be-btn be-btn--primary">+ New Template</button>} />
-      <DataTable columns={columns} rows={EMAILS} rowKey={r => r.id} />
+    <div className="mx-auto max-w-6xl space-y-8">
+      <SectionHeader
+        title="Email Templates"
+        subtitle="Preview all system emails. 2 transactional + 5 drip re-engagement emails in the automated sequence."
+      />
+
+      {/* ── Drip Sequence Timeline ── */}
+      <Card>
+        <h2
+          className="mb-4 text-lg font-bold"
+          style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+        >
+          📬 Drip Sequence Timeline
+        </h2>
+        <div className="flex items-center gap-1 overflow-x-auto pb-2">
+          {timelineSteps.map((step, i) => (
+            <div key={step.day} className="flex items-center">
+              <div className="flex flex-col items-center min-w-[100px]">
+                <div className="h-3 w-3 rounded-full" style={{ background: step.color }} />
+                <div className="mt-1.5 text-xs font-bold" style={{ color: '#181d26' }}>{step.day}</div>
+                <div
+                  className="mt-0.5 text-[10px] text-center leading-tight"
+                  style={{ color: 'rgba(4,14,32,0.45)' }}
+                >
+                  {step.label}
+                </div>
+              </div>
+              {i < timelineSteps.length - 1 && (
+                <div className="h-0.5 w-8 -mt-5" style={{ background: '#e0e2e6' }} />
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs" style={{ color: 'rgba(4,14,32,0.45)' }}>
+          ✅ CAN-SPAM compliant — all emails include unsubscribe links and List-Unsubscribe headers.
+        </p>
+      </Card>
+
+      {/* ── Transactional Emails ── */}
+      <section>
+        <h2
+          className="mb-4 text-xl font-bold"
+          style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+        >
+          ⚡ Transactional Emails
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {transactional.map((email, i) => (
+            <EmailCard
+              key={email.id}
+              email={email}
+              index={i}
+              onPreview={() => setPreviewId(email.id)}
+              onCopy={() => copyHtml(email.id, email.html)}
+              isCopied={copiedId === email.id}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ── Drip Emails ── */}
+      <section>
+        <h2
+          className="mb-4 text-xl font-bold"
+          style={{ color: '#181d26', fontFamily: 'var(--font-sora)' }}
+        >
+          💧 Drip Re-Engagement Sequence
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {drip.map((email, i) => (
+            <EmailCard
+              key={email.id}
+              email={email}
+              index={i}
+              onPreview={() => setPreviewId(email.id)}
+              onCopy={() => copyHtml(email.id, email.html)}
+              isCopied={copiedId === email.id}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ── Preview Modal ── */}
+      <AnimatePresence>
+        {previewEmail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 backdrop-blur-sm"
+            onClick={() => setPreviewId(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl shadow-2xl"
+              style={{ background: '#ffffff', border: '1px solid #e0e2e6' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="sticky top-0 z-10 flex items-center justify-between rounded-t-2xl px-5 py-4"
+                style={{ background: '#ffffff', borderBottom: '1px solid #e0e2e6' }}
+              >
+                <div>
+                  <h3 className="text-sm font-bold" style={{ color: '#181d26' }}>
+                    {previewEmail.name}
+                  </h3>
+                  <p className="text-xs mt-0.5" style={{ color: 'rgba(4,14,32,0.45)' }}>
+                    Subject: {previewEmail.subject}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FormButton
+                    variant={copiedId === previewEmail.id ? 'secondary' : 'ghost'}
+                    size="sm"
+                    onClick={() => copyHtml(previewEmail.id, previewEmail.html)}
+                  >
+                    {copiedId === previewEmail.id ? '✓ Copied!' : '📋 Copy HTML'}
+                  </FormButton>
+                  <FormButton variant="ghost" size="sm" onClick={() => setPreviewId(null)}>
+                    ✕
+                  </FormButton>
+                </div>
+              </div>
+              <div className="p-4 rounded-b-2xl" style={{ background: '#f1f5f9' }}>
+                <p
+                  className="text-center text-[10px] mb-3 uppercase tracking-wider"
+                  style={{ color: 'rgba(4,14,32,0.35)' }}
+                >
+                  Email Preview (actual dark email design)
+                </p>
+                <div dangerouslySetInnerHTML={{ __html: previewEmail.html }} />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  )
+}
+
+/* ── Email Card ─────────────────────────────────────────────── */
+interface EmailCardProps {
+  email: EmailTemplate
+  index: number
+  onPreview: () => void
+  onCopy: () => void
+  isCopied: boolean
+}
+
+function EmailCard({ email, index, onPreview, onCopy, isCopied }: EmailCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: Math.min(0.05 + index * 0.04, 0.25) }}
+    >
+      <Card>
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <StatusBadge tone={typeToneMap[email.type]}>
+              {email.type.toUpperCase()}
+            </StatusBadge>
+            <span
+              className="text-[10px] font-medium"
+              style={{ color: 'rgba(4,14,32,0.40)' }}
+            >
+              {email.timing}
+            </span>
+          </div>
+        </div>
+
+        <h3 className="text-sm font-bold mb-1" style={{ color: '#181d26' }}>
+          {email.name}
+        </h3>
+        <p className="text-xs mb-1" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          <strong style={{ color: 'rgba(4,14,32,0.69)' }}>Subject:</strong> {email.subject}
+        </p>
+        <p className="text-xs mb-1" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          <strong style={{ color: 'rgba(4,14,32,0.69)' }}>Trigger:</strong> {email.trigger}
+        </p>
+        <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(4,14,32,0.45)' }}>
+          {email.description}
+        </p>
+
+        <div className="flex items-center gap-2">
+          <FormButton variant="primary" size="sm" onClick={onPreview}>
+            👁 Preview
+          </FormButton>
+          <FormButton
+            variant={isCopied ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={onCopy}
+          >
+            {isCopied ? '✓ Copied' : '📋 HTML'}
+          </FormButton>
+        </div>
+      </Card>
+    </motion.div>
   )
 }

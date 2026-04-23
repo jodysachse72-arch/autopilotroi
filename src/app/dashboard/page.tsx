@@ -1,108 +1,424 @@
 'use client'
 
+import { useState, useEffect, useCallback } from 'react'
+import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { StatCard, SectionHeader, ActionCard, Card } from '@/components/backend'
-import { StatusBadge } from '@/components/backend'
+import { InfoTip } from '@/components/ui/Tooltip'
+import PartnerOnboardingWizard from '@/components/ui/PartnerOnboardingWizard'
+import {
+  StatCard,
+  Card,
+  ActionCard,
+  SectionHeader,
+  StatusBadge,
+  FilterPill,
+  FormInput,
+  FormSelect,
+  type StatusTone,
+} from '@/components/backend'
 
-const stats = [
-  { label: 'My Prospects',     value: '18',    delta: '+3 this week',  trend: 'up'   as const, icon: '👥' },
-  { label: 'Qualified Leads',  value: '9',     delta: '50% qualified', trend: 'up'   as const, icon: '⭐' },
-  { label: 'Completed',        value: '6',     delta: '33% converted', trend: 'up'   as const, icon: '✅' },
-  { label: 'Est. Commission',  value: '$2,400',delta: 'This quarter',  trend: 'flat' as const, icon: '💰' },
-]
+/* ═══════════════════════════════════════════════════════════════
+   PARTNER DASHBOARD — Live lead tracking with pipeline.
+   Refactored to use backend primitives + canonical CSS tokens.
+   Falls back to demo data when /api/dashboard/leads is unavailable.
+   ═══════════════════════════════════════════════════════════════ */
 
-const activity = [
-  { icon: '📋', name: 'Alex Turner',    action: 'Completed assessment',    score: 72, time: '2h ago',  stage: 'Invited'    as const },
-  { icon: '🆕', name: 'Priya Sharma',   action: 'Applied via referral link', score: 88, time: '5h ago', stage: 'Applied'    as const },
-  { icon: '🎓', name: 'Tom Baker',      action: 'Completed onboarding',    score: 91, time: '1d ago',  stage: 'Completed'  as const },
-  { icon: '👀', name: 'Nina Patel',     action: 'Viewing evaluation',       score: 45, time: '2d ago',  stage: 'Evaluating' as const },
-]
-
-const stageTone: Record<string, 'blue'|'amber'|'green'|'neutral'> = {
-  Applied: 'neutral', Invited: 'blue', Evaluating: 'amber', Completed: 'green',
+interface Lead {
+  id: string
+  name: string
+  email: string
+  tier: 'beginner' | 'intermediate' | 'advanced'
+  score: number
+  status: 'new' | 'assessed' | 'invited' | 'onboarding' | 'active'
+  created_at: string
+  drip_emails_sent?: string[]
 }
 
-const quickActions = [
-  { href: '/dashboard/prospects',   icon: '👥', title: 'My Prospects',    description: 'View, filter, and manage your assigned prospects.', cta: 'Open' },
-  { href: '/dashboard/performance', icon: '📈', title: 'Performance',     description: 'Conversion rates, trends, and your key metrics.',  cta: 'Open' },
-  { href: '/dashboard/links',       icon: '🔗', title: 'Referral Links',  description: 'Generate and track your personal referral links.', cta: 'Open' },
-  { href: '/dashboard/leaderboard', icon: '🏆', title: 'Leaderboard',     description: 'See your ranking among all active partners.',      cta: 'Open' },
+interface DashboardStats {
+  total: number
+  assessed: number
+  onboarding: number
+  active: number
+  avgScore: number
+  thisWeek: number
+  conversionRate: number
+}
+
+const demoLeads: Lead[] = [
+  { id: '1', name: 'Sarah Chen',     email: 'sarah@example.com',   tier: 'beginner',     score: 28, status: 'assessed',   created_at: '2026-04-10T14:30:00Z' },
+  { id: '2', name: 'James Wilson',   email: 'james@example.com',   tier: 'intermediate', score: 55, status: 'invited',    created_at: '2026-04-09T09:15:00Z' },
+  { id: '3', name: 'Maria Garcia',   email: 'maria@example.com',   tier: 'advanced',     score: 85, status: 'onboarding', created_at: '2026-04-08T11:00:00Z' },
+  { id: '4', name: 'Alex Thompson',  email: 'alex@example.com',    tier: 'beginner',     score: 15, status: 'new',        created_at: '2026-04-11T16:45:00Z' },
+  { id: '5', name: 'Lisa Park',      email: 'lisa@example.com',    tier: 'intermediate', score: 62, status: 'active',     created_at: '2026-04-07T08:20:00Z' },
+  { id: '6', name: 'Michael Brown',  email: 'michael@example.com', tier: 'advanced',     score: 91, status: 'active',     created_at: '2026-04-06T10:00:00Z' },
+  { id: '7', name: 'Emily Davis',    email: 'emily@example.com',   tier: 'beginner',     score: 22, status: 'assessed',   created_at: '2026-04-11T20:30:00Z' },
 ]
 
-export default function DashboardPage() {
+const STATUS_FILTERS = ['all', 'new', 'assessed', 'invited', 'onboarding', 'active'] as const
+type StatusFilter = (typeof STATUS_FILTERS)[number]
+const STATUS_FLOW: Lead['status'][] = ['new', 'assessed', 'invited', 'onboarding', 'active']
+
+const tierTone: Record<Lead['tier'], StatusTone> = {
+  beginner:     'amber',
+  intermediate: 'blue',
+  advanced:     'green',
+}
+
+const statusTone: Record<Lead['status'], StatusTone> = {
+  new:        'purple',
+  assessed:   'amber',
+  invited:    'blue',
+  onboarding: 'blue',
+  active:     'green',
+}
+
+const funnelColor: Record<Lead['status'], string> = {
+  new:        '#a78bfa',
+  assessed:   '#fbbf24',
+  invited:    '#60a5fa',
+  onboarding: '#22d3ee',
+  active:     '#34d399',
+}
+
+function computeStats(leads: Lead[]): DashboardStats {
+  const now = new Date()
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  const active = leads.filter(l => l.status === 'active').length
+  const total = leads.length
+  return {
+    total,
+    assessed:       leads.filter(l => l.status === 'assessed').length,
+    onboarding:     leads.filter(l => l.status === 'onboarding').length,
+    active,
+    avgScore:       total > 0 ? Math.round(leads.reduce((s, l) => s + l.score, 0) / total) : 0,
+    thisWeek:       leads.filter(l => new Date(l.created_at) >= weekAgo).length,
+    conversionRate: total > 0 ? Math.round((active / total) * 100) : 0,
+  }
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  return `${Math.floor(hours / 24)}d ago`
+}
+
+function scoreBarColor(score: number): string {
+  if (score >= 70) return '#10b981'
+  if (score >= 40) return '#3b82f6'
+  return '#f59e0b'
+}
+
+export default function DashboardOverview() {
+  const [leads, setLeads] = useState<Lead[]>(demoLeads)
+  const [filter, setFilter] = useState<StatusFilter>('all')
+  const [search, setSearch] = useState('')
+  const [sortBy, setSortBy] = useState<'date' | 'score'>('date')
+  const [isLive, setIsLive] = useState(false)
+
+  const fetchLeads = useCallback(async () => {
+    try {
+      const res = await fetch('/api/dashboard/leads')
+      if (res.ok) {
+        const data = await res.json()
+        if (data.leads?.length > 0) {
+          setLeads(data.leads)
+          setIsLive(true)
+        }
+      }
+    } catch {
+      // demo mode
+    }
+  }, [])
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch from external API on mount; setState inside fetchLeads is the fetch callback
+  useEffect(() => { fetchLeads() }, [fetchLeads])
+
+  const stats = computeStats(leads)
+
+  let filtered = filter === 'all' ? leads : leads.filter(l => l.status === filter)
+  if (search) {
+    const q = search.toLowerCase()
+    filtered = filtered.filter(l => l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q))
+  }
+  filtered = [...filtered].sort((a, b) =>
+    sortBy === 'date'
+      ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      : b.score - a.score
+  )
+
+  function copyLink() {
+    const link = `${window.location.origin}/signup?ref=partner`
+    navigator.clipboard.writeText(link)
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
+      <PartnerOnboardingWizard />
 
-      {/* Welcome */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold" style={{ color: '#0f172a', letterSpacing: '-0.02em' }}>
-            Welcome back, Partner 👋
-          </h2>
-          <p className="text-sm mt-1" style={{ color: 'rgba(15,23,42,0.55)' }}>
-            Here&apos;s what&apos;s happening with your partner account today.
-          </p>
+      {/* Welcome banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Card padding="lg" className="relative overflow-hidden">
+          <div
+            className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full"
+            style={{ background: 'rgba(27,97,201,0.06)', filter: 'blur(48px)' }}
+            aria-hidden
+          />
+          <div className="relative flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold" style={{ color: 'var(--color-text)', letterSpacing: '-0.015em' }}>
+                Welcome back, Partner 👋
+              </h2>
+              <p className="mt-1 text-sm" style={{ color: 'var(--color-text-weak)' }}>
+                {isLive
+                  ? '🟢 Connected to live data'
+                  : '🟡 Showing demo data — configure Supabase for live tracking'}
+              </p>
+            </div>
+            <Link href="/dashboard/links" className="be-btn be-btn--primary">
+              🔗 Generate Link
+            </Link>
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {[
+          { label: 'Total Leads',  value: String(stats.total),                       delta: `+${stats.thisWeek} this week`,    trend: 'up'   as const, icon: '👥', tip: 'Everyone who has filled out the signup form, whether or not they finished the quiz.' },
+          { label: 'Avg Score',    value: `${stats.avgScore}/100`,                   delta: 'readiness score',                  trend: 'flat' as const, icon: '📊', tip: 'The average readiness score across all your leads. Higher = more experienced with crypto.' },
+          { label: 'In Pipeline',  value: String(stats.assessed + stats.onboarding), delta: 'assessed + onboarding',            trend: 'flat' as const, icon: '🎯', tip: 'Leads who completed the quiz but haven\'t finished setting up their account yet. These need attention.' },
+          { label: 'Conversion',   value: `${stats.conversionRate}%`,                delta: `${stats.active} active members`,    trend: 'up'   as const, icon: '✅', tip: 'Percentage of leads that completed onboarding and are now active. Industry average is 10-20%.' },
+        ].map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <StatCard
+              label={
+                <span className="inline-flex items-center gap-1.5">
+                  {stat.label}
+                  <InfoTip content={stat.tip} />
+                </span> as unknown as string
+              }
+              value={stat.value}
+              delta={stat.delta}
+              trend={stat.trend}
+              icon={stat.icon}
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Pipeline funnel */}
+      <Card padding="lg">
+        <div className="mb-4 flex items-center gap-2">
+          <h3 className="be-section-title">Pipeline Funnel</h3>
+          <InfoTip
+            content="Shows where your leads are in the journey."
+            detail="New → Assessed (took the quiz) → Invited (you reached out) → Onboarding (setting up) → Active (using the platform). Ideally, most leads move right."
+          />
         </div>
-        <Link href="/dashboard/prospects" className="be-btn be-btn--primary hidden sm:flex">
-          + Add Prospect
-        </Link>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {stats.map(s => <StatCard key={s.label} {...s} />)}
-      </div>
-
-      {/* Activity + Commission */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card padding="flush">
-          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid #e2e8f0' }}>
-            <h3 className="text-sm font-bold" style={{ color: '#0f172a' }}>Recent Activity</h3>
-            <Link href="/dashboard/prospects" className="text-xs font-semibold" style={{ color: '#1b61c9' }}>View all →</Link>
-          </div>
-          <div className="divide-y" style={{ borderColor: '#f1f5f9' }}>
-            {activity.map((a, i) => (
-              <div key={i} className="flex items-center gap-3 px-5 py-3.5">
-                <span className="text-base shrink-0" aria-hidden>{a.icon}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium" style={{ color: '#0f172a' }}>{a.name}</p>
-                  <p className="text-xs" style={{ color: 'rgba(15,23,42,0.50)' }}>{a.action}</p>
+        <div className="flex items-end gap-2">
+          {STATUS_FLOW.map((s) => {
+            const count = leads.filter(l => l.status === s).length
+            const maxCount = Math.max(...STATUS_FLOW.map(s2 => leads.filter(l => l.status === s2).length), 1)
+            const heightPct = Math.max((count / maxCount) * 100, 8)
+            return (
+              <div key={s} className="flex-1 flex flex-col items-center gap-2">
+                <span className="text-sm font-bold" style={{ color: 'var(--color-text)' }}>{count}</span>
+                <div className="w-full relative" style={{ height: '80px' }}>
+                  <motion.div
+                    initial={{ height: 0 }}
+                    animate={{ height: `${heightPct}%` }}
+                    transition={{ delay: 0.25, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute bottom-0 w-full rounded-t-lg"
+                    style={{ background: funnelColor[s], opacity: 0.85 }}
+                  />
                 </div>
-                <StatusBadge tone={stageTone[a.stage]}>{a.stage}</StatusBadge>
-                <span className="text-xs shrink-0" style={{ color: 'rgba(15,23,42,0.40)' }}>{a.time}</span>
+                <span className="text-xs capitalize" style={{ color: 'var(--color-text-weak)' }}>{s}</span>
               </div>
-            ))}
-          </div>
-        </Card>
+            )
+          })}
+        </div>
+      </Card>
 
-        {/* Commission card */}
-        <Card>
-          <h3 className="text-sm font-bold mb-4" style={{ color: '#0f172a' }}>💰 Commission Summary</h3>
-          <div className="space-y-3">
-            {[
-              { label: 'Q2 2026 (current)', value: '$2,400', note: 'Estimated' },
-              { label: 'Q1 2026',            value: '$3,150', note: 'Paid' },
-              { label: 'Q4 2025',            value: '$2,800', note: 'Paid' },
-            ].map(row => (
-              <div key={row.label} className="flex items-center justify-between py-2.5" style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <div>
-                  <p className="text-sm font-medium" style={{ color: '#0f172a' }}>{row.label}</p>
-                  <p className="text-xs" style={{ color: 'rgba(15,23,42,0.50)' }}>{row.note}</p>
+      {/* Leads table */}
+      <Card padding="flush">
+        <div className="px-5 pt-5">
+          <SectionHeader
+            title="All Leads"
+            actions={
+              <>
+                <FormInput
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search…"
+                  className="!w-44"
+                />
+                <FormSelect
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'date' | 'score')}
+                  className="!w-auto"
+                >
+                  <option value="date">Newest</option>
+                  <option value="score">Top Score</option>
+                </FormSelect>
+              </>
+            }
+          />
+        </div>
+
+        {/* Filter pills */}
+        <div className="flex gap-2 overflow-x-auto px-5 pb-3 scrollbar-hide">
+          {STATUS_FILTERS.map((s) => {
+            const count = s === 'all' ? leads.length : leads.filter(l => l.status === s).length
+            return (
+              <FilterPill
+                key={s}
+                label={s.charAt(0).toUpperCase() + s.slice(1)}
+                count={count}
+                active={filter === s}
+                onClick={() => setFilter(s)}
+              />
+            )
+          })}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden sm:block overflow-x-auto" style={{ borderTop: '1px solid var(--color-border)' }}>
+          <table className="be-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Tier</th>
+                <th>Score</th>
+                <th>Status</th>
+                <th>Drips</th>
+                <th>When</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="be-empty">No leads match your filters</td>
+                </tr>
+              ) : (
+                filtered.map((p) => (
+                  <motion.tr
+                    key={p.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <td>
+                      <div className="font-medium" style={{ color: 'var(--color-text)' }}>{p.name}</div>
+                      <div className="text-xs" style={{ color: 'var(--color-text-weak)' }}>{p.email}</div>
+                    </td>
+                    <td>
+                      <StatusBadge tone={tierTone[p.tier]}>{p.tier}</StatusBadge>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-16 rounded-full" style={{ background: 'rgba(15,23,42,0.08)' }}>
+                          <div
+                            className="h-1.5 rounded-full"
+                            style={{ width: `${p.score}%`, background: scoreBarColor(p.score) }}
+                          />
+                        </div>
+                        <span className="font-mono text-xs" style={{ color: 'var(--color-text)' }}>{p.score}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <StatusBadge tone={statusTone[p.status]}>{p.status}</StatusBadge>
+                    </td>
+                    <td>
+                      <span className="text-xs" style={{ color: 'var(--color-text-weak)' }}>
+                        {p.drip_emails_sent?.length || 0}/5
+                      </span>
+                    </td>
+                    <td>
+                      <span className="text-xs" style={{ color: 'var(--color-text-weak)' }}>
+                        {timeAgo(p.created_at)}
+                      </span>
+                    </td>
+                    <td>
+                      <button type="button" onClick={copyLink} className="be-btn be-btn--secondary be-btn--sm">
+                        Send Link
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile card list */}
+        <div className="sm:hidden divide-y" style={{ borderColor: 'var(--color-border)', borderTop: '1px solid var(--color-border)' }}>
+          {filtered.length === 0 ? (
+            <div className="be-empty">No leads match your filters</div>
+          ) : (
+            filtered.map((p) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="px-4 py-4 space-y-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-semibold" style={{ color: 'var(--color-text)' }}>{p.name}</div>
+                    <div className="text-xs" style={{ color: 'var(--color-text-weak)' }}>{p.email}</div>
+                  </div>
+                  <StatusBadge tone={statusTone[p.status]}>{p.status}</StatusBadge>
                 </div>
-                <p className="text-base font-bold" style={{ color: '#0f172a' }}>{row.value}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(27,97,201,0.06)', border: '1px solid rgba(27,97,201,0.12)' }}>
-            <p className="text-xs" style={{ color: '#1b61c9' }}>💡 Refer 2 more qualified leads this month to unlock Gold tier status and a 25% commission boost.</p>
-          </div>
-        </Card>
-      </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <StatusBadge tone={tierTone[p.tier]}>{p.tier}</StatusBadge>
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-16 rounded-full" style={{ background: 'rgba(15,23,42,0.08)' }}>
+                      <div className="h-1.5 rounded-full" style={{ width: `${p.score}%`, background: scoreBarColor(p.score) }} />
+                    </div>
+                    <span className="font-mono text-xs" style={{ color: 'var(--color-text)' }}>{p.score}</span>
+                  </div>
+                  <span className="text-xs" style={{ color: 'var(--color-text-weak)' }}>{timeAgo(p.created_at)}</span>
+                </div>
+                <button type="button" onClick={copyLink} className="be-btn be-btn--secondary w-full">
+                  Send Link
+                </button>
+              </motion.div>
+            ))
+          )}
+        </div>
 
-      {/* Quick Actions */}
-      <SectionHeader title="Quick Actions" />
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        {quickActions.map(a => <ActionCard key={a.href} {...a} />)}
+        {/* Footer */}
+        <div className="flex items-center justify-between px-5 py-3" style={{ borderTop: '1px solid var(--color-border)' }}>
+          <span className="text-xs" style={{ color: 'var(--color-text-weak)' }}>
+            Showing {filtered.length} of {leads.length} leads
+          </span>
+          <Link href="/dashboard/prospects" className="text-xs font-semibold" style={{ color: 'var(--color-blue)' }}>
+            View full list →
+          </Link>
+        </div>
+      </Card>
+
+      {/* Quick actions */}
+      <div>
+        <h2 className="be-section-title mb-3">Quick actions</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ActionCard href="/dashboard/links"    icon="🔗" title="Referral Links"  description="Generate hot, cold, and page-specific links with QR codes." />
+          <ActionCard href="/dashboard/videos"   icon="🎬" title="Partner Videos"  description="Sales training, product deep dives, and social media strategy." />
+          <ActionCard href="/dashboard/settings" icon="⚙️" title="Profile Settings" description="Update your profile, social links, and notification preferences." />
+        </div>
       </div>
     </div>
   )

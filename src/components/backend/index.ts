@@ -1,14 +1,57 @@
-// Backend design system — barrel exports
-// All components use CSS vars scoped to .be-shell in globals.css
-
-export { Card, SectionHeader, StatCard, ActionCard, StatusBadge, EmptyState } from './cards'
-export type { CardProps, SectionHeaderProps, StatCardProps, ActionCardProps, StatusBadgeProps, EmptyStateProps, StatTrend } from './cards'
-
-export { DataTable, FilterPill, Toolbar } from './data'
-export type { DataColumn, DataTableProps, FilterPillProps, ToolbarProps } from './data'
-
-export { FormField, FormInput, FormSelect, FormTextarea, FormButton } from './forms'
-export type { FormFieldProps, FormInputProps, FormSelectProps, FormTextareaProps, FormButtonProps } from './forms'
+/* ═══════════════════════════════════════════════════════════════
+   BACKEND PRIMITIVES — barrel
+   Import from '@/components/backend' to keep page imports tidy.
+   ═══════════════════════════════════════════════════════════════ */
 
 export { default as SidebarShell } from './SidebarShell'
 export type { SidebarLink, SidebarShellProps } from './SidebarShell'
+
+export {
+  Card,
+  SectionHeader,
+  StatCard,
+  ActionCard,
+  EmptyState,
+} from './cards'
+export type {
+  CardProps,
+  SectionHeaderProps,
+  StatCardProps,
+  StatTrend,
+  ActionCardProps,
+  EmptyStateProps,
+} from './cards'
+
+export {
+  FormField,
+  FormInput,
+  FormSelect,
+  FormTextarea,
+  FormButton,
+  FormRow,
+} from './forms'
+export type {
+  FormFieldProps,
+  FormInputProps,
+  FormSelectProps,
+  FormTextareaProps,
+  FormButtonProps,
+  FormButtonVariant,
+  FormButtonSize,
+  FormRowProps,
+} from './forms'
+
+export {
+  DataTable,
+  FilterPill,
+  StatusBadge,
+  Toolbar,
+} from './data'
+export type {
+  DataColumn,
+  DataTableProps,
+  FilterPillProps,
+  StatusBadgeProps,
+  StatusTone,
+  ToolbarProps,
+} from './data'
