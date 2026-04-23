@@ -1,101 +1,68 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import GuidedTour from '@/components/ui/GuidedTour'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import CommandPalette from '@/components/ui/CommandPalette'
 import { PARTNER_TOUR } from '@/lib/tours'
 import { motion, AnimatePresence } from 'framer-motion'
-import { SidebarShell, type SidebarSection } from '@/components/backend'
+import { SidebarShell, type SidebarLink } from '@/components/backend'
 import {
-  LayoutDashboard, Users, TrendingUp, Trophy, Link2, Video, Library, Settings,
-  Menu, Search, Bell, Compass, ChevronDown, LogOut, UserCircle2,
+  LayoutDashboard, Users, TrendingUp, Trophy, Link2,
+  Video, Library, Settings2, Menu,
 } from 'lucide-react'
 
 /* ─────────────────────────────────────────────
-   PARTNER DASHBOARD SHELL — Lucide icons + premium app bar.
+   PARTNER DASHBOARD SHELL — uses shared SidebarShell.
    ───────────────────────────────────────────── */
 
-const sidebarSections: SidebarSection[] = [
-  {
-    label: 'Overview',
-    links: [
-      { id: 'nav-overview',    label: 'Overview',       href: '/dashboard',             icon: LayoutDashboard, exact: true },
-      { id: 'nav-prospects',   label: 'Prospects',      href: '/dashboard/prospects',   icon: Users, badge: '7', badgeTone: 'blue' },
-      { id: 'nav-performance', label: 'Performance',    href: '/dashboard/performance', icon: TrendingUp },
-      { id: 'nav-leaderboard', label: 'Leaderboard',    href: '/dashboard/leaderboard', icon: Trophy },
-    ],
-  },
-  {
-    label: 'Growth',
-    links: [
-      { id: 'nav-links',       label: 'Referral Links', href: '/dashboard/links',       icon: Link2 },
-      { id: 'nav-videos',      label: 'Partner Videos', href: '/dashboard/videos',      icon: Video },
-      { id: 'nav-resources',   label: 'Resources',      href: '/dashboard/resources',   icon: Library },
-    ],
-  },
-  {
-    label: 'Account',
-    links: [
-      { id: 'nav-settings',    label: 'Settings',       href: '/dashboard/settings',    icon: Settings },
-    ],
-  },
-]
-
-interface Notification { id: number; text: string; time: string; read: boolean }
-
-const NOTIFICATIONS: Notification[] = [
-  { id: 1, text: 'Sarah Chen completed assessment (Score: 28)', time: '2h ago', read: false },
-  { id: 2, text: 'James Wilson moved to Invited stage',         time: '5h ago', read: false },
-  { id: 3, text: 'New prospect from your referral link',        time: '1d ago', read: true  },
-  { id: 4, text: 'Maria Garcia started onboarding',             time: '2d ago', read: true  },
+const sidebarLinks: SidebarLink[] = [
+  { id: 'nav-overview',    label: 'Overview',       href: '/dashboard',              icon: LayoutDashboard, exact: true },
+  { id: 'nav-prospects',   label: 'Prospects',      href: '/dashboard/prospects',    icon: Users },
+  { id: 'nav-performance', label: 'Performance',    href: '/dashboard/performance',  icon: TrendingUp },
+  { id: 'nav-leaderboard', label: 'Leaderboard',    href: '/dashboard/leaderboard',  icon: Trophy },
+  { id: 'nav-links',       label: 'Referral Links', href: '/dashboard/links',        icon: Link2 },
+  { id: 'nav-videos',      label: 'Partner Videos', href: '/dashboard/videos',       icon: Video },
+  { id: 'nav-resources',   label: 'Resources',      href: '/dashboard/resources',    icon: Library },
+  { id: 'nav-settings',    label: 'Settings',       href: '/dashboard/settings',     icon: Settings2 },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const [showTour, setShowTour]                   = useState(false)
+  const [showTour, setShowTour] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
-  const [profileOpen, setProfileOpen]             = useState(false)
-  const [mobileOpen, setMobileOpen]               = useState(false)
-  const profileRef = useRef<HTMLDivElement>(null)
-  const notifRef   = useRef<HTMLDivElement>(null)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
-  const unreadCount = NOTIFICATIONS.filter(n => !n.read).length
+  const notifications = [
+    { id: 1, text: 'Sarah Chen completed assessment (Score: 28)', time: '2h ago', read: false },
+    { id: 2, text: 'James Wilson moved to Invited stage', time: '5h ago', read: false },
+    { id: 3, text: 'New prospect from your referral link', time: '1d ago', read: true },
+    { id: 4, text: 'Maria Garcia started onboarding', time: '2d ago', read: true },
+  ]
+  const unreadCount = notifications.filter(n => !n.read).length
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect -- close drawers when route changes
-  useEffect(() => { setMobileOpen(false); setProfileOpen(false); setShowNotifications(false) }, [pathname])
-
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- close drawer when route changes (URL is the external source)
+  useEffect(() => { setMobileOpen(false) }, [pathname])
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { setMobileOpen(false); setProfileOpen(false); setShowNotifications(false) }
-    }
-    const click = (e: MouseEvent) => {
-      const t = e.target as Node
-      if (profileRef.current && !profileRef.current.contains(t)) setProfileOpen(false)
-      if (notifRef.current   && !notifRef.current.contains(t))   setShowNotifications(false)
-    }
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false) }
     window.addEventListener('keydown', handler)
-    window.addEventListener('mousedown', click)
-    return () => { window.removeEventListener('keydown', handler); window.removeEventListener('mousedown', click) }
+    return () => window.removeEventListener('keydown', handler)
   }, [])
-
   const toggleMobile = useCallback(() => setMobileOpen(prev => !prev), [])
-  const openSearch = useCallback(() => {
-    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
-  }, [])
 
   return (
-    <div className="min-h-screen flex" style={{ background: '#f0f2f7' }}>
-      <aside className="hidden lg:flex w-[15.5rem] flex-col shrink-0">
+    <div className="min-h-screen flex" style={{ background: '#f8fafc' }}>
+      {/* ── Desktop Sidebar ── */}
+      <aside className="hidden lg:flex w-60 flex-col shrink-0 shadow-[2px_0_12px_rgba(27,97,201,0.15)]">
         <SidebarShell
           pathname={pathname}
-          sections={sidebarSections}
+          links={sidebarLinks}
           brandLabel="Partner Hub"
-          brandAccent="#60a5fa"
         />
       </aside>
 
+      {/* ── Mobile Drawer ── */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -112,9 +79,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               <SidebarShell
                 pathname={pathname}
-                sections={sidebarSections}
+                links={sidebarLinks}
                 brandLabel="Partner Hub"
-                brandAccent="#60a5fa"
                 onClose={() => setMobileOpen(false)}
               />
             </motion.aside>
@@ -122,137 +88,101 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       </AnimatePresence>
 
+      {/* ── Main Content ── */}
       <div className="flex flex-1 flex-col min-w-0">
-        <header className="be-appbar sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between px-4 lg:px-6">
-          <div className="flex items-center gap-3 min-w-0">
+        {/* Top bar */}
+        <header
+          className="flex h-[4.8rem] shrink-0 items-center justify-between px-5 lg:px-8"
+          style={{ background: '#ffffff', borderBottom: '1px solid #e0e2e6', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+        >
+          <div className="flex items-center gap-3">
             <button
               onClick={toggleMobile}
-              className="be-appbar-iconbtn lg:hidden"
+              className="flex lg:hidden h-9 w-9 items-center justify-center rounded-lg"
+              style={{ border: '1px solid #e0e2e6' }}
               aria-label="Toggle navigation"
             >
               <Menu className="h-5 w-5" strokeWidth={2} />
             </button>
-            <h1 className="text-[0.95rem] font-semibold truncate" style={{ color: '#0b1220', letterSpacing: '-0.01em' }}>
+            <h1 className="text-lg font-bold" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>
               Partner Dashboard
             </h1>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <button onClick={openSearch} className="be-appbar-search hidden md:flex" title="Quick search (Cmd+K)">
-              <Search className="h-3.5 w-3.5" strokeWidth={2.2} />
-              <span className="flex-1 text-left">Search prospects, links…</span>
-              <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-slate-300 bg-white text-slate-500">⌘K</kbd>
-            </button>
-
-            <button onClick={openSearch} className="be-appbar-iconbtn md:hidden" aria-label="Search">
-              <Search className="h-[18px] w-[18px]" strokeWidth={2} />
-            </button>
-
+          <div className="flex items-center gap-2">
+            {/* Search shortcut */}
             <button
-              onClick={() => setShowTour(true)}
-              className="be-appbar-iconbtn hidden sm:inline-flex"
-              title="Take a guided tour"
+              onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+              className="hidden sm:flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition"
+              style={{ border: '1px solid #e0e2e6', color: 'rgba(4,14,32,0.45)' }}
+              title="Quick search (Cmd+K)"
             >
-              <Compass className="h-[18px] w-[18px]" strokeWidth={2} />
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <kbd className="font-mono">⌘K</kbd>
             </button>
 
-            <div className="relative" ref={notifRef}>
+            {/* Notifications */}
+            <div className="relative">
               <button
-                onClick={() => setShowNotifications(o => !o)}
-                className="be-appbar-iconbtn"
-                aria-label="Notifications"
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg transition"
+                style={{ border: '1px solid #e0e2e6', color: '#181d26' }}
+                title="Notifications"
               >
-                <Bell className="h-[18px] w-[18px]" strokeWidth={2} />
+                🔔
                 {unreadCount > 0 && (
-                  <span
-                    className="absolute right-[5px] top-[5px] flex h-[14px] min-w-[14px] items-center justify-center rounded-full text-[9px] font-bold text-white px-[3px]"
-                    style={{ background: '#ef4444', boxShadow: '0 0 0 2px #fff' }}
-                  >
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white">
                     {unreadCount}
                   </span>
                 )}
               </button>
 
-              <AnimatePresence>
-                {showNotifications && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                    transition={{ duration: 0.14 }}
-                    className="absolute right-0 top-12 w-80 rounded-xl z-40 overflow-hidden"
-                    style={{ background: '#fff', border: '1px solid #e6e8ec', boxShadow: '0 12px 32px rgba(15,23,42,0.12)' }}
-                  >
-                    <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid #f0f2f7' }}>
-                      <h3 className="text-sm font-semibold" style={{ color: '#0b1220' }}>Notifications</h3>
-                      <span className="text-[10px] font-bold rounded-full px-2 py-0.5" style={{ background: 'rgba(59,130,246,0.10)', color: '#1b61c9' }}>{unreadCount} new</span>
-                    </div>
-                    <div className="max-h-72 overflow-y-auto">
-                      {NOTIFICATIONS.map(n => (
-                        <div key={n.id} className="flex items-start gap-3 px-4 py-3" style={{ borderBottom: '1px solid #f0f2f7', background: !n.read ? 'rgba(59,130,246,0.04)' : '#fff' }}>
-                          <span className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ background: !n.read ? '#3b82f6' : '#cbd5e1' }} />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs leading-snug" style={{ color: '#0b1220' }}>{n.text}</p>
-                            <p className="mt-0.5 text-[10px]" style={{ color: 'rgba(4,14,32,0.45)' }}>{n.time}</p>
-                          </div>
+              {showNotifications && (
+                <div
+                  className="absolute right-0 top-12 w-80 rounded-xl z-50 overflow-hidden"
+                  style={{ background: '#fff', border: '1px solid #e0e2e6', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
+                >
+                  <div className="px-4 py-3" style={{ borderBottom: '1px solid #e0e2e6' }}>
+                    <h3 className="text-sm font-bold" style={{ color: '#181d26' }}>Notifications</h3>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.map(n => (
+                      <div key={n.id} className="flex items-start gap-3 px-4 py-3" style={{ borderBottom: '1px solid #f0f2f7', background: !n.read ? 'rgba(27,97,201,0.04)' : '#fff' }}>
+                        <span className="mt-0.5 text-xs">{!n.read ? '🔵' : '⚪'}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs" style={{ color: '#181d26' }}>{n.text}</p>
+                          <p className="mt-0.5 text-[10px]" style={{ color: 'rgba(4,14,32,0.4)' }}>{n.time}</p>
                         </div>
-                      ))}
-                    </div>
-                    <button className="w-full px-4 py-2.5 text-xs font-semibold hover:bg-slate-50" style={{ color: '#1b61c9' }}>
-                      Mark all as read
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="relative ml-1" ref={profileRef}>
-              <button
-                onClick={() => setProfileOpen(o => !o)}
-                className="be-appbar-avatar"
-                aria-label="Profile menu"
-                aria-expanded={profileOpen}
-              >
-                <span className="be-appbar-avatar__circle">DP</span>
-                <span className="hidden sm:flex items-center gap-0.5 pr-1">
-                  <span className="text-xs font-semibold" style={{ color: '#0b1220' }}>Partner</span>
-                  <ChevronDown className="h-3.5 w-3.5 opacity-60" strokeWidth={2} />
-                </span>
-              </button>
+            {/* Tour */}
+            <button
+              onClick={() => setShowTour(true)}
+              className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+              style={{ border: '1px solid #e0e2e6', color: '#1b61c9' }}
+              title="Take a guided tour"
+            >
+              🗺️ Tour
+            </button>
 
-              <AnimatePresence>
-                {profileOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                    transition={{ duration: 0.14 }}
-                    className="absolute right-0 top-12 w-56 rounded-xl overflow-hidden z-40"
-                    style={{ background: '#fff', border: '1px solid #e6e8ec', boxShadow: '0 12px 32px rgba(15,23,42,0.12)' }}
-                  >
-                    <div className="px-4 py-3" style={{ borderBottom: '1px solid #f0f2f7' }}>
-                      <div className="text-xs font-semibold" style={{ color: '#0b1220' }}>Demo Partner</div>
-                      <div className="text-[11px] mt-0.5" style={{ color: 'rgba(4,14,32,0.5)' }}>partner@autopilotroi.com</div>
-                    </div>
-                    <button className="flex items-center gap-2.5 w-full px-4 py-2.5 text-left text-sm hover:bg-slate-50" style={{ color: '#0b1220' }}>
-                      <UserCircle2 className="h-4 w-4 opacity-60" strokeWidth={2} /> Profile
-                    </button>
-                    <button className="flex items-center gap-2.5 w-full px-4 py-2.5 text-left text-sm hover:bg-slate-50" style={{ color: '#0b1220' }}>
-                      <Settings className="h-4 w-4 opacity-60" strokeWidth={2} /> Settings
-                    </button>
-                    <div style={{ borderTop: '1px solid #f0f2f7' }}>
-                      <button className="flex items-center gap-2.5 w-full px-4 py-2.5 text-left text-sm hover:bg-slate-50" style={{ color: '#dc2626' }}>
-                        <LogOut className="h-4 w-4" strokeWidth={2} /> Sign out
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            {/* Badge */}
+            <span
+              id="partner-badge"
+              className="rounded-full px-3 py-1 text-xs font-bold"
+              style={{ background: 'rgba(27,97,201,0.10)', color: '#1b61c9' }}
+            >
+              Partner
+            </span>
           </div>
         </header>
 
-        <main className="flex-1 overflow-x-hidden" style={{ padding: 'clamp(1rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2.5rem) 3rem' }}>
+        {/* Page content */}
+        <main className="flex-1 p-5 lg:p-8 overflow-x-hidden">
           <Breadcrumbs />
           {children}
         </main>
