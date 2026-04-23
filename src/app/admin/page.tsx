@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
         <Card padding="flush">
           <div className="flex items-center justify-between px-5 py-4"
             style={{ borderBottom: '1px solid #e2e8f0' }}>
-            <h2 className="be-section-header-title text-sm font-bold" style={{ color: '#0f172a' }}>
+            <h2 className="be-section-title" style={{ fontSize: '0.9375rem' }}>
               Recent Activity
             </h2>
             <Link href="/admin/audit" className="text-xs font-semibold" style={{ color: '#1b61c9' }}>

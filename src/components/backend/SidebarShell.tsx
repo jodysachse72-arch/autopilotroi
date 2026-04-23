@@ -5,11 +5,8 @@ import { LogoIcon } from '@/components/ui/Logo'
 
 /* ═══════════════════════════════════════════════════════════════
    SIDEBARSHELL — shared sidebar for admin + dashboard.
-   Matches the exact structure of the working qokp83snq deployment:
-   - <aside> has no background (transparent)
-   - Inner <div> has background: #1b61c9
-   - Shadow is on the <aside> via inline style
-   - Nav links use direct Tailwind classes + hover/active states
+   ALL styling via backend.css .be-sidebar / .be-sidebar-link.
+   No Tailwind padding/color classes that might fail to generate.
    ═══════════════════════════════════════════════════════════════ */
 
 export interface SidebarLink {
@@ -42,18 +39,24 @@ export default function SidebarShell({
   onClose,
 }: SidebarShellProps) {
   return (
-    <div className="flex h-full flex-col" style={{ background: '#1b61c9' }}>
+    <div className="be-sidebar" style={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
 
       {/* ── Brand ── */}
-      <div className="flex h-[4.8rem] shrink-0 items-center gap-3 px-5 border-b border-white/10">
-        <Link href="/" className="flex items-center gap-2.5" onClick={onClose}>
+      <div style={{
+        display: 'flex', height: '4.8rem', flexShrink: 0, alignItems: 'center',
+        gap: '0.75rem', padding: '0 1.25rem', borderBottom: '1px solid rgba(255,255,255,0.10)'
+      }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none' }} onClick={onClose}>
           <LogoIcon size={28} />
-          <div className="leading-none">
-            <div className="text-[0.9375rem] font-bold text-white tracking-tight">AutopilotROI</div>
-            <div className="mt-0.5 flex items-center gap-1.5"
-              style={{ fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.58)' }}>
+          <div style={{ lineHeight: 1 }}>
+            <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#fff', letterSpacing: '-0.02em' }}>AutopilotROI</div>
+            <div style={{
+              marginTop: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.375rem',
+              fontSize: '0.625rem', fontWeight: 700, textTransform: 'uppercase',
+              letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)'
+            }}>
               {brandAccent && (
-                <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: brandAccent }} aria-hidden />
+                <span style={{ display: 'inline-block', height: '0.375rem', width: '0.375rem', borderRadius: '50%', background: brandAccent }} aria-hidden />
               )}
               {brandLabel}
             </div>
@@ -62,47 +65,40 @@ export default function SidebarShell({
       </div>
 
       {/* ── Nav ── */}
-      <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
-        {links.map((link) => {
-          const active = isActive(pathname, link)
-          return (
-            <Link
-              key={link.href}
-              id={link.id}
-              href={link.href}
-              onClick={onClose}
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all"
-              style={{
-                color: active ? '#fff' : 'rgba(255,255,255,0.68)',
-                background: active ? 'rgba(255,255,255,0.15)' : 'transparent',
-                fontWeight: active ? 600 : 500,
-                boxShadow: active ? 'inset 3px 0 0 rgba(255,255,255,0.60)' : 'none',
-              }}
-            >
-              <span className="shrink-0 text-[1rem] leading-none" aria-hidden>{link.icon}</span>
-              <span className="flex-1 truncate">{link.label}</span>
-              {link.badge !== undefined && link.badge > 0 && (
-                <span
-                  className="shrink-0 rounded-full px-1.5 text-[10px] font-bold leading-5"
-                  style={{ background: 'rgba(255,255,255,0.20)', color: '#fff' }}
-                >
-                  {link.badge}
-                </span>
-              )}
-            </Link>
-          )
-        })}
+      <nav style={{ flex: 1, overflowY: 'auto', padding: '0.75rem 0.5rem', display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+        {links.map((link) => (
+          <Link
+            key={link.href}
+            id={link.id}
+            href={link.href}
+            onClick={onClose}
+            data-active={isActive(pathname, link) || undefined}
+            className="be-sidebar-link"
+          >
+            <span style={{ flexShrink: 0, fontSize: '1rem', lineHeight: 1 }} aria-hidden>{link.icon}</span>
+            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{link.label}</span>
+            {link.badge !== undefined && link.badge > 0 && (
+              <span style={{
+                flexShrink: 0, borderRadius: '9999px', padding: '0 0.375rem',
+                fontSize: '0.625rem', fontWeight: 700, lineHeight: '1.25rem',
+                background: 'rgba(255,255,255,0.20)', color: '#fff'
+              }}>
+                {link.badge}
+              </span>
+            )}
+          </Link>
+        ))}
       </nav>
 
       {/* ── Footer ── */}
-      <div className="shrink-0 px-2 py-3 border-t border-white/10">
+      <div style={{ flexShrink: 0, padding: '0.75rem 0.5rem', borderTop: '1px solid rgba(255,255,255,0.10)' }}>
         <Link
           href="/"
           onClick={onClose}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all"
-          style={{ color: 'rgba(255,255,255,0.55)', fontWeight: 500 }}
+          className="be-sidebar-link"
+          style={{ color: 'rgba(255,255,255,0.50)' }}
         >
-          <span className="shrink-0 text-base leading-none" aria-hidden>←</span>
+          <span style={{ flexShrink: 0, fontSize: '0.875rem', lineHeight: 1 }} aria-hidden>←</span>
           <span>Back to site</span>
         </Link>
       </div>

@@ -30,8 +30,8 @@
 
 /* ── Sidebar ──────────────────────────────────────────────────── */
 .be-shell .be-sidebar {
-  background: linear-gradient(175deg, #0f2044 0%, #1b3a72 100%);
-  width: 14.5rem;
+  background: #1b61c9;
+  width: 100%;
   flex-shrink: 0;
 }
 
