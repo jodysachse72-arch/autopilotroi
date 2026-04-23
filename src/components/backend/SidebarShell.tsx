@@ -72,7 +72,7 @@ export default function SidebarShell({
             id={link.id}
             href={link.href}
             onClick={onClose}
-            data-active={isActive(pathname, link) || undefined}
+            data-active={isActive(pathname, link) ? "true" : undefined}
             className="be-sidebar-link"
           >
             <span style={{ flexShrink: 0, fontSize: '1rem', lineHeight: 1 }} aria-hidden>{link.icon}</span>

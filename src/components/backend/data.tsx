@@ -82,7 +82,7 @@ export function FilterPill({ label, active, count, onClick }: FilterPillProps) {
     <button
       onClick={onClick}
       className="be-filter"
-      data-active={active || undefined}
+      data-active={active ? "true" : undefined}
     >
       {label}
       {count !== undefined && (
