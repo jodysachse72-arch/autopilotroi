@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useCallback, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
@@ -11,15 +11,15 @@ import {
   FormButton,
 } from '@/components/backend'
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   PARTNER Â· REFERRAL LINKS  (/dashboard/links)
+/* ─────────────────────────────────────────────────────────────────
+   PARTNER · REFERRAL LINKS  (/dashboard/links)
    Three link variants: Hot (signup), Cold (homepage), Specific Page
    QR code with destination selector + share buttons + templates.
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+   ───────────────────────────────────────────────────────────────── */
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://autopilotroi.com'
 
-type LinkType     = 'cold' | 'hot' | 'specific'
+type LinkType      = 'cold' | 'hot' | 'specific'
 type QrDestination = 'signup' | 'home' | 'selected'
 
 interface PageOption { label: string; path: string }
@@ -48,9 +48,9 @@ interface LinkTypeMeta {
 }
 
 const LINK_TYPES: LinkTypeMeta[] = [
-  { key: 'cold',     label: 'Cold prospect', icon: 'â„ï¸', desc: 'Sends to homepage â€” best for cold outreach',  ring: 'ring-cyan-300/50',  bg: 'border-cyan-200 bg-cyan-50/40' },
-  { key: 'hot',      label: 'Hot prospect',  icon: 'ðŸ”¥', desc: 'Sends directly to signup â€” for warm leads',   ring: 'ring-orange-300/50', bg: 'border-orange-200 bg-orange-50/40' },
-  { key: 'specific', label: 'Specific page', icon: 'ðŸ“„', desc: 'Send to any page â€” targeted outreach',        ring: 'ring-purple-300/50', bg: 'border-purple-200 bg-purple-50/40' },
+  { key: 'cold',     label: 'Cold prospect', icon: '❄️', desc: 'Sends to homepage — best for cold outreach',  ring: 'ring-cyan-300/50',   bg: 'border-cyan-200 bg-cyan-50/40' },
+  { key: 'hot',      label: 'Hot prospect',  icon: '🔥', desc: 'Sends directly to signup — for warm leads',   ring: 'ring-orange-300/50', bg: 'border-orange-200 bg-orange-50/40' },
+  { key: 'specific', label: 'Specific page', icon: '🔄', desc: 'Send to any page — targeted outreach',        ring: 'ring-purple-300/50', bg: 'border-purple-200 bg-purple-50/40' },
 ]
 
 export default function ReferralLinksPage() {
@@ -83,27 +83,27 @@ export default function ReferralLinksPage() {
   const shareLinks = useMemo(() => [
     {
       name: 'WhatsApp',
-      url:  `https://wa.me/?text=${encodeURIComponent(`Check out AutopilotROI â€” AI-managed finance platform: ${referralUrl}`)}`,
+      url:  `https://wa.me/?text=${encodeURIComponent(`Check out AutopilotROI — AI-managed finance platform: ${referralUrl}`)}`,
       cls:  'bg-emerald-600 hover:bg-emerald-500 text-white',
-      icon: 'ðŸ’¬',
+      icon: '💬',
     },
     {
       name: 'Telegram',
-      url:  `https://t.me/share/url?url=${encodeURIComponent(referralUrl)}&text=${encodeURIComponent('Check out AutopilotROI â€” AI-managed finance platform')}`,
+      url:  `https://t.me/share/url?url=${encodeURIComponent(referralUrl)}&text=${encodeURIComponent('Check out AutopilotROI — AI-managed finance platform')}`,
       cls:  'bg-blue-500 hover:bg-blue-400 text-white',
-      icon: 'âœˆï¸',
+      icon: '✈️',
     },
     {
       name: 'X / Twitter',
-      url:  `https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out AutopilotROI â€” AI-managed finance platform')}&url=${encodeURIComponent(referralUrl)}`,
+      url:  `https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out AutopilotROI — AI-managed finance platform')}&url=${encodeURIComponent(referralUrl)}`,
       cls:  'bg-gray-900 hover:bg-gray-700 text-white',
-      icon: 'ðŸ¦',
+      icon: '🐦',
     },
     {
       name: 'Email',
-      url:  `mailto:?subject=${encodeURIComponent('Check out AutopilotROI')}&body=${encodeURIComponent(`I wanted to share this with you â€” AutopilotROI is an AI-managed finance platform:\n\n${referralUrl}`)}`,
+      url:  `mailto:?subject=${encodeURIComponent('Check out AutopilotROI')}&body=${encodeURIComponent(`I wanted to share this with you — AutopilotROI is an AI-managed finance platform:\n\n${referralUrl}`)}`,
       cls:  'bg-[#f8fafc] hover:bg-[#e8edf5] text-[#181d26] border border-[#e0e2e6]',
-      icon: 'ðŸ“§',
+      icon: '📧',
     },
   ], [referralUrl])
 
@@ -117,8 +117,8 @@ export default function ReferralLinksPage() {
 
   const messageTemplates = useMemo(() => [
     `Hey! I've been using AutopilotROI for AI-managed finance and thought you'd find it interesting. Takes 2 minutes to get your readiness score: ${referralUrl}`,
-    `Wanted to share this with you â€” AutopilotROI has a free assessment that shows where you stand with crypto/fintech tools. No commitment: ${referralUrl}`,
-    `Check this out â€” I took a quick quiz about AI finance readiness and found it really insightful. Takes 2 min: ${referralUrl}`,
+    `Wanted to share this with you — AutopilotROI has a free assessment that shows where you stand with crypto/fintech tools. No commitment: ${referralUrl}`,
+    `Check this out — I took a quick quiz about AI finance readiness and found it really insightful. Takes 2 min: ${referralUrl}`,
   ], [referralUrl])
 
   return (
@@ -160,7 +160,7 @@ export default function ReferralLinksPage() {
                 }`}
               >
                 {isActive && (
-                  <span className="absolute top-3 right-3 text-xs font-bold text-blue-600">âœ“ Active</span>
+                  <span className="absolute top-3 right-3 text-xs font-bold text-blue-600">✓ Active</span>
                 )}
                 <span className="text-2xl">{type.icon}</span>
                 <h3 className="mt-2 font-semibold text-[#181d26] text-sm">{type.label}</h3>
@@ -187,7 +187,7 @@ export default function ReferralLinksPage() {
               >
                 {FRONTEND_PAGES.map((page) => (
                   <option key={page.path} value={page.path}>
-                    {page.label} â€” {SITE_URL}{page.path}
+                    {page.label} — {SITE_URL}{page.path}
                   </option>
                 ))}
               </FormSelect>
@@ -213,7 +213,7 @@ export default function ReferralLinksPage() {
               variant="primary"
               onClick={() => copyToClipboard(referralUrl, 'link')}
             >
-              {copied === 'link' ? 'âœ“ Copied!' : 'Copy'}
+              {copied === 'link' ? '✓ Copied!' : 'Copy'}
             </FormButton>
           </div>
         </Card>
@@ -223,14 +223,14 @@ export default function ReferralLinksPage() {
       {refCode && (
         <Card padding="lg">
           <h3 className="text-sm font-semibold text-[rgba(4,14,32,0.45)] uppercase tracking-wider mb-4">
-            All your links â€” quick copy
+            All your links — quick copy
           </h3>
           <div className="space-y-3">
             {[
-              { icon: 'â„ï¸', label: 'Cold (Homepage)', url: `${SITE_URL}/?ref=${refCode}` },
-              { icon: 'ðŸ”¥', label: 'Hot (Signup)',     url: `${SITE_URL}/signup?ref=${refCode}` },
+              { icon: '❄️', label: 'Cold (Homepage)', url: `${SITE_URL}/?ref=${refCode}` },
+              { icon: '🔥', label: 'Hot (Signup)',     url: `${SITE_URL}/signup?ref=${refCode}` },
               ...(linkType === 'specific'
-                ? [{ icon: 'ðŸ“„', label: `Page (${selectedPage})`, url: `${SITE_URL}${selectedPage}?ref=${refCode}` }]
+                ? [{ icon: '🔄', label: `Page (${selectedPage})`, url: `${SITE_URL}${selectedPage}?ref=${refCode}` }]
                 : []),
             ].map((link) => (
               <div
@@ -242,7 +242,7 @@ export default function ReferralLinksPage() {
                 <span className="text-xs font-medium text-[#181d26] w-32 shrink-0">{link.label}</span>
                 <code className="flex-1 text-xs text-[rgba(4,14,32,0.55)] truncate">{link.url}</code>
                 <span className="text-xs text-blue-600 opacity-0 group-hover:opacity-100 transition font-semibold">
-                  {copied === link.label ? 'âœ“' : 'Copy'}
+                  {copied === link.label ? '✓' : 'Copy'}
                 </span>
               </div>
             ))}
@@ -261,10 +261,10 @@ export default function ReferralLinksPage() {
           <div className="flex flex-wrap gap-2">
             {(
               [
-                { key: 'home',     label: 'â„ï¸ Homepage',      desc: 'autopilotroi.com' },
-                { key: 'signup',   label: 'ðŸ”¥ Signup',        desc: 'autopilotroi.com/signup' },
+                { key: 'home',     label: '❄️ Homepage',      desc: 'autopilotroi.com' },
+                { key: 'signup',   label: '🔥 Signup',        desc: 'autopilotroi.com/signup' },
                 ...(linkType === 'specific'
-                  ? [{ key: 'selected' as const, label: 'ðŸ“„ Selected page', desc: selectedPage }]
+                  ? [{ key: 'selected' as const, label: '🔄 Selected page', desc: selectedPage }]
                   : []),
               ] as { key: QrDestination; label: string; desc: string }[]
             ).map((opt) => (
@@ -302,8 +302,8 @@ export default function ReferralLinksPage() {
             />
             <div className="hidden w-[200px] h-[200px] items-center justify-center rounded-lg border border-dashed border-[#e0e2e6] text-center">
               <div>
-                <span className="text-3xl">ðŸ“±</span>
-                <p className="mt-2 text-xs text-[rgba(4,14,32,0.45)]">QR preview loadingâ€¦<br/>Use download below</p>
+                <span className="text-3xl">📱</span>
+                <p className="mt-2 text-xs text-[rgba(4,14,32,0.45)]">QR preview loading…<br/>Use download below</p>
               </div>
             </div>
           </div>
@@ -318,7 +318,7 @@ export default function ReferralLinksPage() {
               download={`autopilotroi-qr-${refCode || 'default'}-${qrDest}.png`}
               className="inline-flex items-center gap-2 rounded-xl bg-[#f8fafc] px-5 py-2.5 text-sm font-medium text-[#181d26] transition hover:bg-[#e8edf5] border border-[#e0e2e6]"
             >
-              â¬‡ï¸ Download QR code
+              ⬇️ Download QR code
             </a>
           </div>
         </div>
@@ -362,7 +362,7 @@ export default function ReferralLinksPage() {
             >
               <p className="flex-1 text-sm text-[rgba(4,14,32,0.70)]">{msg}</p>
               <button className="shrink-0 mt-1 text-xs text-blue-600 opacity-0 group-hover:opacity-100 transition font-semibold">
-                {copied === `msg-${i}` ? 'âœ“' : 'Copy'}
+                {copied === `msg-${i}` ? '✓' : 'Copy'}
               </button>
             </div>
           ))}
@@ -371,5 +371,3 @@ export default function ReferralLinksPage() {
     </div>
   )
 }
-
-

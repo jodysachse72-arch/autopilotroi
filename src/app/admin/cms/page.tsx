@@ -26,18 +26,18 @@ import {
    CONTENT EDITOR  (/admin/cms)
    3-panel layout: List | Tiptap Editor | Meta
    Data: Supabase cms_posts / cms_revisions / cms_media
-   Editor: Tiptap (rich text â€” bold, headings, images, YouTubeâ€¦)
+   Editor: Tiptap (rich text — bold, headings, images, YouTube…)
    To migrate to Payload CMS: change src/lib/cms/service.ts only.
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-// Lazy-load Tiptap (it's heavy â€” no SSR)
+// Lazy-load Tiptap (it's heavy — no SSR)
 const RichEditor = dynamic(() => import('@/components/cms/RichEditor'), {
   ssr: false,
   loading: () => (
     <div className="flex h-[360px] items-center justify-center text-sm text-[rgba(4,14,32,0.35)]">
       <div className="flex flex-col items-center gap-3">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1b61c9] border-t-transparent" />
-        Loading editorâ€¦
+        Loading editor…
       </div>
     </div>
   ),
@@ -47,10 +47,10 @@ type Tab = 'blog' | 'faq' | 'video' | 'page_copy'
 type PostStatus = 'published' | 'draft' | 'scheduled'
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
-  { key: 'blog',      label: 'Blog Posts',   icon: 'ðŸ“' },
-  { key: 'faq',       label: 'FAQs',         icon: 'â“' },
-  { key: 'video',     label: 'Videos',       icon: 'ðŸŽ¬' },
-  { key: 'page_copy', label: 'Page Copy',    icon: 'ðŸ ' },
+  { key: 'blog',      label: 'Blog Posts',   icon: '📝' },
+  { key: 'faq',       label: 'FAQs',         icon: '❓' },
+  { key: 'video',     label: 'Videos',       icon: '🎬' },
+  { key: 'page_copy', label: 'Page Copy',    icon: '🏠' },
 ]
 
 const statusToneMap: Record<PostStatus, StatusTone> = {
@@ -69,10 +69,10 @@ const HOW_IT_WORKS = [
 ] as const
 
 const CONTENT_MAP = [
-  { icon: 'ðŸ“', tab: 'Blog Posts', url: '/blog  Â·  /blog/[slug]', note: 'Title + excerpt on list. Full rich-text body on post page.' },
-  { icon: 'â“', tab: 'FAQs',       url: '/faqs',                  note: 'Title = question. Body (rich text) = answer in accordion.' },
-  { icon: 'ðŸŽ¬', tab: 'Videos',     url: '/university  or  /media', note: 'Set the "Section" field to choose which page it appears on.' },
-  { icon: 'ðŸ ', tab: 'Page Copy',  url: 'Homepage, Productsâ€¦',    note: 'Slug = page key (e.g. "homepage"). Key-value meta fields.' },
+  { icon: '📝', tab: 'Blog Posts', url: '/blog  ·  /blog/[slug]', note: 'Title + excerpt on list. Full rich-text body on post page.' },
+  { icon: '❓', tab: 'FAQs',       url: '/faqs',                  note: 'Title = question. Body (rich text) = answer in accordion.' },
+  { icon: '🎬', tab: 'Videos',     url: '/university  or  /media', note: 'Set the "Section" field to choose which page it appears on.' },
+  { icon: '🏠', tab: 'Page Copy',  url: 'Homepage, Products…',    note: 'Slug = page key (e.g. "homepage"). Key-value meta fields.' },
 ] as const
 
 // â”€â”€ Empty post template per type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -197,7 +197,7 @@ export default function ContentEditorPage() {
       await publishPost(selectedId)
       setDraft(d => ({ ...d, status: 'published' }))
       loadList()
-      toast('Published! ðŸš€', 'success')
+      toast('Published! 🚀', 'success')
     } catch { toast('Publish failed', 'error') }
     finally { setIsSaving(false) }
   }, [selectedId, loadList, toast])
@@ -261,7 +261,7 @@ export default function ContentEditorPage() {
         <div>
           <h1 className="font-[var(--font-sora)] text-xl font-bold text-[#181d26]">Content Editor</h1>
           <p className="text-xs text-[rgba(4,14,32,0.40)]">
-            Supabase-backed Â· changes auto-save Â· {posts.length} {activeTab === 'blog' ? 'posts' : activeTab === 'faq' ? 'FAQs' : activeTab === 'video' ? 'videos' : 'entries'}
+            Supabase-backed · changes auto-save · {posts.length} {activeTab === 'blog' ? 'posts' : activeTab === 'faq' ? 'FAQs' : activeTab === 'video' ? 'videos' : 'entries'}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -272,8 +272,8 @@ export default function ContentEditorPage() {
                 className="flex items-center gap-1.5 text-xs text-[rgba(4,14,32,0.45)]"
               >
                 {autoSaveStatus === 'saving'
-                  ? <><div className="h-3 w-3 animate-spin rounded-full border border-[#1b61c9] border-t-transparent" /> Savingâ€¦</>
-                  : <><span className="text-emerald-500">âœ“</span> Saved</>}
+                  ? <><div className="h-3 w-3 animate-spin rounded-full border border-[#1b61c9] border-t-transparent" /> Saving…</>
+                  : <><span className="text-emerald-500">✓</span> Saved</>}
               </motion.div>
             )}
           </AnimatePresence>
@@ -285,14 +285,14 @@ export default function ContentEditorPage() {
                 size="sm"
                 onClick={() => setShowRevisions(s => !s)}
               >
-                ðŸ• History {revisions.length > 0 && `(${revisions.length})`}
+                🕐 History {revisions.length > 0 && `(${revisions.length})`}
               </FormButton>
               <FormButton
                 variant="danger"
                 size="sm"
                 onClick={handleDelete}
               >
-                ðŸ—‘ï¸ Delete
+                🗑️ Delete
               </FormButton>
             </>
           )}
@@ -305,7 +305,7 @@ export default function ContentEditorPage() {
                 loading={isSaving}
                 onClick={handleSave}
               >
-                {isSaving ? 'Savingâ€¦' : 'ðŸ’¾ Save'}
+                {isSaving ? 'Saving…' : '💾 Save'}
               </FormButton>
               {currentStatus !== 'published' ? (
                 <FormButton
@@ -315,7 +315,7 @@ export default function ContentEditorPage() {
                   disabled={isNew}
                   onClick={handlePublish}
                 >
-                  ðŸš€ Publish
+                  🚀 Publish
                 </FormButton>
               ) : (
                 <FormButton
@@ -396,7 +396,7 @@ export default function ContentEditorPage() {
                         {post.title || 'Untitled'}
                       </div>
                       <div className="text-[10px] text-[rgba(4,14,32,0.35)] mt-0.5 truncate">
-                        {(post.meta?.category as string) ?? (post.meta?.youtubeId as string) ?? 'â€”'} Â· {new Date(post.updated_at).toLocaleDateString()}
+                        {(post.meta?.category as string) ?? (post.meta?.youtubeId as string) ?? '—'} · {new Date(post.updated_at).toLocaleDateString()}
                       </div>
                     </div>
                     <StatusBadge tone={statusToneMap[post.status as PostStatus]}>{post.status}</StatusBadge>
@@ -415,12 +415,12 @@ export default function ContentEditorPage() {
 
                 <div className="mb-6 flex items-start gap-4">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#1b61c9]">
-                    <span className="text-xl">âœï¸</span>
+                    <span className="text-xl">✍️</span>
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-[#181d26]">Content Editor</h2>
                     <p className="mt-1 text-sm text-[rgba(4,14,32,0.50)] leading-relaxed">
-                      Backed by Supabase â€” edits go live on the public site within 60 seconds. No rebuild needed.
+                      Backed by Supabase — edits go live on the public site within 60 seconds. No rebuild needed.
                     </p>
                   </div>
                 </div>
@@ -467,24 +467,24 @@ export default function ContentEditorPage() {
                     <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Draft â†’ Published workflow</h3>
                     <ol className="space-y-1.5 text-xs text-[rgba(4,14,32,0.65)]">
                       <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">1.</span> Create or select a post from the left panel</li>
-                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">2.</span> Write content â€” body auto-saves every 1.5 s</li>
-                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">3.</span> Fill metadata in the right panel (author, excerpt, categoryâ€¦)</li>
-                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">4.</span> Press <strong className="text-[#181d26]">ðŸ’¾ Save</strong> to persist metadata</li>
-                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">5.</span> Press <strong className="text-[#181d26]">ðŸš€ Publish</strong> â€” appears on site in ~60 s</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">2.</span> Write content — body auto-saves every 1.5 s</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">3.</span> Fill metadata in the right panel (author, excerpt, category…)</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">4.</span> Press <strong className="text-[#181d26]">💾 Save</strong> to persist metadata</li>
+                      <li className="flex items-start gap-2"><span className="font-bold text-[#1b61c9]">5.</span> Press <strong className="text-[#181d26]">🚀 Publish</strong> — appears on site in ~60 s</li>
                     </ol>
                   </Card>
                   <Card padding="lg" className="space-y-3">
                     <div>
                       <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Version History</h3>
-                      <p className="text-xs text-[rgba(4,14,32,0.65)]">Every save creates a snapshot. Click <strong className="text-[#181d26]">ðŸ• History</strong> in the top bar to browse and restore any previous version.</p>
+                      <p className="text-xs text-[rgba(4,14,32,0.65)]">Every save creates a snapshot. Click <strong className="text-[#181d26]">🕐 History</strong> in the top bar to browse and restore any previous version.</p>
                     </div>
                     <div>
                       <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Images &amp; YouTube</h3>
-                      <p className="text-xs text-[rgba(4,14,32,0.65)]">Drag images into the editor or click ðŸ–¼ï¸. Paste a YouTube URL and click the YouTube button to embed a video inline. Images upload to Supabase Storage automatically.</p>
+                      <p className="text-xs text-[rgba(4,14,32,0.65)]">Drag images into the editor or click 🖼️. Paste a YouTube URL and click the YouTube button to embed a video inline. Images upload to Supabase Storage automatically.</p>
                     </div>
                     <div>
                       <h3 className="mb-1.5 text-xs font-bold uppercase tracking-widest text-[rgba(4,14,32,0.40)]">Rich Text Toolbar</h3>
-                      <p className="text-xs text-[rgba(4,14,32,0.65)]">H1/H2/H3 Â· Bold Â· Italic Â· Underline Â· Lists Â· Quote Â· Code Â· Link Â· Align Â· Highlight Â· HR Â· Undo/Redo</p>
+                      <p className="text-xs text-[rgba(4,14,32,0.65)]">H1/H2/H3 · Bold · Italic · Underline · Lists · Quote · Code · Link · Align · Highlight · HR · Undo/Redo</p>
                     </div>
                   </Card>
                 </div>
@@ -499,12 +499,12 @@ export default function ContentEditorPage() {
           ) : (
             <div className="flex flex-col gap-5 p-6">
 
-              {/* Title â€” kept as a custom oversized input for editorial feel */}
+              {/* Title — kept as a custom oversized input for editorial feel */}
               <input
                 type="text"
                 value={draft.title ?? ''}
                 onChange={(e) => setDraft(d => ({ ...d, title: e.target.value }))}
-                placeholder={activeTab === 'faq' ? 'Questionâ€¦' : activeTab === 'video' ? 'Video titleâ€¦' : 'Post titleâ€¦'}
+                placeholder={activeTab === 'faq' ? 'Question…' : activeTab === 'video' ? 'Video title…' : 'Post title…'}
                 className="w-full rounded-2xl border border-[#e0e2e6] bg-white px-5 py-3.5 font-[var(--font-sora)] text-2xl font-bold text-[#181d26] placeholder:text-[rgba(4,14,32,0.25)] outline-none focus:border-[#1b61c9] focus:ring-2 focus:ring-[#1b61c9]/15 shadow-sm transition"
               />
 
@@ -529,9 +529,9 @@ export default function ContentEditorPage() {
                   content={bodyJson}
                   contentHtml={bodyHtml}
                   placeholder={
-                    activeTab === 'faq'  ? 'Write the answerâ€¦'
-                    : activeTab === 'blog' ? 'Start writing your postâ€¦'
-                    : 'Edit page copyâ€¦'
+                    activeTab === 'faq'  ? 'Write the answer…'
+                    : activeTab === 'blog' ? 'Start writing your post…'
+                    : 'Edit page copy…'
                   }
                   onChange={handleEditorChange}
                   onImageUpload={handleImageUpload}
@@ -549,7 +549,7 @@ export default function ContentEditorPage() {
                       type="text"
                       value={(draft.meta?.youtubeId as string) ?? ''}
                       onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, youtubeId: e.target.value } }))}
-                      placeholder="https://youtube.com/watch?v=â€¦ or dQw4w9WgXcQ"
+                      placeholder="https://youtube.com/watch?v=… or dQw4w9WgXcQ"
                     />
                   </FormField>
 
@@ -603,7 +603,7 @@ export default function ContentEditorPage() {
                       value={(draft.body_html ?? '') as string}
                       onChange={(e) => setBodyHtml(e.target.value)}
                       rows={3}
-                      placeholder="Brief description of the videoâ€¦"
+                      placeholder="Brief description of the video…"
                     />
                   </FormField>
                 </Card>
@@ -640,7 +640,7 @@ export default function ContentEditorPage() {
                       onClick={handlePublish}
                       className="w-full justify-center"
                     >
-                      ðŸš€ Publish now
+                      🚀 Publish now
                     </FormButton>
                   ) : (
                     <FormButton
@@ -683,7 +683,7 @@ export default function ContentEditorPage() {
                         value={(draft.meta?.excerpt as string) ?? ''}
                         onChange={(e) => setDraft(d => ({ ...d, meta: { ...d.meta, excerpt: e.target.value } }))}
                         rows={3}
-                        placeholder="Short summary for post cardsâ€¦"
+                        placeholder="Short summary for post cards…"
                       />
                     </FormField>
 
