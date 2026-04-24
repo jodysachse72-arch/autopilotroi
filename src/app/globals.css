@@ -1076,3 +1076,34 @@ input, textarea, select {
   /* Radius */
   --radius:                0.625rem;
 }
+
+/* ── Admin shell layout & card polish ──────────────────────────────
+   Scoped to .admin-shell only. Makes cards visually prominent and
+   fixes the page content padding to match the qokp83snq target.
+   ───────────────────────────────────────────────────────────────── */
+
+/* Card: visible border + shadow so they don't look flat */
+.admin-shell [data-slot="card"] {
+  border: 1px solid oklch(0.91 0 0);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
+}
+
+/* Sidebar nav label ("Navigation") — subtle uppercase caption */
+.admin-shell [data-slot="sidebar-group-label"] {
+  color: oklch(0.78 0.02 254.7);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Sidebar menu button text — always white */
+.admin-shell [data-sidebar="menu-button"] {
+  color: oklch(0.96 0.008 254.7);
+}
+
+/* Active sidebar item — lighter blue highlight */
+.admin-shell [data-sidebar="menu-button"][data-active="true"] {
+  background-color: oklch(0.57 0.155 254.7);
+  color: #ffffff;
+}

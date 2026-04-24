@@ -145,9 +145,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           >
             <div className="flex items-center gap-3">
               <SidebarTrigger className="-ml-1" />
-              <h1 className="text-lg font-bold" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>
+              <span className="text-sm font-semibold" style={{ color: '#181d26' }}>
                 System Administration
-              </h1>
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <button
