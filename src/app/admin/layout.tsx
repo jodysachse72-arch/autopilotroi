@@ -139,24 +139,41 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Main content */}
         <div className="flex flex-1 flex-col min-h-screen overflow-hidden bg-[oklch(0.98_0_0)]">
           {/* Top bar */}
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/admin">Admin</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{getPageTitle(pathname)}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-            <div className="ml-auto flex items-center gap-2">
-              <Badge variant="outline" className="text-xs font-medium text-primary border-primary/30 bg-primary/5">
+          <header
+            className="flex h-[4.8rem] shrink-0 items-center justify-between border-b bg-background px-5 lg:px-8"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+          >
+            <div className="flex items-center gap-3">
+              <SidebarTrigger className="-ml-1" />
+              <h1 className="text-lg font-bold" style={{ color: '#181d26', letterSpacing: '-0.02em' }}>
+                System Administration
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                className="hidden sm:flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition"
+                style={{ border: '1px solid #e0e2e6', color: 'rgba(4,14,32,0.45)' }}
+                title="Quick search (Cmd+K)"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <kbd className="font-mono">⌘K</kbd>
+              </button>
+              <button
+                className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+                style={{ border: '1px solid #e0e2e6', color: '#1b61c9' }}
+                title="Take a guided tour"
+              >
+                🗺️ Tour
+              </button>
+              <span
+                id="admin-badge"
+                className="rounded-full px-3 py-1 text-xs font-bold"
+                style={{ background: 'rgba(239,68,68,0.10)', color: '#dc2626' }}
+              >
                 Admin
-              </Badge>
+              </span>
             </div>
           </header>
 
