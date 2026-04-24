@@ -1,13 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Search, Plus, MoreHorizontal, Users } from 'lucide-react'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Plus, Search } from 'lucide-react'
 
 const partners = [
   { id: 1, name: 'Sarah Chen',    email: 'sarah@example.com',  status: 'Active',   prospects: 12, conversions: 8,  joined: 'Jan 15, 2026' },
@@ -17,10 +11,10 @@ const partners = [
   { id: 5, name: 'Alicia Torres', email: 'alicia@example.com', status: 'Inactive', prospects: 2,  conversions: 1,  joined: 'Apr 1, 2026' },
 ]
 
-const statusStyle: Record<string, string> = {
-  Active:   'bg-green-100 text-green-800',
-  Pending:  'bg-amber-100 text-amber-800',
-  Inactive: 'bg-gray-100 text-gray-600',
+const statusPill: Record<string, string> = {
+  Active:   'adm-pill adm-pill--green',
+  Pending:  'adm-pill adm-pill--amber',
+  Inactive: 'adm-pill adm-pill--gray',
 }
 
 export default function PartnersPage() {
@@ -31,80 +25,74 @@ export default function PartnersPage() {
   )
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div className="adm-page-header">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Partners</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage your active referral partner accounts.</p>
+          <h1 className="adm-page-title">Partners</h1>
+          <p className="adm-page-subtitle">Manage your active referral partner accounts.</p>
         </div>
-        <Button size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Partner
-        </Button>
+        <div className="adm-page-actions">
+          <button className="adm-btn adm-btn--primary">
+            <Plus size={15} />
+            Add Partner
+          </button>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search partners..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Badge variant="outline" className="text-muted-foreground">{filtered.length} partners</Badge>
+      {/* Toolbar */}
+      <div className="adm-toolbar">
+        <div className="adm-toolbar-left">
+          <div className="adm-search-wrap">
+            <Search size={15} className="adm-search-icon" />
+            <input
+              className="adm-input"
+              placeholder="Search partners..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Partner</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Prospects</TableHead>
-                <TableHead className="text-right">Conversions</TableHead>
-                <TableHead>Joined</TableHead>
-                <TableHead className="w-10" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map(p => (
-                <TableRow key={p.id}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium text-sm">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">{p.email}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={`text-xs ${statusStyle[p.status]}`} variant="outline">{p.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-medium">{p.prospects}</TableCell>
-                  <TableCell className="text-right font-medium">{p.conversions}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{p.joined}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View profile</DropdownMenuItem>
-                        <DropdownMenuItem>Edit partner</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">Deactivate</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+          <span className="adm-pill adm-pill--gray">{filtered.length} partners</span>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="adm-table-wrap">
+        <table className="adm-table">
+          <thead>
+            <tr>
+              <th>Partner</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'right' }}>Prospects</th>
+              <th style={{ textAlign: 'right' }}>Conversions</th>
+              <th>Joined</th>
+              <th style={{ width: 140 }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(p => (
+              <tr key={p.id}>
+                <td>
+                  <div style={{ fontWeight: 500, color: '#0f172a', fontSize: 13.5 }}>{p.name}</div>
+                  <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 1 }}>{p.email}</div>
+                </td>
+                <td>
+                  <span className={statusPill[p.status]}>{p.status}</span>
+                </td>
+                <td style={{ textAlign: 'right', fontWeight: 600 }}>{p.prospects}</td>
+                <td style={{ textAlign: 'right', fontWeight: 600 }}>{p.conversions}</td>
+                <td style={{ color: '#94a3b8', fontSize: 12.5 }}>{p.joined}</td>
+                <td>
+                  <div className="adm-row-actions">
+                    <button className="adm-row-action-btn">View</button>
+                    <button className="adm-row-action-btn">Edit</button>
+                    <button className="adm-row-action-btn adm-row-action-btn--danger">Deactivate</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

@@ -1,85 +1,91 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Mail, Send, Clock, CheckCircle2 } from 'lucide-react'
 
 const emails = [
-  { id: 1, subject: 'Welcome to AutopilotROI',      recipient: 'New partners',       status: 'Sent',      opens: 87,  date: 'Apr 22' },
-  { id: 2, subject: 'Your prospect has been assigned', recipient: 'Partners',         status: 'Sent',      opens: 42,  date: 'Apr 21' },
-  { id: 3, subject: 'Readiness score available',     recipient: 'Prospects',          status: 'Sent',      opens: 134, date: 'Apr 20' },
-  { id: 4, subject: 'Monthly partner report',         recipient: 'All partners',      status: 'Draft',     opens: 0,   date: 'Apr 19' },
-  { id: 5, subject: 'Onboarding complete — next steps', recipient: 'Completed users', status: 'Scheduled', opens: 0,   date: 'Apr 25' },
+  { id: 1, subject: 'Welcome to AutopilotROI',         recipient: 'New partners',      status: 'Sent',      opens: 87,  date: 'Apr 22' },
+  { id: 2, subject: 'Your prospect has been assigned',  recipient: 'Partners',          status: 'Sent',      opens: 42,  date: 'Apr 21' },
+  { id: 3, subject: 'Readiness score available',        recipient: 'Prospects',         status: 'Sent',      opens: 134, date: 'Apr 20' },
+  { id: 4, subject: 'Monthly partner report',           recipient: 'All partners',      status: 'Draft',     opens: 0,   date: 'Apr 19' },
+  { id: 5, subject: 'Onboarding complete — next steps', recipient: 'Completed users',   status: 'Scheduled', opens: 0,   date: 'Apr 25' },
 ]
 
-const statusStyle: Record<string, string> = {
-  Sent:      'bg-green-100 text-green-800',
-  Draft:     'bg-gray-100 text-gray-600',
-  Scheduled: 'bg-blue-100 text-blue-800',
+const statusPill: Record<string, string> = {
+  Sent:      'adm-pill adm-pill--green',
+  Draft:     'adm-pill adm-pill--gray',
+  Scheduled: 'adm-pill adm-pill--blue',
 }
+
+const emailStats = [
+  { label: 'Sent',        value: '3',   icon: CheckCircle2, iconBg: 'rgba(22,163,74,0.10)',   iconColor: '#16a34a' },
+  { label: 'Scheduled',   value: '1',   icon: Clock,        iconBg: 'rgba(27,97,201,0.10)',   iconColor: '#1b61c9' },
+  { label: 'Total Opens', value: '263', icon: Mail,         iconBg: 'rgba(124,58,237,0.10)',  iconColor: '#7c3aed' },
+]
 
 export default function EmailsPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div className="adm-page-header">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Emails</h1>
-          <p className="text-muted-foreground text-sm mt-1">View and manage platform email campaigns.</p>
+          <h1 className="adm-page-title">Emails</h1>
+          <p className="adm-page-subtitle">View and manage platform email campaigns.</p>
         </div>
-        <Button size="sm"><Mail className="mr-2 h-4 w-4" />Compose</Button>
+        <div className="adm-page-actions">
+          <button className="adm-btn adm-btn--primary">
+            <Mail size={15} />
+            Compose
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {[
-          { label: 'Sent',      value: '3',   icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50' },
-          { label: 'Scheduled', value: '1',   icon: Clock,        color: 'text-blue-600',  bg: 'bg-blue-50' },
-          { label: 'Total Opens',value: '263', icon: Mail,         color: 'text-purple-600',bg: 'bg-purple-50' },
-        ].map(s => (
-          <Card key={s.label}>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className={`rounded-lg p-2 ${s.bg}`}><s.icon className={`h-5 w-5 ${s.color}`} /></div>
-              <div><p className="text-2xl font-bold">{s.value}</p><p className="text-xs text-muted-foreground">{s.label}</p></div>
-            </CardContent>
-          </Card>
+      {/* Email Stats */}
+      <div className="adm-three-col">
+        {emailStats.map(s => (
+          <div key={s.label} className="adm-card" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16 }}>
+            <div className="adm-stat-icon" style={{ background: s.iconBg, color: s.iconColor }}>
+              <s.icon size={20} />
+            </div>
+            <div>
+              <div className="adm-stat-value" style={{ fontSize: 22 }}>{s.value}</div>
+              <div className="adm-stat-label" style={{ marginTop: 2 }}>{s.label}</div>
+            </div>
+          </div>
         ))}
       </div>
 
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Subject</TableHead>
-                <TableHead>Recipient</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Opens</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="w-16" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {emails.map(e => (
-                <TableRow key={e.id}>
-                  <TableCell className="font-medium text-sm">{e.subject}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{e.recipient}</TableCell>
-                  <TableCell>
-                    <Badge className={`text-xs ${statusStyle[e.status]}`} variant="outline">{e.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right text-sm font-medium">{e.opens > 0 ? e.opens : '—'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{e.date}</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="sm" className="h-7 text-xs">
-                      {e.status === 'Draft' ? <><Send className="mr-1 h-3 w-3" />Send</> : 'View'}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      {/* Table */}
+      <div className="adm-table-wrap">
+        <table className="adm-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Recipient</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'right' }}>Opens</th>
+              <th>Date</th>
+              <th style={{ width: 80 }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {emails.map(e => (
+              <tr key={e.id}>
+                <td style={{ fontWeight: 500, color: '#0f172a' }}>{e.subject}</td>
+                <td style={{ color: '#94a3b8', fontSize: 12.5 }}>{e.recipient}</td>
+                <td>
+                  <span className={statusPill[e.status]}>{e.status}</span>
+                </td>
+                <td style={{ textAlign: 'right', fontWeight: 600 }}>{e.opens > 0 ? e.opens : '—'}</td>
+                <td style={{ color: '#94a3b8', fontSize: 12.5 }}>{e.date}</td>
+                <td>
+                  <button className="adm-btn adm-btn--ghost adm-btn--sm" style={{ gap: 4 }}>
+                    {e.status === 'Draft' ? <><Send size={12} />Send</> : 'View'}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

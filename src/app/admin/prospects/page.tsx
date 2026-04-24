@@ -1,33 +1,27 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Search, UserPlus } from 'lucide-react'
 
 const prospects = [
-  { id: 1, name: 'John Doe',      email: 'john@example.com',    score: 42, status: 'Unassigned', partner: null,         date: '2 min ago' },
-  { id: 2, name: 'Emma Brown',    email: 'emma@example.com',    score: 18, status: 'Unassigned', partner: null,         date: '15 min ago' },
-  { id: 3, name: 'Mike Johnson',  email: 'mike@example.com',    score: 73, status: 'Unassigned', partner: null,         date: '1 hour ago' },
-  { id: 4, name: 'Lisa Park',     email: 'lisa@example.com',    score: 85, status: 'Assigned',   partner: 'Sarah Chen', date: '3 hours ago' },
-  { id: 5, name: 'Carlos Ruiz',   email: 'carlos@example.com',  score: 31, status: 'Completed',  partner: 'James Wu',   date: 'Apr 21' },
-  { id: 6, name: 'Nina Kowalski', email: 'nina@example.com',    score: 67, status: 'Assigned',   partner: 'Marcus Lee', date: 'Apr 20' },
+  { id: 1, name: 'John Doe',      email: 'john@example.com',   score: 42, status: 'Unassigned', partner: null,         date: '2 min ago' },
+  { id: 2, name: 'Emma Brown',    email: 'emma@example.com',   score: 18, status: 'Unassigned', partner: null,         date: '15 min ago' },
+  { id: 3, name: 'Mike Johnson',  email: 'mike@example.com',   score: 73, status: 'Unassigned', partner: null,         date: '1 hour ago' },
+  { id: 4, name: 'Lisa Park',     email: 'lisa@example.com',   score: 85, status: 'Assigned',   partner: 'Sarah Chen', date: '3 hours ago' },
+  { id: 5, name: 'Carlos Ruiz',   email: 'carlos@example.com', score: 31, status: 'Completed',  partner: 'James Wu',   date: 'Apr 21' },
+  { id: 6, name: 'Nina Kowalski', email: 'nina@example.com',   score: 67, status: 'Assigned',   partner: 'Marcus Lee', date: 'Apr 20' },
 ]
 
-const statusStyle: Record<string, string> = {
-  Unassigned: 'bg-orange-100 text-orange-800',
-  Assigned:   'bg-blue-100 text-blue-800',
-  Completed:  'bg-green-100 text-green-800',
+const statusPill: Record<string, string> = {
+  Unassigned: 'adm-pill adm-pill--amber',
+  Assigned:   'adm-pill adm-pill--blue',
+  Completed:  'adm-pill adm-pill--green',
 }
 
-function scoreColor(score: number) {
-  if (score >= 70) return 'bg-green-100 text-green-800'
-  if (score >= 40) return 'bg-amber-100 text-amber-800'
-  return 'bg-red-100 text-red-800'
+function scoreClass(score: number) {
+  if (score >= 70) return 'adm-score adm-score--high'
+  if (score >= 40) return 'adm-score adm-score--medium'
+  return 'adm-score adm-score--low'
 }
 
 export default function ProspectsPage() {
@@ -41,85 +35,87 @@ export default function ProspectsPage() {
   })
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Prospects</h1>
-        <p className="text-muted-foreground text-sm mt-1">Filter, triage, and assign incoming prospects.</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div className="adm-page-header">
+        <div>
+          <h1 className="adm-page-title">Prospects</h1>
+          <p className="adm-page-subtitle">Filter, triage, and assign incoming prospects.</p>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative flex-1 min-w-[200px] max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search prospects..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? 'all')}>
-              <SelectTrigger className="w-36">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="unassigned">Unassigned</SelectItem>
-                <SelectItem value="assigned">Assigned</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-            <Badge variant="outline" className="text-muted-foreground">{filtered.length} prospects</Badge>
+      {/* Toolbar */}
+      <div className="adm-toolbar">
+        <div className="adm-toolbar-left">
+          <div className="adm-search-wrap">
+            <Search size={15} className="adm-search-icon" />
+            <input
+              className="adm-input"
+              placeholder="Search prospects..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Prospect</TableHead>
-                <TableHead>Score</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Partner</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead className="w-20" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map(p => (
-                <TableRow key={p.id}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium text-sm">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">{p.email}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={`text-xs font-bold ${scoreColor(p.score)}`} variant="outline">
-                      {p.score}/100
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={`text-xs ${statusStyle[p.status]}`} variant="outline">{p.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {p.partner ?? <span className="text-orange-500 font-medium">Unassigned</span>}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{p.date}</TableCell>
-                  <TableCell>
-                    {p.status === 'Unassigned' && (
-                      <Button size="sm" className="h-7 text-xs">
-                        <UserPlus className="mr-1 h-3 w-3" />
-                        Assign
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+          <select
+            className="adm-select"
+            style={{ width: 140 }}
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All Status</option>
+            <option value="unassigned">Unassigned</option>
+            <option value="assigned">Assigned</option>
+            <option value="completed">Completed</option>
+          </select>
+          <span className="adm-pill adm-pill--gray">{filtered.length} prospects</span>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="adm-table-wrap">
+        <table className="adm-table">
+          <thead>
+            <tr>
+              <th>Prospect</th>
+              <th>Score</th>
+              <th>Status</th>
+              <th>Partner</th>
+              <th>Date</th>
+              <th style={{ width: 90 }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(p => (
+              <tr key={p.id}>
+                <td>
+                  <div style={{ fontWeight: 500, color: '#0f172a', fontSize: 13.5 }}>{p.name}</div>
+                  <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 1 }}>{p.email}</div>
+                </td>
+                <td>
+                  <span className={scoreClass(p.score)}>{p.score}/100</span>
+                </td>
+                <td>
+                  <span className={statusPill[p.status]}>{p.status}</span>
+                </td>
+                <td style={{ fontSize: 12.5 }}>
+                  {p.partner
+                    ? <span style={{ color: '#334155' }}>{p.partner}</span>
+                    : <span style={{ color: '#ea580c', fontWeight: 600 }}>Unassigned</span>
+                  }
+                </td>
+                <td style={{ color: '#94a3b8', fontSize: 12.5 }}>{p.date}</td>
+                <td>
+                  {p.status === 'Unassigned' && (
+                    <button className="adm-btn adm-btn--primary adm-btn--sm" style={{ gap: 4 }}>
+                      <UserPlus size={12} />
+                      Assign
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
