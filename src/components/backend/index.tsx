@@ -1,53 +1,28 @@
 /**
- * @/components/backend — Compatibility shim
+ * @/components/backend — Native admin component library
  *
- * Re-exports shadcn/ui primitives under the legacy names used by all
- * admin, dashboard, and auth pages. This means we never have to rewrite
- * the complex business-logic pages — they just work with the new design
- * system automatically.
- *
- * The JSX in these pages renders with shadcn styling because the primitives
- * below map to shadcn components that are scoped inside .admin-shell /
- * .dashboard-shell / .auth-shell via globals.css.
+ * Provides all UI primitives used by admin, dashboard, and auth pages.
+ * Uses plain HTML with .adm-* CSS classes from src/app/admin/admin.css.
+ * Zero shadcn dependencies. Zero Tailwind utilities.
  */
 
 'use client'
 
 import * as React from 'react'
-import {
-  Card as ShadCard,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
-import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
+import Link from 'next/link'
 
-/* ─── Type exports ───────────────────────────────────────────────── */
+/* ─── Types ──────────────────────────────────────────────────────── */
 
 export type StatusTone = 'green' | 'blue' | 'amber' | 'red' | 'gray' | 'purple' | 'neutral'
 
-const toneClass: Record<StatusTone, string> = {
-  green:   'bg-green-100 text-green-800',
-  blue:    'bg-blue-100 text-blue-800',
-  amber:   'bg-amber-100 text-amber-800',
-  red:     'bg-red-100 text-red-800',
-  gray:    'bg-gray-100 text-gray-700',
-  neutral: 'bg-gray-100 text-gray-700',
-  purple:  'bg-purple-100 text-purple-800',
+const toneToPill: Record<StatusTone, string> = {
+  green:   'adm-pill--green',
+  blue:    'adm-pill--blue',
+  amber:   'adm-pill--amber',
+  red:     'adm-pill--red',
+  gray:    'adm-pill--gray',
+  neutral: 'adm-pill--gray',
+  purple:  'adm-pill--purple',
 }
 
 /* ─── SectionHeader ──────────────────────────────────────────────── */
@@ -56,7 +31,7 @@ export function SectionHeader({
   title,
   subtitle,
   actions,
-  className,
+  className = '',
 }: {
   title: string
   subtitle?: string
@@ -64,12 +39,12 @@ export function SectionHeader({
   className?: string
 }) {
   return (
-    <div className={cn('flex items-start justify-between gap-4 mb-1', className)}>
+    <div className={`adm-page-header ${className}`.trim()}>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        {subtitle && <p className="text-muted-foreground text-sm mt-1">{subtitle}</p>}
+        <h1 className="adm-page-title">{title}</h1>
+        {subtitle && <p className="adm-page-subtitle">{subtitle}</p>}
       </div>
-      {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
+      {actions && <div className="adm-page-actions">{actions}</div>}
     </div>
   )
 }
@@ -78,28 +53,50 @@ export function SectionHeader({
 
 export function Card({
   children,
-  className,
+  className = '',
   padding = 'md',
 }: {
   children: React.ReactNode
   className?: string
   padding?: 'sm' | 'md' | 'lg' | 'flush'
 }) {
-  const padClass = {
-    flush: 'p-0',
-    sm:    'p-3',
-    md:    'p-5',
-    lg:    'p-6',
-  }[padding]
-
+  const padStyle: Record<string, React.CSSProperties> = {
+    flush: { padding: 0 },
+    sm:    { padding: '12px' },
+    md:    { padding: '20px' },
+    lg:    { padding: '28px' },
+  }
   return (
-    <ShadCard className={cn('', className)}>
-      <CardContent className={padClass}>{children}</CardContent>
-    </ShadCard>
+    <div
+      className={`adm-card ${padding === 'flush' ? 'adm-card--flush' : ''} ${className}`.trim()}
+      style={padStyle[padding]}
+    >
+      {children}
+    </div>
   )
 }
 
 /* ─── StatCard ───────────────────────────────────────────────────── */
+
+const toneIconBg: Record<StatusTone, string> = {
+  green:   'rgba(22,163,74,0.10)',
+  blue:    'rgba(27,97,201,0.10)',
+  amber:   'rgba(202,138,4,0.10)',
+  red:     'rgba(220,38,38,0.10)',
+  gray:    'rgba(100,116,139,0.10)',
+  neutral: 'rgba(100,116,139,0.10)',
+  purple:  'rgba(124,58,237,0.10)',
+}
+
+const toneIconColor: Record<StatusTone, string> = {
+  green:   '#16a34a',
+  blue:    '#1b61c9',
+  amber:   '#ca8a04',
+  red:     '#dc2626',
+  gray:    '#64748b',
+  neutral: '#64748b',
+  purple:  '#7c3aed',
+}
 
 export function StatCard({
   label,
@@ -107,30 +104,28 @@ export function StatCard({
   icon,
   delta,
   tone = 'blue',
-  trend: _trend,
 }: {
   label: string
   value: React.ReactNode
   icon?: React.ReactNode
   delta?: string
   tone?: StatusTone
-  trend?: string  // accepted but not rendered
+  trend?: string
 }) {
   return (
-    <ShadCard>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-muted-foreground">{label}</span>
-          {icon && (
-            <span className={cn('rounded-lg p-1.5 text-base', toneClass[tone] + '/20')}>
-              {icon}
-            </span>
-          )}
+    <div className="adm-card">
+      {icon && (
+        <div
+          className="adm-stat-icon"
+          style={{ background: toneIconBg[tone], color: toneIconColor[tone] }}
+        >
+          {icon}
         </div>
-        <div className="text-2xl font-bold">{value}</div>
-        {delta && <div className="text-xs text-muted-foreground mt-1">{delta}</div>}
-      </CardContent>
-    </ShadCard>
+      )}
+      <div className="adm-stat-label">{label}</div>
+      <div className="adm-stat-value">{value}</div>
+      {delta && <div className="adm-stat-delta">{delta}</div>}
+    </div>
   )
 }
 
@@ -144,7 +139,7 @@ export function StatusBadge({
   tone?: StatusTone
 }) {
   return (
-    <span className={cn('inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium', toneClass[tone])}>
+    <span className={`adm-pill ${toneToPill[tone]}`}>
       {children}
     </span>
   )
@@ -152,11 +147,19 @@ export function StatusBadge({
 
 /* ─── Toolbar ────────────────────────────────────────────────────── */
 
-export function Toolbar({ children, left, className }: { children?: React.ReactNode; left?: React.ReactNode; className?: string }) {
+export function Toolbar({
+  children,
+  left,
+  className = '',
+}: {
+  children?: React.ReactNode
+  left?: React.ReactNode
+  className?: string
+}) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-3 mb-4', className)}>
-      {left && <div className="flex items-center gap-2">{left}</div>}
-      {children}
+    <div className={`adm-toolbar ${className}`.trim()}>
+      {left && <div className="adm-toolbar-left">{left}</div>}
+      {children && <div className="adm-toolbar-right">{children}</div>}
     </div>
   )
 }
@@ -165,11 +168,12 @@ export function Toolbar({ children, left, className }: { children?: React.ReactN
 
 export function FilterPill({
   children,
-  'data-active': active,
+  'data-active': dataActive,
   label,
   count,
   onClick,
-  className,
+  active,
+  className = '',
 }: {
   children?: React.ReactNode
   'data-active'?: string | boolean
@@ -179,23 +183,21 @@ export function FilterPill({
   onClick?: () => void
   className?: string
 }) {
-  const isActive = active === 'true' || active === true || active === (true as unknown as string | boolean)
+  const isActive =
+    active === true ||
+    dataActive === true ||
+    dataActive === 'true'
   const displayText = children ?? label
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        'inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition-colors',
-        isActive
-          ? 'bg-primary text-primary-foreground'
-          : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-        className,
-      )}
+      className={`adm-filter ${isActive ? 'adm-filter--active' : ''} ${className}`.trim()}
     >
       {displayText}
       {count !== undefined && (
-        <span className="ml-1 rounded-full bg-current/10 px-1 text-[10px]">{count}</span>
+        <span style={{ marginLeft: 4, opacity: 0.7 }}>({count})</span>
       )}
     </button>
   )
@@ -217,11 +219,13 @@ export function EmptyState({
   action?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      {icon && <div className="text-4xl mb-4">{icon}</div>}
-      <h3 className="font-semibold text-foreground">{title}</h3>
-      {(message || description) && <p className="text-sm text-muted-foreground mt-1 max-w-xs">{message ?? description}</p>}
-      {action && <div className="mt-4">{action}</div>}
+    <div className="adm-empty">
+      {icon && <div className="adm-empty-icon">{icon}</div>}
+      <div className="adm-empty-title">{title}</div>
+      {(message || description) && (
+        <p className="adm-empty-desc">{message ?? description}</p>
+      )}
+      {action && <div style={{ marginTop: 16 }}>{action}</div>}
     </div>
   )
 }
@@ -230,12 +234,16 @@ export function EmptyState({
 
 export const FormInput = React.forwardRef<
   HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement> & { label?: string; hint?: string; invalid?: boolean }
->(({ label, hint, invalid: _invalid, className, ...props }, ref) => (
-  <div className="space-y-1">
-    {label && <label className="text-sm font-medium">{label}</label>}
-    <Input ref={ref} className={className} {...props} />
-    {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+  React.InputHTMLAttributes<HTMLInputElement> & {
+    label?: string
+    hint?: string
+    invalid?: boolean
+  }
+>(({ label, hint, invalid: _invalid, className = '', ...props }, ref) => (
+  <div className="adm-form-group">
+    {label && <label className="adm-label">{label}</label>}
+    <input ref={ref} className={`adm-input ${className}`.trim()} {...props} />
+    {hint && <p className="adm-help">{hint}</p>}
   </div>
 ))
 FormInput.displayName = 'FormInput'
@@ -244,12 +252,15 @@ FormInput.displayName = 'FormInput'
 
 export const FormTextarea = React.forwardRef<
   HTMLTextAreaElement,
-  React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label?: string; hint?: string }
->(({ label, hint, className, ...props }, ref) => (
-  <div className="space-y-1">
-    {label && <label className="text-sm font-medium">{label}</label>}
-    <Textarea ref={ref} className={className} {...props} />
-    {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+    label?: string
+    hint?: string
+  }
+>(({ label, hint, className = '', ...props }, ref) => (
+  <div className="adm-form-group">
+    {label && <label className="adm-label">{label}</label>}
+    <textarea ref={ref} className={`adm-textarea ${className}`.trim()} {...props} />
+    {hint && <p className="adm-help">{hint}</p>}
   </div>
 ))
 FormTextarea.displayName = 'FormTextarea'
@@ -264,7 +275,7 @@ export function FormButton({
   type = 'button',
   disabled,
   loading,
-  className,
+  className = '',
 }: {
   children: React.ReactNode
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'default'
@@ -275,19 +286,22 @@ export function FormButton({
   loading?: boolean
   className?: string
 }) {
-  const shadVariant = v === 'primary' ? 'default' : v === 'danger' ? 'destructive' : v === 'secondary' ? 'outline' : v as 'ghost' | 'default' | 'outline' | 'destructive'
-  const shadSize   = size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'default'
+  const variantClass =
+    v === 'primary' || v === 'default' ? 'adm-btn--primary'
+    : v === 'danger'  ? 'adm-btn--danger'
+    : 'adm-btn--ghost'
+
+  const sizeClass = size === 'sm' ? 'adm-btn--sm' : ''
+
   return (
-    <Button
-      variant={shadVariant}
-      size={shadSize}
-      onClick={onClick}
+    <button
       type={type}
+      onClick={onClick}
       disabled={disabled || loading}
-      className={className}
+      className={`adm-btn ${variantClass} ${sizeClass} ${className}`.trim()}
     >
-      {children}
-    </Button>
+      {loading ? 'Loading…' : children}
+    </button>
   )
 }
 
@@ -296,7 +310,7 @@ export function FormButton({
 export interface DataColumn<T> {
   key: keyof T | string
   label?: string
-  header?: string  // alias for label (legacy compat)
+  header?: string
   render?: (row: T) => React.ReactNode
   align?: 'left' | 'right' | 'center'
   width?: string
@@ -317,12 +331,14 @@ export function DataTable<T extends Record<string, any>>({
   keyField?: keyof T
   rowKey?: (row: T, idx: number) => string
   emptyMessage?: string
-  emptyState?: string  // alias for emptyMessage
+  emptyState?: string
 }) {
   const emptyText = emptyMessage ?? emptyState ?? 'No data found.'
+
   if (rows.length === 0) {
     return <EmptyState title={emptyText} icon="📭" />
   }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const effectiveLabel = (col: DataColumn<any>) => col.label || col.header || String(col.key)
   const getKey = (row: T, idx: number): string => {
@@ -330,35 +346,38 @@ export function DataTable<T extends Record<string, any>>({
     if (keyField) return String(row[keyField])
     return String(idx)
   }
+
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          {(columns as DataColumn<T>[]).map(col => (
-            <TableHead
-              key={String(col.key)}
-              style={{ width: col.width, textAlign: col.align }}
-            >
-              {effectiveLabel(col)}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {(rows as T[]).map((row, idx) => (
-          <TableRow key={getKey(row, idx)}>
+    <div className="adm-table-wrap">
+      <table className="adm-table">
+        <thead>
+          <tr>
             {(columns as DataColumn<T>[]).map(col => (
-              <TableCell
+              <th
                 key={String(col.key)}
-                style={{ textAlign: col.align }}
+                style={{ width: col.width, textAlign: col.align }}
               >
-                {col.render ? col.render(row) : String(row[col.key as keyof T] ?? '')}
-              </TableCell>
+                {effectiveLabel(col)}
+              </th>
             ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+          </tr>
+        </thead>
+        <tbody>
+          {(rows as T[]).map((row, idx) => (
+            <tr key={getKey(row, idx)}>
+              {(columns as DataColumn<T>[]).map(col => (
+                <td
+                  key={String(col.key)}
+                  style={{ textAlign: col.align }}
+                >
+                  {col.render ? col.render(row) : String(row[col.key as keyof T] ?? '')}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }
 
@@ -369,13 +388,13 @@ export function FormField({
   hint,
   help,
   children,
-  className,
+  className = '',
   htmlFor: _htmlFor,
   required: _required,
 }: {
   label?: string
   hint?: string
-  help?: string  // alias for hint
+  help?: string
   children: React.ReactNode
   className?: string
   htmlFor?: string
@@ -383,10 +402,10 @@ export function FormField({
 }) {
   const note = hint ?? help
   return (
-    <div className={cn('space-y-1', className)}>
-      {label && <label className="text-sm font-medium">{label}</label>}
+    <div className={`adm-form-group ${className}`.trim()}>
+      {label && <label className="adm-label">{label}</label>}
       {children}
-      {note && <p className="text-xs text-muted-foreground">{note}</p>}
+      {note && <p className="adm-help">{note}</p>}
     </div>
   )
 }
@@ -401,7 +420,7 @@ export function FormSelect({
   value,
   onChange,
   placeholder,
-  className,
+  className = '',
 }: {
   label?: string
   hint?: string
@@ -414,28 +433,40 @@ export function FormSelect({
   className?: string
 }) {
   return (
-    <div className={cn('space-y-1', className)}>
-      {label && <label className="text-sm font-medium">{label}</label>}
+    <div className={`adm-form-group ${className}`.trim()}>
+      {label && <label className="adm-label">{label}</label>}
       <select
         value={value}
         onChange={onChange}
-        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        className="adm-select"
       >
         {placeholder && <option value="">{placeholder}</option>}
         {children}
         {options?.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="adm-help">{hint}</p>}
     </div>
   )
 }
 
 /* ─── FormRow ────────────────────────────────────────────────────── */
 
-export function FormRow({ children, cols, className }: { children: React.ReactNode; cols?: number; className?: string }) {
-  const gridClass = cols === 3 ? 'grid-cols-1 sm:grid-cols-3' : cols === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'
+export function FormRow({
+  children,
+  cols,
+  className = '',
+}: {
+  children: React.ReactNode
+  cols?: number
+  className?: string
+}) {
+  const gridStyle: React.CSSProperties = {
+    display: 'grid',
+    gap: 16,
+    gridTemplateColumns: cols === 3 ? 'repeat(3,1fr)' : cols === 1 ? '1fr' : 'repeat(2,1fr)',
+  }
   return (
-    <div className={cn(`grid gap-4 ${gridClass}`, className)}>
+    <div className={className} style={gridStyle}>
       {children}
     </div>
   )
@@ -450,7 +481,7 @@ export function ActionCard({
   href,
   onClick,
   badge,
-  className,
+  className = '',
 }: {
   title: string
   description?: string
@@ -460,22 +491,40 @@ export function ActionCard({
   badge?: string
   className?: string
 }) {
-  const content = (
-    <ShadCard className={cn('cursor-pointer transition-shadow hover:shadow-md', className)}>
-      <CardContent className="p-4 flex items-start gap-3">
-        {icon && <div className="shrink-0 mt-0.5 text-2xl">{icon}</div>}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-sm">{title}</h3>
-            {badge && <Badge className="text-[10px]" variant="outline">{badge}</Badge>}
-          </div>
-          {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
+  const inner = (
+    <div
+      className={`adm-card ${className}`.trim()}
+      style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: href || onClick ? 'pointer' : undefined }}
+      onClick={!href ? onClick : undefined}
+      role={!href && onClick ? 'button' : undefined}
+    >
+      {icon && <div style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{icon}</div>}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#0f172a' }}>{title}</span>
+          {badge && <span className="adm-pill adm-pill--blue" style={{ fontSize: 10 }}>{badge}</span>}
         </div>
-      </CardContent>
-    </ShadCard>
+        {description && (
+          <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 3, lineHeight: 1.4 }}>
+            {description}
+          </p>
+        )}
+      </div>
+    </div>
   )
+
   if (href) {
-    return <a href={href} className="block no-underline">{content}</a>
+    return <Link href={href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>
   }
-  return <div onClick={onClick} role={onClick ? 'button' : undefined}>{content}</div>
+  return inner
 }
+
+/* ─── PageContainer (layout wrapper used by some pages) ─────────── */
+
+export function PageContainer({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return <div className={className}>{children}</div>
+}
+
+/* ─── PageHeader (alias for SectionHeader) ───────────────────────── */
+
+export const PageHeader = SectionHeader
