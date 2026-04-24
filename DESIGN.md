@@ -1,7 +1,13 @@
 # DESIGN.md — AutopilotROI Design System
 
-> **Color palette**: Airtable — White canvas, deep navy text, Airtable Blue primary, multi-color semantic accents  
-> **Structure & layout**: ThriveDesk — Friendly SaaS, clean whitespace, Instrument Sans, rounded product UI, marketing-forward  
+> [!IMPORTANT]
+> **SCOPE: Marketing frontend only.**
+> This file applies to `src/app/page.tsx`, all sections, navbar, footer, and public-facing pages.
+> **Do NOT apply this design system to admin, dashboard, or auth pages.**
+> For backend pages, use `ADMIN-DESIGN.md` exclusively.
+
+> **Color palette**: Airtable — White canvas, deep navy text, Airtable Blue primary, multi-color semantic accents
+> **Structure & layout**: ThriveDesk — Friendly SaaS, clean whitespace, rounded product UI, marketing-forward
 > **Product**: AutopilotROI — B2B SaaS ROI automation platform for marketers and growth teams
 
 ---
@@ -74,9 +80,9 @@ AutopilotROI uses a **bright, structured SaaS aesthetic** — a white canvas wit
 ## 3. Typography Rules
 
 ### Font
-- **Primary**: `'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`
-- Load from Google Fonts: `https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap`
-- No separate display font — Instrument Sans handles all weights (ThriveDesk approach)
+- **Display (headings)**: `'Plus Jakarta Sans'` — loaded via Next.js font optimization
+- **Body (paragraphs, UI)**: `'Inter'` — loaded via Next.js font optimization
+- **Note**: The codebase uses Plus Jakarta Sans + Inter, NOT Instrument Sans. Do not introduce Instrument Sans.
 
 ### Type Scale
 

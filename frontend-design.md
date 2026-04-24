@@ -1,6 +1,19 @@
+> [!IMPORTANT]
+> ## ⛔ BACKEND EXCEPTION — Read Before Applying This Skill
+>
+> This skill file does **NOT** apply to any files in these paths:
+> - `src/app/admin/` and all subdirectories
+> - `src/app/dashboard/` and all subdirectories
+> - `src/app/(auth)/` and all subdirectories
+> - `src/components/admin/`
+>
+> For backend/admin/dashboard/auth pages, follow **`ADMIN-DESIGN.md`** exclusively.
+> The backend uses a locked, predictable design system. Do NOT apply bold/unforgettable/
+> varied aesthetics to backend pages. Consistency is the goal, not creativity.
+
 ---
 name: frontend-design
-description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics.
+description: Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, artifacts, posters, or applications (examples include websites, landing pages, dashboards, React components, HTML/CSS layouts, or when styling/beautifying any web UI). Generates creative, polished code and UI design that avoids generic AI aesthetics. NOTE: Does not apply to backend/admin/dashboard pages — see ADMIN-DESIGN.md.
 license: Complete terms in LICENSE.txt
 ---
 

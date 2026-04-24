@@ -1,41 +1,23 @@
 'use client'
 
+import '../admin/admin.css'
 import * as React from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Users, Trophy, TrendingUp, Link2,
-  FolderOpen, PlayCircle, Settings, ChevronRight,
-  ExternalLink, LogOut, Briefcase
+  FolderOpen, PlayCircle, Settings, Menu, ExternalLink, LogOut, Briefcase,
 } from 'lucide-react'
 
-import {
-  Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
-  SidebarGroupLabel, SidebarHeader, SidebarMenu,
-  SidebarMenuButton, SidebarMenuItem, SidebarProvider,
-  SidebarRail, SidebarTrigger,
-} from '@/components/ui/sidebar'
-import { Separator } from '@/components/ui/separator'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList,
-  BreadcrumbPage, BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-
 const navItems = [
-  { id: 'dash-home',        label: 'Dashboard',    href: '/dashboard',              icon: LayoutDashboard, exact: true },
-  { id: 'dash-prospects',   label: 'My Prospects', href: '/dashboard/prospects',    icon: Users },
-  { id: 'dash-leaderboard', label: 'Leaderboard',  href: '/dashboard/leaderboard',  icon: Trophy },
-  { id: 'dash-performance', label: 'Performance',  href: '/dashboard/performance',  icon: TrendingUp },
-  { id: 'dash-links',       label: 'My Links',     href: '/dashboard/links',        icon: Link2 },
-  { id: 'dash-resources',   label: 'Resources',    href: '/dashboard/resources',    icon: FolderOpen },
-  { id: 'dash-videos',      label: 'Videos',       href: '/dashboard/videos',       icon: PlayCircle },
-  { id: 'dash-settings',    label: 'Settings',     href: '/dashboard/settings',     icon: Settings },
+  { id: 'dash-home',        label: 'Dashboard',     href: '/dashboard',             icon: LayoutDashboard, exact: true },
+  { id: 'dash-prospects',   label: 'My Prospects',  href: '/dashboard/prospects',   icon: Users },
+  { id: 'dash-leaderboard', label: 'Leaderboard',   href: '/dashboard/leaderboard', icon: Trophy },
+  { id: 'dash-performance', label: 'Performance',   href: '/dashboard/performance', icon: TrendingUp },
+  { id: 'dash-links',       label: 'My Links',      href: '/dashboard/links',       icon: Link2 },
+  { id: 'dash-resources',   label: 'Resources',     href: '/dashboard/resources',   icon: FolderOpen },
+  { id: 'dash-videos',      label: 'Videos',        href: '/dashboard/videos',      icon: PlayCircle },
+  { id: 'dash-settings',    label: 'Settings',      href: '/dashboard/settings',    icon: Settings },
 ]
 
 function isActive(pathname: string, href: string, exact?: boolean) {
@@ -50,114 +32,123 @@ function getPageTitle(pathname: string) {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const [collapsed, setCollapsed] = React.useState(false)
+  const [mobileOpen, setMobileOpen] = React.useState(false)
+
+  React.useEffect(() => { setMobileOpen(false) }, [pathname])
 
   return (
-    <div className="dashboard-shell">
-      <SidebarProvider>
-        <Sidebar collapsible="icon" variant="sidebar">
-          {/* Brand */}
-          <SidebarHeader className="border-b border-sidebar-border">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton size="lg" onClick={() => router.push('/dashboard')}>
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                    <Briefcase className="size-4" />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">AutopilotROI</span>
-                    <span className="truncate text-xs text-sidebar-foreground/60">Partner Portal</span>
-                  </div>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarHeader>
+    <div className="adm-shell">
 
-          {/* Nav */}
-          <SidebarContent>
-            <SidebarGroup>
-              <SidebarGroupLabel>Partner Tools</SidebarGroupLabel>
-              <SidebarMenu>
-                {navItems.map((item) => {
-                  const active = isActive(pathname, item.href, item.exact)
-                  return (
-                    <SidebarMenuItem key={item.id}>
-                      <SidebarMenuButton
-                        isActive={active}
-                        tooltip={item.label}
-                        id={item.id}
-                        onClick={() => router.push(item.href)}
-                      >
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  )
-                })}
-              </SidebarMenu>
-            </SidebarGroup>
-          </SidebarContent>
+      {mobileOpen && (
+        <div
+          className="adm-sidebar-overlay adm-sidebar-overlay--visible"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
-          {/* Footer */}
-          <SidebarFooter className="border-t border-sidebar-border">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton size="lg">
-                      <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarFallback className="rounded-lg bg-primary text-primary-foreground text-xs">PT</AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">Partner</span>
-                        <span className="truncate text-xs text-sidebar-foreground/60">partner@example.com</span>
-                      </div>
-                      <ChevronRight className="ml-auto size-4" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent side="top" align="start" className="w-56">
-                    <DropdownMenuItem onClick={() => window.open('/', '_blank')}>
-                      <ExternalLink className="mr-2 h-4 w-4" />
-                      View Site
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push('/login')}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarFooter>
-          <SidebarRail />
-        </Sidebar>
+      <nav
+        className={[
+          'adm-sidebar',
+          collapsed ? 'adm-sidebar--collapsed' : '',
+          mobileOpen ? 'adm-sidebar--mobile-open' : '',
+        ].filter(Boolean).join(' ')}
+      >
+        {/* Brand */}
+        <button
+          type="button"
+          className="adm-sidebar-brand"
+          onClick={() => router.push('/dashboard')}
+        >
+          <div className="adm-sidebar-brand-icon">
+            <Briefcase size={16} />
+          </div>
+          <div className="adm-sidebar-brand-text">
+            <span className="adm-sidebar-brand-name">AutopilotROI</span>
+            <span className="adm-sidebar-brand-sub">Partner Portal</span>
+          </div>
+        </button>
 
-        {/* Main */}
-        <div className="flex flex-1 flex-col min-h-screen overflow-hidden bg-[oklch(0.98_0_0)]">
-          <header className="flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/dashboard">Portal</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{getPageTitle(pathname)}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-            <div className="ml-auto">
-              <Badge variant="outline" className="text-xs font-medium text-primary border-primary/30 bg-primary/5">
-                Partner
-              </Badge>
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto p-4 sm:p-6">
-            {children}
-          </main>
+        {/* Nav */}
+        <div className="adm-sidebar-nav">
+          <div className="adm-nav-section-label">Partner Tools</div>
+          {navItems.map((item) => {
+            const active = isActive(pathname, item.href, item.exact)
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                id={item.id}
+                className={`adm-nav-link${active ? ' adm-nav-link--active' : ''}`}
+                title={collapsed ? item.label : undefined}
+              >
+                <span className="adm-nav-link-icon">
+                  <item.icon size={17} />
+                </span>
+                <span className="adm-nav-label">{item.label}</span>
+              </Link>
+            )
+          })}
         </div>
-      </SidebarProvider>
+
+        {/* Footer */}
+        <div className="adm-sidebar-footer">
+          <Link href="/" target="_blank" className="adm-nav-link" title={collapsed ? 'View Site' : undefined}>
+            <span className="adm-nav-link-icon"><ExternalLink size={16} /></span>
+            <span className="adm-nav-label">View Site</span>
+          </Link>
+          <Link href="/login" className="adm-nav-link" title={collapsed ? 'Sign out' : undefined}>
+            <span className="adm-nav-link-icon"><LogOut size={16} /></span>
+            <span className="adm-nav-label">Sign out</span>
+          </Link>
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '8px 2px' }} />
+          <div className="adm-sidebar-user">
+            <div className="adm-sidebar-avatar" style={{ background: '#0891b2' }}>PT</div>
+            <div className="adm-sidebar-user-info">
+              <div className="adm-sidebar-user-name">Partner</div>
+              <div className="adm-sidebar-user-email">partner@example.com</div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main */}
+      <div className={`adm-main${collapsed ? ' adm-main--collapsed' : ''}`}>
+        <header className="adm-topbar">
+          <div className="adm-topbar-left">
+            <button
+              type="button"
+              className="adm-collapse-btn adm-desktop-only"
+              onClick={() => setCollapsed(c => !c)}
+              title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              <Menu size={16} />
+            </button>
+            <button
+              type="button"
+              className="adm-collapse-btn adm-mobile-only"
+              onClick={() => setMobileOpen(o => !o)}
+              title="Toggle menu"
+              aria-label="Toggle menu"
+            >
+              <Menu size={16} />
+            </button>
+            <span className="adm-topbar-title">
+              {getPageTitle(pathname)}
+            </span>
+          </div>
+          <div className="adm-topbar-right">
+            <span className="adm-topbar-badge adm-topbar-badge--partner">
+              Partner
+            </span>
+          </div>
+        </header>
+
+        <main className="adm-content">
+          {children}
+        </main>
+      </div>
     </div>
   )
 }
