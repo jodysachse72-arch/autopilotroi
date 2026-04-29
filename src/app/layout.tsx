@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Inter } from 'next/font/google'
 import Script from 'next/script'
+import { headers } from 'next/headers'
 import './globals.css'
 import AnnouncementBanner from '@/components/layout/AnnouncementBanner'
 import Navbar from '@/components/layout/Navbar'
@@ -63,7 +64,20 @@ export const metadata: Metadata = {
 const thriveDeskId = process.env.NEXT_PUBLIC_THRIVEDESK_WIDGET_ID
 const plausibleDomain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // /plasmic-host must render as a bare page — no fonts, no CSS, no Navbar/Footer.
+  // Plasmic Studio loads it in an iframe; any extra chrome breaks the canvas.
+  const headersList = await headers()
+  const isPlasmicHost = headersList.get('x-plasmic-host') === 'true'
+
+  if (isPlasmicHost) {
+    return (
+      <html lang="en">
+        <body>{children}</body>
+      </html>
+    )
+  }
+
   return (
     <html lang="en" className={`${jakartaSans.variable} ${inter.variable}`}>
       <body className="flex min-h-screen flex-col font-body antialiased">
