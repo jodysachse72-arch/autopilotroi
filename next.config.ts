@@ -1,6 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Transpile Plasmic packages so Turbopack can resolve their ESM modules
+  // correctly on both server and browser bundles.
+  transpilePackages: ['@plasmicapp/loader-nextjs', '@plasmicapp/loader-react', '@plasmicapp/host'],
+
+  // Disable React StrictMode in development.
+  // StrictMode double-invokes effects (mount → unmount → remount) to catch bugs.
+  // PlasmicCanvasHost's `renderStudioIntoIframe()` has no cleanup function,
+  // so StrictMode fires it twice, loading studio.js twice into the same global
+  // scope → "Identifier '__plasmicData' has already been declared" SyntaxError.
+  // This flag only affects local dev; production is never in StrictMode.
+  reactStrictMode: false,
+
   turbopack: {
     root: __dirname,
   },
@@ -19,7 +31,7 @@ const nextConfig: NextConfig = {
             // Allow everything — Plasmic's canvas host loads many resources
             // from its own CDN. The only restriction we keep is frame-ancestors
             // so only Plasmic Studio can embed this page.
-            value: "frame-ancestors https://studio.plasmic.app https://*.plasmic.app; default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;",
+            value: "frame-ancestors https://studio.plasmic.app https://*.plasmic.app; default-src * 'unsafe-inline' 'unsafe-eval' data: blob: wss:; connect-src * wss:;",
           },
         ],
       },
