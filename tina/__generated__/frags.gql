@@ -1,0 +1,65 @@
+fragment NavigationParts on Navigation {
+  __typename
+  navItems {
+    __typename
+    label
+    href
+    dropdown {
+      __typename
+      label
+      href
+    }
+  }
+  ctaLabel
+  ctaHref
+}
+
+fragment FooterParts on Footer {
+  __typename
+  tagline
+  columns {
+    __typename
+    heading
+    links {
+      __typename
+      label
+      href
+      external
+    }
+  }
+  copyright
+}
+
+fragment FaqParts on Faq {
+  __typename
+  title
+  category
+  body
+  sortOrder
+}
+
+fragment HomePageParts on HomePage {
+  __typename
+  heroEyebrow
+  heroHeadline
+  heroSubheadline
+  heroCtaLabel
+  heroCtaHref
+  stat1Number
+  stat1Label
+  stat2Number
+  stat2Label
+  stat3Number
+  stat3Label
+  stat4Number
+  stat4Label
+}
+
+fragment ContactPageParts on ContactPage {
+  __typename
+  headline
+  subheadline
+  email
+  telegram
+  responseNote
+}
