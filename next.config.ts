@@ -8,8 +8,34 @@ const nextConfig: NextConfig = {
   // ── Security Headers ──
   async headers() {
     return [
+      // ── /plasmic-host — allow Plasmic Studio to frame this page ──
+      // This is the only page that needs to be embeddable in an iframe.
+      // All other pages remain fully locked down.
       {
-        source: "/(.*)",
+        source: "/plasmic-host",
+        headers: [
+          {
+            key: "X-Frame-Options",
+            value: "ALLOWALL",
+          },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://studio.plasmic.app https://*.plasmic.app",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://*.plasmic.app",
+              "connect-src 'self' https://*.plasmic.app https://codegen.plasmic.app https://data.plasmic.app",
+              "frame-ancestors https://studio.plasmic.app",
+            ].join("; "),
+          },
+        ],
+      },
+
+      // ── All other routes — fully locked down ──
+      {
+        source: "/((?!plasmic-host).*)",
         headers: [
           {
             key: "X-Frame-Options",
