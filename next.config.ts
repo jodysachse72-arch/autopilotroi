@@ -9,27 +9,17 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       // ── /plasmic-host — allow Plasmic Studio to frame this page ──
-      // This is the only page that needs to be embeddable in an iframe.
-      // All other pages remain fully locked down.
+      // This page is a canvas host for Plasmic Studio only. It is intentionally
+      // fully open so PlasmicCanvasHost can load all its internal resources.
       {
         source: "/plasmic-host",
         headers: [
           {
-            key: "X-Frame-Options",
-            value: "ALLOWALL",
-          },
-          {
             key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://studio.plasmic.app https://*.plasmic.app",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.plasmic.app https://studio.plasmic.app",
-              "font-src 'self' https://fonts.gstatic.com https://*.plasmic.app",
-              "img-src 'self' data: blob: https://*.plasmic.app https://studio.plasmic.app",
-              "connect-src 'self' https://*.plasmic.app https://studio.plasmic.app https://codegen.plasmic.app https://data.plasmic.app",
-              "frame-src https://*.plasmic.app https://studio.plasmic.app",
-              "frame-ancestors https://studio.plasmic.app",
-            ].join("; "),
+            // Allow everything — Plasmic's canvas host loads many resources
+            // from its own CDN. The only restriction we keep is frame-ancestors
+            // so only Plasmic Studio can embed this page.
+            value: "frame-ancestors https://studio.plasmic.app https://*.plasmic.app; default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;",
           },
         ],
       },
