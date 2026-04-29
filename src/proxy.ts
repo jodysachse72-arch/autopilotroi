@@ -1,7 +1,14 @@
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // TinaCMS visual editor handles its own Tina Cloud OAuth — do not block it
+  if (pathname.startsWith('/admin/index.html') || pathname === '/admin/') {
+    return NextResponse.next()
+  }
+
   // Skip Supabase session refresh if not configured
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
