@@ -9,20 +9,30 @@
  *
  * SET THIS URL IN PLASMIC:
  * Plasmic Studio → your project → Settings → Edit → App Host URL:
- *   https://your-vercel-url.vercel.app/plasmic-host   (staging)
- *   https://autopilotroi.com/plasmic-host             (production)
- *
- * Also works locally:
- *   http://localhost:3000/plasmic-host
+ *   https://autopilotroi.vercel.app/plasmic-host   (production / stable)
+ *   http://localhost:3000/plasmic-host              (local dev)
  *
  * IMPORTANT: This page must be publicly accessible (no auth required).
+ *
+ * WHY NO PLASMIC LOADER HERE:
+ * We deliberately do NOT import PLASMIC / initPlasmicLoader on this page.
+ * The loader makes async API calls to Plasmic's CDN after mounting. When
+ * those calls complete (or fail), the loader's internal state changes and
+ * studio.js re-reads the component registry — finding it modified. This
+ * causes the components to flash briefly and then disappear from the
+ * Studio Components panel.
+ *
+ * Instead, we register components directly via @plasmicapp/host, which
+ * writes to globalThis.__PlasmicComponentRegistry synchronously and
+ * permanently. studio.js reads the same registry and the components
+ * stay visible.
  */
 
 import { PlasmicCanvasHost } from '@plasmicapp/loader-nextjs'
-import { PLASMIC } from '@/plasmic-init'
-import { registerAllComponents } from '@/components/builder/plasmicComponents'
+import { registerAllHostComponents } from '@/components/builder/plasmicHostRegistrations'
 
-registerAllComponents(PLASMIC)
+// Register synchronously at module load time — no async, no loader API calls.
+registerAllHostComponents()
 
 export default function PlasmicHostPage() {
   return <PlasmicCanvasHost />
