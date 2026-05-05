@@ -48,7 +48,7 @@ export default function PuckEditorPage({
       .catch(() => {})
   }, [saveStatus])
 
-  // Load page data when path changes
+  // Load page data — auto-seed if empty
   useEffect(() => {
     if (!pagePath) return
     setLoading(true)
@@ -59,14 +59,47 @@ export default function PuckEditorPage({
         if (res.ok) return res.json()
         return null
       })
-      .then((data) => {
-        setInitialData(data || { content: [], root: { props: { title: '' } } })
-        setLoading(false)
+      .then(async (data) => {
+        if (data && data.content && data.content.length > 0) {
+          // Existing content found
+          setInitialData(data)
+          setLoading(false)
+        } else {
+          // No content — auto-seed from defaults
+          try {
+            const seedRes = await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, { method: 'POST' })
+            if (seedRes.ok) {
+              // Re-fetch the seeded data
+              const reloadRes = await fetch(`/api/puck?path=${encodeURIComponent(pagePath)}`)
+              if (reloadRes.ok) {
+                const seeded = await reloadRes.json()
+                setInitialData(seeded)
+                setLoading(false)
+                return
+              }
+            }
+          } catch {}
+          // Fallback if seed fails
+          setInitialData({ content: [], root: { props: { title: '' } } })
+          setLoading(false)
+        }
       })
       .catch(() => {
         setInitialData({ content: [], root: { props: { title: '' } } })
         setLoading(false)
       })
+  }, [pagePath])
+
+  // Reset page to default content
+  const resetToDefault = useCallback(async () => {
+    if (!confirm('Reset this page to default content? Current edits will be lost.')) return
+    setLoading(true)
+    try {
+      await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, { method: 'POST' })
+      window.location.reload()
+    } catch {
+      setLoading(false)
+    }
   }, [pagePath])
 
   // Publish handler
@@ -264,6 +297,19 @@ export default function PuckEditorPage({
               >
                 👁 Preview
               </a>
+
+              {/* Reset to defaults */}
+              <button
+                onClick={resetToDefault}
+                style={{
+                  padding: '6px 12px', borderRadius: 6,
+                  border: '1px solid #fca5a5', background: '#fff',
+                  fontSize: 13, cursor: 'pointer', color: '#dc2626',
+                  fontFamily: 'system-ui', fontWeight: 500,
+                }}
+              >
+                ↺ Reset
+              </button>
 
               {/* Saving indicator */}
               {saving && (
