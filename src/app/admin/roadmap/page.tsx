@@ -85,7 +85,7 @@ const phases: Phase[] = [
       { feature: 'Leaderboard + achievement badges', devHours: 24, devRate: 150, aiHours: 2 },
       { feature: 'AI chatbot (FAQ + lead capture)', devHours: 40, devRate: 175, aiHours: 4 },
       { feature: 'Trust Check — Opportunity Evaluator', devHours: 24, devRate: 150, aiHours: 2 },
-      { feature: 'Content Editor (replaced Sanity CMS)', devHours: 32, devRate: 175, aiHours: 3 },
+      { feature: 'Puck Visual Page Editor', devHours: 32, devRate: 175, aiHours: 3 },
       { feature: 'Profit Calculator (8 Aurum tiers)', devHours: 20, devRate: 150, aiHours: 2 },
       { feature: 'Beginner/Advanced onboarding (accordion)', devHours: 32, devRate: 150, aiHours: 3 },
       { feature: 'Mobile-responsive admin + partner dashboards', devHours: 16, devRate: 125, aiHours: 1.5 },

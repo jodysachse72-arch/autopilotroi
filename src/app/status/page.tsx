@@ -99,7 +99,7 @@ const features = [
     icon: '🛡️',
     items: [
       '15 feature flags — toggle any feature ON/OFF instantly, no deploy needed',
-      'Content Editor — edit blog, homepage, FAQs, videos in-app (replaced Sanity)',
+      'Content Editor — Puck visual page builder for drag-and-drop editing',
       'Email template manager — preview all 7 system emails with live rendering',
       'Integration vault — Vercel, Supabase, Resend, Plausible, Sentry, Turnstile, ThriveDesk',
       'Partner management, audit log, launch checklist, roadmap, changelog',

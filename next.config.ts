@@ -1,17 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Transpile Plasmic packages so Turbopack can resolve their ESM modules
-  // correctly on both server and browser bundles.
-  transpilePackages: ['@plasmicapp/loader-nextjs', '@plasmicapp/loader-react', '@plasmicapp/host'],
-
-  // Disable React StrictMode in development.
-  // StrictMode double-invokes effects (mount → unmount → remount) to catch bugs.
-  // PlasmicCanvasHost's `renderStudioIntoIframe()` has no cleanup function,
-  // so StrictMode fires it twice, loading studio.js twice into the same global
-  // scope → "Identifier '__plasmicData' has already been declared" SyntaxError.
-  // This flag only affects local dev; production is never in StrictMode.
-  reactStrictMode: false,
+  reactStrictMode: true,
 
   turbopack: {
     root: __dirname,

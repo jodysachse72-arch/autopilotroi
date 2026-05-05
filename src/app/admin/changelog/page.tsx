@@ -55,7 +55,7 @@ const changelog: ChangeEntry[] = [
       { title: 'Command Palette (Cmd+K)', description: 'Keyboard-activated search across all pages. Fuzzy filtering, arrow-key navigation, category badges.', type: 'feature', files: ['src/components/ui/CommandPalette.tsx'] },
       { title: 'Partner Onboarding Wizard', description: '3-step welcome card for new partners: Set Up Profile → Share First Link → Watch Training.', type: 'feature', files: ['src/components/ui/PartnerOnboardingWizard.tsx'] },
       { title: 'Admin Audit Log', description: 'New /admin/audit page with filterable event timeline, search, category badges.', type: 'feature', files: ['src/app/admin/audit/page.tsx'] },
-      { title: 'Replaced Sanity CMS with In-App Content Editor', description: 'Removed sanity packages (~140MB). Built full in-app Content Editor with 4 tabs, 50-step undo, Export/Import.', type: 'feature', files: ['src/lib/content-store.ts', 'src/app/admin/cms/page.tsx'] },
+      { title: 'Replaced legacy CMS with Puck Visual Editor', description: 'Removed legacy CMS packages. Built Puck-based visual page builder with drag-and-drop components, Supabase persistence, and admin-only access.', type: 'feature', files: ['src/puck.config.tsx', 'src/app/admin/edit/[[...path]]/page.tsx'] },
     ],
   },
   {
