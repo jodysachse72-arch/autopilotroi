@@ -40,17 +40,15 @@ function LoginForm() {
         return
       }
 
-      // Determine where to redirect
-      const { data: { user } } = await supabase.auth.getUser()
-      let destination = redirect
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-        if (profile?.role === 'admin') destination = redirect !== '/' ? redirect : '/admin'
-        else if (profile?.role === 'partner') destination = redirect !== '/' ? redirect : '/dashboard'
+      // Redirect based on account — admin goes to Puck editor, partner to dashboard
+      const lowerEmail = email.toLowerCase()
+      if (lowerEmail === 'admin@autopilotroi.com' || lowerEmail === 'jodysachse72@gmail.com') {
+        window.location.href = '/admin/edit'
+      } else if (lowerEmail === 'partner@autopilotroi.com') {
+        window.location.href = '/dashboard'
+      } else {
+        window.location.href = redirect
       }
-
-      // Full page reload so middleware picks up the new auth cookies
-      window.location.href = destination
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
