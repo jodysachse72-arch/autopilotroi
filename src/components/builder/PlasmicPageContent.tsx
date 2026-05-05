@@ -1,24 +1,20 @@
 'use client'
 
 /**
- * PlasmicPageContent — Client Component
+ * PlasmicPageContent — Client Component (legacy compatibility)
  *
- * Handles all Plasmic interactions on the browser side.
- * The server page (page.tsx) simply renders this component,
- * passing the URL path. Everything Plasmic happens here.
+ * This component renders a Plasmic-managed page by path.
+ * It fetches Plasmic data client-side and falls back to the provided
+ * static content if Plasmic has no page for the given path.
  *
- * Why client-only:
- * Plasmic's initPlasmicLoader uses browser APIs to communicate
- * with the studio iframe for live editing. It cannot run server-side.
+ * NOTE: For new pages, prefer the SSR approach in [[...catchall]]/page.tsx
+ * which fetches data on the server. This component is kept for backward
+ * compatibility with pages that already use it.
  */
 
 import { useEffect, useState } from 'react'
 import { PlasmicComponent, PlasmicRootProvider } from '@plasmicapp/loader-nextjs'
 import { PLASMIC } from '@/plasmic-init'
-import { registerAllComponents } from '@/components/builder/plasmicComponents'
-
-// Register custom blocks once
-registerAllComponents(PLASMIC)
 
 interface PlasmicPageContentProps {
   /** The URL path to fetch from Plasmic, e.g. "/" or "/about" */

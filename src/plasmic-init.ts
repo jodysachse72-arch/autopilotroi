@@ -1,24 +1,25 @@
 'use client'
 
 /**
- * plasmic-init.ts
+ * plasmic-init.ts — Client-side Plasmic loader
  *
- * Single source of truth for the Plasmic loader instance.
- * Import PLASMIC wherever you need to fetch or render Plasmic content.
+ * Single source of truth for the client-side Plasmic loader instance.
+ * Import PLASMIC wherever you need to render Plasmic content in client
+ * components (PlasmicRootProvider, PlasmicComponent).
+ *
+ * For server-side data fetching (Server Components, generateMetadata),
+ * use plasmic-init-server.ts instead.
  *
  * TO SET UP:
- * 1. Go to studio.plasmic.app → your project → Settings (gear icon) → API Tokens
+ * 1. Go to studio.plasmic.app → your project → Settings → API Tokens
  * 2. Copy your Project ID and Public API Token
  * 3. Paste them in .env.local:
  *    NEXT_PUBLIC_PLASMIC_PROJECT_ID=your-project-id
  *    NEXT_PUBLIC_PLASMIC_API_TOKEN=your-token
- *
- * PREVIEW MODE:
- * Set preview: true during development so you see unpublished changes.
- * Set preview: false for production (only sees published content).
  */
 
 import { initPlasmicLoader } from '@plasmicapp/loader-nextjs'
+import { registerAllComponents } from '@/components/builder/plasmicComponents'
 
 export const PLASMIC = initPlasmicLoader({
   projects: [
@@ -27,7 +28,8 @@ export const PLASMIC = initPlasmicLoader({
       token: process.env.NEXT_PUBLIC_PLASMIC_API_TOKEN!,
     },
   ],
-  // In preview mode Barry sees unpublished draft changes in real-time.
-  // In production this should be false so only published content appears.
   preview: process.env.NODE_ENV !== 'production',
 })
+
+// Register all custom code components once at init time.
+registerAllComponents(PLASMIC)
