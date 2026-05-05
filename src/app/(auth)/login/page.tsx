@@ -11,16 +11,7 @@ import { FormField, FormInput, FormButton } from '@/components/backend'
    Demo accounts short-circuit Supabase if env not configured.
    ═══════════════════════════════════════════════════════════════ */
 
-interface DemoAccount {
-  password: string
-  role: 'admin' | 'partner'
-  name: string
-}
 
-const DEMO_ACCOUNTS: Record<string, DemoAccount> = {
-  'admin@autopilotroi.com':   { password: 'Admin2026!',   role: 'admin',   name: 'Admin User' },
-  'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
-}
 
 const TEST_ACCOUNTS = [
   { icon: '🛡️', label: 'Admin',   cred: 'admin@autopilotroi.com / Admin2026!' },
@@ -37,30 +28,10 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const redirect     = searchParams.get('redirect') || '/'
 
-  const isConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
-
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-
-    const demo = DEMO_ACCOUNTS[email.toLowerCase()]
-    if (demo) {
-      if (demo.password !== password) {
-        setError('Invalid password. Please try again.')
-        setLoading(false)
-        return
-      }
-      localStorage.setItem('autopilotroi-demo-user', JSON.stringify({ email, role: demo.role, name: demo.name }))
-      router.push(demo.role === 'admin' ? '/admin' : '/dashboard')
-      return
-    }
-
-    if (!isConfigured) {
-      setError('No account found. Try admin@autopilotroi.com or partner@autopilotroi.com')
-      setLoading(false)
-      return
-    }
 
     try {
       const supabase = createClient()
@@ -83,7 +54,7 @@ function LoginForm() {
     } finally {
       setLoading(false)
     }
-  }, [email, password, isConfigured, redirect, router])
+  }, [email, password, redirect, router])
 
   return (
     <div className="w-full max-w-md">
