@@ -18,6 +18,30 @@ import '@puckeditor/core/puck.css'
 
 type PageEntry = { path: string; saved: boolean; updated_at: string | null }
 
+// Hide global layout elements (Navbar, Footer, etc.) that leak from root layout
+function useHideGlobalChrome() {
+  useEffect(() => {
+    // Add class to body to suppress global elements via CSS
+    document.body.classList.add('puck-editor-active')
+    // Also directly hide known global elements
+    const selectors = ['nav', 'footer', '[data-announcement]', '.announcement-banner', '.smart-faq-bot', '[data-puck-edit-button]']
+    const hidden: HTMLElement[] = []
+    selectors.forEach((sel) => {
+      document.querySelectorAll(sel).forEach((el) => {
+        // Don't hide elements inside the Puck editor
+        if (el.closest('[class*="Puck"]')) return
+        const htmlEl = el as HTMLElement
+        htmlEl.style.display = 'none'
+        hidden.push(htmlEl)
+      })
+    })
+    return () => {
+      document.body.classList.remove('puck-editor-active')
+      hidden.forEach((el) => { el.style.display = '' })
+    }
+  }, [])
+}
+
 export default function PuckEditorPage({
   params,
 }: {
@@ -32,6 +56,8 @@ export default function PuckEditorPage({
   const [newPagePath, setNewPagePath] = useState('')
   const [showNewPage, setShowNewPage] = useState(false)
 
+  // Suppress global Navbar/Footer/Announcement from root layout
+  useHideGlobalChrome()
   // Resolve page path from route params
   useEffect(() => {
     params.then((resolved) => {
@@ -210,6 +236,51 @@ export default function PuckEditorPage({
         viewports={viewports}
         iframe={{ enabled: true }}
         overrides={{
+          // Inject site CSS into the iframe so all component classes render correctly
+          iframe: ({ children, document: iframeDoc }) => {
+            useEffect(() => {
+              if (!iframeDoc) return
+              // Already injected?
+              if (iframeDoc.querySelector('[data-puck-site-css]')) return
+
+              // Clone all <link rel="stylesheet"> and <style> elements from parent
+              const parentDoc = window.document
+              parentDoc.querySelectorAll('link[rel="stylesheet"], style').forEach((el) => {
+                // Skip Puck's own CSS — we only want site styles
+                if (el.getAttribute('href')?.includes('puck')) return
+                const clone = el.cloneNode(true) as HTMLElement
+                clone.setAttribute('data-puck-site-css', 'true')
+                iframeDoc.head.appendChild(clone)
+              })
+
+              // Also inject Google Fonts used by the site
+              const fontsLink = iframeDoc.createElement('link')
+              fontsLink.rel = 'stylesheet'
+              fontsLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap'
+              fontsLink.setAttribute('data-puck-site-css', 'true')
+              iframeDoc.head.appendChild(fontsLink)
+
+              // Critical overrides for the editor iframe
+              const overrideStyle = iframeDoc.createElement('style')
+              overrideStyle.setAttribute('data-puck-site-css', 'true')
+              overrideStyle.textContent = `
+                /* Force reveal elements visible — IntersectionObserver doesn't fire in iframe */
+                .reveal {
+                  opacity: 1 !important;
+                  transform: none !important;
+                }
+                /* Reset body for clean editor canvas */
+                body {
+                  background: #ffffff !important;
+                  margin: 0;
+                }
+                /* Hide any stray nav/footer elements that shouldn't be in the canvas */
+                body > nav, body > footer { display: none !important; }
+              `
+              iframeDoc.head.appendChild(overrideStyle)
+            }, [iframeDoc])
+            return <>{children}</>
+          },
           headerActions: ({ children }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {/* Page Switcher */}
