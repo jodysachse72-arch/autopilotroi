@@ -41,10 +41,6 @@ const HOMEPAGE_SEED: any = {
       },
     },
     {
-      type: 'SectionBox',
-      props: { id: 'stats-section', variant: 'white', padding: 'lg' },
-    },
-    {
       type: 'StatRow',
       props: {
         id: 'stat-row-1',

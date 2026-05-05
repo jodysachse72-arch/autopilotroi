@@ -181,15 +181,15 @@ export const puckConfig: Config<Components> = {
     HeroDark: {
       label: 'Hero (Dark)',
       fields: {
-        badge:           { type: 'text' },
-        title:           { type: 'text' },
-        highlightedText: { type: 'text' },
-        description:     { type: 'textarea' },
-        ctaLabel:        { type: 'text' },
+        badge:           { type: 'text', contentEditable: true },
+        title:           { type: 'text', contentEditable: true },
+        highlightedText: { type: 'text', contentEditable: true },
+        description:     { type: 'textarea', contentEditable: true },
+        ctaLabel:        { type: 'text', contentEditable: true },
         ctaHref:         { type: 'text' },
-        bulletOne:       { type: 'text' },
-        bulletTwo:       { type: 'text' },
-        bulletThree:     { type: 'text' },
+        bulletOne:       { type: 'text', contentEditable: true },
+        bulletTwo:       { type: 'text', contentEditable: true },
+        bulletThree:     { type: 'text', contentEditable: true },
       },
       defaultProps: {
         badge: '✦ Powered by Aurum Ecosystem',
@@ -227,10 +227,10 @@ export const puckConfig: Config<Components> = {
     HeroBlue: {
       label: 'Hero (Blue)',
       fields: {
-        eyebrow:      { type: 'text' },
-        title:        { type: 'text' },
-        description:  { type: 'textarea' },
-        ctaLabel:     { type: 'text' },
+        eyebrow:      { type: 'text', contentEditable: true },
+        title:        { type: 'text', contentEditable: true },
+        description:  { type: 'textarea', contentEditable: true },
+        ctaLabel:     { type: 'text', contentEditable: true },
         ctaHref:      { type: 'text' },
       },
       defaultProps: {
@@ -257,14 +257,14 @@ export const puckConfig: Config<Components> = {
     PageHeaderWhite: {
       label: 'Page Header (White)',
       fields: {
-        badge:            { type: 'text' },
-        title:            { type: 'text' },
-        highlightedText:  { type: 'text' },
-        description1:     { type: 'textarea' },
-        description2:     { type: 'textarea' },
-        cta1Label:        { type: 'text' },
+        badge:            { type: 'text', contentEditable: true },
+        title:            { type: 'text', contentEditable: true },
+        highlightedText:  { type: 'text', contentEditable: true },
+        description1:     { type: 'textarea', contentEditable: true },
+        description2:     { type: 'textarea', contentEditable: true },
+        cta1Label:        { type: 'text', contentEditable: true },
         cta1Href:         { type: 'text' },
-        cta2Label:        { type: 'text' },
+        cta2Label:        { type: 'text', contentEditable: true },
         cta2Href:         { type: 'text' },
       },
       defaultProps: {
@@ -363,9 +363,9 @@ export const puckConfig: Config<Components> = {
     SectionHeader: {
       label: 'Section Header',
       fields: {
-        eyebrow:      { type: 'text' },
-        title:        { type: 'text' },
-        lead:         { type: 'textarea' },
+        eyebrow:      { type: 'text', contentEditable: true },
+        title:        { type: 'text', contentEditable: true },
+        lead:         { type: 'textarea', contentEditable: true },
         align:        {
           type: 'select',
           options: [
@@ -428,8 +428,8 @@ export const puckConfig: Config<Components> = {
     FeatureCard: {
       label: 'Feature Card',
       fields: {
-        title:   { type: 'text' },
-        body:    { type: 'textarea' },
+        title:   { type: 'text', contentEditable: true },
+        body:    { type: 'textarea', contentEditable: true },
         color:   { type: 'text' },
         colorBg: { type: 'text' },
       },
@@ -458,8 +458,8 @@ export const puckConfig: Config<Components> = {
           type: 'select',
           options: Object.keys(ICONS).map(k => ({ label: k.replace('Icon', ''), value: k })),
         },
-        title:    { type: 'text' },
-        body:     { type: 'textarea' },
+        title:    { type: 'text', contentEditable: true },
+        body:     { type: 'textarea', contentEditable: true },
       },
       defaultProps: {
         iconName: 'BankIcon',
@@ -488,9 +488,9 @@ export const puckConfig: Config<Components> = {
       label: 'Product Card',
       fields: {
         productId:   { type: 'text' },
-        name:        { type: 'text' },
-        tagline:     { type: 'text' },
-        description: { type: 'textarea' },
+        name:        { type: 'text', contentEditable: true },
+        tagline:     { type: 'text', contentEditable: true },
+        description: { type: 'textarea', contentEditable: true },
         features:    { type: 'array', arrayFields: { value: { type: 'text' } } },
         badge:       { type: 'text' },
         badgeColor:  { type: 'text' },
@@ -551,8 +551,8 @@ export const puckConfig: Config<Components> = {
     EcoCard: {
       label: 'Ecosystem Card',
       fields: {
-        title:       { type: 'text' },
-        description: { type: 'textarea' },
+        title:       { type: 'text', contentEditable: true },
+        description: { type: 'textarea', contentEditable: true },
         tag:         { type: 'text' },
         tagColor:    { type: 'text' },
       },
@@ -577,9 +577,9 @@ export const puckConfig: Config<Components> = {
     TestimonialCard: {
       label: 'Testimonial',
       fields: {
-        quote:  { type: 'textarea' },
-        author: { type: 'text' },
-        role:   { type: 'text' },
+        quote:  { type: 'textarea', contentEditable: true },
+        author: { type: 'text', contentEditable: true },
+        role:   { type: 'text', contentEditable: true },
       },
       defaultProps: {
         quote: 'I was skeptical at first — the results speak for themselves.',
@@ -595,9 +595,9 @@ export const puckConfig: Config<Components> = {
     Step: {
       label: 'Process Step',
       fields: {
-        num:   { type: 'text' },
-        title: { type: 'text' },
-        body:  { type: 'textarea' },
+        num:   { type: 'text', contentEditable: true },
+        title: { type: 'text', contentEditable: true },
+        body:  { type: 'textarea', contentEditable: true },
       },
       defaultProps: {
         num: '1',
@@ -613,12 +613,12 @@ export const puckConfig: Config<Components> = {
     CTABand: {
       label: 'CTA Banner',
       fields: {
-        eyebrow:        { type: 'text' },
-        title:          { type: 'text' },
-        description:    { type: 'textarea' },
-        ctaLabel:       { type: 'text' },
+        eyebrow:        { type: 'text', contentEditable: true },
+        title:          { type: 'text', contentEditable: true },
+        description:    { type: 'textarea', contentEditable: true },
+        ctaLabel:       { type: 'text', contentEditable: true },
         ctaHref:        { type: 'text' },
-        secondaryLabel: { type: 'text' },
+        secondaryLabel: { type: 'text', contentEditable: true },
         secondaryHref:  { type: 'text' },
       },
       defaultProps: {
