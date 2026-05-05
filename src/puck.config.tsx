@@ -669,4 +669,51 @@ export const puckConfig: Config<Components> = {
       render: () => <FaqAccordionWidget />,
     },
   },
+
+  // ── Component Categories (sidebar grouping) ──────────────
+  categories: {
+    heroes: {
+      title: '🎯 Heroes & Headers',
+      components: ['HeroDark', 'HeroBlue', 'PageHeaderWhite'],
+      defaultExpanded: true,
+    },
+    layout: {
+      title: '📐 Layout',
+      components: ['SectionBox', 'SectionHeader'],
+      defaultExpanded: true,
+    },
+    content: {
+      title: '📝 Content Blocks',
+      components: ['StatRow', 'Step', 'CTABand'],
+      defaultExpanded: true,
+    },
+    cards: {
+      title: '🃏 Cards',
+      components: ['FeatureCard', 'TrustSignalCard', 'ProductCard', 'EcoCard', 'TestimonialCard'],
+      defaultExpanded: false,
+    },
+    widgets: {
+      title: '⚡ Interactive Widgets',
+      components: ['CalculatorWidget', 'SignupWidget', 'FaqAccordionWidget'],
+      defaultExpanded: false,
+    },
+  },
+
+  // ── Root Config (page-level settings) ────────────────────
+  root: {
+    fields: {
+      title: { type: 'text' },
+      description: { type: 'textarea' },
+    },
+    render: ({ children, puck }) => (
+      <div
+        style={{
+          fontFamily: 'var(--font-body, system-ui, sans-serif)',
+          minHeight: '100vh',
+        }}
+      >
+        {children}
+      </div>
+    ),
+  },
 }
