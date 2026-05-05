@@ -2,13 +2,12 @@
 
 import { useState, useCallback, Suspense } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { FormField, FormInput, FormButton } from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
-   LOGIN — uses backend form primitives.
-   Demo accounts short-circuit Supabase if env not configured.
+   LOGIN — uses backend form primitives + real Supabase auth.
    ═══════════════════════════════════════════════════════════════ */
 
 
@@ -24,7 +23,6 @@ function LoginForm() {
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
   const [remember, setRemember] = useState(true)
-  const router       = useRouter()
   const searchParams = useSearchParams()
   const redirect     = searchParams.get('redirect') || '/'
 
@@ -42,19 +40,23 @@ function LoginForm() {
         return
       }
 
+      // Determine where to redirect
       const { data: { user } } = await supabase.auth.getUser()
+      let destination = redirect
       if (user) {
         const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-        if (profile?.role === 'admin') router.push('/admin')
-        else if (profile?.role === 'partner') router.push('/dashboard')
-        else router.push(redirect)
+        if (profile?.role === 'admin') destination = redirect !== '/' ? redirect : '/admin'
+        else if (profile?.role === 'partner') destination = redirect !== '/' ? redirect : '/dashboard'
       }
+
+      // Full page reload so middleware picks up the new auth cookies
+      window.location.href = destination
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [email, password, redirect, router])
+  }, [email, password, redirect])
 
   return (
     <div className="w-full max-w-md">
