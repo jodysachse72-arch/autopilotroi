@@ -1,6 +1,41 @@
+import { headers } from 'next/headers'
+import PuckRenderer from '@/components/builder/PuckRenderer'
+
 export const metadata = { title: 'Privacy Policy — AutopilotROI', description: 'How AutopilotROI collects, uses, and protects your personal information.' }
 
-export default function PrivacyPage() {
+export const revalidate = 60
+
+async function getPuckData(path: string) {
+  try {
+    const host = (await headers()).get('host')
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    const baseUrl = `${protocol}://${host}`
+    
+    const res = await fetch(`${baseUrl}/api/puck?path=${encodeURIComponent(path)}`, {
+      cache: 'no-store',
+    })
+
+    if (!res.ok) {
+      return null
+    }
+    const data = await res.json()
+    return data
+  } catch (error) {
+    return null
+  }
+}
+
+export default async function PrivacyPage() {
+  const puckData = await getPuckData('/privacy')
+  
+  if (puckData && Object.keys(puckData).length > 0) {
+    return (
+      <div className="page-bg">
+        <PuckRenderer data={puckData} />
+      </div>
+    )
+  }
+
   return (
     <div className="page-bg">
       <div className="sections-stack">

@@ -3,11 +3,8 @@
 /**
  * StaticHomePage
  *
- * This is the existing homepage, extracted into a component so it can be
- * used as a fallback while Builder.io is being configured.
- *
- * Once Barry has set up the homepage in Builder.io, this component will
- * no longer be used — Builder.io will render the page instead.
+ * The default homepage, used as a fallback when no Puck-edited
+ * content has been published for the "/" path.
  */
 
 import VideoModal from '@/components/ui/VideoModal'

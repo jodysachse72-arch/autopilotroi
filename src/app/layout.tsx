@@ -7,6 +7,7 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import { FeatureFlagProvider } from '@/lib/feature-flags'
 import SmartFaqBot from '@/components/ui/SmartFaqBot'
+import { PuckEditButton } from '@/components/puck/PuckEditButton'
 
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -74,6 +75,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main className="flex-1">{children}</main>
           <Footer />
           <SmartFaqBot />
+          <PuckEditButton />
         </FeatureFlagProvider>
 
         {plausibleDomain && (

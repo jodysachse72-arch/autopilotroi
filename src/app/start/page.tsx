@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import PuckRenderer from '@/components/builder/PuckRenderer'
 import {
   PageShell,
   SectionBox,
@@ -192,7 +193,40 @@ const prereqs = [
   { Icon: SparkleIcon,     label: '30–45 minutes, undistracted', detail: 'Don\u0027t rush wallet setup. Quiet room, full attention.' },
 ]
 
-export default function StartPage() {
+export const revalidate = 60
+
+async function getPuckData(path: string) {
+  try {
+    const { headers } = await import('next/headers')
+    const host = (await headers()).get('host')
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    const baseUrl = `${protocol}://${host}`
+    
+    const res = await fetch(`${baseUrl}/api/puck?path=${encodeURIComponent(path)}`, {
+      cache: 'no-store',
+    })
+
+    if (!res.ok) {
+      return null
+    }
+    const data = await res.json()
+    return data
+  } catch (error) {
+    return null
+  }
+}
+
+export default async function StartPage() {
+  const puckData = await getPuckData('/start')
+  
+  if (puckData && Object.keys(puckData).length > 0) {
+    return (
+      <div className="page-bg">
+        <PuckRenderer data={puckData} />
+      </div>
+    )
+  }
+
   return (
     <PageShell>
 

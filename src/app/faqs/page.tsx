@@ -1,3 +1,5 @@
+import { headers } from 'next/headers'
+import PuckRenderer from '@/components/builder/PuckRenderer'
 import FaqsPageClient from './FaqsPageClient'
 import { getPublishedFaqsServer } from '@/lib/cms/server-adapter'
 import type { CmsPost } from '@/lib/cms/types'
@@ -26,8 +28,45 @@ const HARDCODED_FAQS: CmsPost[] = [
   { id: 'h-13', type: 'faq', slug: null, title: 'What is the Partner Dashboard?',            body: null, body_html: '<p>The Partner Dashboard is live at /dashboard. Partners can track prospects, see readiness scores, tiers, onboarding status, and use a multi-type referral link generator with QR codes.</p>', meta: { category: 'partner' }, status: 'published', publish_at: null, sort_order: 13, created_at: '', updated_at: '', created_by: null },
 ]
 
-export default async function FaqsPage() {
+export async function StaticFaqsPage() {
   const cmsFaqs = await getPublishedFaqsServer()
   const faqs = cmsFaqs.length > 0 ? cmsFaqs : HARDCODED_FAQS
   return <FaqsPageClient faqs={faqs} />
+}
+
+async function getPuckData(path: string) {
+  try {
+    const host = (await headers()).get('host')
+    const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
+    const baseUrl = `${protocol}://${host}`
+    
+    const res = await fetch(`${baseUrl}/api/puck?path=${encodeURIComponent(path)}`, {
+      cache: 'no-store', // ensures we get the latest data published
+    })
+
+    if (!res.ok) {
+      console.error('Failed to fetch Puck data for', path, res.status)
+      return null
+    }
+    const data = await res.json()
+    return data
+  } catch (error) {
+    console.error('Error fetching Puck data:', error)
+    return null
+  }
+}
+
+export default async function FaqsPage() {
+  const puckData = await getPuckData('/faqs')
+  
+  if (puckData && Object.keys(puckData).length > 0) {
+    return (
+      <div className="page-bg">
+        <PuckRenderer data={puckData} />
+      </div>
+    )
+  }
+
+  // Fallback to the statically coded page if no Puck data exists
+  return <StaticFaqsPage />
 }
