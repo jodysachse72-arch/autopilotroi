@@ -43,3 +43,6 @@ next-env.d.ts
 .vercel
 
 graphify-out/
+
+# Puck page data (local dev)
+puck-data/

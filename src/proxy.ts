@@ -4,17 +4,15 @@ import { updateSession } from '@/lib/supabase/middleware'
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // /plasmic-host — tag the request so the root layout can strip all site
-  // chrome (Navbar, Footer, scripts) and serve a bare HTML shell.
-  // Plasmic Studio loads this route in an iframe; any extra chrome breaks it.
-  if (pathname === '/plasmic-host') {
-    const response = NextResponse.next()
-    response.headers.set('x-plasmic-host', 'true')
-    return response
-  }
 
-  // TinaCMS visual editor handles its own Tina Cloud OAuth — do not block it
-  if (pathname.startsWith('/admin/index.html') || pathname === '/admin/') {
+
+  // Puck visual editor and TinaCMS — bypass auth so the editor loads
+  if (
+    pathname.startsWith('/admin/edit') ||
+    pathname.startsWith('/api/puck') ||
+    pathname.startsWith('/admin/index.html') ||
+    pathname === '/admin/'
+  ) {
     return NextResponse.next()
   }
 
