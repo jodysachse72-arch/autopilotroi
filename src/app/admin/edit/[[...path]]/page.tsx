@@ -16,24 +16,6 @@ import { Puck, type Data } from '@puckeditor/core'
 import { puckConfig } from '@/puck.config'
 import '@puckeditor/core/puck.css'
 
-// Override admin layout chrome — Puck needs full viewport
-const fullscreenStyle = `
-  .admin-sidebar, .admin-topbar, nav[class*="admin"],
-  header, footer, [class*="Navbar"], [class*="Footer"],
-  [class*="announcement"], [class*="SmartFaq"] {
-    display: none !important;
-  }
-  .admin-main, main, [class*="admin-content"] {
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: 100% !important;
-    width: 100vw !important;
-  }
-  body {
-    overflow: hidden !important;
-  }
-`
-
 export default function PuckEditorPage({
   params,
 }: {
@@ -42,7 +24,6 @@ export default function PuckEditorPage({
   const [pagePath, setPagePath] = useState<string>('/')
   const [initialData, setInitialData] = useState<Data | null>(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
 
   // Resolve the page path from route params
   useEffect(() => {
@@ -74,7 +55,6 @@ export default function PuckEditorPage({
   // Save page data to the API
   const handlePublish = useCallback(
     async (data: Data) => {
-      setSaving(true)
       try {
         const res = await fetch('/api/puck', {
           method: 'POST',
@@ -89,8 +69,6 @@ export default function PuckEditorPage({
       } catch (err) {
         console.error('Save error:', err)
         alert('❌ Network error while saving.')
-      } finally {
-        setSaving(false)
       }
     },
     [pagePath]
@@ -98,33 +76,27 @@ export default function PuckEditorPage({
 
   if (loading) {
     return (
-      <>
-        <style dangerouslySetInnerHTML={{ __html: fullscreenStyle }} />
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          fontFamily: 'system-ui',
-          fontSize: '1.25rem',
-          color: '#666',
-          background: '#fafafa',
-        }}>
-          Loading editor for <strong style={{ marginLeft: '0.5ch' }}>{pagePath}</strong>…
-        </div>
-      </>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        fontFamily: 'system-ui',
+        fontSize: '1.25rem',
+        color: '#666',
+        background: '#fafafa',
+      }}>
+        Loading editor for <strong style={{ marginLeft: '0.5ch' }}>{pagePath}</strong>…
+      </div>
     )
   }
 
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: fullscreenStyle }} />
-      <Puck
-        config={puckConfig}
-        data={initialData!}
-        onPublish={handlePublish}
-        headerTitle={`Editing: ${pagePath}`}
-      />
-    </>
+    <Puck
+      config={puckConfig}
+      data={initialData!}
+      onPublish={handlePublish}
+      headerTitle={`Editing: ${pagePath}`}
+    />
   )
 }
