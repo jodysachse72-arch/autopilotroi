@@ -225,6 +225,15 @@ export default function PuckEditorPage({
           from { transform: translateY(20px); opacity: 0 }
           to { transform: translateY(0); opacity: 1 }
         }
+        /* Force reveal elements visible in Puck iframe — IntersectionObserver doesn't fire */
+        .reveal {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+        /* Ensure puck editor takes full viewport */
+        .puck-editor-active .flex.min-h-screen {
+          min-height: auto;
+        }
       `}</style>
 
       <Puck
