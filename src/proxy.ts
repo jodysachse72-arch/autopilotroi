@@ -4,17 +4,13 @@ import { updateSession } from '@/lib/supabase/middleware'
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-
-
-  // Puck visual editor and TinaCMS — bypass auth so the editor loads
-  if (
-    pathname.startsWith('/admin/edit') ||
-    pathname.startsWith('/api/puck') ||
-    pathname.startsWith('/admin/index.html') ||
-    pathname === '/admin/'
-  ) {
+  // Puck API — GET is public (read-only page data), POST is secured in the route handler
+  if (pathname.startsWith('/api/puck')) {
     return NextResponse.next()
   }
+
+  // /admin/edit is protected by the standard admin role check in middleware.ts
+  // No special bypass needed — admin auth handles it.
 
   // Skip Supabase session refresh if not configured
   if (

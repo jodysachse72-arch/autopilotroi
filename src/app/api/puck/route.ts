@@ -10,6 +10,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -51,6 +53,27 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // ── Auth check: require admin role ──
+    const cookieStore = await cookies()
+    const authClient = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() { return cookieStore.getAll() },
+        setAll() { /* read-only in route handlers */ },
+      },
+    })
+    const { data: { user } } = await authClient.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const { data: profile } = await authClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    if (!profile || profile.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden — admin role required' }, { status: 403 })
+    }
+
     const body = await request.json()
     const { path: pagePath, data } = body
 
