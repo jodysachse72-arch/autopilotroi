@@ -996,3 +996,19 @@ input, textarea, select {
 .be-pill--amber  { background: #fef3c7;               color: #b45309; }
 .be-pill--red    { background: #fef2f2;               color: #b91c1c; }
 .be-pill--purple { background: #f5f3ff;               color: #6d28d9; }
+
+/* -- Puck editor grid pass-through --------------------------------
+   Puck's DropZone wraps children in its own <div>. These utility
+   classes make the DropZone wrapper transparent to CSS grid/flex
+   so our layout containers work correctly in the editor canvas. */
+.puck-grid-passthrough > div {
+  display: grid;
+  grid-template-columns: inherit;
+  gap: inherit;
+}
+.puck-flex-passthrough > div {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+}
+

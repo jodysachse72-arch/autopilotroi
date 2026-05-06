@@ -387,7 +387,7 @@ export const puckConfig: Config<Components> = {
       },
       defaultProps: { columns: '3' },
       render: ({ columns, puck }) => (
-        <div style={{
+        <div className="puck-grid-passthrough" style={{
           display: 'grid',
           gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${columns === '2' ? '340px' : '280px'}), 1fr))`,
           gap: '1.25rem',
@@ -412,7 +412,7 @@ export const puckConfig: Config<Components> = {
       },
       defaultProps: { columns: '4' },
       render: ({ columns, puck }) => (
-        <div style={{
+        <div className="puck-grid-passthrough" style={{
           display: 'grid',
           gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${columns === '2' ? '340px' : '260px'}), 1fr))`,
           gap: '1.25rem',
@@ -427,7 +427,7 @@ export const puckConfig: Config<Components> = {
       label: 'Step Group',
       fields: {},
       render: ({ puck }) => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        <div className="puck-flex-passthrough" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
           {puck.renderDropZone({ zone: 'steps' })}
         </div>
       ),
