@@ -12,7 +12,7 @@
  */
 
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import { Puck, type Data } from '@puckeditor/core'
+import { Puck, blocksPlugin, type Data } from '@puckeditor/core'
 import { puckConfig } from '@/puck.config'
 import '@puckeditor/core/puck.css'
 
@@ -244,6 +244,7 @@ export default function PuckEditorPage({
         headerPath={pagePath}
         viewports={viewports}
         iframe={{ enabled: true }}
+        plugins={[blocksPlugin()]}
         overrides={{
           // Inject site CSS into the iframe so all component classes render correctly
           iframe: ({ children, document: iframeDoc }) => {

@@ -38,6 +38,8 @@ const HOMEPAGE_SEED: any = {
         bulletOne: 'Start with $100 USDT',
         bulletTwo: 'AI runs 24/7',
         bulletThree: 'Guided onboarding',
+        videoUrl: 'https://youtu.be/MmAnR4YAPv4',
+        videoThumb: 'https://i.ytimg.com/vi/MmAnR4YAPv4/hqdefault.jpg',
       },
     },
     // Stats in a white SectionBox
