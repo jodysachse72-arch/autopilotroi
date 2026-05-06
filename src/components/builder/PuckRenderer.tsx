@@ -12,7 +12,10 @@
 
 import { Render, type Data } from '@puckeditor/core'
 import { puckConfig } from '@/puck.config'
+import { useScrollReveal } from '@/lib/useScrollReveal'
 
 export default function PuckRenderer({ data }: { data: Data }) {
+  // Activate scroll-reveal animations so .reveal elements become visible
+  useScrollReveal()
   return <Render config={puckConfig} data={data} />
 }
