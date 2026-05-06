@@ -70,7 +70,8 @@ type PageHeaderWhiteProps = {
 
 type SectionBoxProps = {
   variant: 'white' | 'surface' | 'blue' | 'navy'
-  padding: 'lg' | 'xl' | 'none'
+  padding: 'lg' | 'xl' | 'none' | 'custom'
+  customPadding: number
 }
 
 type SectionHeaderProps = {
@@ -180,6 +181,7 @@ type Components = {
   HtmlBlock: { html: string }
   Spacer: { height: number }
   ImageBlock: { src: string; alt: string; maxWidth: number; borderRadius: number }
+  ButtonBlock: { label: string; href: string; variant: string; align: string; fullWidth: boolean }
 }
 
 const ICONS: Record<string, ReactNode> = {
@@ -417,7 +419,6 @@ export const puckConfig: Config<Components> = {
       ),
     },
 
-    // ── SECTION BOX ────────────────────────────────────────
     SectionBox: {
       label: 'Section Container',
       fields: {
@@ -436,18 +437,31 @@ export const puckConfig: Config<Components> = {
             { label: 'Normal', value: 'lg' },
             { label: 'Large', value: 'xl' },
             { label: 'None', value: 'none' },
+            { label: 'Custom', value: 'custom' },
           ],
+        },
+        customPadding: {
+          type: 'number',
+          label: 'Custom Padding (px)',
+          min: 0,
+          max: 200,
         },
       },
       defaultProps: {
         variant: 'white',
         padding: 'lg',
+        customPadding: 48,
       },
-      render: ({ variant, padding, puck }) => (
-        <SectionBox variant={variant} padding={padding}>
-          {puck.renderDropZone({ zone: 'content' })}
-        </SectionBox>
-      ),
+      render: ({ variant, padding, customPadding, puck }) => {
+        const customStyle = padding === 'custom'
+          ? { paddingTop: `${customPadding}px`, paddingBottom: `${customPadding}px` }
+          : undefined
+        return (
+          <SectionBox variant={variant} padding={padding === 'custom' ? 'none' : padding} innerStyle={customStyle}>
+            {puck.renderDropZone({ zone: 'content' })}
+          </SectionBox>
+        )
+      },
     },
 
     // ── FEATURE GRID (wraps FeatureCards in a CSS grid) ────
@@ -891,6 +905,70 @@ export const puckConfig: Config<Components> = {
         )
       ),
     },
+
+    // ── BUTTON BLOCK ──────────────────────────────────────
+    ButtonBlock: {
+      label: 'Button',
+      fields: {
+        label:     { type: 'text', contentEditable: true, label: 'Button Text' },
+        href:      { type: 'text', label: 'Link URL' },
+        variant: {
+          type: 'select',
+          label: 'Style',
+          options: [
+            { label: 'Primary (blue)', value: 'primary' },
+            { label: 'Outline', value: 'outline' },
+            { label: 'Ghost (text only)', value: 'ghost' },
+          ],
+        },
+        align: {
+          type: 'select',
+          label: 'Alignment',
+          options: [
+            { label: 'Left', value: 'left' },
+            { label: 'Center', value: 'center' },
+            { label: 'Right', value: 'right' },
+          ],
+        },
+        fullWidth: { type: 'radio', label: 'Full Width', options: [{ label: 'Yes', value: true }, { label: 'No', value: false }] },
+      },
+      defaultProps: {
+        label: 'Click Here →',
+        href: '#',
+        variant: 'primary',
+        align: 'left',
+        fullWidth: false,
+      },
+      render: ({ label, href, variant, align, fullWidth }) => {
+        const baseStyle: React.CSSProperties = {
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.375rem',
+          padding: '0.875rem 2rem',
+          borderRadius: 'var(--radius-btn, 12px)',
+          fontFamily: 'var(--font-display)',
+          fontWeight: 700,
+          fontSize: 'var(--text-body, 1rem)',
+          textDecoration: 'none',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          width: fullWidth ? '100%' : 'auto',
+        }
+        const variantStyles: Record<string, React.CSSProperties> = {
+          primary: { background: 'var(--color-accent, #1b61c9)', color: '#fff', border: 'none' },
+          outline: { background: 'transparent', color: 'var(--color-accent, #1b61c9)', border: '2px solid var(--color-accent, #1b61c9)' },
+          ghost:   { background: 'transparent', color: 'var(--color-accent, #1b61c9)', border: 'none', textDecoration: 'underline' },
+        }
+        return (
+          <div style={{ textAlign: align as 'left' | 'center' | 'right' }}>
+            <a href={href} style={{ ...baseStyle, ...variantStyles[variant] }} className="shimmer-hover">
+              {label}
+            </a>
+          </div>
+        )
+      },
+    },
   },
 
   // ── Component Categories (sidebar grouping) ──────────────
@@ -907,7 +985,7 @@ export const puckConfig: Config<Components> = {
     },
     content: {
       title: '📝 Content Blocks',
-      components: ['StatRow', 'Step', 'CTABand', 'HtmlBlock', 'ImageBlock'],
+      components: ['StatRow', 'Step', 'CTABand', 'HtmlBlock', 'ImageBlock', 'ButtonBlock'],
       defaultExpanded: true,
     },
     cards: {

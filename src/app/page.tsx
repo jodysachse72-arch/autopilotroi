@@ -5,6 +5,10 @@ import type { Metadata } from 'next'
 import type { Data } from '@puckeditor/core'
 import { createClient } from '@supabase/supabase-js'
 
+// Force dynamic rendering so published edits appear immediately
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   title: 'AutopilotROI — Your AI-Powered Finance Onboarding Platform',
   description:
