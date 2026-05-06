@@ -48,11 +48,7 @@ export default async function HomePage() {
   const puckData = await loadPuckData()
 
   if (puckData) {
-    return (
-      <PageShell>
-        <PuckRenderer data={puckData} />
-      </PageShell>
-    )
+    return <PuckRenderer data={puckData} />
   }
 
   return <StaticHomePage />

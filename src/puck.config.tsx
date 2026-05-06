@@ -144,6 +144,16 @@ type FaqAccordionWidgetProps = {}
 // Puck Config
 // ─────────────────────────────────────────────────────────────────
 
+type FeatureGridProps = {
+  columns: '2' | '3' | '4'
+}
+
+type CardGridProps = {
+  columns: '2' | '3' | '4'
+}
+
+type StepGroupProps = {}
+
 type Components = {
   HeroDark: HeroDarkProps
   HeroBlue: HeroBlueProps
@@ -151,11 +161,14 @@ type Components = {
   SectionBox: SectionBoxProps
   SectionHeader: SectionHeaderProps
   StatRow: StatRowProps
+  FeatureGrid: FeatureGridProps
   FeatureCard: FeatureCardProps
   TrustSignalCard: TrustSignalCardProps
   ProductCard: ProductCardProps
+  CardGrid: CardGridProps
   EcoCard: EcoCardProps
   TestimonialCard: TestimonialCardProps
+  StepGroup: StepGroupProps
   Step: StepProps
   CTABand: CTABandProps
   CalculatorWidget: CalculatorWidgetProps
@@ -356,6 +369,67 @@ export const puckConfig: Config<Components> = {
         <SectionBox variant={variant} padding={padding}>
           {puck.renderDropZone({ zone: 'content' })}
         </SectionBox>
+      ),
+    },
+
+    // ── FEATURE GRID (wraps FeatureCards in a CSS grid) ────
+    FeatureGrid: {
+      label: 'Feature Grid',
+      fields: {
+        columns: {
+          type: 'select',
+          options: [
+            { label: '2 columns', value: '2' },
+            { label: '3 columns', value: '3' },
+            { label: '4 columns', value: '4' },
+          ],
+        },
+      },
+      defaultProps: { columns: '3' },
+      render: ({ columns, puck }) => (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${columns === '2' ? '340px' : '280px'}), 1fr))`,
+          gap: '1.25rem',
+        }}>
+          {puck.renderDropZone({ zone: 'cards' })}
+        </div>
+      ),
+    },
+
+    // ── CARD GRID (wraps EcoCards/Testimonials in a grid) ──
+    CardGrid: {
+      label: 'Card Grid',
+      fields: {
+        columns: {
+          type: 'select',
+          options: [
+            { label: '2 columns', value: '2' },
+            { label: '3 columns', value: '3' },
+            { label: '4 columns', value: '4' },
+          ],
+        },
+      },
+      defaultProps: { columns: '4' },
+      render: ({ columns, puck }) => (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${columns === '2' ? '340px' : '260px'}), 1fr))`,
+          gap: '1.25rem',
+        }}>
+          {puck.renderDropZone({ zone: 'cards' })}
+        </div>
+      ),
+    },
+
+    // ── STEP GROUP (vertical list of Steps) ────────────────
+    StepGroup: {
+      label: 'Step Group',
+      fields: {},
+      render: ({ puck }) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+          {puck.renderDropZone({ zone: 'steps' })}
+        </div>
       ),
     },
 
@@ -679,7 +753,7 @@ export const puckConfig: Config<Components> = {
     },
     layout: {
       title: '📐 Layout',
-      components: ['SectionBox', 'SectionHeader'],
+      components: ['SectionBox', 'SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup'],
       defaultExpanded: true,
     },
     content: {
@@ -705,14 +779,11 @@ export const puckConfig: Config<Components> = {
       title: { type: 'text' },
       description: { type: 'textarea' },
     },
-    render: ({ children, puck }) => (
-      <div
-        style={{
-          fontFamily: 'var(--font-body, system-ui, sans-serif)',
-          minHeight: '100vh',
-        }}
-      >
-        {children}
+    render: ({ children }) => (
+      <div className="page-bg">
+        <div className="sections-stack">
+          {children}
+        </div>
       </div>
     ),
   },
