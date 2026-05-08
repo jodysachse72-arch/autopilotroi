@@ -1,292 +1,286 @@
 /**
- * AutopilotROI V3 — Internal Roadmap Data
+ * AutopilotROI V3 — Roadmap Data
  *
- * Single source of truth for team-facing project status.
- * Update this file to reflect the current build state.
+ * Mirrors the full roadmap artifact: architecture, status audit,
+ * phased tasks, component inventory, tech stack, timeline, and decisions.
  *
  * Last updated: May 8, 2026
  */
 
 export const lastUpdated = 'May 8, 2026'
 
-/* ─── Status Types ───────────────────────────────────────────── */
+/* ─── Status types ───────────────────────────────────────────── */
 
-export type ItemStatus = 'done' | 'active' | 'next' | 'later' | 'abandoned'
+export type SystemStatus = 'live' | 'partial' | 'not-started'
+export type TaskPriority = 'critical' | 'high' | 'medium' | 'low'
+export type TaskEffort = 'small' | 'medium' | 'large'
+export type PhaseStatus = 'current' | 'upcoming' | 'later'
 
-export interface StatusItem {
-  label: string
-  note?: string
-  status: ItemStatus
-}
+/* ─── Built & Working ────────────────────────────────────────── */
 
-/* ─── Active Focus ───────────────────────────────────────────── */
-
-export const activeFocus: StatusItem[] = [
-  { label: 'Finish current front-facing pages', note: 'Products, University, Calculator, Media — need content and polish', status: 'active' },
-  { label: 'Stabilize Puck editor for homepage and marketing pages', note: 'Inline editing works, save/publish pipeline stable, richtext still basic', status: 'active' },
-  { label: 'Complete frontend polish and responsive QA', note: 'Mobile breakpoints, font sizing, spacing consistency', status: 'active' },
-  { label: 'Clarify content editing model for Barry\'s lane', note: 'What can Barry safely edit vs what needs developer involvement', status: 'next' },
-  { label: 'Prepare next phase: blog, university, partner portal, community', note: 'Scope and tooling decisions still needed', status: 'next' },
-]
-
-/* ─── Architecture Decisions ─────────────────────────────────── */
-
-export interface ArchDecision {
-  area: string
-  decision: string
-}
-
-export const archDecisions: ArchDecision[] = [
-  { area: 'Framework', decision: 'Continuing with Next.js 16 / React 19 / App Router' },
-  { area: 'Database & Auth', decision: 'Supabase — Postgres, RLS, auth, storage' },
-  { area: 'Hosting', decision: 'Vercel for deployments and CI/CD' },
-  { area: 'Marketing Page Editing', decision: 'Puck — handles front-of-house marketing pages via visual editor' },
-  { area: 'Blog / University', decision: 'Not Puck — will use structured CMS/database content later' },
-  { area: 'Community / Forum', decision: 'Handled later as a separate system or integration' },
-]
-
-/* ─── CMS / Editor Attempts ──────────────────────────────────── */
-
-export interface EditorAttempt {
+export interface SystemRow {
   name: string
-  status: 'current' | 'tried' | 'considered' | 'reference'
-  summary: string
-  reason: string
+  status: SystemStatus
+  details: string
 }
 
-export const editorAttempts: EditorAttempt[] = [
-  {
-    name: 'Puck',
-    status: 'current',
-    summary: 'Inline visual editor for marketing pages',
-    reason: 'Current direction. 18 custom components, save/publish to Supabase. Works well for structured marketing page editing. Not intended for blog/article content.',
-  },
-  {
-    name: 'Plasmic',
-    status: 'tried',
-    summary: 'Full visual builder with code generation',
-    reason: 'Attempted integration. Initial output and workflow were not suitable for this project\'s architecture. May revisit if needs change.',
-  },
-  {
-    name: 'TinaCMS',
-    status: 'considered',
-    summary: 'Git-backed structured content CMS',
-    reason: 'Considered for structured blog/university content. Not selected for current front-page editing work. Could be useful later for content-heavy sections.',
-  },
-  {
-    name: 'TipTap',
-    status: 'considered',
-    summary: 'Rich text editor framework',
-    reason: 'Likely useful later for rich text editing in blog posts, university content, or inline text formatting inside Puck blocks.',
-  },
-  {
-    name: 'WordPress / Thrive Themes',
-    status: 'reference',
-    summary: 'Strong visual editor benchmark',
-    reason: 'Good reference point for what visual editing should feel like. Not selected because this project is more app/platform than a standard WordPress site.',
-  },
+export const builtAndWorking: SystemRow[] = [
+  { name: 'Homepage', status: 'live', details: 'Puck-rendered from Supabase, force-dynamic, scroll animations' },
+  { name: 'Hero Section', status: 'live', details: 'Dark hero with video modal, CTA, bullet points' },
+  { name: 'Puck Visual Editor', status: 'live', details: '18 components, sidebar categories, save/publish to Supabase' },
+  { name: 'Navigation', status: 'live', details: 'Responsive navbar, hamburger menu, dropdowns' },
+  { name: 'Footer', status: 'live', details: 'Full footer with links, newsletter, legal' },
+  { name: 'Announcement Banner', status: 'live', details: 'Dismissible top banner' },
+  { name: 'FAQs Page', status: 'live', details: 'Accordion-style FAQ from cms_posts' },
+  { name: 'Products Page', status: 'live', details: 'Product cards with badges' },
+  { name: 'Calculator Page', status: 'live', details: 'ROI calculator UI' },
+  { name: 'University Page', status: 'live', details: 'Course curriculum browser (42KB component)' },
+  { name: 'Media / Resources', status: 'live', details: 'Video library, resource pages' },
+  { name: 'Contact Page', status: 'live', details: 'Contact form' },
+  { name: 'Legal Pages', status: 'live', details: 'Terms, Privacy, Disclaimer' },
+  { name: 'Signup Flow', status: 'live', details: 'Name/email capture → readiness quiz' },
+  { name: 'Readiness Quiz', status: 'live', details: 'Multi-step quiz → scoring → tier assignment' },
+  { name: 'Waiting Room', status: 'live', details: 'Post-signup holding page' },
+  { name: 'Auth System', status: 'live', details: 'Login, forgot password, reset password (Supabase Auth)' },
+  { name: 'Email System', status: 'live', details: 'Resend integration, welcome + partner notification emails' },
+  { name: 'Smart FAQ Bot', status: 'live', details: 'Floating chat widget for FAQ answers' },
+  { name: 'SEO', status: 'live', details: 'Sitemap, robots.txt, OG tags, meta descriptions' },
+  { name: 'Analytics', status: 'live', details: 'Plausible tracking, custom event helpers' },
+  { name: 'Error Monitoring', status: 'live', details: 'Sentry client + server configs' },
+  { name: 'Feature Flags', status: 'live', details: 'Provider + flag system for gated rollouts' },
+  { name: 'Rate Limiting', status: 'live', details: 'Upstash Redis rate limiter' },
 ]
 
-/* ─── Completed Frontend Work ────────────────────────────────── */
+/* ─── Needs Work ─────────────────────────────────────────────── */
 
-export interface WorkCategory {
-  category: string
-  items: string[]
+export interface NeedsWorkRow {
+  name: string
+  issue: string
 }
 
-export const completedFrontend: WorkCategory[] = [
-  {
-    category: 'Design & Layout',
-    items: [
-      'V3 design direction — OnePay-inspired system with fluid typography, rounded sections, scroll animations',
-      'Design system v2 — CSS tokens, spacing scale, color palette, typography scale',
-      'Hero section with atmospheric effects',
-      'Navigation header with dropdown menus',
-      'Footer with link columns and legal links',
-      'Announcement banner (top bar)',
-      'PageShell / SectionBox / SectionHeader layout primitives',
-    ],
-  },
-  {
-    category: 'Marketing Components',
-    items: [
-      'FeatureCard, StatRow, Step, CTABand, TestimonialCarousel',
-      'Social proof components (count-up stats, testimonials)',
-      'Exit-intent popup',
-      'Video player with modal and tracking',
-      'Command palette (search/nav overlay)',
-      'Smart FAQ bot (AI-powered floating widget)',
-    ],
-  },
-  {
-    category: 'Visual Editor',
-    items: [
-      'Puck integration with 18 custom blocks',
-      'Save/publish pipeline to Supabase (puck_pages table)',
-      'Section container with variant and padding controls',
-      'Inline overlay editing on existing blocks',
-      'ButtonBlock with variant/alignment controls',
-      'force-dynamic rendering to bypass stale Vercel cache',
-      'useScrollReveal added to PuckRenderer for below-fold animations',
-    ],
-  },
-  {
-    category: 'Pages (scaffolded or substantially built)',
-    items: [
-      'Homepage (rebuilt in Puck)',
-      'Products / What Is Aurum',
-      'FAQs',
-      'Calculator / ROI estimator',
-      'University',
-      'Media',
-      'Contact',
-      'Terms / Privacy / Disclaimer (legal pages)',
-      'Signup flow',
-      'Readiness quiz / evaluation',
-      'Onboarding / orientation',
-      'Waiting room',
-      'Roadmap (this page)',
-    ],
-  },
+export const needsWork: NeedsWorkRow[] = [
+  { name: 'Puck Editor — Richtext', issue: 'Text fields are plain inputs, no bold/italic/size/color toolbar' },
+  { name: 'Puck Editor — Action Bar', issue: 'Copy/delete buttons not reliably visible on all blocks' },
+  { name: 'Puck Editor — Global Header/Footer', issue: 'Header/footer not editable through Puck' },
+  { name: 'Partner Dashboard', issue: 'Layout + page exist, but data binding is incomplete' },
+  { name: 'Drip Emails', issue: 'Logic written in drip-emails.ts, cron endpoint exists but unwired' },
+  { name: 'Blog', issue: '/blog route exists but no content pipeline' },
+  { name: 'Turnstile Bot Protection', issue: 'Turnstile.tsx built, env vars not set' },
 ]
 
-/* ─── Later-Phase Work (built but not current focus) ──────────── */
+/* ─── Not Built Yet ──────────────────────────────────────────── */
 
-export const laterPhaseWork: WorkCategory[] = [
-  {
-    category: 'Auth & Backend',
-    items: [
-      'Supabase auth integration with SSR middleware',
-      'Profile management',
-      'Email system via Resend (welcome emails, partner notifications)',
-      'Database tables: profiles, leads, cms_posts, cms_content, referral_codes, puck_pages, contacts',
-    ],
-  },
-  {
-    category: 'Partner Tools',
-    items: [
-      'Partner dashboard scaffold (placeholder views)',
-      'Referral code generation basics',
-      'Partner-tools route structure',
-    ],
-  },
-  {
-    category: 'Infrastructure',
-    items: [
-      'Feature flag system',
-      'Rate limiting via Upstash Redis',
-      'Sentry error monitoring',
-      'Plausible analytics integration',
-      'Turnstile bot protection component (not yet wired to forms)',
-      'CSP headers',
-      'Supabase RLS policies',
-      'SEO: sitemap, robots.txt, Open Graph, PWA manifest',
-    ],
-  },
-]
-
-/* ─── Time Investment ────────────────────────────────────────── */
-
-export interface TimeEntry {
-  category: string
-  days: string
-  note: string
+export interface NotBuiltRow {
+  name: string
 }
 
-export const timeInvestment: TimeEntry[] = [
-  { category: 'Frontend rebuild / design direction', days: '~8–10 days', note: 'Design system, layout primitives, component library, all page scaffolds' },
-  { category: 'Puck editor integration and debugging', days: '~5–6 days', note: 'Block creation, save/publish pipeline, scroll reveal, padding, inline editing' },
-  { category: 'CMS/editor exploration (Plasmic, Tina, etc.)', days: '~2–3 days', note: 'Evaluation, attempted integrations, decision process' },
-  { category: 'Signup / auth / backend foundation', days: '~3–4 days', note: 'Supabase setup, auth flows, email system, database schema' },
-  { category: 'Partner dashboard groundwork', days: '~1–2 days', note: 'Route scaffolding, placeholder views, referral basics' },
-  { category: 'QA / debugging / rework', days: '~3–4 days', note: 'Hydration fixes, caching issues, responsive bugs, editor edge cases' },
+export const notBuiltYet: NotBuiltRow[] = [
+  { name: 'Admin Dashboard (user/content management)' },
+  { name: 'Partner Onboarding Wizard' },
+  { name: 'Referral Link Generator' },
+  { name: 'Prospect Pipeline (partner view)' },
+  { name: 'Leaderboard' },
+  { name: 'Performance Analytics (partner)' },
+  { name: 'Custom Domain (autopilotroi.com)' },
+  { name: 'Webhook-based ISR (Supabase → Vercel)' },
 ]
 
-/* ─── V3 Roadmap Phases ──────────────────────────────────────── */
+/* ─── Database Schema ────────────────────────────────────────── */
+
+export interface DbTable {
+  name: string
+  rows: number | string
+  purpose: string
+  rls: boolean
+}
+
+export const dbTables: DbTable[] = [
+  { name: 'profiles', rows: 4, purpose: 'User accounts (prospect/partner/admin)', rls: true },
+  { name: 'leads', rows: 2, purpose: 'Pre-auth signup captures', rls: true },
+  { name: 'readiness_responses', rows: 8, purpose: 'Quiz answers linked to profiles', rls: true },
+  { name: 'referral_links', rows: 0, purpose: 'Partner referral codes + tracking', rls: true },
+  { name: 'puck_pages', rows: 4, purpose: 'Visual editor page configs (JSON)', rls: true },
+  { name: 'cms_posts', rows: 7, purpose: 'Blog, FAQ, video, page content', rls: true },
+  { name: 'cms_content', rows: 0, purpose: 'Generic CMS content blocks', rls: true },
+  { name: 'cms_revisions', rows: 0, purpose: 'Content revision history', rls: true },
+]
+
+/* ─── Phased Tasks ───────────────────────────────────────────── */
+
+export interface PhaseTask {
+  id: string
+  task: string
+  priority: TaskPriority
+  effort: TaskEffort
+}
 
 export interface RoadmapPhase {
-  phase: string
+  phase: number
   name: string
-  status: 'done' | 'active' | 'next' | 'later'
-  items: string[]
+  status: PhaseStatus
+  goal: string
+  sessions: string
+  tasks: PhaseTask[]
 }
 
 export const roadmapPhases: RoadmapPhase[] = [
   {
-    phase: 'Phase 1',
-    name: 'Editor Polish & Frontend Pages',
-    status: 'active',
-    items: [
-      'Stabilize Puck editor for marketing pages',
-      'TipTap richtext integration for editor fields',
-      'Finish scaffolded page content and design',
-      'Homepage content finalization',
+    phase: 1,
+    name: 'Editor Polish',
+    status: 'current',
+    goal: 'Make the Puck editor fully production-ready for non-technical content editing.',
+    sessions: '2-3',
+    tasks: [
+      { id: '1.1', task: 'Richtext fields — Convert key text fields to TipTap (bold, italic, size, color, links)', priority: 'high', effort: 'medium' },
+      { id: '1.2', task: 'Editor ↔ Published CSS parity — Audit/fix any remaining style gaps in the iframe', priority: 'high', effort: 'small' },
+      { id: '1.3', task: 'Action bar — Ensure copy/delete/move buttons work on all block types', priority: 'medium', effort: 'small' },
+      { id: '1.4', task: 'Global header/footer editing — Expose navbar + footer content via Puck or a settings panel', priority: 'medium', effort: 'medium' },
+      { id: '1.5', task: 'Page selector — Ability to switch between /, /faqs, /products etc. in the editor', priority: 'medium', effort: 'medium' },
+      { id: '1.6', task: 'Seed all pages — Pre-populate Puck data for every marketing page (not just /)', priority: 'medium', effort: 'medium' },
+      { id: '1.7', task: 'Undo/redo — Verify Puck\'s built-in history works; add keyboard shortcuts', priority: 'low', effort: 'small' },
     ],
   },
   {
-    phase: 'Phase 2',
-    name: 'Frontend Completion & Mobile QA',
-    status: 'next',
-    items: [
-      'Full responsive audit across all pages',
-      'WCAG accessibility pass',
-      'Content editing workflow for Barry',
-      'Polish animations and interactions',
+    phase: 2,
+    name: 'Frontend Completion',
+    status: 'upcoming',
+    goal: 'Ensure every public page is pixel-perfect and content-driven from Supabase.',
+    sessions: '2-3',
+    tasks: [
+      { id: '2.1', task: 'Blog pipeline — Connect /blog to cms_posts with list + detail views', priority: 'high', effort: 'medium' },
+      { id: '2.2', task: 'Media page — Wire to cms_posts (type: video) with tracked YouTube player', priority: 'medium', effort: 'medium' },
+      { id: '2.3', task: 'University content — Move curriculum data from hardcoded → CMS or Supabase', priority: 'medium', effort: 'large' },
+      { id: '2.4', task: 'FAQ content — Verify FAQ accordion pulls from cms_posts (type: faq)', priority: 'medium', effort: 'small' },
+      { id: '2.5', task: 'Mobile QA — Full responsive audit at 375px, 768px, 1024px', priority: 'high', effort: 'medium' },
+      { id: '2.6', task: 'Accessibility audit — ARIA labels, keyboard nav, screen reader testing', priority: 'medium', effort: 'medium' },
+      { id: '2.7', task: 'Performance — Lighthouse 90+ on all pages, image optimization', priority: 'medium', effort: 'medium' },
     ],
   },
   {
-    phase: 'Phase 3',
-    name: 'Signup, Auth, Email, Funnel',
-    status: 'next',
-    items: [
-      'Complete signup → quiz → scoring → tier flow',
-      'Turnstile bot protection on forms',
-      'Drip email sequences',
-      'Funnel analytics and conversion tracking',
+    phase: 3,
+    name: 'Auth & Signup Funnel',
+    status: 'upcoming',
+    goal: 'Complete the prospect-to-partner onboarding pipeline.',
+    sessions: '2-3',
+    tasks: [
+      { id: '3.1', task: 'Turnstile integration — Set env vars, wire bot protection on signup', priority: 'high', effort: 'small' },
+      { id: '3.2', task: 'Signup → Quiz flow — End-to-end test: submit → quiz → score → tier → waiting room', priority: 'high', effort: 'medium' },
+      { id: '3.3', task: 'Email testing — Verify welcome email, partner notification, unsubscribe', priority: 'high', effort: 'medium' },
+      { id: '3.4', task: 'Partner code referral — ?ref=jody → stored in lead, partner notified', priority: 'medium', effort: 'small' },
+      { id: '3.5', task: 'Drip email cron — Wire /api/cron/re-engage, set CRON_SECRET, test sequences', priority: 'medium', effort: 'medium' },
+      { id: '3.6', task: 'Onboarding wizard — Complete PartnerOnboardingWizard.tsx flow', priority: 'medium', effort: 'medium' },
     ],
   },
   {
-    phase: 'Phase 4',
+    phase: 4,
     name: 'Partner Dashboard',
     status: 'later',
-    items: [
-      'Lead tracking and referral analytics',
-      'Prospect pipeline views',
-      'Referral link generator with QR codes',
-      'Performance metrics',
+    goal: 'Give partners a functional portal to manage their prospects and referrals.',
+    sessions: '3-4',
+    tasks: [
+      { id: '4.1', task: 'Dashboard home — Stats cards (total leads, active, conversion rate)', priority: 'high', effort: 'medium' },
+      { id: '4.2', task: 'Prospects list — Table with lead name, score, tier, status, date', priority: 'high', effort: 'medium' },
+      { id: '4.3', task: 'Referral link generator — Create/manage referral codes + copy link', priority: 'high', effort: 'medium' },
+      { id: '4.4', task: 'Lead detail view — Quiz answers, timeline, status transitions', priority: 'medium', effort: 'medium' },
+      { id: '4.5', task: 'Leaderboard — Partner rankings by conversions', priority: 'low', effort: 'small' },
+      { id: '4.6', task: 'Performance analytics — Charts for referral traffic, conversions over time', priority: 'low', effort: 'large' },
+      { id: '4.7', task: 'Settings — Profile edit, notification preferences, password change', priority: 'medium', effort: 'medium' },
     ],
   },
   {
-    phase: 'Phase 5',
+    phase: 5,
     name: 'Pre-Launch Hardening',
     status: 'later',
-    items: [
-      'Security audit',
-      'Performance optimization',
-      'Domain migration to Vercel',
-      'Staging → production promotion',
+    goal: 'Security, compliance, and infrastructure for production.',
+    sessions: '1-2',
+    tasks: [
+      { id: '5.1', task: 'Custom domain — Point autopilotroi.com → Vercel, SSL, DNS', priority: 'high', effort: 'small' },
+      { id: '5.2', task: 'Resend domain verification — SPF, DKIM, DMARC for @autopilotroi.com', priority: 'high', effort: 'small' },
+      { id: '5.3', task: 'Supabase RLS audit — Verify all tables have correct row-level policies', priority: 'high', effort: 'medium' },
+      { id: '5.4', task: 'Rate limiting — Apply to /api/leads, /api/notify, /api/contact', priority: 'medium', effort: 'small' },
+      { id: '5.5', task: 'CSP headers — Verify next.config.ts security headers are production-ready', priority: 'medium', effort: 'small' },
+      { id: '5.6', task: 'Plausible analytics — Verify tracking, set up conversion goals', priority: 'medium', effort: 'small' },
+      { id: '5.7', task: 'Sentry — Verify error capture on both client and server', priority: 'medium', effort: 'small' },
+      { id: '5.8', task: 'Backup strategy — Supabase PITR or scheduled pg_dump', priority: 'medium', effort: 'small' },
     ],
   },
   {
-    phase: 'Phase 6',
-    name: 'Launch',
+    phase: 6,
+    name: 'Launch & Post-Launch',
     status: 'later',
-    items: [
-      'Public launch',
-      'Blog / content pipeline',
-      'University content structure',
-      'Community / forum evaluation',
+    goal: 'Go live and iterate based on real traffic.',
+    sessions: '1',
+    tasks: [
+      { id: '6.1', task: 'End-to-end test — Full launch checklist procedure', priority: 'critical', effort: 'medium' },
+      { id: '6.2', task: 'Social preview — OG image testing on WhatsApp, Telegram, Twitter', priority: 'medium', effort: 'small' },
+      { id: '6.3', task: 'Google Search Console — Submit sitemap, verify indexing', priority: 'medium', effort: 'small' },
+      { id: '6.4', task: 'PWA verification — Manifest, icons, install prompts', priority: 'low', effort: 'small' },
+      { id: '6.5', task: 'Monitoring dashboard — Plausible + Sentry + Supabase logs', priority: 'low', effort: 'small' },
     ],
   },
 ]
 
-/* ─── Next Decisions ─────────────────────────────────────────── */
+/* ─── Component Inventory ────────────────────────────────────── */
 
-export const nextDecisions: string[] = [
-  'Confirm Puck remains the editor for marketing pages',
-  'Decide blog CMS approach (database-driven, TinaCMS, or other)',
-  'Decide university content structure',
-  'Decide community/forum platform (separate tool or integration)',
-  'Decide when to move autopilotroi.com domain to Vercel',
-  'Decide what Barry should be allowed to edit directly in Puck',
+export interface ComponentGroup {
+  category: string
+  icon: string
+  components: string[]
+}
+
+export const componentInventory: ComponentGroup[] = [
+  { category: 'Heroes', icon: '🌟', components: ['HeroDark', 'HeroBlue', 'PageHeaderWhite'] },
+  { category: 'Layout', icon: '📐', components: ['SectionBox (custom padding)', 'FeatureGrid', 'Spacer'] },
+  { category: 'Content', icon: '📝', components: ['StatRow', 'Step', 'CTABand', 'HtmlBlock', 'ImageBlock', 'ButtonBlock'] },
+  { category: 'Cards', icon: '🃏', components: ['FeatureCard', 'TrustSignalCard', 'ProductCard'] },
+  { category: 'Widgets', icon: '🧩', components: ['FAQ', 'TestimonialCard'] },
+]
+
+/* ─── Tech Stack ─────────────────────────────────────────────── */
+
+export interface TechRow {
+  layer: string
+  technology: string
+  status: SystemStatus
+}
+
+export const techStack: TechRow[] = [
+  { layer: 'Framework', technology: 'Next.js 16.2.2 (App Router)', status: 'live' },
+  { layer: 'UI', technology: 'React 19 + Vanilla CSS + Framer Motion', status: 'live' },
+  { layer: 'Visual Editor', technology: 'Puck Editor 0.21.2', status: 'live' },
+  { layer: 'Database', technology: 'Supabase Postgres 17', status: 'live' },
+  { layer: 'Auth', technology: 'Supabase Auth', status: 'live' },
+  { layer: 'Email', technology: 'Resend', status: 'live' },
+  { layer: 'Hosting', technology: 'Vercel (auto-deploy from main)', status: 'live' },
+  { layer: 'Analytics', technology: 'Plausible (self-hosted script)', status: 'partial' },
+  { layer: 'Errors', technology: 'Sentry', status: 'partial' },
+  { layer: 'Bot Protection', technology: 'Cloudflare Turnstile', status: 'partial' },
+  { layer: 'Rate Limiting', technology: 'Upstash Redis', status: 'live' },
+  { layer: 'Fonts', technology: 'Plus Jakarta Sans + Inter (Google)', status: 'live' },
+]
+
+/* ─── Timeline ───────────────────────────────────────────────── */
+
+export interface TimelineRow {
+  phase: string
+  sessions: string
+  focus: string
+}
+
+export const timeline: TimelineRow[] = [
+  { phase: 'Phase 1 — Editor Polish', sessions: '2-3', focus: 'Richtext, CSS parity, page selector' },
+  { phase: 'Phase 2 — Frontend Completion', sessions: '2-3', focus: 'Blog, mobile QA, accessibility' },
+  { phase: 'Phase 3 — Auth & Funnel', sessions: '2-3', focus: 'Signup flow, emails, Turnstile' },
+  { phase: 'Phase 4 — Partner Dashboard', sessions: '3-4', focus: 'Prospects, referrals, stats' },
+  { phase: 'Phase 5 — Pre-Launch', sessions: '1-2', focus: 'Domain, security, monitoring' },
+  { phase: 'Phase 6 — Launch', sessions: '1', focus: 'E2E test, go live' },
+]
+
+/* ─── Key Decisions ──────────────────────────────────────────── */
+
+export const keyDecisions: string[] = [
+  'CMS strategy — Continue with Puck for all pages, or use cms_posts table for blog/FAQ content management? (Currently a hybrid)',
+  'Partner Dashboard scope — MVP with basic prospect list + referral links, or full analytics from day one?',
+  'Launch domain — When to point autopilotroi.com DNS to Vercel?',
+  'Content authoring — Will you be the sole editor, or do partners need CMS access too?',
 ]
