@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'framer-motion'
 import PageShell from '@/components/sections/PageShell'
@@ -7,7 +7,8 @@ import {
   lastUpdated,
   builtAndWorking,
   needsWork,
-  notBuiltYet,
+  brokenByV2,
+  v2PostMortem,
   dbTables,
   roadmapPhases,
   componentInventory,
@@ -246,31 +247,59 @@ export default function RoadmapPageClient() {
         </motion.div>
       </SectionBox>
 
-      {/* ── Not Built Yet ───────────────────────────────────── */}
+      {/* ── Built in V1, Broken by V2 ────────────────────────── */}
       <SectionBox>
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={stagger}>
-          <SectionTitle id="not-built">❌ Not Built Yet</SectionTitle>
-          <SectionSub>Planned features that have not been started</SectionSub>
+          <SectionTitle id="broken-by-v2">🔧 Built in V1 — Broken by V2 Redesign</SectionTitle>
+          <SectionSub>These features were fully working. The V2 global CSS overhaul destroyed their styling. V3 will resurface them with isolated CSS in Phase 4.</SectionSub>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
-            {notBuiltYet.map((r) => (
-              <motion.div
-                key={r.name}
-                variants={fadeUp}
-                style={{
-                  padding: '14px 18px',
-                  borderRadius: 10,
-                  background: '#fef2f2',
-                  border: '1px solid #fecaca',
-                  color: '#991b1b',
-                  fontSize: '0.87rem',
-                  fontWeight: 500,
-                }}
-              >
-                {r.name}
-              </motion.div>
-            ))}
+          <motion.div
+            variants={fadeUp}
+            style={{
+              padding: '14px 18px',
+              borderRadius: 10,
+              background: '#fefce8',
+              border: '1px solid #fde68a',
+              color: '#854d0e',
+              fontSize: '0.85rem',
+              lineHeight: 1.7,
+              marginBottom: '1.25rem',
+            }}
+          >
+            <strong>{v2PostMortem.title}:</strong> {v2PostMortem.summary}
+          </motion.div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={tblStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Feature</th>
+                  <th style={{ ...thStyle, width: 120 }}>V1 Route</th>
+                  <th style={thStyle}>What Broke</th>
+                </tr>
+              </thead>
+              <tbody>
+                {brokenByV2.map((r) => (
+                  <motion.tr key={r.name} variants={fadeUp}>
+                    <td style={{ ...tdStyle, fontWeight: 600, color: '#92400e' }}>{r.name}</td>
+                    <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: '0.8rem', color: '#64748b' }}>{r.v1Route}</td>
+                    <td style={tdStyle}>{r.whatBroke}</td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+
+          <motion.div variants={fadeUp} style={{ marginTop: '1rem' }}>
+            <a
+              href={v2PostMortem.v1Deployment}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#2563eb', fontSize: '0.83rem', textDecoration: 'underline' }}
+            >
+              View old V1 deployment (proof these features exist) →
+            </a>
+          </motion.div>
         </motion.div>
       </SectionBox>
 
