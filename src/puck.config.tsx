@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 /**
  * Puck Configuration
@@ -11,7 +11,7 @@
  * directly on the rendered page in the editor.
  */
 
-import type { Config } from '@puckeditor/core'
+import type { Config, RichText } from '@puckeditor/core'
 import type { ReactNode } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
 
@@ -38,7 +38,7 @@ type HeroDarkProps = {
   badge: string
   title: string
   highlightedText: string
-  description: string
+  description: RichText
   ctaLabel: string
   ctaHref: string
   bulletOne: string
@@ -51,7 +51,7 @@ type HeroDarkProps = {
 type HeroBlueProps = {
   eyebrow: string
   title: string
-  description: string
+  description: RichText
   ctaLabel: string
   ctaHref: string
 }
@@ -60,8 +60,8 @@ type PageHeaderWhiteProps = {
   badge: string
   title: string
   highlightedText: string
-  description1: string
-  description2: string
+  description1: RichText
+  description2: RichText
   cta1Label: string
   cta1Href: string
   cta2Label: string
@@ -77,7 +77,7 @@ type SectionBoxProps = {
 type SectionHeaderProps = {
   eyebrow: string
   title: string
-  lead: string
+  lead: RichText
   align: 'center' | 'left'
   badgeVariant: 'blue' | 'white'
 }
@@ -88,7 +88,7 @@ type StatRowProps = {
 
 type FeatureCardProps = {
   title: string
-  body: string
+  body: RichText
   color: string
   colorBg: string
 }
@@ -96,14 +96,14 @@ type FeatureCardProps = {
 type TrustSignalCardProps = {
   iconName: string
   title: string
-  body: string
+  body: RichText
 }
 
 type ProductCardProps = {
   productId: string
   name: string
   tagline: string
-  description: string
+  description: RichText
   features: { value: string }[]
   badge: string
   badgeColor: string
@@ -113,13 +113,13 @@ type ProductCardProps = {
 
 type EcoCardProps = {
   title: string
-  description: string
+  description: RichText
   tag: string
   tagColor: string
 }
 
 type TestimonialCardProps = {
-  quote: string
+  quote: RichText
   author: string
   role: string
 }
@@ -127,13 +127,13 @@ type TestimonialCardProps = {
 type StepProps = {
   num: string
   title: string
-  body: string
+  body: RichText
 }
 
 type CTABandProps = {
   eyebrow: string
   title: string
-  description: string
+  description: RichText
   ctaLabel: string
   ctaHref: string
   secondaryLabel: string
@@ -205,7 +205,7 @@ export const puckConfig: Config<Components> = {
         badge:           { type: 'text', contentEditable: true },
         title:           { type: 'text', contentEditable: true },
         highlightedText: { type: 'text', contentEditable: true },
-        description:     { type: 'textarea', contentEditable: true },
+        description:     { type: 'richtext', contentEditable: true },
         ctaLabel:        { type: 'text', contentEditable: true },
         ctaHref:         { type: 'text' },
         bulletOne:       { type: 'text', contentEditable: true },
@@ -322,7 +322,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         eyebrow:      { type: 'text', contentEditable: true },
         title:        { type: 'text', contentEditable: true },
-        description:  { type: 'textarea', contentEditable: true },
+        description:  { type: 'richtext', contentEditable: true },
         ctaLabel:     { type: 'text', contentEditable: true },
         ctaHref:      { type: 'text' },
       },
@@ -353,8 +353,8 @@ export const puckConfig: Config<Components> = {
         badge:            { type: 'text', contentEditable: true },
         title:            { type: 'text', contentEditable: true },
         highlightedText:  { type: 'text', contentEditable: true },
-        description1:     { type: 'textarea', contentEditable: true },
-        description2:     { type: 'textarea', contentEditable: true },
+        description1:     { type: 'richtext', contentEditable: true },
+        description2:     { type: 'richtext', contentEditable: true },
         cta1Label:        { type: 'text', contentEditable: true },
         cta1Href:         { type: 'text' },
         cta2Label:        { type: 'text', contentEditable: true },
@@ -531,7 +531,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         eyebrow:      { type: 'text', contentEditable: true },
         title:        { type: 'text', contentEditable: true },
-        lead:         { type: 'textarea', contentEditable: true },
+        lead:         { type: 'richtext', contentEditable: true },
         align:        {
           type: 'select',
           options: [
@@ -595,7 +595,7 @@ export const puckConfig: Config<Components> = {
       label: 'Feature Card',
       fields: {
         title:   { type: 'text', contentEditable: true },
-        body:    { type: 'textarea', contentEditable: true },
+        body:    { type: 'richtext', contentEditable: true },
         color:   { type: 'text' },
         colorBg: { type: 'text' },
       },
@@ -625,7 +625,7 @@ export const puckConfig: Config<Components> = {
           options: Object.keys(ICONS).map(k => ({ label: k.replace('Icon', ''), value: k })),
         },
         title:    { type: 'text', contentEditable: true },
-        body:     { type: 'textarea', contentEditable: true },
+        body:     { type: 'richtext', contentEditable: true },
       },
       defaultProps: {
         iconName: 'BankIcon',
@@ -656,7 +656,7 @@ export const puckConfig: Config<Components> = {
         productId:   { type: 'text' },
         name:        { type: 'text', contentEditable: true },
         tagline:     { type: 'text', contentEditable: true },
-        description: { type: 'textarea', contentEditable: true },
+        description: { type: 'richtext', contentEditable: true },
         features:    { type: 'array', arrayFields: { value: { type: 'text' } } },
         badge:       { type: 'text' },
         badgeColor:  { type: 'text' },
@@ -718,7 +718,7 @@ export const puckConfig: Config<Components> = {
       label: 'Ecosystem Card',
       fields: {
         title:       { type: 'text', contentEditable: true },
-        description: { type: 'textarea', contentEditable: true },
+        description: { type: 'richtext', contentEditable: true },
         tag:         { type: 'text' },
         tagColor:    { type: 'text' },
       },
@@ -743,7 +743,7 @@ export const puckConfig: Config<Components> = {
     TestimonialCard: {
       label: 'Testimonial',
       fields: {
-        quote:  { type: 'textarea', contentEditable: true },
+        quote:  { type: 'richtext', contentEditable: true },
         author: { type: 'text', contentEditable: true },
         role:   { type: 'text', contentEditable: true },
       },
@@ -763,7 +763,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         num:   { type: 'text', contentEditable: true },
         title: { type: 'text', contentEditable: true },
-        body:  { type: 'textarea', contentEditable: true },
+        body:  { type: 'richtext', contentEditable: true },
       },
       defaultProps: {
         num: '1',
@@ -781,7 +781,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         eyebrow:        { type: 'text', contentEditable: true },
         title:          { type: 'text', contentEditable: true },
-        description:    { type: 'textarea', contentEditable: true },
+        description:    { type: 'richtext', contentEditable: true },
         ctaLabel:       { type: 'text', contentEditable: true },
         ctaHref:        { type: 'text' },
         secondaryLabel: { type: 'text', contentEditable: true },
