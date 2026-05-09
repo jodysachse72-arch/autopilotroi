@@ -69,7 +69,7 @@ export default function HeroBlue({
         </motion.h1>
 
         {description && (
-          <motion.p
+          <motion.div
             className="text-body-lg"
             style={{
               color: 'rgba(255,255,255,0.85)',
@@ -82,7 +82,7 @@ export default function HeroBlue({
             transition={{ duration: 0.6, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
           >
             {description}
-          </motion.p>
+          </motion.div>
         )}
 
         {ctas && ctas.length > 0 && (

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 /**
  * Puck Configuration
@@ -393,14 +393,14 @@ export const puckConfig: Config<Components> = {
                 {title}<br /><span style={{ color: '#1b61c9' }}>{highlightedText}</span>
               </h1>
               {description1 && (
-                <p style={{ fontSize: 'var(--text-body-lg)', color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)', maxWidth: '44rem', marginBottom: '2rem' }}>
+                <div style={{ fontSize: 'var(--text-body-lg)', color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)', maxWidth: '44rem', marginBottom: '2rem' }}>
                   {description1}
-                </p>
+                </div>
               )}
               {description2 && (
-                <p style={{ fontSize: 'var(--text-body-lg)', color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)', maxWidth: '44rem', marginBottom: '2.5rem' }}>
+                <div style={{ fontSize: 'var(--text-body-lg)', color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)', maxWidth: '44rem', marginBottom: '2.5rem' }}>
                   {description2}
-                </p>
+                </div>
               )}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.875rem' }}>
                 {cta1Label && cta1Href && (
@@ -643,9 +643,9 @@ export const puckConfig: Config<Components> = {
               {title}
             </h3>
           </div>
-          <p style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)' }}>
+          <div style={{ fontSize: 'var(--text-body)', color: 'var(--color-text-weak)', lineHeight: 'var(--lh-relaxed)' }}>
             {body}
-          </p>
+          </div>
         </div>
       ),
     },
@@ -699,9 +699,9 @@ export const puckConfig: Config<Components> = {
           <p style={{ fontSize: 'var(--text-body)', fontWeight: 600, color: '#1b61c9', marginBottom: '0.875rem' }}>
             {tagline}
           </p>
-          <p style={{ fontSize: 'var(--text-body)', lineHeight: 1.65, color: 'var(--color-text-weak)', marginBottom: '1.5rem' }}>
+          <div style={{ fontSize: 'var(--text-body)', lineHeight: 1.65, color: 'var(--color-text-weak)', marginBottom: '1.5rem' }}>
             {description}
-          </p>
+          </div>
           <ul style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             {features?.map((f, i) => (
               <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', fontSize: 'var(--text-body)', color: 'var(--color-text-weak)' }}>

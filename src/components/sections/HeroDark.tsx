@@ -132,7 +132,7 @@ export default function HeroDark({
             </motion.h1>
 
             {description && (
-              <motion.p
+              <motion.div
                 className="text-body-lg"
                 style={{
                   color: 'rgba(255,255,255,0.78)',
@@ -145,7 +145,7 @@ export default function HeroDark({
                 transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
               >
                 {description}
-              </motion.p>
+              </motion.div>
             )}
 
             {ctas && ctas.length > 0 && (
