@@ -8,8 +8,7 @@
  *   fields: { description: richTextField() }
  */
 
-import Color from '@tiptap/extension-color'
-import { TextStyle } from '@tiptap/extension-text-style'
+import { Color, TextStyle } from '@tiptap/extension-text-style'
 import { RichTextMenu } from '@puckeditor/core'
 import { ColorPickerControl } from './menu/ColorPickerControl'
 import type { ReactNode } from 'react'
