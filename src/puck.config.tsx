@@ -12,6 +12,7 @@
  */
 
 import type { Config, RichText } from '@puckeditor/core'
+import { richTextField } from '@/lib/puck-editor'
 import type { ReactNode } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
 
@@ -205,7 +206,7 @@ export const puckConfig: Config<Components> = {
         badge:           { type: 'text', contentEditable: true },
         title:           { type: 'text', contentEditable: true },
         highlightedText: { type: 'text', contentEditable: true },
-        description:     { type: 'richtext', contentEditable: true },
+        description:     richTextField(),
         ctaLabel:        { type: 'text', contentEditable: true },
         ctaHref:         { type: 'text' },
         bulletOne:       { type: 'text', contentEditable: true },
@@ -322,7 +323,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         eyebrow:      { type: 'text', contentEditable: true },
         title:        { type: 'text', contentEditable: true },
-        description:  { type: 'richtext', contentEditable: true },
+        description:  richTextField(),
         ctaLabel:     { type: 'text', contentEditable: true },
         ctaHref:      { type: 'text' },
       },
@@ -353,8 +354,8 @@ export const puckConfig: Config<Components> = {
         badge:            { type: 'text', contentEditable: true },
         title:            { type: 'text', contentEditable: true },
         highlightedText:  { type: 'text', contentEditable: true },
-        description1:     { type: 'richtext', contentEditable: true },
-        description2:     { type: 'richtext', contentEditable: true },
+        description1:     richTextField(),
+        description2:     richTextField(),
         cta1Label:        { type: 'text', contentEditable: true },
         cta1Href:         { type: 'text' },
         cta2Label:        { type: 'text', contentEditable: true },
@@ -531,7 +532,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         eyebrow:      { type: 'text', contentEditable: true },
         title:        { type: 'text', contentEditable: true },
-        lead:         { type: 'richtext', contentEditable: true },
+        lead:         richTextField(),
         align:        {
           type: 'select',
           options: [
@@ -595,7 +596,7 @@ export const puckConfig: Config<Components> = {
       label: 'Feature Card',
       fields: {
         title:   { type: 'text', contentEditable: true },
-        body:    { type: 'richtext', contentEditable: true },
+        body:    richTextField(),
         color:   { type: 'text' },
         colorBg: { type: 'text' },
       },
@@ -625,7 +626,7 @@ export const puckConfig: Config<Components> = {
           options: Object.keys(ICONS).map(k => ({ label: k.replace('Icon', ''), value: k })),
         },
         title:    { type: 'text', contentEditable: true },
-        body:     { type: 'richtext', contentEditable: true },
+        body:     richTextField(),
       },
       defaultProps: {
         iconName: 'BankIcon',
@@ -656,7 +657,7 @@ export const puckConfig: Config<Components> = {
         productId:   { type: 'text' },
         name:        { type: 'text', contentEditable: true },
         tagline:     { type: 'text', contentEditable: true },
-        description: { type: 'richtext', contentEditable: true },
+        description: richTextField(),
         features:    { type: 'array', arrayFields: { value: { type: 'text' } } },
         badge:       { type: 'text' },
         badgeColor:  { type: 'text' },
@@ -718,7 +719,7 @@ export const puckConfig: Config<Components> = {
       label: 'Ecosystem Card',
       fields: {
         title:       { type: 'text', contentEditable: true },
-        description: { type: 'richtext', contentEditable: true },
+        description: richTextField(),
         tag:         { type: 'text' },
         tagColor:    { type: 'text' },
       },
@@ -743,7 +744,7 @@ export const puckConfig: Config<Components> = {
     TestimonialCard: {
       label: 'Testimonial',
       fields: {
-        quote:  { type: 'richtext', contentEditable: true },
+        quote:  richTextField(),
         author: { type: 'text', contentEditable: true },
         role:   { type: 'text', contentEditable: true },
       },
@@ -763,7 +764,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         num:   { type: 'text', contentEditable: true },
         title: { type: 'text', contentEditable: true },
-        body:  { type: 'richtext', contentEditable: true },
+        body:  richTextField(),
       },
       defaultProps: {
         num: '1',
@@ -781,7 +782,7 @@ export const puckConfig: Config<Components> = {
       fields: {
         eyebrow:        { type: 'text', contentEditable: true },
         title:          { type: 'text', contentEditable: true },
-        description:    { type: 'richtext', contentEditable: true },
+        description:    richTextField(),
         ctaLabel:       { type: 'text', contentEditable: true },
         ctaHref:        { type: 'text' },
         secondaryLabel: { type: 'text', contentEditable: true },
