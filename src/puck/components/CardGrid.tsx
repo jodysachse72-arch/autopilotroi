@@ -1,6 +1,6 @@
 'use client'
 
-import type { ComponentConfig } from '@puckeditor/core'
+import type { ComponentConfig, SlotComponent } from '@puckeditor/core'
 import type { CardGridProps } from '../types'
 
 export const CardGrid: ComponentConfig<CardGridProps> = {
@@ -16,7 +16,7 @@ export const CardGrid: ComponentConfig<CardGridProps> = {
     },
     cards: { type: 'slot' },
   },
-  defaultProps: { columns: '4', cards: [] },
+  defaultProps: { columns: '4', cards: ((() => null) as unknown) as SlotComponent },
   render: ({ columns, cards: Cards }) => (
     <div className="puck-grid-passthrough" style={{
       display: 'grid',

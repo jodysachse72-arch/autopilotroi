@@ -1,6 +1,6 @@
 'use client'
 
-import type { ComponentConfig } from '@puckeditor/core'
+import type { ComponentConfig, SlotComponent } from '@puckeditor/core'
 import SectionBoxSection from '@/components/sections/SectionBox'
 import type { SectionBoxProps } from '../types'
 
@@ -32,7 +32,7 @@ export const SectionBox: ComponentConfig<SectionBoxProps> = {
     variant:       'white',
     padding:       'lg',
     customPadding: 48,
-    content:       [],
+    content:       ((() => null) as unknown) as SlotComponent,
   },
   render: ({ variant, padding, customPadding, content: Content }) => {
     const customStyle = padding === 'custom'

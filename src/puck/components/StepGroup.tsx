@@ -1,6 +1,6 @@
 'use client'
 
-import type { ComponentConfig } from '@puckeditor/core'
+import type { ComponentConfig, SlotComponent } from '@puckeditor/core'
 import type { StepGroupProps } from '../types'
 
 export const StepGroup: ComponentConfig<StepGroupProps> = {
@@ -8,7 +8,7 @@ export const StepGroup: ComponentConfig<StepGroupProps> = {
   fields: {
     steps: { type: 'slot' },
   },
-  defaultProps: { steps: [] },
+  defaultProps: { steps: ((() => null) as unknown) as SlotComponent },
   render: ({ steps: Steps }) => (
     <div className="puck-flex-passthrough" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
       <Steps />
