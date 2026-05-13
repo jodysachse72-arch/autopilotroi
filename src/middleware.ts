@@ -1,28 +1,20 @@
-import { type NextRequest } from 'next/server'
-import { updateSession } from '@/lib/supabase/middleware'
+import { type NextRequest, NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Skip Supabase middleware if not configured
-  if (
-    !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-    process.env.NEXT_PUBLIC_SUPABASE_URL === 'https://placeholder.supabase.co'
-  ) {
-    return
+  const { pathname } = request.nextUrl
+
+  // Puck API & editor — public access for now (Phase 1)
+  if (pathname.startsWith('/api/puck') || pathname.startsWith('/admin/edit')) {
+    return NextResponse.next()
   }
 
-  return await updateSession(request)
+  // All other routes pass through without auth checks for Phase 1
+  // Auth protection for /admin, /dashboard will be added in Phase 2
+  return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
-     * - favicon.ico
-     * - public folder
-     * - API routes
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
