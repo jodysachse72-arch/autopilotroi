@@ -17,7 +17,7 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
-TBD      docs(puck): add retroactive migration for puck_pages table
+f073716  docs(puck): add retroactive migration for puck_pages table
 3ae0d38  chore: update STATUS.md — P2 resolved, P3 is next target
 fdbffe5  fix(puck-editor): apply pathResolved guard — race condition fixed
 94931e9  chore: add graphify-out/ and PUCK_PLAN.md to .gitignore
