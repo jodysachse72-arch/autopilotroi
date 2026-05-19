@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-19 20:49 UTC
+> Last verified: 2026-05-19 20:56 UTC
 
 ---
 
@@ -17,18 +17,18 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
+3968164  fix(puck): add temporary write protection to /api/puck and /api/puck/seed
+85b19ae  chore: update STATUS.md — P3 resolved, commit hash corrected
 f073716  docs(puck): add retroactive migration for puck_pages table
 3ae0d38  chore: update STATUS.md — P2 resolved, P3 is next target
 fdbffe5  fix(puck-editor): apply pathResolved guard — race condition fixed
-94931e9  chore: add graphify-out/ and PUCK_PLAN.md to .gitignore
-489edf3  fix(puck): resolve all SlotComponent type errors
 ```
 
 ---
 
 ## BUILD STATUS (verified 2026-05-19)
 ```
-npm run build  →  ✅ EXIT 0 (post-P3, verified 2026-05-19 20:49 UTC)
+npm run build  →  ✅ EXIT 0 (post-P4, verified 2026-05-19 20:56 UTC)
   ✓ TypeScript: 0 errors
   ✓ 64 static pages generated
   ⚠ ONE WARNING: "middleware" file deprecated — must rename to "proxy"
@@ -129,10 +129,20 @@ table: puck_pages
   created_at timestamptz (auto)
 ```
 
-### P4 🔴 /api/puck has no write auth
-- POST to /api/puck is publicly accessible, no session check
-- Anyone can overwrite any page's content
-- Fix belongs on `feature/api-layer`
+### P4 ✅ RESOLVED — Temporary write protection added (2026-05-19)
+- `POST /api/puck` → requires `x-puck-write-secret` header or returns 401
+- `DELETE /api/puck` → same guard
+- `POST /api/puck/seed` → same guard
+- `GET /api/puck` → untouched, reads remain public
+- If `NEXT_PUBLIC_PUCK_WRITE_SECRET` env var is unset → returns 500 (fail closed)
+- Editor page updated: all 3 write fetches send the header
+- `.env.example` created documenting the var
+- Commit: `3968164`
+- TypeScript: 0 errors. Build: exit 0.
+
+> ⚠️ **ACTION REQUIRED before testing:** Set a real value for `NEXT_PUBLIC_PUCK_WRITE_SECRET`
+> in `.env.local` AND in Vercel environment variables.
+> Current `.env.local` value is the placeholder `replace-with-a-secure-random-string`.
 
 ### P5 🟡 Turnstile site key is empty
 - `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is empty in .env.local
@@ -144,16 +154,15 @@ table: puck_pages
 
 ## TODAY'S FIRST IMPLEMENTATION TARGET
 
-**P3 ✅ COMPLETE** — table verified, retroactive migration committed.
+**P4 ✅ COMPLETE** — temporary write protection committed as `3968164`.
 
-**Next target: P4 — Add write auth to /api/puck**
+> ⚠️ **Before testing the editor:** Set `NEXT_PUBLIC_PUCK_WRITE_SECRET` to a real random
+> string in `.env.local` (replace the placeholder) and in Vercel dashboard env vars.
+> Generate one with: `openssl rand -hex 32`
 
-What to do:
-1. Branch: this is `feature/api-layer` work per governance doc
-2. But it can be done here as a CMS-layer concern if we scope it tightly
-3. Decision needed: add simple secret-header check to POST/DELETE on `/api/puck/route.ts`
-   OR defer to `feature/api-layer` for full Supabase session auth
-4. **Do NOT implement until role + branch decision is made**
+**Next target: P5 — Set Turnstile key** (config only, no code change)
+
+Or begin the next sprint: `feature/frontend-pages` — homepage hero overhaul.
 
 ---
 
