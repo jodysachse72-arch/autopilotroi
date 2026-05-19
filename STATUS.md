@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-19 20:56 UTC
+> Last verified: 2026-05-19 21:05 UTC
 
 ---
 
@@ -17,24 +17,24 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
+TBD      chore: cleanup sprint — rename middleware, delete dead code, archive docs
+420cacf  chore: update STATUS.md — P4 resolved, write protection active
 3968164  fix(puck): add temporary write protection to /api/puck and /api/puck/seed
 85b19ae  chore: update STATUS.md — P3 resolved, commit hash corrected
 f073716  docs(puck): add retroactive migration for puck_pages table
-3ae0d38  chore: update STATUS.md — P2 resolved, P3 is next target
-fdbffe5  fix(puck-editor): apply pathResolved guard — race condition fixed
 ```
 
 ---
 
 ## BUILD STATUS (verified 2026-05-19)
 ```
-npm run build  →  ✅ EXIT 0 (post-P4, verified 2026-05-19 20:56 UTC)
+npm run build  →  ✅ EXIT 0 (cleanup sprint, verified 2026-05-19 21:05 UTC)
   ✓ TypeScript: 0 errors
   ✓ 64 static pages generated
-  ⚠ ONE WARNING: "middleware" file deprecated — must rename to "proxy"
+  ✓ NO deprecation warnings (middleware renamed to proxy)
 ```
 
-## TYPESCRIPT STATUS (verified 2026-05-19)
+## TYPESCRIPT STATUS (verified 2026-05-19 21:05 UTC)
 ```
 npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 ```
@@ -57,53 +57,52 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: Stabilize `feature/puck-editor` as a functional CMS editing environment**
+**Sprint: COMPLETE — `feature/puck-editor` Puck stabilization sprint CLOSED**
 
-Sprint goal: Puck editor correctly loads/saves the right page data for each route.
-No visual redesign work until sprint is complete.
+All blockers P1–P4 resolved. Cleanup complete.
+
+**NEXT SPRINT:** `feature/frontend-pages` — Homepage hero overhaul
+Role: Frontend Dev | Branch: `feature/frontend-pages` | No CMS work
 
 ---
 
 ## ACTIVE ROLE FOR NEXT SESSION
-**CMS Dev** — working on `feature/puck-editor` only
+**Frontend Dev** — working on `feature/frontend-pages`
+
+Do NOT continue on `feature/puck-editor`. That sprint is CLOSED.
 
 ---
 
-## ALLOWED FILES FOR NEXT SESSION
+## ALLOWED FILES FOR NEXT SESSION (feature/frontend-pages)
 ```
-src/app/admin/edit/[[...path]]/page.tsx   ← fix pathResolved race condition
-src/app/api/puck/route.ts                 ← add write auth (P5)
-src/app/api/puck/seed/route.ts            ← verify/fix seed logic
-src/puck.config.tsx                       ← if needed for editor fixes
-src/puck/**                               ← Puck component updates only
-STATUS.md                                 ← update at end of session
+src/app/page.tsx                          ← homepage hero section
+src/app/globals.css                      ← if design tokens needed
+src/components/sections/**               ← hero components
+src/components/ui/**                     ← shared UI primitives
+STATUS.md                                ← update at end of session
 ```
 
 ---
 
-## FORBIDDEN FILES FOR THIS BRANCH
+## FORBIDDEN FILES FOR NEXT SESSION (feature/frontend-pages)
 ```
-src/app/page.tsx                          ← marketing homepage, not this branch
-src/app/calculator/page.tsx              ← marketing, not this branch
-src/app/products/page.tsx                ← marketing, not this branch
-src/app/faqs/page.tsx                    ← marketing, not this branch
-src/app/start/page.tsx                   ← marketing, not this branch
-src/app/globals.css                      ← design system, not this branch
-src/components/sections/**               ← marketing components
-src/components/ui/**                     ← shared marketing UI
-src/app/admin/page.tsx                   ← admin UI, belongs to feature/admin-backend
-src/app/dashboard/**                     ← partner UI, belongs to feature/partner-dashboard
-src/middleware.ts                        ← belongs to feature/api-layer
+src/app/admin/**                          ← admin backend, wrong branch
+src/app/dashboard/**                     ← partner portal, wrong branch
+src/app/api/puck/**                      ← CMS API, wrong branch
+src/proxy.ts                             ← proxy layer, feature/api-layer only
+src/middleware.ts                        ← DELETED — do not recreate
 ```
 
 ---
 
 ## IMMEDIATE BLOCKERS (ordered by priority)
 
-### P1 🔴 middleware.ts must be renamed to proxy.ts
-- Every build emits a deprecation warning
-- Belongs on: `feature/api-layer` (NOT current branch)
-- Do NOT fix on this branch — flag for api-layer sprint
+### P1 ✅ RESOLVED — middleware renamed to proxy.ts (2026-05-19)
+- `src/middleware.ts` → `src/proxy.ts`
+- Function export renamed from `middleware` to `proxy`
+- Deprecation warning GONE from build output
+- Behavior preserved exactly (pure pass-through)
+- TypeScript: 0 errors. Build: exit 0.
 
 ### P2 ✅ RESOLVED — Puck editor race condition (pathResolved fix applied)
 - Commit: `fdbffe5`
@@ -117,7 +116,7 @@ src/middleware.ts                        ← belongs to feature/api-layer
 - Schema matches API expectations exactly (see gap analysis below)
 - RLS: anon read ✅, anon write ❌ (service_role required) ✅
 - Gap found: no migration file existed — created `supabase/migrations/20260519_puck_pages.sql`
-- Commit: TBD (pending build)
+- Commit: `f073716`
 
 **P3 Schema verified:**
 ```
@@ -152,32 +151,58 @@ table: puck_pages
 
 ---
 
+## CLEANUP SPRINT SUMMARY (2026-05-19)
+
+### Files Deleted (dead systems)
+- `src/middleware.ts` — renamed to `src/proxy.ts` (NOT deleted, renamed)
+- `src/lib/content-store.ts` — DELETED (zero imports confirmed)
+- `src/lib/puck-metadata.ts` — DELETED (zero imports confirmed)
+- `src/components/builder/PuckRenderer.tsx` — DELETED (zero imports confirmed)
+- `CLAUDE.md` — DELETED (stale governance doc)
+- `HANDOFF.md` — DELETED (stale handoff doc)
+
+### Files Archived to docs/archive/
+- `docs/DESIGN_SYSTEM.md`
+- `DOCS.md`
+- `frontend-design.md`
+- `LAUNCH_CHECKLIST.md`
+- `COMPETITIVE_ANALYSIS.md`
+- `marketing-skills.md`
+
+### Known Risks Remaining
+- `NEXT_PUBLIC_PUCK_WRITE_SECRET` placeholder in `.env.local` — must be replaced before editor testing
+- `NEXT_PUBLIC_PUCK_WRITE_SECRET` must be set in Vercel dashboard env vars
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` still empty — signup bot protection disabled
+- `puck_pages` RLS: public reads are intentional but unreviewed for production
+- `feature/api-layer` still needs real session-based auth to replace P4 temp guard
+
+---
+
 ## TODAY'S FIRST IMPLEMENTATION TARGET
 
-**P4 ✅ COMPLETE** — temporary write protection committed as `3968164`.
+**Cleanup sprint COMPLETE.** Switch to `feature/frontend-pages`.
 
-> ⚠️ **Before testing the editor:** Set `NEXT_PUBLIC_PUCK_WRITE_SECRET` to a real random
-> string in `.env.local` (replace the placeholder) and in Vercel dashboard env vars.
-> Generate one with: `openssl rand -hex 32`
+> ⚠️ **Before switching branches:** Set `NEXT_PUBLIC_PUCK_WRITE_SECRET` to a real value
+> in `.env.local` and Vercel. `openssl rand -hex 32`
 
-**Next target: P5 — Set Turnstile key** (config only, no code change)
-
-Or begin the next sprint: `feature/frontend-pages` — homepage hero overhaul.
+**Next sprint target:** Homepage hero section on `feature/frontend-pages`.
+1. `git checkout feature/frontend-pages`
+2. Audit current homepage hero state vs. reference URL
+3. Implement/refine hero section only
 
 ---
 
 ## NOT-NOW LIST
 These are real priorities that are explicitly deferred until the sprint is complete:
 
-| Item | Reason Deferred |
-|------|----------------|
-| Homepage hero redesign | Belongs on `feature/frontend-pages`, different sprint |
-| /roadmap visual timeline | `feature/frontend-pages`, different sprint |
-| Admin CSS reconciliation (adm-* vs Tailwind) | `feature/admin-backend`, different sprint |
-| Auth middleware rename | `feature/api-layer`, different sprint |
-| Partner dashboard divergence | `feature/partner-dashboard`, different sprint |
-| Delete dead code (PuckRenderer, puck-metadata, content-store, payload-adapter) | Not urgent, no current harm |
-| Signup bot protection (Turnstile) | Config task, not a build issue |
+| Item | Status |
+|------|--------|
+| Homepage hero redesign | 🟡 **UP NEXT** — `feature/frontend-pages` |
+| /roadmap visual timeline | Deferred — `feature/frontend-pages`, after hero |
+| Admin CSS reconciliation (adm-* vs Tailwind) | Deferred — `feature/admin-backend` |
+| Partner dashboard divergence | Deferred — `feature/partner-dashboard` |
+| Signup bot protection (Turnstile) | Config task — needs Cloudflare key |
+| Real session auth for /api/puck | Deferred — `feature/api-layer` sprint |
 
 ---
 
@@ -185,11 +210,11 @@ These are real priorities that are explicitly deferred until the sprint is compl
 
 | Branch | Status | Source of Truth For |
 |--------|--------|---------------------|
-| `feature/frontend-pages` | ✅ Clean, identical to visual-skin-upgrade | Marketing pages |
-| `feature/puck-editor` | ✅ Clean, P2+P3 resolved | Puck CMS editor |
+| `feature/frontend-pages` | 🟡 NEXT SPRINT | Marketing pages |
+| `feature/puck-editor` | ✅ SPRINT CLOSED — P1–P4 resolved | Puck CMS editor |
 | `feature/admin-backend` | ✅ Clean | Admin panel (adm-* CSS) |
 | `feature/partner-dashboard` | ⚠️ Identical to admin-backend | Partner portal (not diverged yet) |
-| `feature/api-layer` | ✅ Clean, identical to visual-skin-upgrade | API routes, middleware |
+| `feature/api-layer` | ✅ Clean | API routes, real session auth |
 | `visual-skin-upgrade` | ✅ Gold UI source | Do not commit to directly |
 | `backend-rebuild` | ✅ Gold backend source | Do not commit to directly |
 | `main` | 🚫 Contaminated | Do not use |
