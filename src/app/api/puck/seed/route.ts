@@ -1,14 +1,47 @@
 /**
- * Seed API — Populate puck_pages with default content for the homepage
- * 
- * POST /api/puck/seed?path=/   → seeds the homepage with default Puck components
- * 
- * This converts the static homepage content into Puck JSON format
- * so the editor has something to show and edit.
+ * Seed API — Populate puck_pages with default content for a given path
+ *
+ * POST /api/puck/seed?path=/   → seeds the given path with default Puck components
+ *
+ * This converts static page content into Puck JSON format so the editor
+ * has something to show and edit. Called automatically by the editor when
+ * a page has no saved content.
+ *
+ * WRITE PROTECTION
+ * Requires the request header:
+ *   x-puck-write-secret: <value of NEXT_PUBLIC_PUCK_WRITE_SECRET env var>
+ *
+ * NOTE: This is TEMPORARY stabilization protection.
+ * Replace with Supabase session/role auth during the auth hardening sprint.
+ * See: STATUS.md — P4, feature/api-layer branch.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+
+// ── Temporary write protection guard ────────────────────────────────────────
+// NOTE: Temporary stabilization protection.
+// Replace with Supabase session/role auth during the auth hardening sprint.
+// See: STATUS.md — P4, feature/api-layer branch.
+function requireWriteSecret(request: NextRequest): NextResponse | null {
+  const secret = process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET
+  if (!secret) {
+    console.error('[Seed API] NEXT_PUBLIC_PUCK_WRITE_SECRET is not set. Refusing seed operation.')
+    return NextResponse.json(
+      { error: 'Server misconfiguration: NEXT_PUBLIC_PUCK_WRITE_SECRET is not set.' },
+      { status: 500 }
+    )
+  }
+  const header = request.headers.get('x-puck-write-secret')
+  if (!header || header !== secret) {
+    return NextResponse.json(
+      { error: 'Unauthorized: missing or incorrect x-puck-write-secret header.' },
+      { status: 401 }
+    )
+  }
+  return null
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 function getWriteClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -173,6 +206,9 @@ const HOMEPAGE_SEED: any = {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = requireWriteSecret(request)
+  if (authError) return authError
+
   const pagePath = request.nextUrl.searchParams.get('path') || '/'
 
   try {

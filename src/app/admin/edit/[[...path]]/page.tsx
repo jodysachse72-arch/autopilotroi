@@ -98,7 +98,10 @@ export default function PuckEditorPage({
         } else {
           // No content — auto-seed from defaults
           try {
-            const seedRes = await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, { method: 'POST' })
+            const seedRes = await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, {
+              method: 'POST',
+              headers: { 'x-puck-write-secret': process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET || '' },
+            })
             if (seedRes.ok) {
               // Re-fetch the seeded data
               const reloadRes = await fetch(`/api/puck?path=${encodeURIComponent(pagePath)}`)
@@ -126,7 +129,10 @@ export default function PuckEditorPage({
     if (!confirm('Reset this page to default content? Current edits will be lost.')) return
     setLoading(true)
     try {
-      await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, { method: 'POST' })
+      await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, {
+        method: 'POST',
+        headers: { 'x-puck-write-secret': process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET || '' },
+      })
       window.location.reload()
     } catch {
       setLoading(false)
@@ -141,7 +147,10 @@ export default function PuckEditorPage({
       try {
         const res = await fetch('/api/puck', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-puck-write-secret': process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET || '',
+          },
           body: JSON.stringify({ path: pagePath, data }),
         })
         if (res.ok) {

@@ -8,10 +8,53 @@
  *
  * Reads from `puck_pages` table using the anon key (public read via RLS).
  * Writes using the service_role key (bypasses RLS for admin operations).
+ *
+ * WRITE PROTECTION
+ * POST and DELETE require the request header:
+ *   x-puck-write-secret: <value of PUCK_WRITE_SECRET env var>
+ *
+ * NOTE: This is TEMPORARY stabilization protection.
+ * Replace with Supabase session/role auth during the auth hardening sprint.
+ * See: STATUS.md — P4, feature/api-layer branch.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+
+// ── Temporary write protection guard ────────────────────────────────────────
+// NOTE: Temporary stabilization protection.
+// Replace with Supabase session/role auth during the auth hardening sprint.
+// See: STATUS.md — P4, feature/api-layer branch.
+//
+// Uses NEXT_PUBLIC_PUCK_WRITE_SECRET (not PUCK_WRITE_SECRET) so the client
+// editor page can include the header in fetch calls without a server relay.
+// Trade-off accepted: header is visible in browser devtools, but this is
+// significantly better than fully open writes. Replace before production launch.
+function requireWriteSecret(request: NextRequest): NextResponse | null {
+  const secret = process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET
+
+  // Fail closed: if the env var is not set at all, refuse all writes.
+  // This prevents a misconfigured deployment from being an open write endpoint.
+  if (!secret) {
+    console.error('[Puck API] NEXT_PUBLIC_PUCK_WRITE_SECRET is not set. Refusing write operation.')
+    return NextResponse.json(
+      { error: 'Server misconfiguration: NEXT_PUBLIC_PUCK_WRITE_SECRET is not set.' },
+      { status: 500 }
+    )
+  }
+
+  const header = request.headers.get('x-puck-write-secret')
+  if (!header || header !== secret) {
+    return NextResponse.json(
+      { error: 'Unauthorized: missing or incorrect x-puck-write-secret header.' },
+      { status: 401 }
+    )
+  }
+
+  // Header is present and matches — allow the write to proceed.
+  return null
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Read client — uses anon key (RLS allows public reads)
 function getReadClient() {
@@ -93,6 +136,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = requireWriteSecret(request)
+  if (authError) return authError
+
   try {
     const body = await request.json()
     const { path: pagePath, data } = body
@@ -122,6 +168,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = requireWriteSecret(request)
+  if (authError) return authError
+
   try {
     const pagePath = request.nextUrl.searchParams.get('path')
     if (!pagePath) {
