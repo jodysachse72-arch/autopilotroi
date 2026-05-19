@@ -17,7 +17,7 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
-TBD      chore: cleanup sprint — rename middleware, delete dead code, archive docs
+26dbfbb  chore: cleanup sprint — rename middleware, delete dead code, archive docs
 420cacf  chore: update STATUS.md — P4 resolved, write protection active
 3968164  fix(puck): add temporary write protection to /api/puck and /api/puck/seed
 85b19ae  chore: update STATUS.md — P3 resolved, commit hash corrected
