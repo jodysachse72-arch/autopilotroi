@@ -47,7 +47,8 @@ export default function PuckEditorPage({
 }: {
   params: Promise<{ path?: string[] }>
 }) {
-  const [pagePath, setPagePath] = useState<string>('/')
+  const [pagePath, setPagePath] = useState<string>('')
+  const [pathResolved, setPathResolved] = useState(false)
   const [initialData, setInitialData] = useState<Data | null>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -63,6 +64,7 @@ export default function PuckEditorPage({
     params.then((resolved) => {
       const path = resolved.path ? '/' + resolved.path.join('/') : '/'
       setPagePath(path)
+      setPathResolved(true)
     })
   }, [params])
 
@@ -75,8 +77,11 @@ export default function PuckEditorPage({
   }, [saveStatus])
 
   // Load page data — auto-seed if empty
+  // Guard: do not fetch until params have resolved. Without this guard, the effect
+  // fires immediately on mount with the default empty string, or worse, with '/'
+  // before the real route path is known, causing the wrong page's data to load.
   useEffect(() => {
-    if (!pagePath) return
+    if (!pagePath || !pathResolved) return
     setLoading(true)
     setSaveStatus('idle')
 
@@ -114,7 +119,7 @@ export default function PuckEditorPage({
         setInitialData({ content: [], root: { props: { title: '' } } })
         setLoading(false)
       })
-  }, [pagePath])
+  }, [pagePath, pathResolved])
 
   // Reset page to default content
   const resetToDefault = useCallback(async () => {
