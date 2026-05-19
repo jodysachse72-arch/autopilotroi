@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-19 20:39 UTC
+> Last verified: 2026-05-19 20:43 UTC
 
 ---
 
@@ -17,11 +17,11 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
+fdbffe5  fix(puck-editor): apply pathResolved guard — race condition fixed
 94931e9  chore: add graphify-out/ and PUCK_PLAN.md to .gitignore
 489edf3  fix(puck): resolve all SlotComponent type errors
 84b0862  fix: install @puckeditor/core 0.21.2 — was empty, now real
 abb9033  feat: puck-editor branch — clean UI + Puck infra transplanted
-5be7171  fix(globals.css): restore truncated box-drawing char
 ```
 
 ---
@@ -29,8 +29,8 @@ abb9033  feat: puck-editor branch — clean UI + Puck infra transplanted
 ## BUILD STATUS (verified 2026-05-19)
 ```
 npm run build  →  ✅ EXIT 0
-  ✓ Compiled in 5.6s
-  ✓ TypeScript passed in 7.5s
+  ✓ Compiled in 5.9s
+  ✓ TypeScript passed in 8.3s
   ✓ 64 static pages generated
   ⚠ ONE WARNING: "middleware" file deprecated — must rename to "proxy"
 ```
@@ -39,6 +39,11 @@ npm run build  →  ✅ EXIT 0
 ```
 npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 ```
+
+---
+
+## BUILD & TS VERIFIED (2026-05-19 20:43 UTC)
+Post-fix verification — both passed after `pathResolved` change.
 
 ---
 
@@ -101,13 +106,12 @@ src/middleware.ts                        ← belongs to feature/api-layer
 - Belongs on: `feature/api-layer` (NOT current branch)
 - Do NOT fix on this branch — flag for api-layer sprint
 
-### P2 🔴 Puck editor has a race condition (pathResolved fix missing)
-- The `useEffect` that fetches page data depends on `[pagePath]`
-- `pagePath` initializes to `'/'` before params resolve
-- Result: editor may load homepage data when switching to other pages
-- Fix is in `src/app/admin/edit/[[...path]]/page.tsx`
-- Add `const [pathResolved, setPathResolved] = useState(false)` and gate the fetch effect
-- **This IS on the allowed list. This is the first implementation target.**
+### P2 ✅ RESOLVED — Puck editor race condition (pathResolved fix applied)
+- Commit: `fdbffe5`
+- `pathResolved` state flag added
+- Data-fetch effect now gated on `pathResolved === true`
+- Dependency array updated to `[pagePath, pathResolved]`
+- TypeScript: 0 errors. Build: exit 0.
 
 ### P3 🔴 puck_pages Supabase table — existence UNVERIFIED
 - The Puck API reads/writes `puck_pages` table
@@ -130,18 +134,15 @@ src/middleware.ts                        ← belongs to feature/api-layer
 
 ## TODAY'S FIRST IMPLEMENTATION TARGET
 
-**Apply the pathResolved race condition fix to the Puck editor**
+**P2 ✅ COMPLETE** — pathResolved fix committed and pushed as `fdbffe5`.
 
-File: `src/app/admin/edit/[[...path]]/page.tsx`
+**Next target: P3 — Verify puck_pages Supabase table exists**
 
 What to do:
-1. Add `const [pathResolved, setPathResolved] = useState(false)`
-2. In the params-resolution `useEffect`, call `setPathResolved(true)` after `setPagePath()`
-3. In the data-fetch `useEffect`, add guard: `if (!pagePath || !pathResolved) return`
-4. Dependency array becomes `[pagePath, pathResolved]`
-
-After the fix: run `npx tsc --noEmit` and `npm run build`. Both must exit 0.
-Then: manually test the editor by switching routes in the dropdown and verifying the correct page data loads.
+1. Open Supabase dashboard → Table Editor
+2. Confirm `puck_pages` table exists with columns: `path` (text, primary key), `data` (jsonb), `updated_at` (timestamptz)
+3. If missing: run the migration in `src/app/api/admin/migrate-cms/route.ts` or apply the SQL manually
+4. Test: open `/admin/edit`, switch to a non-home page in the dropdown, confirm it loads different data than `/`
 
 ---
 
@@ -165,7 +166,7 @@ These are real priorities that are explicitly deferred until the sprint is compl
 | Branch | Status | Source of Truth For |
 |--------|--------|---------------------|
 | `feature/frontend-pages` | ✅ Clean, identical to visual-skin-upgrade | Marketing pages |
-| `feature/puck-editor` | ✅ Clean, has P2 race condition | Puck CMS editor |
+| `feature/puck-editor` | ✅ Clean, P2 resolved | Puck CMS editor |
 | `feature/admin-backend` | ✅ Clean | Admin panel (adm-* CSS) |
 | `feature/partner-dashboard` | ⚠️ Identical to admin-backend | Partner portal (not diverged yet) |
 | `feature/api-layer` | ✅ Clean, identical to visual-skin-upgrade | API routes, middleware |
