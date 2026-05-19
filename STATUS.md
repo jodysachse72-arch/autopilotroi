@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-19 20:43 UTC
+> Last verified: 2026-05-19 20:49 UTC
 
 ---
 
@@ -17,20 +17,19 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
+TBD      docs(puck): add retroactive migration for puck_pages table
+3ae0d38  chore: update STATUS.md — P2 resolved, P3 is next target
 fdbffe5  fix(puck-editor): apply pathResolved guard — race condition fixed
 94931e9  chore: add graphify-out/ and PUCK_PLAN.md to .gitignore
 489edf3  fix(puck): resolve all SlotComponent type errors
-84b0862  fix: install @puckeditor/core 0.21.2 — was empty, now real
-abb9033  feat: puck-editor branch — clean UI + Puck infra transplanted
 ```
 
 ---
 
 ## BUILD STATUS (verified 2026-05-19)
 ```
-npm run build  →  ✅ EXIT 0
-  ✓ Compiled in 5.9s
-  ✓ TypeScript passed in 8.3s
+npm run build  →  ✅ EXIT 0 (post-P3, verified 2026-05-19 20:49 UTC)
+  ✓ TypeScript: 0 errors
   ✓ 64 static pages generated
   ⚠ ONE WARNING: "middleware" file deprecated — must rename to "proxy"
 ```
@@ -113,11 +112,22 @@ src/middleware.ts                        ← belongs to feature/api-layer
 - Dependency array updated to `[pagePath, pathResolved]`
 - TypeScript: 0 errors. Build: exit 0.
 
-### P3 🔴 puck_pages Supabase table — existence UNVERIFIED
-- The Puck API reads/writes `puck_pages` table
-- Table existence against live Supabase has not been confirmed
-- If the table doesn't exist, all saves fail silently
-- Must verify before testing editor end-to-end
+### P3 ✅ RESOLVED — puck_pages table verified (2026-05-19)
+- Table EXISTS in production Supabase with 6 live rows
+- Schema matches API expectations exactly (see gap analysis below)
+- RLS: anon read ✅, anon write ❌ (service_role required) ✅
+- Gap found: no migration file existed — created `supabase/migrations/20260519_puck_pages.sql`
+- Commit: TBD (pending build)
+
+**P3 Schema verified:**
+```
+table: puck_pages
+  id         uuid, PK, auto
+  path       text, UNIQUE (upsert conflict target)
+  data       jsonb ({ root, content, zones })
+  updated_at timestamptz (written by API)
+  created_at timestamptz (auto)
+```
 
 ### P4 🔴 /api/puck has no write auth
 - POST to /api/puck is publicly accessible, no session check
@@ -134,15 +144,16 @@ src/middleware.ts                        ← belongs to feature/api-layer
 
 ## TODAY'S FIRST IMPLEMENTATION TARGET
 
-**P2 ✅ COMPLETE** — pathResolved fix committed and pushed as `fdbffe5`.
+**P3 ✅ COMPLETE** — table verified, retroactive migration committed.
 
-**Next target: P3 — Verify puck_pages Supabase table exists**
+**Next target: P4 — Add write auth to /api/puck**
 
 What to do:
-1. Open Supabase dashboard → Table Editor
-2. Confirm `puck_pages` table exists with columns: `path` (text, primary key), `data` (jsonb), `updated_at` (timestamptz)
-3. If missing: run the migration in `src/app/api/admin/migrate-cms/route.ts` or apply the SQL manually
-4. Test: open `/admin/edit`, switch to a non-home page in the dropdown, confirm it loads different data than `/`
+1. Branch: this is `feature/api-layer` work per governance doc
+2. But it can be done here as a CMS-layer concern if we scope it tightly
+3. Decision needed: add simple secret-header check to POST/DELETE on `/api/puck/route.ts`
+   OR defer to `feature/api-layer` for full Supabase session auth
+4. **Do NOT implement until role + branch decision is made**
 
 ---
 
@@ -166,7 +177,7 @@ These are real priorities that are explicitly deferred until the sprint is compl
 | Branch | Status | Source of Truth For |
 |--------|--------|---------------------|
 | `feature/frontend-pages` | ✅ Clean, identical to visual-skin-upgrade | Marketing pages |
-| `feature/puck-editor` | ✅ Clean, P2 resolved | Puck CMS editor |
+| `feature/puck-editor` | ✅ Clean, P2+P3 resolved | Puck CMS editor |
 | `feature/admin-backend` | ✅ Clean | Admin panel (adm-* CSS) |
 | `feature/partner-dashboard` | ⚠️ Identical to admin-backend | Partner portal (not diverged yet) |
 | `feature/api-layer` | ✅ Clean, identical to visual-skin-upgrade | API routes, middleware |
