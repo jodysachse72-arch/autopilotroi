@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 20:49 UTC
+> Last verified: 2026-05-20 21:24 UTC
 
 ---
 
@@ -11,18 +11,41 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN** (nothing to commit)
-Synced with: `origin/feature/frontend-pages` — up to date (commit `60b6447`)
-**Preview URL:** https://autopilotroi-5nwuph31k-autopilot-roi.vercel.app
+Synced with: `origin/feature/frontend-pages` — up to date (commit `49a14ed`)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_3P4kKPAQHe3KessqEDUqnksSaSHP`
 **Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/3P4kKPAQHe3KessqEDUqnksSaSHP
 **Deployed At:** 2026-05-20 20:44 UTC (26s build, iad1 Washington DC)
-**Commit Deployed:** `60b6447` (tip of CMS UX hardening stack)
+**Commit Deployed:** `60b6447` (CMS UX hardening stack tip)
 
 ---
 
-## LAST 5 COMMITS (verified)
+## OPERATIONAL STATUS: ✅ PRODUCTION CERTIFIED
+
+The AutopilotROI CMS is a live, fully functional content management platform.
+
 ```
+CMS UX Hardening Stack — DEPLOYED TO PRODUCTION ✅
+Last certified: 2026-05-20 20:49 UTC
+Certifying agent: Production Release Lead
+```
+
+**What is live:**
+- Puck visual editor at /admin/edit with full Barry-language UX
+- Publishing confidence signals (status bar, header timestamp, dirty state)
+- Brand-safe color selects (no raw hex inputs)
+- Section orientation system (sectionName field, canvas overlay, outline guide)
+- Navigation protection (beforeunload guard, page-switch warning)
+- Content backup and restore scripts
+- Production data migration (sectionName for all SectionBox instances)
+- Full governance documentation suite
+
+---
+
+## LAST 10 COMMITS
+
+```
+49a14ed  chore: update STATUS.md — CMS UX stack deployed to production
 60b6447  chore: add dotenv dev dependency (migrate scripts)
 2568bda  chore: update STATUS.md — content discovery sprint complete
 685811a  feat(cms-ux): content discovery sprint — section names, humanized labels, canvas badges
@@ -30,292 +53,192 @@ ccd8dd9  fix(cms-ux): operator simulation corrections — status bar, reset moda
 3542d18  feat(cms-ux): add publishing confidence signals and navigation protection
 59f0451  feat(cms-ux): replace raw hex color inputs with brand-safe select palettes
 318c17a  feat(cms-ux): translate Puck editor to Barry-language
+6fde49e  feat(cms): add puck backup and restore scripts for production content safety
+32e8c78  chore: update STATUS.md — production certified 2026-05-20 03:24 UTC
 ```
 
 ---
 
-## BUILD STATUS (verified 2026-05-19)
-```
-npm run build  →  ✅ EXIT 0 (cleanup sprint, verified 2026-05-19 21:05 UTC)
-  ✓ TypeScript: 0 errors
-  ✓ 64 static pages generated
-  ✓ NO deprecation warnings (middleware renamed to proxy)
-```
+## BUILD & TYPESCRIPT STATUS
 
-## TYPESCRIPT STATUS (verified 2026-05-19 21:05 UTC)
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-20 20:44 UTC)
+npm run build     →  ✅ EXIT 0  (64 pages — verified 2026-05-20 20:44 UTC)
+Vercel build      →  ✅ EXIT 0  (11.9s compile — verified 2026-05-20 20:44 UTC)
 ```
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 03:36 UTC)
-**PRODUCTION CERTIFIED + BACKUP VERIFIED ✅**
-`npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
-Backup script verified: 30.7 KB, 6 pages from production Supabase. Restore dry-run verified.
+## DOCUMENTATION SUITE
+
+```
+docs/CMS_OPERATOR_GUIDE.md              ← Barry-facing: how to edit safely
+docs/CMS_DEVELOPER_OPERATIONS.md        ← Dev: backup, deploy, restore, env vars
+docs/SAFE_COMPONENT_EXPANSION_GUIDE.md  ← Dev: governance principles + expansion checklists
+docs/archive/                           ← Archived stale docs from cleanup sprint
+```
 
 ---
 
-## STASH WARNING
-```
-stash@{0}: On main: wip: main branch state before puck-editor branch creation
-stash@{1}: WIP on main: aa746ba restore admin files
-```
-> ⚠️ DO NOT POP THESE STASHES. They exist on `main` (contaminated branch).
-> Leave them. They are labeled in case forensic review is ever needed.
+## BRANCH MAP
+
+| Branch | Status | Deploy Target |
+|--------|--------|---------------|
+| `feature/frontend-pages` | ✅ **PRODUCTION** | `vercel deploy --prod` |
+| `feature/api-layer` | Queued | Auth hardening, session-based write |
+| `feature/admin-backend` | Parked | Admin panel |
+| `feature/partner-dashboard` | Parked | Partner portal |
+| `main` | 🚫 Contaminated | Do not use |
 
 ---
 
-## CURRENT SPRINT
-**Sprint: COMPLETE — CMS Reliability + Backup/Restore**
+## CMS ARCHITECTURE
 
-### Files added
-| File | Purpose |
-|---|---|
-| `scripts/puck-backup.js` | Exports all puck_pages rows to `backups/puck/puck-backup-YYYY-MM-DD-HHMM.json` |
-| `scripts/puck-restore.js` | Restores page(s) from backup with mandatory dry-run and `--confirm` flag |
-| `backups/puck/.gitkeep` | Tracks backup directory in git (JSON files excluded) |
+```
+Browser → /admin/edit  →  Puck visual editor (client-side React)
+                               ↓  on Publish
+                        POST /api/puck  (x-puck-write-secret guard)
+                               ↓
+                        Supabase puck_pages table (JSONB)
+                               ↓
+                    GET /api/puck  (public read)
+                               ↓
+              Next.js [[...path]]/page.tsx → PuckRenderer → live site
+```
 
-### Files modified
-| File | Change |
-|---|---|
-| `package.json` | Added `puck:backup` and `puck:restore` npm scripts |
-| `.gitignore` | Added `backups/puck/*.json` (backup data excluded from git) |
+**Key files:**
+- `src/app/admin/edit/[[...path]]/page.tsx` — editor UI, all overrides
+- `src/puck.config.tsx` — all editable component definitions
+- `src/app/api/puck/route.ts` — read/write/delete API
+- `src/app/api/puck/seed/route.ts` — default content seeder
+- `scripts/puck-backup.js` — backup utility
+- `scripts/puck-restore.js` — restore utility
+- `scripts/migrate-section-names.js` — one-time sectionName migration
 
-### Verification
-- Backup: 6 pages, 30.7 KB from production Supabase ✅
-- Restore dry-run (single page `/`): ✅ shows plan, writes nothing
-- Restore dry-run (all pages): ✅ shows all 6 pages, writes nothing
-- TypeScript: 0 errors ✅
-- Build: exit 0, 64 pages ✅
+---
+
+## PUCK PAGES (live production data)
+
+| Path | Status | Last Updated |
+|------|--------|-------------|
+| `/` | ✅ seeded, sectionName populated | 2026-05-20 |
+| `/products` | ✅ seeded, sectionName populated | 2026-05-20 |
+| `/calculator` | ✅ seeded | 2026-05-20 |
+| `/contact` | ✅ seeded | 2026-05-20 |
+| `/faqs` | ✅ seeded | 2026-05-20 |
+| `/signup` | ✅ seeded | 2026-05-20 |
 
 ---
 
 ## CMS RECOVERY WORKFLOW
 
-### Backup Command
+### Backup
 ```bash
 npm run puck:backup
-# Output: backups/puck/puck-backup-YYYY-MM-DD-HHMM.json
-# Reads from .env.local automatically
-# Safe to run at any time — read-only, no writes to Supabase
+# → backups/puck/puck-backup-YYYY-MM-DD-HHMM.json
+# Safe: read-only. Run before every editing session.
 ```
 
-### Restore Command (dry-run first — always)
+### Restore (always dry-run first)
 ```bash
-# 1. List available backups:
-ls backups/puck/
-
-# 2. Dry-run (always do this first):
+# Dry-run (shows plan, writes nothing):
 node scripts/puck-restore.js --backup backups/puck/<filename>.json --path /
-# OR restore all:
-node scripts/puck-restore.js --backup backups/puck/<filename>.json --all
 
-# 3. Execute restore (single page):
+# Execute restore:
 node scripts/puck-restore.js --backup backups/puck/<filename>.json --path / --confirm
-
-# 4. Execute restore (all pages):
-node scripts/puck-restore.js --backup backups/puck/<filename>.json --all --confirm
-```
-
-### Rollback Process
-```
-1. Run backup BEFORE any risky change:  npm run puck:backup
-2. Make your change in the Puck editor
-3. If change is wrong, run dry-run to see restore plan
-4. Add --confirm to execute restore
-5. Reload https://autopilotroi.vercel.app/ to verify
-```
-
-### Production Safety Notes
-- Backup JSON files are excluded from git (`.gitignore`) — store copies offsite if needed
-- `backups/puck/` directory is tracked via `.gitkeep`
-- Restore requires explicit `--confirm` flag — dry-run is always the default
-- Backup reads via anon key (public read) — safe, no auth risk
-- Restore writes via `SUPABASE_SERVICE_ROLE_KEY` — keep `.env.local` secure
-- **Take a backup before every major content editing session**
-- **Take a backup before any code deployment that touches puck config or components**
-
-**ACTIVE BRANCH:** `feature/frontend-pages`
-**PRODUCTION URL:** https://autopilotroi.vercel.app
-**RELIABILITY SPRINT COMPLETE:** ✅ 2026-05-20 03:36 UTC
-Role: CMS Reliability Dev | Branch: `feature/frontend-pages`
-
----
-
-## ACTIVE ROLE FOR NEXT SESSION
-**CMS Validation Dev** — working on `feature/frontend-pages` (unified)
-
-Next task: live Puck editor session test.
-
----
-
-## ALLOWED FILES FOR NEXT SESSION (feature/frontend-pages)
-```
-src/app/page.tsx                          ← homepage hero section
-src/app/globals.css                      ← if design tokens needed
-src/components/sections/**               ← hero components
-src/components/ui/**                     ← shared UI primitives
-STATUS.md                                ← update at end of session
 ```
 
 ---
 
-## FORBIDDEN FILES FOR NEXT SESSION (feature/frontend-pages)
+## KNOWN LIMITATIONS
+
+| Limitation | Impact | Resolution |
+|---|---|---|
+| Write guard is shared-secret only (no session auth) | Medium — secret must be protected | `feature/api-layer` sprint |
+| Puck DropZone API deprecated (console warning) | Low — no functional impact | Future migration sprint |
+| Outline rows show type label only (5× "Content Section") | Low — mitigated by sectionName field + canvas overlay | Puck constraint, cannot be eliminated |
+| No automated editor smoke tests | Low — manual verification checklist used | Future CI/CD sprint |
+| Turnstile site key empty (bot protection disabled on /signup) | Low — signup bot risk | Config task — needs Cloudflare key |
+| `feature/frontend-pages` not merged to `main` | Medium — `main` is contaminated | Keep as is; all deploys from this branch |
+
+---
+
+## NEXT-PHASE RECOMMENDATIONS (ordered)
+
+### Phase 1 — Auth Hardening (feature/api-layer)
+Replace the shared-secret write guard with Supabase session-based authentication.
+- Restrict `/api/puck` write operations to authenticated admin sessions
+- Remove `NEXT_PUBLIC_PUCK_WRITE_SECRET` dependency
+- Add admin role to Supabase RLS policies
+
+### Phase 2 — Slot Field Migration (future sprint)
+Migrate `SectionBox` and `FeatureGrid` from deprecated DropZones to Puck slot fields.
+- Eliminates console warning
+- Future-proofs for Puck major version upgrade
+- Requires puck_pages data migration (backup-first workflow)
+
+### Phase 3 — Content Expansion (operator-requested)
+Add new page sections only as operator needs emerge.
+- Follow `docs/SAFE_COMPONENT_EXPANSION_GUIDE.md` checklist without exception
+- Each new component requires full deploy certification before going live
+
+### Phase 4 — Signup Bot Protection
+Add `NEXT_PUBLIC_TURNSTILE_SITE_KEY` via Cloudflare Turnstile dashboard.
+- Config-only change, no code needed
+- Protects /signup from automated bot submissions
+
+### Phase 5 — Merge Strategy
+Evaluate whether `feature/frontend-pages` can become `main` via:
+- `git checkout -b new-main feature/frontend-pages`
+- `git push origin new-main:main --force` (with team agreement)
+
+---
+
+## STASH WARNING
+
 ```
-src/app/admin/**                          ← admin backend, wrong branch
-src/app/dashboard/**                     ← partner portal, wrong branch
-src/app/api/puck/**                      ← CMS API, wrong branch
-src/proxy.ts                             ← proxy layer, feature/api-layer only
-src/middleware.ts                        ← DELETED — do not recreate
+stash@{0}: On main: wip: main branch state before puck-editor branch creation
+stash@{1}: WIP on main: aa746ba restore admin files
 ```
+> ⚠️ DO NOT POP THESE STASHES. They exist on `main` (contaminated branch).
+> Leave them. They are labeled in case forensic review is needed.
 
 ---
 
-## IMMEDIATE BLOCKERS (ordered by priority)
+## IMMEDIATE BLOCKERS
 
-### P1 ✅ RESOLVED — middleware renamed to proxy.ts (2026-05-19)
-- `src/middleware.ts` → `src/proxy.ts`
-- Function export renamed from `middleware` to `proxy`
-- Deprecation warning GONE from build output
-- Behavior preserved exactly (pure pass-through)
-- TypeScript: 0 errors. Build: exit 0.
-
-### P2 ✅ RESOLVED — Puck editor race condition (pathResolved fix applied)
-- Commit: `fdbffe5`
-- `pathResolved` state flag added
-- Data-fetch effect now gated on `pathResolved === true`
-- Dependency array updated to `[pagePath, pathResolved]`
-- TypeScript: 0 errors. Build: exit 0.
-
-### P3 ✅ RESOLVED — puck_pages table verified (2026-05-19)
-- Table EXISTS in production Supabase with 6 live rows
-- Schema matches API expectations exactly (see gap analysis below)
-- RLS: anon read ✅, anon write ❌ (service_role required) ✅
-- Gap found: no migration file existed — created `supabase/migrations/20260519_puck_pages.sql`
-- Commit: `f073716`
-
-**P3 Schema verified:**
-```
-table: puck_pages
-  id         uuid, PK, auto
-  path       text, UNIQUE (upsert conflict target)
-  data       jsonb ({ root, content, zones })
-  updated_at timestamptz (written by API)
-  created_at timestamptz (auto)
-```
-
-### P4 ✅ RESOLVED — Temporary write protection added (2026-05-19)
-- `POST /api/puck` → requires `x-puck-write-secret` header or returns 401
-- `DELETE /api/puck` → same guard
-- `POST /api/puck/seed` → same guard
-- `GET /api/puck` → untouched, reads remain public
-- If `NEXT_PUBLIC_PUCK_WRITE_SECRET` env var is unset → returns 500 (fail closed)
-- Editor page updated: all 3 write fetches send the header
-- `.env.example` created documenting the var
-- Commit: `3968164`
-- TypeScript: 0 errors. Build: exit 0.
-
-> ⚠️ **ACTION REQUIRED before testing:** Set a real value for `NEXT_PUBLIC_PUCK_WRITE_SECRET`
-> in `.env.local` AND in Vercel environment variables.
-> Current `.env.local` value is the placeholder `replace-with-a-secure-random-string`.
-
-### P5 🟡 Turnstile site key is empty
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` is empty in .env.local
-- Bot protection on /signup is silently disabled
-- Config-only fix — needs Cloudflare key
-- Does NOT affect this sprint
+None. Production is certified and stable.
 
 ---
 
-## CLEANUP SPRINT SUMMARY (2026-05-19)
+## RESOLVED BLOCKERS (for record)
 
-### Files Deleted (dead systems)
-- `src/middleware.ts` — renamed to `src/proxy.ts` (NOT deleted, renamed)
-- `src/lib/content-store.ts` — DELETED (zero imports confirmed)
-- `src/lib/puck-metadata.ts` — DELETED (zero imports confirmed)
-- `src/components/builder/PuckRenderer.tsx` — DELETED (zero imports confirmed)
-- `CLAUDE.md` — DELETED (stale governance doc)
-- `HANDOFF.md` — DELETED (stale handoff doc)
-
-### Files Archived to docs/archive/
-- `docs/DESIGN_SYSTEM.md`
-- `DOCS.md`
-- `frontend-design.md`
-- `LAUNCH_CHECKLIST.md`
-- `COMPETITIVE_ANALYSIS.md`
-- `marketing-skills.md`
-
-### Known Risks Remaining
-- `NEXT_PUBLIC_PUCK_WRITE_SECRET` placeholder in `.env.local` — must be replaced before editor testing
-- `NEXT_PUBLIC_PUCK_WRITE_SECRET` must be set in Vercel dashboard env vars
-- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` still empty — signup bot protection disabled
-- `puck_pages` RLS: public reads are intentional but unreviewed for production
-- `feature/api-layer` still needs real session-based auth to replace P4 temp guard
-
----
-
-## TODAY'S FIRST IMPLEMENTATION TARGET
-
-**Cleanup sprint COMPLETE.** Switch to `feature/frontend-pages`.
-
-> ⚠️ **Before switching branches:** Set `NEXT_PUBLIC_PUCK_WRITE_SECRET` to a real value
-> in `.env.local` and Vercel. `openssl rand -hex 32`
-
-**Next sprint target:** Homepage hero section on `feature/frontend-pages`.
-1. `git checkout feature/frontend-pages`
-2. Audit current homepage hero state vs. reference URL
-3. Implement/refine hero section only
-
----
-
-## NOT-NOW LIST
-These are real priorities that are explicitly deferred until the sprint is complete:
-
-| Item | Status |
-|------|--------|
-| Homepage hero redesign | 🟡 **UP NEXT** — `feature/frontend-pages` |
-| /roadmap visual timeline | Deferred — `feature/frontend-pages`, after hero |
-| Admin CSS reconciliation (adm-* vs Tailwind) | Deferred — `feature/admin-backend` |
-| Partner dashboard divergence | Deferred — `feature/partner-dashboard` |
-| Signup bot protection (Turnstile) | Config task — needs Cloudflare key |
-| Real session auth for /api/puck | Deferred — `feature/api-layer` sprint |
-
----
-
-## BRANCH MAP QUICK REFERENCE
-
-| Branch | Status | Source of Truth For |
-|--------|--------|---------------------|
-| `feature/frontend-pages` | 🟡 NEXT SPRINT | Marketing pages |
-| `feature/puck-editor` | ✅ SPRINT CLOSED — P1–P4 resolved | Puck CMS editor |
-| `feature/admin-backend` | ✅ Clean | Admin panel (adm-* CSS) |
-| `feature/partner-dashboard` | ⚠️ Identical to admin-backend | Partner portal (not diverged yet) |
-| `feature/api-layer` | ✅ Clean | API routes, real session auth |
-| `visual-skin-upgrade` | ✅ Gold UI source | Do not commit to directly |
-| `backend-rebuild` | ✅ Gold backend source | Do not commit to directly |
-| `main` | 🚫 Contaminated | Do not use |
-| `puck-editor` | ⚠️ Ahead of origin by 1 | Superseded by feature/puck-editor |
+| ID | Blocker | Resolution |
+|----|---------|-----------|
+| P1 | middleware.ts deprecation warning | Renamed to proxy.ts — ✅ 2026-05-19 |
+| P2 | Puck editor race condition | pathResolved flag added — ✅ commit fdbffe5 |
+| P3 | puck_pages table unverified | Verified, migration file created — ✅ 2026-05-19 |
+| P4 | No write protection on CMS API | x-puck-write-secret guard added — ✅ 2026-05-19 |
+| P5 | PUCK_WRITE_SECRET placeholder in env | Rotated to secure random hex — ✅ 2026-05-20 |
 
 ---
 
 ## SESSION STARTUP CHECKLIST
+
 ```
-□ git branch --show-current      → must be the correct feature branch
+□ git branch --show-current      → must be feature/frontend-pages
 □ git status                      → must be clean
-□ git log --oneline -3            → confirm you're at expected commit
-□ npx tsc --noEmit                → must be 0 errors BEFORE you touch anything
-□ Read the ALLOWED FILES list above
-□ State your role and domain out loud before writing a single line
+□ git log --oneline -3            → verify at expected commit
+□ npx tsc --noEmit                → must be 0 errors BEFORE touching anything
+□ npm run puck:backup             → take snapshot before editing session
 ```
 
 ## SESSION SHUTDOWN CHECKLIST
+
 ```
-□ git status                      → confirm no uncommitted work
+□ npx tsc --noEmit                → must be 0 errors AFTER your changes
+□ npm run build                   → must exit 0, 64 pages
 □ git add -A && git commit -m "..."
-□ git push origin <branch>
-□ npx tsc --noEmit                → must still be 0 errors after your changes
-□ npm run build                   → must still exit 0
-□ Update STATUS.md with new state
-□ Update "Last verified" timestamp above
+□ git push origin feature/frontend-pages
+□ Update STATUS.md — "Last verified" timestamp + current state
 ```
