@@ -36,8 +36,8 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://plausible.io https://*.sentry.io https://www.youtube.com https://s.ytimg.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://rsms.me",
+              "font-src 'self' https://fonts.gstatic.com https://rsms.me",
               "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.supabase.co",
               "frame-src https://www.youtube.com https://challenges.cloudflare.com",
               "connect-src 'self' https://*.supabase.co https://plausible.io https://*.sentry.io https://challenges.cloudflare.com",
