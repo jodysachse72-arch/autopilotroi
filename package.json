@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "puck:backup": "node scripts/puck-backup.js",
+    "puck:restore": "node scripts/puck-restore.js"
   },
   "dependencies": {
     "@puckeditor/core": "^0.21.2",

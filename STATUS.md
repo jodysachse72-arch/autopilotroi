@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 03:24 UTC
+> Last verified: 2026-05-20 03:36 UTC
 
 ---
 
@@ -45,10 +45,10 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 03:24 UTC)
-**PRODUCTION CERTIFIED ✅** — `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
-Production homepage: **0 console messages**. Production editor: **0 errors** (DropZone + form field id, Puck-internal only).
-Puck write pipeline: **200 OK on production** — writes reach Supabase, persist, reflect on live homepage.
+## BUILD & TS VERIFIED (2026-05-20 03:36 UTC)
+**PRODUCTION CERTIFIED + BACKUP VERIFIED ✅**
+`npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
+Backup script verified: 30.7 KB, 6 pages from production Supabase. Restore dry-run verified.
 
 ---
 
@@ -63,64 +63,79 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — Production Deployment + Certification**
+**Sprint: COMPLETE — CMS Reliability + Backup/Restore**
 
-### Production URL
-`https://autopilotroi.vercel.app` (aliased)
-`https://autopilotroi-gnemzw0d6-autopilot-roi.vercel.app` (deployment URL)
-
-### Production env readiness
-| Var | Vercel Production | Status |
-|---|---|---|
-| `NEXT_PUBLIC_PUCK_WRITE_SECRET` | ✅ Encrypted | Set 37m before deploy |
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ Encrypted | Set 14d ago |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ Encrypted | Set 14d ago |
-| `SUPABASE_SERVICE_ROLE_KEY` | ✅ Encrypted | Set 14d ago |
-| `NEXT_PUBLIC_SITE_URL` | ⚠️ Not in Vercel | **Safe** — all usages have `\|\| 'https://autopilotroi.com'` fallback |
-
-### Deployment result
-- Vercel CLI deploy `--prod`
-- Build: exit 0, 11.8s compile, TypeScript 9.4s, 64 pages
-- Region: iad1 (Washington DC)
-- Status: `READY`, target: `production`
-- Aliased to: `https://autopilotroi.vercel.app`
-- Deployment ID: `dpl_GrWajpPzE6ZriRv6ZzjMGfRV5Wdp`
-
-### Homepage validation
-- `https://autopilotroi.vercel.app/` — ✅ loads, approved layout, 0 console messages
-- Hero copy, CTAs, bullets, video thumbnail all correct
-- Navbar shows live logged-in session ("Admin User")
-
-### Editor validation
-| Check | Result |
+### Files added
+| File | Purpose |
 |---|---|
-| `/admin/edit` loads | ✅ |
-| Hero canvas renders | ✅ Approved layout, copy, both CTAs |
-| Inter font (rsms.me) | ✅ No CSP block |
-| Hydration errors | ✅ 0 |
-| CSP errors | ✅ 0 |
-| DropZone deprecation | ⚠️ 9× (Puck-internal, non-blocker) |
-| Form field id/name | ⚠️ 2× (Puck-internal, non-blocker) |
+| `scripts/puck-backup.js` | Exports all puck_pages rows to `backups/puck/puck-backup-YYYY-MM-DD-HHMM.json` |
+| `scripts/puck-restore.js` | Restores page(s) from backup with mandatory dry-run and `--confirm` flag |
+| `backups/puck/.gitkeep` | Tracks backup directory in git (JSON files excluded) |
 
-### Save/persist validation (on production URL)
-- `GET /api/puck?path=/` — **200 OK**, returned live Supabase data
-- `POST /api/puck` with `x-puck-write-secret` — **200 OK**, badge `[PROD-TEST]` written and verified persisted
-- Restore POST — **200 OK**, original badge `✦ Powered by Aurum Ecosystem` confirmed
-- Homepage reload: approved content, **0 console messages**
+### Files modified
+| File | Change |
+|---|---|
+| `package.json` | Added `puck:backup` and `puck:restore` npm scripts |
+| `.gitignore` | Added `backups/puck/*.json` (backup data excluded from git) |
 
-### Files changed this sprint
-None (deploy only — no code changes required)
+### Verification
+- Backup: 6 pages, 30.7 KB from production Supabase ✅
+- Restore dry-run (single page `/`): ✅ shows plan, writes nothing
+- Restore dry-run (all pages): ✅ shows all 6 pages, writes nothing
+- TypeScript: 0 errors ✅
+- Build: exit 0, 64 pages ✅
 
-### Remaining non-blockers
-1. `NEXT_PUBLIC_SITE_URL` not in Vercel — safe (hardcoded fallback), add optionally
-2. DropZone deprecation (18× local, 9× prod) — future slot-field migration sprint
-3. Turnstile keys empty — signup bot protection disabled (Cloudflare config task)
-4. `NEXT_PUBLIC_PUCK_WRITE_SECRET` is `NEXT_PUBLIC_` (browser-exposed) — future: move to server-only `PUCK_WRITE_SECRET`
+---
+
+## CMS RECOVERY WORKFLOW
+
+### Backup Command
+```bash
+npm run puck:backup
+# Output: backups/puck/puck-backup-YYYY-MM-DD-HHMM.json
+# Reads from .env.local automatically
+# Safe to run at any time — read-only, no writes to Supabase
+```
+
+### Restore Command (dry-run first — always)
+```bash
+# 1. List available backups:
+ls backups/puck/
+
+# 2. Dry-run (always do this first):
+node scripts/puck-restore.js --backup backups/puck/<filename>.json --path /
+# OR restore all:
+node scripts/puck-restore.js --backup backups/puck/<filename>.json --all
+
+# 3. Execute restore (single page):
+node scripts/puck-restore.js --backup backups/puck/<filename>.json --path / --confirm
+
+# 4. Execute restore (all pages):
+node scripts/puck-restore.js --backup backups/puck/<filename>.json --all --confirm
+```
+
+### Rollback Process
+```
+1. Run backup BEFORE any risky change:  npm run puck:backup
+2. Make your change in the Puck editor
+3. If change is wrong, run dry-run to see restore plan
+4. Add --confirm to execute restore
+5. Reload https://autopilotroi.vercel.app/ to verify
+```
+
+### Production Safety Notes
+- Backup JSON files are excluded from git (`.gitignore`) — store copies offsite if needed
+- `backups/puck/` directory is tracked via `.gitkeep`
+- Restore requires explicit `--confirm` flag — dry-run is always the default
+- Backup reads via anon key (public read) — safe, no auth risk
+- Restore writes via `SUPABASE_SERVICE_ROLE_KEY` — keep `.env.local` secure
+- **Take a backup before every major content editing session**
+- **Take a backup before any code deployment that touches puck config or components**
 
 **ACTIVE BRANCH:** `feature/frontend-pages`
-**PRODUCTION CERTIFIED:** ✅ 2026-05-20 03:24 UTC
 **PRODUCTION URL:** https://autopilotroi.vercel.app
-Role: Production Deployment Lead | Branch: `feature/frontend-pages`
+**RELIABILITY SPRINT COMPLETE:** ✅ 2026-05-20 03:36 UTC
+Role: CMS Reliability Dev | Branch: `feature/frontend-pages`
 
 ---
 
