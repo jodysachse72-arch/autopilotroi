@@ -43,14 +43,15 @@ export default function HomePage() {
             <span style={{ color: '#93c5fd' }}>Working 24/7</span>
           </>
         }
-        description="AutoPilotROI is your structured guide into the Aurum ecosystem — AI-powered crypto trading, a Visa crypto card, exchange, and Web3 neobank. Start with $100."
+        description="Start earning with $100 USDT. AutoPilotROI guides you into the Aurum ecosystem step by step — AI trading bot, Visa crypto card, exchange, and Web3 neobank. No experience needed."
         ctas={[
           { label: 'Start Here →', href: '/signup', variant: 'primary' },
+          { label: 'See how it works', href: '#how-it-works', variant: 'ghost' },
         ]}
         bullets={[
           { text: 'Start with $100 USDT' },
-          { text: 'AI runs 24/7' },
-          { text: 'Guided onboarding' },
+          { text: 'AI trades 24/7 — you sleep' },
+          { text: 'Setup complete in 3 days' },
         ]}
         visual={
           <VideoModal
@@ -253,7 +254,7 @@ export default function HomePage() {
       </SectionBox>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────── */}
-      <SectionBox>
+      <SectionBox id="how-it-works">
         <div
           style={{
             display: 'grid',
