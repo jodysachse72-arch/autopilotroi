@@ -8,9 +8,10 @@
  * - Responsive viewports (mobile / tablet / desktop)
  * - Iframe isolation for CSS encapsulation
  * - Dirty-state detection with beforeunload guard
- * - Publishing confidence signals: spinner, timestamp, persistent status bar
- * - Unsaved-changes indicator in header
+ * - Publishing confidence signals: spinner, timestamp, status pill
+ * - Unsaved-changes indicator in header bar
  * - Navigation protection on page-switch when dirty
+ * - Cache-awareness note on Preview link
  */
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
@@ -32,7 +33,6 @@ function formatSaveTime(date: Date): string {
 
 // ── Global chrome suppression ─────────────────────────────────────────────────
 
-// Hide global layout elements (Navbar, Footer, etc.) that leak from root layout
 function useHideGlobalChrome() {
   useEffect(() => {
     document.body.classList.add('puck-editor-active')
@@ -60,8 +60,7 @@ function useBeforeUnloadGuard(isDirty: boolean) {
     if (!isDirty) return
     const handler = (e: BeforeUnloadEvent) => {
       e.preventDefault()
-      // Modern browsers show a generic message; the string is ignored but required
-      e.returnValue = 'You have unsaved changes. Leave without publishing?'
+      e.returnValue = 'You have unpublished changes. Leave without publishing?'
     }
     window.addEventListener('beforeunload', handler)
     return () => window.removeEventListener('beforeunload', handler)
@@ -86,15 +85,12 @@ export default function PuckEditorPage({
   const [pages, setPages]               = useState<PageEntry[]>([])
   const [newPagePath, setNewPagePath]   = useState('')
   const [showNewPage, setShowNewPage]   = useState(false)
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
-  // Track whether a change has been made since the last publish
-  // We use a ref so the Puck onChange callback always reads the latest value
+  // Ref for synchronous closure-safe dirty check
   const isDirtyRef = useRef(false)
 
-  // Suppress global Navbar/Footer/Announcement from root layout
   useHideGlobalChrome()
-
-  // Warn on tab close / browser navigation when dirty
   useBeforeUnloadGuard(isDirty)
 
   // Resolve page path from route params
@@ -159,7 +155,7 @@ export default function PuckEditorPage({
 
   // Reset page to default content
   const resetToDefault = useCallback(async () => {
-    if (!confirm('Reset this page to default content? Current edits will be lost.')) return
+    setShowResetConfirm(false)
     setLoading(true)
     try {
       await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, {
@@ -191,7 +187,7 @@ export default function PuckEditorPage({
           setLastSavedAt(new Date())
           setIsDirty(false)
           isDirtyRef.current = false
-          setTimeout(() => setSaveStatus('idle'), 4000)
+          setTimeout(() => setSaveStatus('idle'), 5000)
         } else {
           setSaveStatus('error')
         }
@@ -204,7 +200,7 @@ export default function PuckEditorPage({
     [pagePath]
   )
 
-  // onChange handler — marks content as dirty
+  // onChange handler — marks content as dirty on first change
   const handleChange = useCallback((_data: Data) => {
     if (!isDirtyRef.current) {
       isDirtyRef.current = true
@@ -274,92 +270,84 @@ export default function PuckEditorPage({
       {/* ── Save success toast ──────────────────────────────────── */}
       {saveStatus === 'saved' && (
         <div style={{
-          position: 'fixed', bottom: 24, right: 24, zIndex: 99999,
+          position: 'fixed', top: 60, right: 16, zIndex: 2147483647,
           background: '#059669', color: '#fff',
-          padding: '12px 20px', borderRadius: 8,
-          fontFamily: 'system-ui', fontSize: 14, fontWeight: 600,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+          padding: '10px 18px', borderRadius: 8,
+          fontFamily: 'system-ui', fontSize: 13, fontWeight: 600,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
           animation: 'slideUp 0.25s ease',
           display: 'flex', alignItems: 'center', gap: 8,
+          pointerEvents: 'none',
         }}>
-          <span style={{ fontSize: 16 }}>✅</span>
-          <span>Published successfully — changes are live!</span>
+          <span>✅</span>
+          <span>Published! Changes are live. (Allow 30–60s for page cache to refresh.)</span>
         </div>
       )}
 
       {/* ── Save error toast ────────────────────────────────────── */}
       {saveStatus === 'error' && (
         <div style={{
-          position: 'fixed', bottom: 24, right: 24, zIndex: 99999,
+          position: 'fixed', top: 60, right: 16, zIndex: 2147483647,
           background: '#dc2626', color: '#fff',
-          padding: '12px 20px', borderRadius: 8,
-          fontFamily: 'system-ui', fontSize: 14, fontWeight: 600,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.18)',
+          padding: '10px 18px', borderRadius: 8,
+          fontFamily: 'system-ui', fontSize: 13, fontWeight: 600,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
           animation: 'slideUp 0.25s ease',
           display: 'flex', alignItems: 'center', gap: 8,
         }}>
-          <span style={{ fontSize: 16 }}>❌</span>
-          <span>Publish failed — please try again or refresh.</span>
+          <span>❌</span>
+          <span>Publish failed — please try again or refresh the page.</span>
         </div>
       )}
 
-      {/* ── Persistent status bar ───────────────────────────────── */}
-      {/* Shows last-saved timestamp + unsaved-changes warning below the editor header */}
-      <div style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 99990,
-        background: isDirty ? '#fffbeb' : '#f0fdf4',
-        borderTop: `1px solid ${isDirty ? '#fde68a' : '#bbf7d0'}`,
-        padding: '6px 20px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        fontFamily: 'system-ui', fontSize: 12,
-        transition: 'background 0.3s ease, border-color 0.3s ease',
-      }}>
-        {/* Left: dirty indicator */}
-        <span style={{
-          color: isDirty ? '#92400e' : '#166534',
-          fontWeight: isDirty ? 600 : 400,
-          display: 'flex', alignItems: 'center', gap: 6,
+      {/* ── Reset confirmation modal ────────────────────────────── */}
+      {showResetConfirm && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2147483647,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          {isDirty ? (
-            <>
-              <span style={{
-                width: 7, height: 7, borderRadius: '50%',
-                background: '#f59e0b', display: 'inline-block',
-                boxShadow: '0 0 0 2px rgba(245,158,11,0.25)',
-              }} />
-              Unpublished changes — click Publish to go live
-            </>
-          ) : lastSavedAt ? (
-            <>
-              <span style={{
-                width: 7, height: 7, borderRadius: '50%',
-                background: '#22c55e', display: 'inline-block',
-              }} />
-              All changes published
-            </>
-          ) : (
-            <>
-              <span style={{
-                width: 7, height: 7, borderRadius: '50%',
-                background: '#94a3b8', display: 'inline-block',
-              }} />
-              No changes yet
-            </>
-          )}
-        </span>
-
-        {/* Right: last saved timestamp + backup tip */}
-        <span style={{ color: '#6b7280', display: 'flex', alignItems: 'center', gap: 16 }}>
-          {lastSavedAt && (
-            <span>
-              Last published: <strong style={{ color: '#374151' }}>{formatSaveTime(lastSavedAt)}</strong>
-            </span>
-          )}
-          <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>
-            Tip: run <code style={{ fontFamily: 'monospace', background: '#f1f5f9', padding: '1px 5px', borderRadius: 3 }}>npm run puck:backup</code> before large editing sessions
-          </span>
-        </span>
-      </div>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: '28px 32px',
+            maxWidth: 420, width: '90%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            fontFamily: 'system-ui',
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>⚠️</div>
+            <h3 style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 700, color: '#111827' }}>
+              Reset page to defaults?
+            </h3>
+            <p style={{ margin: '0 0 20px', fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
+              This will replace all your current edits with the original default content.
+              <strong style={{ color: '#dc2626' }}> This cannot be undone.</strong>
+              <br /><br />
+              If you want to keep a copy of your current content first, close this dialog
+              and run <code style={{ background: '#f1f5f9', padding: '2px 5px', borderRadius: 3, fontSize: 12 }}>npm run puck:backup</code> before resetting.
+            </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                style={{
+                  padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db',
+                  background: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 500,
+                }}
+              >
+                Cancel — keep my edits
+              </button>
+              <button
+                onClick={resetToDefault}
+                style={{
+                  padding: '8px 16px', borderRadius: 6, border: 'none',
+                  background: '#dc2626', color: '#fff', fontSize: 14,
+                  cursor: 'pointer', fontWeight: 600,
+                }}
+              >
+                Yes, reset to defaults
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Puck editor ─────────────────────────────────────────── */}
       <Puck
@@ -373,7 +361,7 @@ export default function PuckEditorPage({
         iframe={{ enabled: true }}
         plugins={[blocksPlugin()]}
         overrides={{
-          // Inject site CSS into the iframe so all component classes render correctly
+          // Inject site CSS into the iframe
           iframe: ({ children, document: iframeDoc }) => {
             useEffect(() => {
               if (!iframeDoc) return
@@ -406,143 +394,201 @@ export default function PuckEditorPage({
           },
 
           headerActions: ({ children }) => (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-              {/* Page Switcher */}
-              <select
-                value={pagePath}
-                onChange={(e) => switchPage(e.target.value)}
-                style={{
-                  padding: '6px 12px', borderRadius: 6,
-                  border: '1px solid #d1d5db', fontSize: 13,
-                  fontFamily: 'system-ui', background: '#fff',
-                  cursor: 'pointer', minWidth: 160,
-                }}
-              >
-                <optgroup label="Site Pages">
-                  {pages.map((p) => (
-                    <option key={p.path} value={p.path}>
-                      {p.path === '/' ? '/ (Homepage)' : p.path}
-                      {p.saved ? ' ✓' : ''}
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
+              {/* ── Row 1: Controls ──────────────────────────────── */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 
-              {/* New Page */}
-              {showNewPage ? (
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <input
-                    type="text"
-                    placeholder="/new-page"
-                    value={newPagePath}
-                    onChange={(e) => setNewPagePath(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && createPage()}
-                    style={{
-                      padding: '6px 10px', borderRadius: 6,
-                      border: '1px solid #d1d5db', fontSize: 13,
-                      width: 140, fontFamily: 'system-ui',
-                    }}
-                    autoFocus
-                  />
+                {/* Page Switcher */}
+                <select
+                  value={pagePath}
+                  onChange={(e) => switchPage(e.target.value)}
+                  style={{
+                    padding: '6px 12px', borderRadius: 6,
+                    border: '1px solid #d1d5db', fontSize: 13,
+                    fontFamily: 'system-ui', background: '#fff',
+                    cursor: 'pointer', minWidth: 160,
+                  }}
+                >
+                  <optgroup label="Site Pages">
+                    {pages.map((p) => (
+                      <option key={p.path} value={p.path}>
+                        {p.path === '/' ? '/ (Homepage)' : p.path}
+                        {p.saved ? ' ✓' : ''}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+
+                {/* New Page */}
+                {showNewPage ? (
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <input
+                      type="text"
+                      placeholder="/new-page"
+                      value={newPagePath}
+                      onChange={(e) => setNewPagePath(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && createPage()}
+                      style={{
+                        padding: '6px 10px', borderRadius: 6,
+                        border: '1px solid #d1d5db', fontSize: 13,
+                        width: 140, fontFamily: 'system-ui',
+                      }}
+                      autoFocus
+                    />
+                    <button
+                      onClick={createPage}
+                      style={{
+                        padding: '6px 12px', borderRadius: 6, border: 'none',
+                        background: '#059669', color: '#fff', fontSize: 13,
+                        cursor: 'pointer', fontWeight: 600,
+                      }}
+                    >
+                      Create
+                    </button>
+                    <button
+                      onClick={() => setShowNewPage(false)}
+                      style={{
+                        padding: '6px 8px', borderRadius: 6, border: '1px solid #d1d5db',
+                        background: '#fff', fontSize: 13, cursor: 'pointer',
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    onClick={createPage}
+                    onClick={() => setShowNewPage(true)}
                     style={{
-                      padding: '6px 12px', borderRadius: 6, border: 'none',
-                      background: '#059669', color: '#fff', fontSize: 13,
-                      cursor: 'pointer', fontWeight: 600,
+                      padding: '6px 12px', borderRadius: 6,
+                      border: '1px solid #d1d5db', background: '#fff',
+                      fontSize: 13, cursor: 'pointer', fontFamily: 'system-ui',
+                      fontWeight: 500,
                     }}
                   >
-                    Create
+                    + New Page
                   </button>
-                  <button
-                    onClick={() => setShowNewPage(false)}
-                    style={{
-                      padding: '6px 8px', borderRadius: 6, border: '1px solid #d1d5db',
-                      background: '#fff', fontSize: 13, cursor: 'pointer',
-                    }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowNewPage(true)}
+                )}
+
+                {/* Preview link — with cache caveat */}
+                <a
+                  href={pagePath}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Opens the live page in a new tab. After publishing, allow 30–60 seconds for the page to refresh."
                   style={{
                     padding: '6px 12px', borderRadius: 6,
                     border: '1px solid #d1d5db', background: '#fff',
-                    fontSize: 13, cursor: 'pointer', fontFamily: 'system-ui',
-                    fontWeight: 500,
+                    fontSize: 13, textDecoration: 'none', color: '#374151',
+                    fontFamily: 'system-ui', fontWeight: 500,
                   }}
                 >
-                  + New Page
+                  👁 View live page ↗
+                </a>
+
+                {/* Divider before danger zone */}
+                <span style={{ width: 1, height: 20, background: '#e5e7eb', flexShrink: 0 }} />
+
+                {/* Reset — moved to a less prominent position, opens confirm modal */}
+                <button
+                  onClick={() => setShowResetConfirm(true)}
+                  style={{
+                    padding: '6px 10px', borderRadius: 6,
+                    border: '1px solid #e5e7eb', background: '#fff',
+                    fontSize: 12, cursor: 'pointer', color: '#9ca3af',
+                    fontFamily: 'system-ui', fontWeight: 400,
+                  }}
+                  title="Reset this page to its original default content"
+                >
+                  ↺ Reset
                 </button>
-              )}
 
-              {/* Preview link */}
-              <a
-                href={pagePath}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  padding: '6px 12px', borderRadius: 6,
-                  border: '1px solid #d1d5db', background: '#fff',
-                  fontSize: 13, textDecoration: 'none', color: '#374151',
-                  fontFamily: 'system-ui', fontWeight: 500,
-                }}
-              >
-                👁 Preview
-              </a>
+                {/* Saving spinner */}
+                {saving && (
+                  <span style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    fontSize: 13, color: '#6b7280', fontFamily: 'system-ui',
+                  }}>
+                    <span style={{
+                      width: 13, height: 13,
+                      border: '2px solid #e2e8f0',
+                      borderTopColor: '#3b82f6',
+                      borderRadius: '50%',
+                      display: 'inline-block',
+                      animation: 'spin 0.7s linear infinite',
+                      flexShrink: 0,
+                    }} />
+                    Publishing…
+                  </span>
+                )}
 
-              {/* Reset to defaults */}
-              <button
-                onClick={resetToDefault}
-                style={{
-                  padding: '6px 12px', borderRadius: 6,
-                  border: '1px solid #fca5a5', background: '#fff7f7',
-                  fontSize: 13, cursor: 'pointer', color: '#dc2626',
-                  fontFamily: 'system-ui', fontWeight: 500,
-                }}
-                title="Reset this page to its original default content — this cannot be undone"
-              >
-                ↺ Reset to defaults
-              </button>
+                {/* Unsaved-changes pill */}
+                {isDirty && !saving && (
+                  <span style={{
+                    fontSize: 11, fontWeight: 600, fontFamily: 'system-ui',
+                    background: '#fef3c7', color: '#92400e',
+                    border: '1px solid #fde68a',
+                    borderRadius: 99, padding: '3px 9px',
+                    whiteSpace: 'nowrap',
+                    animation: 'fadeIn 0.2s ease',
+                  }}>
+                    ● Unpublished
+                  </span>
+                )}
 
-              {/* Saving spinner — shown during active save only */}
-              {saving && (
+                {/* Saved indicator in header */}
+                {!isDirty && lastSavedAt && !saving && (
+                  <span style={{
+                    fontSize: 11, fontFamily: 'system-ui', color: '#166534',
+                    whiteSpace: 'nowrap',
+                    animation: 'fadeIn 0.3s ease',
+                  }}>
+                    ✓ Published {formatSaveTime(lastSavedAt)}
+                  </span>
+                )}
+
+                {/* Puck's own Publish button */}
+                {children}
+              </div>
+
+              {/* ── Row 2: Status bar inside header ──────────────── */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '4px 0 2px',
+                borderTop: '1px solid rgba(0,0,0,0.06)',
+                marginTop: 4,
+                fontSize: 11,
+                fontFamily: 'system-ui',
+                gap: 12,
+              }}>
+                {/* Left: publish state */}
                 <span style={{
-                  display: 'flex', alignItems: 'center', gap: 6,
-                  fontSize: 13, color: '#6b7280', fontFamily: 'system-ui',
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  color: isDirty ? '#92400e' : (lastSavedAt ? '#166534' : '#9ca3af'),
+                  fontWeight: isDirty ? 600 : 400,
                 }}>
                   <span style={{
-                    width: 13, height: 13,
-                    border: '2px solid #e2e8f0',
-                    borderTopColor: '#3b82f6',
-                    borderRadius: '50%',
+                    width: 6, height: 6, borderRadius: '50%', flexShrink: 0,
+                    background: isDirty ? '#f59e0b' : (lastSavedAt ? '#22c55e' : '#d1d5db'),
                     display: 'inline-block',
-                    animation: 'spin 0.7s linear infinite',
-                    flexShrink: 0,
+                    boxShadow: isDirty ? '0 0 0 2px rgba(245,158,11,0.2)' : 'none',
                   }} />
-                  Publishing…
+                  {isDirty
+                    ? 'Unpublished changes — click Publish to go live'
+                    : lastSavedAt
+                      ? `All changes published · Last: ${formatSaveTime(lastSavedAt)}`
+                      : 'No changes yet'}
                 </span>
-              )}
 
-              {/* Unsaved-changes pill — subtle header badge */}
-              {isDirty && !saving && (
-                <span style={{
-                  fontSize: 11, fontWeight: 600, fontFamily: 'system-ui',
-                  background: '#fef3c7', color: '#92400e',
-                  border: '1px solid #fde68a',
-                  borderRadius: 99, padding: '3px 9px',
-                  whiteSpace: 'nowrap',
-                  animation: 'fadeIn 0.2s ease',
-                }}>
-                  ● Unpublished
+                {/* Right: backup tip */}
+                <span style={{ color: '#9ca3af', whiteSpace: 'nowrap' }}>
+                  Tip: run{' '}
+                  <code style={{ fontFamily: 'monospace', background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>
+                    npm run puck:backup
+                  </code>
+                  {' '}before large sessions
                 </span>
-              )}
-
-              {/* Default Puck publish button */}
-              {children}
+              </div>
             </div>
           ),
         }}
