@@ -42,6 +42,8 @@ type HeroDarkProps = {
   description: RichText
   ctaLabel: string
   ctaHref: string
+  secondaryCtaLabel: string
+  secondaryCtaHref: string
   bulletOne: string
   bulletTwo: string
   bulletThree: string
@@ -195,32 +197,36 @@ export const puckConfig: Config<Components> = {
     HeroDark: {
       label: 'Hero (Dark)',
       fields: {
-        badge:           { type: 'text', contentEditable: true },
-        title:           { type: 'text', contentEditable: true },
-        highlightedText: { type: 'text', contentEditable: true },
-        description:     richTextField(),
-        ctaLabel:        { type: 'text', contentEditable: true },
-        ctaHref:         { type: 'text' },
-        bulletOne:       { type: 'text', contentEditable: true },
-        bulletTwo:       { type: 'text', contentEditable: true },
-        bulletThree:     { type: 'text', contentEditable: true },
-        videoUrl:        { type: 'text', label: 'Video URL (YouTube)' },
-        videoThumb:      { type: 'text', label: 'Thumbnail URL' },
+        badge:              { type: 'text', contentEditable: true },
+        title:              { type: 'text', contentEditable: true },
+        highlightedText:    { type: 'text', contentEditable: true },
+        description:        richTextField(),
+        ctaLabel:           { type: 'text', contentEditable: true },
+        ctaHref:            { type: 'text' },
+        secondaryCtaLabel:  { type: 'text', contentEditable: true, label: 'Secondary CTA Label (optional)' },
+        secondaryCtaHref:   { type: 'text', label: 'Secondary CTA URL (optional)' },
+        bulletOne:          { type: 'text', contentEditable: true },
+        bulletTwo:          { type: 'text', contentEditable: true },
+        bulletThree:        { type: 'text', contentEditable: true },
+        videoUrl:           { type: 'text', label: 'Video URL (YouTube)' },
+        videoThumb:         { type: 'text', label: 'Thumbnail URL' },
       },
       defaultProps: {
         badge: '✦ Powered by Aurum Ecosystem',
         title: 'Your Money,',
         highlightedText: 'Working 24/7',
-        description: 'AutoPilotROI is your structured guide into the Aurum ecosystem — AI-powered crypto trading, a Visa crypto card, exchange, and Web3 neobank. Start with $100.',
+        description: 'Start earning with $100 USDT. AutoPilotROI guides you into the Aurum ecosystem step by step — AI trading bot, Visa crypto card, exchange, and Web3 neobank. No experience needed.',
         ctaLabel: 'Start Here →',
         ctaHref: '/signup',
+        secondaryCtaLabel: 'See how it works',
+        secondaryCtaHref: '#how-it-works',
         bulletOne: 'Start with $100 USDT',
-        bulletTwo: 'AI runs 24/7',
-        bulletThree: 'Guided onboarding',
+        bulletTwo: 'AI trades 24/7 — you sleep',
+        bulletThree: 'Setup complete in 3 days',
         videoUrl: 'https://youtu.be/MmAnR4YAPv4',
         videoThumb: 'https://i.ytimg.com/vi/MmAnR4YAPv4/hqdefault.jpg',
       },
-      render: ({ badge, title, highlightedText, description, ctaLabel, ctaHref, bulletOne, bulletTwo, bulletThree, videoUrl, videoThumb }) => {
+      render: ({ badge, title, highlightedText, description, ctaLabel, ctaHref, secondaryCtaLabel, secondaryCtaHref, bulletOne, bulletTwo, bulletThree, videoUrl, videoThumb }) => {
         const videoVisual = videoUrl ? (
           <VideoModal videoUrl={videoUrl} ctaLabel="Start Here →" ctaHref={ctaHref || '/signup'}>
             <div style={{
@@ -285,6 +291,14 @@ export const puckConfig: Config<Components> = {
           </VideoModal>
         ) : undefined
 
+        // Build CTAs: primary always present; ghost CTA only if both label and href are set
+        const ctas: { label: string; href: string; variant: 'primary' | 'ghost' }[] = [
+          { label: ctaLabel, href: ctaHref, variant: 'primary' },
+          ...(secondaryCtaLabel && secondaryCtaHref
+            ? [{ label: secondaryCtaLabel, href: secondaryCtaHref, variant: 'ghost' as const }]
+            : []),
+        ]
+
         return (
           <HeroDark
             badge={badge}
@@ -296,7 +310,7 @@ export const puckConfig: Config<Components> = {
               </>
             }
             description={description}
-            ctas={[{ label: ctaLabel, href: ctaHref, variant: 'primary' }]}
+            ctas={ctas}
             bullets={[
               { icon: '✓', text: bulletOne },
               { icon: '✓', text: bulletTwo },
