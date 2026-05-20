@@ -187,6 +187,8 @@ export interface RichTextFieldOptions {
   lineHeight?: boolean
   /** Enable inline canvas toolbar via renderInlineMenu. Default: true */
   inline?: boolean
+  /** Optional human-readable label shown in the Puck sidebar. */
+  label?: string
 }
 
 /**
@@ -212,6 +214,7 @@ export function richTextField(opts: RichTextFieldOptions = {}) {
     backgroundColor = true,
     lineHeight = true,
     inline = true,
+    label,
   } = opts
 
   const flags: ExtensionFlags = { colors, fontSize, fontFamily, backgroundColor, lineHeight }
@@ -225,5 +228,6 @@ export function richTextField(opts: RichTextFieldOptions = {}) {
     tiptap: { extensions },
     renderMenu,
     ...(renderInlineMenu ? { renderInlineMenu } : {}),
+    ...(label ? { label } : {}),
   }
 }

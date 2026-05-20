@@ -197,19 +197,19 @@ export const puckConfig: Config<Components> = {
     HeroDark: {
       label: 'Hero (Dark)',
       fields: {
-        badge:              { type: 'text', contentEditable: true },
-        title:              { type: 'text', contentEditable: true },
-        highlightedText:    { type: 'text', contentEditable: true },
-        description:        richTextField(),
-        ctaLabel:           { type: 'text', contentEditable: true },
-        ctaHref:            { type: 'text' },
-        secondaryCtaLabel:  { type: 'text', contentEditable: true, label: 'Secondary CTA Label (optional)' },
-        secondaryCtaHref:   { type: 'text', label: 'Secondary CTA URL (optional)' },
-        bulletOne:          { type: 'text', contentEditable: true },
-        bulletTwo:          { type: 'text', contentEditable: true },
-        bulletThree:        { type: 'text', contentEditable: true },
-        videoUrl:           { type: 'text', label: 'Video URL (YouTube)' },
-        videoThumb:         { type: 'text', label: 'Thumbnail URL' },
+        badge:              { type: 'text', contentEditable: true, label: 'Badge Text' },
+        title:              { type: 'text', contentEditable: true, label: 'Headline — First Line' },
+        highlightedText:    { type: 'text', contentEditable: true, label: 'Headline — Highlighted Word(s)' },
+        description:        richTextField({ label: 'Body Text' }),
+        ctaLabel:           { type: 'text', contentEditable: true, label: 'Primary Button Text' },
+        ctaHref:            { type: 'text', label: 'Primary Button Link' },
+        secondaryCtaLabel:  { type: 'text', contentEditable: true, label: 'Secondary Button Text (optional)' },
+        secondaryCtaHref:   { type: 'text', label: 'Secondary Button Link (optional — use #section-name to scroll to a section)' },
+        bulletOne:          { type: 'text', contentEditable: true, label: 'First Benefit' },
+        bulletTwo:          { type: 'text', contentEditable: true, label: 'Second Benefit' },
+        bulletThree:        { type: 'text', contentEditable: true, label: 'Third Benefit' },
+        videoUrl:           { type: 'text', label: 'YouTube Video URL' },
+        videoThumb:         { type: 'text', label: 'Video Thumbnail Image URL (leave blank to auto-generate)' },
       },
       defaultProps: {
         badge: '✦ Powered by Aurum Ecosystem',
@@ -327,11 +327,11 @@ export const puckConfig: Config<Components> = {
     HeroBlue: {
       label: 'Hero (Blue)',
       fields: {
-        eyebrow:      { type: 'text', contentEditable: true },
-        title:        { type: 'text', contentEditable: true },
-        description:  richTextField(),
-        ctaLabel:     { type: 'text', contentEditable: true },
-        ctaHref:      { type: 'text' },
+        eyebrow:      { type: 'text', contentEditable: true, label: 'Eyebrow Label' },
+        title:        { type: 'text', contentEditable: true, label: 'Headline' },
+        description:  richTextField({ label: 'Body Text' }),
+        ctaLabel:     { type: 'text', contentEditable: true, label: 'Button Text (leave blank to hide)' },
+        ctaHref:      { type: 'text', label: 'Button Link (leave blank to hide)' },
       },
       defaultProps: {
         eyebrow: 'Knowledge Base',
@@ -357,15 +357,15 @@ export const puckConfig: Config<Components> = {
     PageHeaderWhite: {
       label: 'Page Header (White)',
       fields: {
-        badge:            { type: 'text', contentEditable: true },
-        title:            { type: 'text', contentEditable: true },
-        highlightedText:  { type: 'text', contentEditable: true },
-        description1:     richTextField(),
-        description2:     richTextField(),
-        cta1Label:        { type: 'text', contentEditable: true },
-        cta1Href:         { type: 'text' },
-        cta2Label:        { type: 'text', contentEditable: true },
-        cta2Href:         { type: 'text' },
+        badge:            { type: 'text', contentEditable: true, label: 'Badge Text' },
+        title:            { type: 'text', contentEditable: true, label: 'Headline' },
+        highlightedText:  { type: 'text', contentEditable: true, label: 'Highlighted Headline Phrase' },
+        description1:     richTextField({ label: 'First Paragraph' }),
+        description2:     richTextField({ label: 'Second Paragraph (optional)' }),
+        cta1Label:        { type: 'text', contentEditable: true, label: 'Primary Button Text' },
+        cta1Href:         { type: 'text', label: 'Primary Button Link' },
+        cta2Label:        { type: 'text', contentEditable: true, label: 'Secondary Button Text (leave blank to hide)' },
+        cta2Href:         { type: 'text', label: 'Secondary Button Link' },
       },
       defaultProps: {
         badge: 'What Is Aurum',
@@ -431,18 +431,20 @@ export const puckConfig: Config<Components> = {
       fields: {
         variant: {
           type: 'select',
+          label: 'Background Color',
           options: [
             { label: 'White', value: 'white' },
-            { label: 'Surface (gray)', value: 'surface' },
+            { label: 'Light Gray', value: 'surface' },
             { label: 'Blue', value: 'blue' },
-            { label: 'Navy (dark)', value: 'navy' },
+            { label: 'Dark Navy', value: 'navy' },
           ],
         },
         padding: {
           type: 'select',
+          label: 'Vertical Spacing',
           options: [
             { label: 'Normal', value: 'lg' },
-            { label: 'Large', value: 'xl' },
+            { label: 'Extra Spacious', value: 'xl' },
             { label: 'None', value: 'none' },
           ],
         },
@@ -510,21 +512,23 @@ export const puckConfig: Config<Components> = {
     SectionHeader: {
       label: 'Section Header',
       fields: {
-        eyebrow:      { type: 'text', contentEditable: true },
-        title:        { type: 'text', contentEditable: true },
-        lead:         richTextField(),
+        eyebrow:      { type: 'text', contentEditable: true, label: 'Eyebrow Label' },
+        title:        { type: 'text', contentEditable: true, label: 'Section Headline' },
+        lead:         richTextField({ label: 'Subtitle / Supporting Text' }),
         align:        {
           type: 'select',
+          label: 'Text Alignment',
           options: [
-            { label: 'Center', value: 'center' },
-            { label: 'Left', value: 'left' },
+            { label: 'Centered', value: 'center' },
+            { label: 'Left-aligned', value: 'left' },
           ],
         },
         badgeVariant: {
           type: 'select',
+          label: 'Badge Style',
           options: [
-            { label: 'Blue', value: 'blue' },
-            { label: 'White', value: 'white' },
+            { label: 'Blue (on white background)', value: 'blue' },
+            { label: 'White (on dark background)', value: 'white' },
           ],
         },
       },
@@ -553,10 +557,11 @@ export const puckConfig: Config<Components> = {
       fields: {
         stats: {
           type: 'array',
+          label: 'Statistics',
           arrayFields: {
-            value:  { type: 'number' },
-            suffix: { type: 'text' },
-            label:  { type: 'text' },
+            value:  { type: 'number', label: 'Number' },
+            suffix: { type: 'text', label: 'Symbol after number (e.g. + or %)' },
+            label:  { type: 'text', label: 'Caption below number' },
           },
         },
       },
@@ -575,10 +580,10 @@ export const puckConfig: Config<Components> = {
     FeatureCard: {
       label: 'Feature Card',
       fields: {
-        title:   { type: 'text', contentEditable: true },
-        body:    richTextField(),
-        color:   { type: 'text' },
-        colorBg: { type: 'text' },
+        title:   { type: 'text', contentEditable: true, label: 'Card Title' },
+        body:    richTextField({ label: 'Card Description' }),
+        color:   { type: 'text', label: 'Icon Color (hex code, e.g. #1b61c9)' },
+        colorBg: { type: 'text', label: 'Icon Background Color (hex code with opacity, e.g. rgba(27,97,201,0.10))' },
       },
       defaultProps: {
         title: 'EX-AI Trading Bot',
@@ -603,10 +608,11 @@ export const puckConfig: Config<Components> = {
       fields: {
         iconName: {
           type: 'select',
+          label: 'Icon',
           options: Object.keys(ICONS).map(k => ({ label: k.replace('Icon', ''), value: k })),
         },
-        title:    { type: 'text', contentEditable: true },
-        body:     richTextField(),
+        title:    { type: 'text', contentEditable: true, label: 'Trust Point Headline' },
+        body:     richTextField({ label: 'Trust Point Detail' }),
       },
       defaultProps: {
         iconName: 'BankIcon',
@@ -634,18 +640,19 @@ export const puckConfig: Config<Components> = {
     ProductCard: {
       label: 'Product Card',
       fields: {
-        productId:   { type: 'text' },
-        name:        { type: 'text', contentEditable: true },
-        tagline:     { type: 'text', contentEditable: true },
-        description: richTextField(),
-        features:    { type: 'array', arrayFields: { value: { type: 'text' } } },
-        badge:       { type: 'text' },
-        badgeColor:  { type: 'text' },
+        productId:   { type: 'text', label: 'Anchor ID (used for #links to this card — no spaces)' },
+        name:        { type: 'text', contentEditable: true, label: 'Product Name' },
+        tagline:     { type: 'text', contentEditable: true, label: 'Short Tagline' },
+        description: richTextField({ label: 'Product Description' }),
+        features:    { type: 'array', label: 'Feature Bullet Points', arrayFields: { value: { type: 'text', label: 'Feature' } } },
+        badge:       { type: 'text', label: 'Corner Badge Text (e.g. Flagship — leave blank to hide)' },
+        badgeColor:  { type: 'text', label: 'Badge Color (hex code)' },
         iconName: {
           type: 'select',
+          label: 'Icon',
           options: Object.keys(ICONS).map(k => ({ label: k.replace('Icon', ''), value: k })),
         },
-        image:       { type: 'text' },
+        image:       { type: 'text', label: 'Product Image URL (leave blank to hide)' },
       },
       defaultProps: {
         productId: 'bots',
@@ -698,10 +705,10 @@ export const puckConfig: Config<Components> = {
     EcoCard: {
       label: 'Ecosystem Card',
       fields: {
-        title:       { type: 'text', contentEditable: true },
-        description: richTextField(),
-        tag:         { type: 'text' },
-        tagColor:    { type: 'text' },
+        title:       { type: 'text', contentEditable: true, label: 'Card Title' },
+        description: richTextField({ label: 'Card Description' }),
+        tag:         { type: 'text', label: 'Status Badge (e.g. LIVE, COMING SOON)' },
+        tagColor:    { type: 'text', label: 'Badge Color (hex code, e.g. #059669 for green)' },
       },
       defaultProps: {
         title: 'EX-AI Trading Bot',
@@ -724,9 +731,9 @@ export const puckConfig: Config<Components> = {
     TestimonialCard: {
       label: 'Testimonial',
       fields: {
-        quote:  richTextField(),
-        author: { type: 'text', contentEditable: true },
-        role:   { type: 'text', contentEditable: true },
+        quote:  richTextField({ label: 'Testimonial Quote' }),
+        author: { type: 'text', contentEditable: true, label: 'Member Name' },
+        role:   { type: 'text', contentEditable: true, label: 'Member Description (e.g. Member since 2025)' },
       },
       defaultProps: {
         quote: 'I was skeptical at first — the results speak for themselves.',
@@ -742,9 +749,9 @@ export const puckConfig: Config<Components> = {
     Step: {
       label: 'Process Step',
       fields: {
-        num:   { type: 'text', contentEditable: true },
-        title: { type: 'text', contentEditable: true },
-        body:  richTextField(),
+        num:   { type: 'text', contentEditable: true, label: 'Step Number' },
+        title: { type: 'text', contentEditable: true, label: 'Step Title' },
+        body:  richTextField({ label: 'Step Description' }),
       },
       defaultProps: {
         num: '1',
@@ -760,13 +767,13 @@ export const puckConfig: Config<Components> = {
     CTABand: {
       label: 'CTA Banner',
       fields: {
-        eyebrow:        { type: 'text', contentEditable: true },
-        title:          { type: 'text', contentEditable: true },
-        description:    richTextField(),
-        ctaLabel:       { type: 'text', contentEditable: true },
-        ctaHref:        { type: 'text' },
-        secondaryLabel: { type: 'text', contentEditable: true },
-        secondaryHref:  { type: 'text' },
+        eyebrow:        { type: 'text', contentEditable: true, label: 'Eyebrow Label' },
+        title:          { type: 'text', contentEditable: true, label: 'Headline' },
+        description:    richTextField({ label: 'Supporting Text' }),
+        ctaLabel:       { type: 'text', contentEditable: true, label: 'Primary Button Text' },
+        ctaHref:        { type: 'text', label: 'Primary Button Link' },
+        secondaryLabel: { type: 'text', contentEditable: true, label: 'Secondary Button Text (leave blank to hide)' },
+        secondaryHref:  { type: 'text', label: 'Secondary Button Link' },
       },
       defaultProps: {
         eyebrow: 'Ready to start?',
@@ -866,12 +873,12 @@ export const puckConfig: Config<Components> = {
   // ── Component Categories (sidebar grouping) ──────────────
   categories: {
     heroes: {
-      title: '🎯 Heroes & Headers',
+      title: '🎯 Heroes & Page Banners',
       components: ['HeroDark', 'HeroBlue', 'PageHeaderWhite'],
       defaultExpanded: true,
     },
     layout: {
-      title: '📐 Layout',
+      title: '📦 Page Sections',
       components: ['SectionBox', 'SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup'],
       defaultExpanded: true,
     },
@@ -895,8 +902,8 @@ export const puckConfig: Config<Components> = {
   // ── Root Config (page-level settings) ────────────────────
   root: {
     fields: {
-      title: { type: 'text' },
-      description: { type: 'textarea' },
+      title:       { type: 'text',     label: 'Page Title (appears in browser tab)' },
+      description: { type: 'textarea', label: 'Page Description (used by search engines)' },
     },
     render: ({ children }) => (
       <div className="page-bg">
