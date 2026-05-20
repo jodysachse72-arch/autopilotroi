@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-19 21:05 UTC
+> Last verified: 2026-05-20 01:17 UTC
 
 ---
 
@@ -17,11 +17,11 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
+b876b87  feat(puck): sync HeroDark config with frontend-pages baseline — add secondary ghost CTA, update defaultProps
+8ef118d  chore: update STATUS.md — constrainment sprint complete
 63324e0  refactor(puck): remove unsafe blocks and constrain dropzones
 26dbfbb  chore: cleanup sprint — rename middleware, delete dead code, archive docs
 420cacf  chore: update STATUS.md — P4 resolved, write protection active
-3968164  fix(puck): add temporary write protection to /api/puck and /api/puck/seed
-85b19ae  chore: update STATUS.md — P3 resolved, commit hash corrected
 ```
 
 ---
@@ -41,8 +41,8 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 01:00 UTC)
-Post-fix verification — both passed after constrainment sprint (`allowedComponents` fixed to `allow` in `DropZone`).
+## BUILD & TS VERIFIED (2026-05-20 01:17 UTC)
+HeroDark Puck sync: tsc 0 errors, build exit 0, 64 pages.
 
 ---
 
@@ -57,12 +57,13 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — `feature/puck-editor` Puck constrainment sprint CLOSED**
+**Sprint: COMPLETE — `feature/puck-editor` HeroDark sync sprint CLOSED**
 
-- All blockers P1–P4 resolved.
-- Unsafe blocks (HtmlBlock, Spacer, ButtonBlock) removed.
-- Dropzones constrained using `allow`.
-- Dangerous layout controls removed.
+- HeroDark `defaultProps` synced with `feature/frontend-pages` commit `1c37992`
+- New editable fields added: `secondaryCtaLabel`, `secondaryCtaHref` (both optional)
+- Ghost CTA conditionally rendered: only if both label and href are non-empty
+- `description`, `bulletTwo`, `bulletThree` defaultProps updated to match approved baseline
+- Unsafe blocks and dropzone constrainment remain in place from previous sprint
 
 **NEXT SPRINT:** `feature/frontend-pages` — Homepage hero overhaul
 Role: Frontend Dev | Branch: `feature/frontend-pages` | No CMS work
