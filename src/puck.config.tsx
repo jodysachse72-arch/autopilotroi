@@ -91,8 +91,7 @@ type StatRowProps = {
 type FeatureCardProps = {
   title: string
   body: RichText
-  color: string
-  colorBg: string
+  colorPreset: string
 }
 
 type TrustSignalCardProps = {
@@ -190,6 +189,48 @@ const ICONS: Record<string, ReactNode> = {
   CardIcon: <CardIcon />,
   PartnerIcon: <PartnerIcon />,
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Brand-safe color palettes — Barry never types a hex code
+// ─────────────────────────────────────────────────────────────────
+
+/** Icon accent color + tinted background pairs for Feature Cards */
+const ICON_COLOR_PRESETS: Record<string, { color: string; colorBg: string }> = {
+  'brand-blue':   { color: '#1b61c9',  colorBg: 'rgba(27,97,201,0.10)'  },
+  'emerald':      { color: '#059669',  colorBg: 'rgba(5,150,105,0.10)'  },
+  'violet':       { color: '#7c3aed',  colorBg: 'rgba(124,58,237,0.10)' },
+  'amber':        { color: '#d97706',  colorBg: 'rgba(217,119,6,0.10)'  },
+  'rose':         { color: '#e11d48',  colorBg: 'rgba(225,29,72,0.10)'  },
+  'slate':        { color: '#475569',  colorBg: 'rgba(71,85,105,0.10)'  },
+}
+
+const ICON_COLOR_OPTIONS = [
+  { label: 'Brand Blue',    value: 'brand-blue' },
+  { label: 'Emerald Green', value: 'emerald'    },
+  { label: 'Violet',        value: 'violet'     },
+  { label: 'Amber Gold',    value: 'amber'      },
+  { label: 'Rose Red',      value: 'rose'       },
+  { label: 'Slate Gray',    value: 'slate'      },
+]
+
+/** Badge colors for Product Card corner badges */
+const BADGE_COLOR_OPTIONS = [
+  { label: 'Brand Blue',    value: '#1b61c9' },
+  { label: 'Emerald Green', value: '#059669' },
+  { label: 'Violet',        value: '#7c3aed' },
+  { label: 'Amber Gold',    value: '#d97706' },
+  { label: 'Rose Red',      value: '#e11d48' },
+  { label: 'Dark Navy',     value: '#0f172a' },
+]
+
+/** Status tag colors for Ecosystem Cards */
+const TAG_COLOR_OPTIONS = [
+  { label: 'Emerald Green (Live)',    value: '#059669' },
+  { label: 'Brand Blue (Active)',     value: '#1b61c9' },
+  { label: 'Amber Gold (Coming Soon)', value: '#d97706' },
+  { label: 'Rose Red (Paused)',       value: '#e11d48' },
+  { label: 'Slate Gray (Inactive)',   value: '#475569' },
+]
 
 export const puckConfig: Config<Components> = {
   components: {
@@ -580,26 +621,31 @@ export const puckConfig: Config<Components> = {
     FeatureCard: {
       label: 'Feature Card',
       fields: {
-        title:   { type: 'text', contentEditable: true, label: 'Card Title' },
-        body:    richTextField({ label: 'Card Description' }),
-        color:   { type: 'text', label: 'Icon Color (hex code, e.g. #1b61c9)' },
-        colorBg: { type: 'text', label: 'Icon Background Color (hex code with opacity, e.g. rgba(27,97,201,0.10))' },
+        title:       { type: 'text', contentEditable: true, label: 'Card Title' },
+        body:        richTextField({ label: 'Card Description' }),
+        colorPreset: {
+          type: 'select',
+          label: 'Icon Color Theme',
+          options: ICON_COLOR_OPTIONS,
+        },
       },
       defaultProps: {
         title: 'EX-AI Trading Bot',
         body: 'The AI analyzes global crypto markets 24/7, executing trades with precision.',
-        color: '#1b61c9',
-        colorBg: 'rgba(27,97,201,0.10)',
+        colorPreset: 'brand-blue',
       },
-      render: ({ title, body, color, colorBg }) => (
-        <FeatureCard
-          icon={<span style={{ fontSize: '1.5rem' }}>⚡</span>}
-          title={title}
-          body={body}
-          color={color}
-          colorBg={colorBg}
-        />
-      ),
+      render: ({ title, body, colorPreset }) => {
+        const { color, colorBg } = ICON_COLOR_PRESETS[colorPreset] ?? ICON_COLOR_PRESETS['brand-blue']
+        return (
+          <FeatureCard
+            icon={<span style={{ fontSize: '1.5rem' }}>⚡</span>}
+            title={title}
+            body={body}
+            color={color}
+            colorBg={colorBg}
+          />
+        )
+      },
     },
 
     // ── TRUST SIGNAL CARD ──────────────────────────────────
@@ -646,7 +692,11 @@ export const puckConfig: Config<Components> = {
         description: richTextField({ label: 'Product Description' }),
         features:    { type: 'array', label: 'Feature Bullet Points', arrayFields: { value: { type: 'text', label: 'Feature' } } },
         badge:       { type: 'text', label: 'Corner Badge Text (e.g. Flagship — leave blank to hide)' },
-        badgeColor:  { type: 'text', label: 'Badge Color (hex code)' },
+        badgeColor:  {
+          type: 'select',
+          label: 'Badge Color',
+          options: BADGE_COLOR_OPTIONS,
+        },
         iconName: {
           type: 'select',
           label: 'Icon',
@@ -707,8 +757,12 @@ export const puckConfig: Config<Components> = {
       fields: {
         title:       { type: 'text', contentEditable: true, label: 'Card Title' },
         description: richTextField({ label: 'Card Description' }),
-        tag:         { type: 'text', label: 'Status Badge (e.g. LIVE, COMING SOON)' },
-        tagColor:    { type: 'text', label: 'Badge Color (hex code, e.g. #059669 for green)' },
+        tag:         { type: 'text', label: 'Status Badge Text (e.g. LIVE, COMING SOON)' },
+        tagColor:    {
+          type: 'select',
+          label: 'Status Badge Color',
+          options: TAG_COLOR_OPTIONS,
+        },
       },
       defaultProps: {
         title: 'EX-AI Trading Bot',
