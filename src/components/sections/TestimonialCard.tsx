@@ -53,15 +53,15 @@ export default function TestimonialCard({
 
   return (
     <div className={reveal ? 'reveal' : ''} style={{ ...cardStyle, ...style }}>
-      <p style={{
+      <div style={{
         fontSize: 'var(--text-body-lg)',
         color: quoteColor,
         lineHeight: 1.7,
         marginBottom: '1.25rem',
         fontStyle: 'italic',
       }}>
-        &ldquo;{quote}&rdquo;
-      </p>
+        {quote}
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <div
           className="avatar-monogram"

@@ -72,13 +72,13 @@ export default function EcoCard({
         }}>
           {title}
         </h3>
-        <p style={{
+        <div style={{
           fontSize: 'var(--text-body)',
           color: 'rgba(24,29,38,0.62)',
           lineHeight: 1.6,
         }}>
           {description}
-        </p>
+        </div>
       </div>
     </div>
   )

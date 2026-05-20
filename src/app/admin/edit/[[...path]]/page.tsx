@@ -221,7 +221,7 @@ export default function PuckEditorPage({
           fontWeight: 600, boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           animation: 'slideUp 0.3s ease',
         }}>
-          ✅ Page "{pagePath}" published successfully!
+          ✅ Changes saved and published to the live site!
         </div>
       )}
       {saveStatus === 'error' && (
@@ -231,7 +231,7 @@ export default function PuckEditorPage({
           borderRadius: 8, fontFamily: 'system-ui', fontSize: 14,
           fontWeight: 600, boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
         }}>
-          ❌ Failed to save. Check console.
+          ❌ Save failed — please try again or refresh the page.
         </div>
       )}
       <style>{`
@@ -398,18 +398,19 @@ export default function PuckEditorPage({
                 onClick={resetToDefault}
                 style={{
                   padding: '6px 12px', borderRadius: 6,
-                  border: '1px solid #fca5a5', background: '#fff',
+                  border: '1px solid #fca5a5', background: '#fff7f7',
                   fontSize: 13, cursor: 'pointer', color: '#dc2626',
                   fontFamily: 'system-ui', fontWeight: 500,
                 }}
+                title="Reset this page to its original default content — this cannot be undone"
               >
-                ↺ Reset
+                ↺ Reset to defaults
               </button>
 
               {/* Saving indicator */}
               {saving && (
                 <span style={{ fontSize: 13, color: '#6b7280', fontFamily: 'system-ui' }}>
-                  Saving...
+                ⏳ Saving…
                 </span>
               )}
 

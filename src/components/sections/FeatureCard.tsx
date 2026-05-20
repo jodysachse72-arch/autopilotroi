@@ -63,13 +63,13 @@ export default function FeatureCard({
         }}>
           {title}
         </h3>
-        <p style={{
+        <div style={{
           fontSize: 'var(--text-body)',
           color: 'rgba(24,29,38,0.62)',
           lineHeight: 1.65,
         }}>
           {body}
-        </p>
+        </div>
       </div>
     </div>
   )

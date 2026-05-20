@@ -64,13 +64,13 @@ export default function CTABand({
           </h2>
 
           {description && (
-            <p className="text-body-lg" style={{
+            <div className="text-body-lg" style={{
               color: 'rgba(255,255,255,0.62)',
               maxWidth: '38rem',
               margin: '0 auto 2.5rem',
             }}>
               {description}
-            </p>
+            </div>
           )}
 
           {ctas && ctas.length > 0 && (

@@ -51,12 +51,12 @@ export default function SectionHeader({
         {title}
       </h2>
       {children && (
-        <p
+        <div
           className="text-body-lg reveal reveal-delay-2"
           style={{ color: leadColor ?? 'rgba(24,29,38,0.60)' }}
         >
           {children}
-        </p>
+        </div>
       )}
     </div>
   )
