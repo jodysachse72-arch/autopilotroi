@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 20:38 UTC
+> Last verified: 2026-05-20 20:49 UTC
 
 ---
 
@@ -11,21 +11,25 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN** (nothing to commit)
-Synced with: `origin/feature/frontend-pages` — up to date (commit `685811a`)
+Synced with: `origin/feature/frontend-pages` — up to date (commit `60b6447`)
 **Preview URL:** https://autopilotroi-5nwuph31k-autopilot-roi.vercel.app
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
-**Prod Deployment ID:** `dpl_GrWajpPzE6ZriRv6ZzjMGfRV5Wdp`
-**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/GrWajpPzE6ZriRv6ZzjMGfRV5Wdp
+**Prod Deployment ID:** `dpl_3P4kKPAQHe3KessqEDUqnksSaSHP`
+**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/3P4kKPAQHe3KessqEDUqnksSaSHP
+**Deployed At:** 2026-05-20 20:44 UTC (26s build, iad1 Washington DC)
+**Commit Deployed:** `60b6447` (tip of CMS UX hardening stack)
 
 ---
 
 ## LAST 5 COMMITS (verified)
 ```
-2994568  merge: integrate puck-editor CMS infrastructure into frontend-pages
-1c37992  feat(hero): improve copy, add ghost CTA, sharpen bullets
-43128d7  chore: update STATUS.md — HeroDark Puck sync complete
-b876b87  feat(puck): sync HeroDark config with frontend-pages baseline
-63324e0  refactor(puck): remove unsafe blocks and constrain dropzones
+60b6447  chore: add dotenv dev dependency (migrate scripts)
+2568bda  chore: update STATUS.md — content discovery sprint complete
+685811a  feat(cms-ux): content discovery sprint — section names, humanized labels, canvas badges
+ccd8dd9  fix(cms-ux): operator simulation corrections — status bar, reset modal, cache awareness
+3542d18  feat(cms-ux): add publishing confidence signals and navigation protection
+59f0451  feat(cms-ux): replace raw hex color inputs with brand-safe select palettes
+318c17a  feat(cms-ux): translate Puck editor to Barry-language
 ```
 
 ---
