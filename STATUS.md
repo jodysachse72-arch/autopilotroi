@@ -2,26 +2,26 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 01:17 UTC
+> Last verified: 2026-05-20 01:33 UTC
 
 ---
 
 ## CURRENT BRANCH
 ```
-feature/puck-editor
+feature/frontend-pages
 ```
 Working tree: **CLEAN** (nothing to commit)
-Synced with: `origin/feature/puck-editor` — up to date
+Synced with: `origin/feature/frontend-pages` — up to date (merge commit `2994568`)
 
 ---
 
 ## LAST 5 COMMITS (verified)
 ```
-b876b87  feat(puck): sync HeroDark config with frontend-pages baseline — add secondary ghost CTA, update defaultProps
-8ef118d  chore: update STATUS.md — constrainment sprint complete
+2994568  merge: integrate puck-editor CMS infrastructure into frontend-pages
+1c37992  feat(hero): improve copy, add ghost CTA, sharpen bullets
+43128d7  chore: update STATUS.md — HeroDark Puck sync complete
+b876b87  feat(puck): sync HeroDark config with frontend-pages baseline
 63324e0  refactor(puck): remove unsafe blocks and constrain dropzones
-26dbfbb  chore: cleanup sprint — rename middleware, delete dead code, archive docs
-420cacf  chore: update STATUS.md — P4 resolved, write protection active
 ```
 
 ---
@@ -41,8 +41,9 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 01:17 UTC)
-HeroDark Puck sync: tsc 0 errors, build exit 0, 64 pages.
+## BUILD & TS VERIFIED (2026-05-20 01:33 UTC)
+Post-merge verification: `npm ci` clean, `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
+`/admin/edit/[[...path]]` now present in route manifest.
 
 ---
 
@@ -57,23 +58,27 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — `feature/puck-editor` HeroDark sync sprint CLOSED**
+**Sprint: COMPLETE — Controlled merge of `feature/puck-editor` into `feature/frontend-pages`**
 
-- HeroDark `defaultProps` synced with `feature/frontend-pages` commit `1c37992`
-- New editable fields added: `secondaryCtaLabel`, `secondaryCtaHref` (both optional)
-- Ghost CTA conditionally rendered: only if both label and href are non-empty
-- `description`, `bulletTwo`, `bulletThree` defaultProps updated to match approved baseline
-- Unsafe blocks and dropzone constrainment remain in place from previous sprint
+- Merge commit: `2994568`
+- Strategy: `--no-ff` (ort), zero conflicts
+- `src/app/page.tsx`: auto-merged correctly to `feature/frontend-pages` version (verified)
+- `src/middleware.ts`: deleted (accepted)
+- `src/proxy.ts`: added (accepted)
+- All Puck CMS infrastructure now present on `feature/frontend-pages`
+- Approved frontend design baseline preserved
+- `npm ci` + TypeScript + build all verified clean
 
-**NEXT SPRINT:** `feature/frontend-pages` — Homepage hero overhaul
-Role: Frontend Dev | Branch: `feature/frontend-pages` | No CMS work
+**ACTIVE BRANCH:** `feature/frontend-pages` (now unified with Puck CMS)
+**NEXT SPRINT:** Set `NEXT_PUBLIC_PUCK_WRITE_SECRET` in `.env.local`, then do a live Barry editing session test at `/admin/edit/homepage`
+Role: CMS Validation Dev | Branch: `feature/frontend-pages`
 
 ---
 
 ## ACTIVE ROLE FOR NEXT SESSION
-**Frontend Dev** — working on `feature/frontend-pages`
+**CMS Validation Dev** — working on `feature/frontend-pages` (unified)
 
-Do NOT continue on `feature/puck-editor`. That sprint is CLOSED.
+Next task: live Puck editor session test.
 
 ---
 
