@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 01:33 UTC
+> Last verified: 2026-05-20 01:43 UTC
 
 ---
 
@@ -41,9 +41,10 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 01:33 UTC)
-Post-merge verification: `npm ci` clean, `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
-`/admin/edit/[[...path]]` now present in route manifest.
+## BUILD & TS VERIFIED (2026-05-20 01:43 UTC)
+Post-merge + live Puck QA: `npm ci` clean, `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
+Puck editor: loads, reads from Supabase, writes to Supabase (200 OK), persists on reload.
+Live homepage: 0 console errors, approved layout intact.
 
 ---
 
@@ -58,19 +59,26 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — Controlled merge of `feature/puck-editor` into `feature/frontend-pages`**
+**Sprint: COMPLETE — Live Puck Editor Validation**
 
-- Merge commit: `2994568`
-- Strategy: `--no-ff` (ort), zero conflicts
-- `src/app/page.tsx`: auto-merged correctly to `feature/frontend-pages` version (verified)
-- `src/middleware.ts`: deleted (accepted)
-- `src/proxy.ts`: added (accepted)
-- All Puck CMS infrastructure now present on `feature/frontend-pages`
-- Approved frontend design baseline preserved
-- `npm ci` + TypeScript + build all verified clean
+### PASSED
+- Editor loads at `/admin/edit` — ✅
+- Homepage route loads in Puck canvas — ✅
+- All HeroDark fields visible in right panel (badge, title, highlightedText, description, ctaLabel, ctaHref, secondaryCtaLabel, secondaryCtaHref, bulletOne–Three, videoUrl, videoThumb) — ✅
+- POST `/api/puck` — 200 OK, write secret accepted — ✅
+- Updated fields persist in Supabase on re-fetch — ✅
+- Editor reload loads persisted data correctly — ✅
+- Live homepage at `/` renders approved layout, 0 console errors — ✅
+- Approved copy live: "Start earning with $100 USDT...", "AI trades 24/7 — you sleep", "Setup complete in 3 days" — ✅
 
-**ACTIVE BRANCH:** `feature/frontend-pages` (now unified with Puck CMS)
-**NEXT SPRINT:** Set `NEXT_PUBLIC_PUCK_WRITE_SECRET` in `.env.local`, then do a live Barry editing session test at `/admin/edit/homepage`
+### KNOWN ISSUES (non-blocking for Barry)
+1. **Hydration warning in editor canvas only**: `<div>` inside `<p>` — caused by Puck's `RichTextEditor` wrapping a `<div contentEditable>` inside `<motion.p>`. Editor-canvas only, does NOT affect live homepage. To fix: change `<motion.p>` to `<motion.div>` in `HeroDark.tsx` description wrapper.
+2. **DropZone deprecation warnings**: Puck 0.21.2 warns `DropZones` are deprecated in favour of slot fields. Not a blocker; migration is a future sprint.
+3. **CSP blocking `rsms.me/inter/inter.css`**: Font loads from `rsms.me` blocked by CSP. Affects editor canvas font only. Fix: add `rsms.me` to `style-src` in `next.config.js`. Not a blocker.
+4. **`NEXT_PUBLIC_PUCK_WRITE_SECRET` is still placeholder**: Safe for local QA. Must be rotated to a real secret before production deployment.
+
+**ACTIVE BRANCH:** `feature/frontend-pages` (unified with Puck CMS)
+**NEXT SPRINT:** Fix hydration warning in editor — change `<motion.p>` to `<motion.div>` for description wrapper in `src/components/sections/HeroDark.tsx`.
 Role: CMS Validation Dev | Branch: `feature/frontend-pages`
 
 ---
