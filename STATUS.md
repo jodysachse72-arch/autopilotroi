@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 01:43 UTC
+> Last verified: 2026-05-20 02:12 UTC
 
 ---
 
@@ -41,10 +41,9 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 01:43 UTC)
-Post-merge + live Puck QA: `npm ci` clean, `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
-Puck editor: loads, reads from Supabase, writes to Supabase (200 OK), persists on reload.
-Live homepage: 0 console errors, approved layout intact.
+## BUILD & TS VERIFIED (2026-05-20 02:12 UTC)
+Post hydration-fix sprint: `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
+Editor console: 0 hydration errors. Remaining non-blockers: CSP (rsms.me), DropZone deprecation (18×), form field id (3×).
 
 ---
 
@@ -59,27 +58,41 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — Live Puck Editor Validation**
+**Sprint: COMPLETE — Hydration Fix + Barry First-Time UX**
 
-### PASSED
-- Editor loads at `/admin/edit` — ✅
-- Homepage route loads in Puck canvas — ✅
-- All HeroDark fields visible in right panel (badge, title, highlightedText, description, ctaLabel, ctaHref, secondaryCtaLabel, secondaryCtaHref, bulletOne–Three, videoUrl, videoThumb) — ✅
-- POST `/api/puck` — 200 OK, write secret accepted — ✅
-- Updated fields persist in Supabase on re-fetch — ✅
-- Editor reload loads persisted data correctly — ✅
-- Live homepage at `/` renders approved layout, 0 console errors — ✅
-- Approved copy live: "Start earning with $100 USDT...", "AI trades 24/7 — you sleep", "Setup complete in 3 days" — ✅
+### Hydration fixes applied (all `<p>` → `<div>` for rich-text ReactNode wrappers)
+| File | Field | Fix |
+|---|---|---|
+| `HeroDark.tsx` | `description` | `motion.p` → `motion.div` |
+| `HeroBlue.tsx` | `description` | `motion.p` → `motion.div` |
+| `SectionHeader.tsx` | `children`/lead | `p` → `div` |
+| `CTABand.tsx` | `description` | `p` → `div` |
+| `FeatureCard.tsx` | `body` | `p` → `div` |
+| `Step.tsx` | `body` | `p` → `div` |
+| `EcoCard.tsx` | `description` | `p` → `div` |
+| `TestimonialCard.tsx` | `quote` | `p` → `div`, removed `&ldquo;`/`&rdquo;` inline entities |
 
-### KNOWN ISSUES (non-blocking for Barry)
-1. **Hydration warning in editor canvas only**: `<div>` inside `<p>` — caused by Puck's `RichTextEditor` wrapping a `<div contentEditable>` inside `<motion.p>`. Editor-canvas only, does NOT affect live homepage. To fix: change `<motion.p>` to `<motion.div>` in `HeroDark.tsx` description wrapper.
-2. **DropZone deprecation warnings**: Puck 0.21.2 warns `DropZones` are deprecated in favour of slot fields. Not a blocker; migration is a future sprint.
-3. **CSP blocking `rsms.me/inter/inter.css`**: Font loads from `rsms.me` blocked by CSP. Affects editor canvas font only. Fix: add `rsms.me` to `style-src` in `next.config.js`. Not a blocker.
-4. **`NEXT_PUBLIC_PUCK_WRITE_SECRET` is still placeholder**: Safe for local QA. Must be rotated to a real secret before production deployment.
+### Barry UX improvements applied
+- Reset button: `↺ Reset` → `↺ Reset to defaults` with red bg tint + tooltip `"cannot be undone"`
+- Save success toast: `Page "..." published successfully!` → `Changes saved and published to the live site!`
+- Save error toast: `Failed to save. Check console.` → `Save failed — please try again or refresh the page.`
+- Saving indicator: `Saving...` → `⏳ Saving…`
 
-**ACTIVE BRANCH:** `feature/frontend-pages` (unified with Puck CMS)
-**NEXT SPRINT:** Fix hydration warning in editor — change `<motion.p>` to `<motion.div>` for description wrapper in `src/components/sections/HeroDark.tsx`.
-Role: CMS Validation Dev | Branch: `feature/frontend-pages`
+### Verification
+- TypeScript: 0 errors
+- Build: exit 0, 64 pages
+- Editor console: **0 hydration errors** (was 2 per page load)
+- Live homepage: 0 regressions
+- Commit: `eb92ede`
+
+### Remaining non-blocking issues in editor
+1. CSP blocks `rsms.me/inter/inter.css` — affects editor canvas font only
+2. DropZone deprecation warnings (18×) — Puck 0.21.2 API, future sprint
+3. Form field missing id/name (3×) — Puck internal, not our code
+
+**ACTIVE BRANCH:** `feature/frontend-pages`
+**NEXT SPRINT:** Fix CSP to allow `rsms.me` for editor canvas font, OR migrate DropZones to slot fields (larger sprint).
+Role: CMS UX Dev | Branch: `feature/frontend-pages`
 
 ---
 
