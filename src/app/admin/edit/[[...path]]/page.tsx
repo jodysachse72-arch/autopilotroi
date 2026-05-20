@@ -393,6 +393,80 @@ export default function PuckEditorPage({
             return <>{children}</>
           },
 
+          // ── Section name badge on canvas ──────────────────────
+          // Shows a floating label on Content Sections when hovered/selected.
+          // Since componentOverlay does not receive instance props, we show
+          // the component type label — the sectionName is visible in the
+          // right-hand fields panel when the section is selected.
+          componentOverlay: ({ children, componentType, isSelected, hover }) => {
+            const isSectionBox = componentType === 'SectionBox'
+            if (!isSectionBox) return <>{children}</>
+            const visible = isSelected || hover
+            return (
+              <div style={{ position: 'relative' }}>
+                {children}
+                {visible && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 100,
+                    pointerEvents: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    padding: '4px 8px',
+                    background: isSelected
+                      ? 'rgba(27,97,201,0.12)'
+                      : 'rgba(27,97,201,0.06)',
+                    borderTop: isSelected
+                      ? '2px solid rgba(27,97,201,0.6)'
+                      : '2px solid rgba(27,97,201,0.25)',
+                  }}>
+                    <span style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                      color: '#1b61c9',
+                      fontFamily: 'system-ui',
+                      textTransform: 'uppercase',
+                      background: 'rgba(255,255,255,0.85)',
+                      padding: '2px 7px',
+                      borderRadius: 99,
+                      border: '1px solid rgba(27,97,201,0.2)',
+                    }}>
+                      Content Section — click to edit, check right panel for name
+                    </span>
+                  </div>
+                )}
+              </div>
+            )
+          },
+
+          // ── Outline discovery guide ───────────────────────────
+          // Wraps the default layer tree with a one-line tip so Barry
+          // knows to click each section to reveal its name.
+          outline: ({ children }) => (
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{
+                padding: '8px 12px 6px',
+                fontSize: 11,
+                color: '#6b7280',
+                fontFamily: 'system-ui',
+                lineHeight: 1.4,
+                borderBottom: '1px solid #f1f5f9',
+                background: '#fafafa',
+                flexShrink: 0,
+              }}>
+                💡 Click any section to see its name and fields in the right panel.
+              </div>
+              <div style={{ flex: 1, overflow: 'auto' }}>
+                {children}
+              </div>
+            </div>
+          ),
+
           headerActions: ({ children }) => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 

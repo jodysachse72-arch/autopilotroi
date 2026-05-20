@@ -72,6 +72,7 @@ type PageHeaderWhiteProps = {
 }
 
 type SectionBoxProps = {
+  sectionName: string
   variant: 'white' | 'surface' | 'blue' | 'navy'
   padding: 'lg' | 'xl' | 'none'
 }
@@ -468,8 +469,15 @@ export const puckConfig: Config<Components> = {
     },
 
     SectionBox: {
-      label: 'Section Container',
+      label: 'Content Section',
       fields: {
+        sectionName: {
+          type: 'text',
+          label: 'Section Name (for your reference)',
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore — non-standard helper text field
+          helperText: 'Give this section a name so you can identify it in the editor (e.g. "Stats Bar", "Features", "Testimonials"). This name is not visible to visitors.',
+        },
         variant: {
           type: 'select',
           label: 'Background Color',
@@ -491,6 +499,7 @@ export const puckConfig: Config<Components> = {
         },
       },
       defaultProps: {
+        sectionName: '',
         variant: 'white',
         padding: 'lg',
       },
@@ -508,7 +517,7 @@ export const puckConfig: Config<Components> = {
 
     // ── FEATURE GRID (wraps FeatureCards in a CSS grid) ────
     FeatureGrid: {
-      label: 'Feature Grid',
+      label: 'Benefits Grid',
       fields: {},
       defaultProps: {},
       render: ({ puck }) => (
@@ -524,7 +533,7 @@ export const puckConfig: Config<Components> = {
 
     // ── CARD GRID (wraps EcoCards/Testimonials in a grid) ──
     CardGrid: {
-      label: 'Card Grid',
+      label: 'Card Grid (Products / Testimonials)',
       fields: {},
       defaultProps: {},
       render: ({ puck }) => (
@@ -540,7 +549,7 @@ export const puckConfig: Config<Components> = {
 
     // ── STEP GROUP (vertical list of Steps) ────────────────
     StepGroup: {
-      label: 'Step Group',
+      label: 'How-It-Works Steps',
       fields: {},
       render: ({ puck }) => (
         <div className="puck-flex-passthrough" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
@@ -551,7 +560,7 @@ export const puckConfig: Config<Components> = {
 
     // ── SECTION HEADER ─────────────────────────────────────
     SectionHeader: {
-      label: 'Section Header',
+      label: 'Section Heading',
       fields: {
         eyebrow:      { type: 'text', contentEditable: true, label: 'Eyebrow Label' },
         title:        { type: 'text', contentEditable: true, label: 'Section Headline' },
@@ -594,7 +603,7 @@ export const puckConfig: Config<Components> = {
 
     // ── STAT ROW ───────────────────────────────────────────
     StatRow: {
-      label: 'Stats Row',
+      label: 'Statistics Bar',
       fields: {
         stats: {
           type: 'array',
@@ -619,7 +628,7 @@ export const puckConfig: Config<Components> = {
 
     // ── FEATURE CARD ───────────────────────────────────────
     FeatureCard: {
-      label: 'Feature Card',
+      label: 'Feature / Benefit Card',
       fields: {
         title:       { type: 'text', contentEditable: true, label: 'Card Title' },
         body:        richTextField({ label: 'Card Description' }),
@@ -650,7 +659,7 @@ export const puckConfig: Config<Components> = {
 
     // ── TRUST SIGNAL CARD ──────────────────────────────────
     TrustSignalCard: {
-      label: 'Trust Signal',
+      label: 'Trust Signal Card',
       fields: {
         iconName: {
           type: 'select',
@@ -684,7 +693,7 @@ export const puckConfig: Config<Components> = {
 
     // ── PRODUCT CARD ───────────────────────────────────────
     ProductCard: {
-      label: 'Product Card',
+      label: 'Product Card (Aurum Suite)',
       fields: {
         productId:   { type: 'text', label: 'Anchor ID (used for #links to this card — no spaces)' },
         name:        { type: 'text', contentEditable: true, label: 'Product Name' },
@@ -753,7 +762,7 @@ export const puckConfig: Config<Components> = {
 
     // ── ECO CARD ───────────────────────────────────────────
     EcoCard: {
-      label: 'Ecosystem Card',
+      label: 'Ecosystem Product Card',
       fields: {
         title:       { type: 'text', contentEditable: true, label: 'Card Title' },
         description: richTextField({ label: 'Card Description' }),
@@ -783,7 +792,7 @@ export const puckConfig: Config<Components> = {
 
     // ── TESTIMONIAL CARD ───────────────────────────────────
     TestimonialCard: {
-      label: 'Testimonial',
+      label: 'Member Testimonial',
       fields: {
         quote:  richTextField({ label: 'Testimonial Quote' }),
         author: { type: 'text', contentEditable: true, label: 'Member Name' },
@@ -801,7 +810,7 @@ export const puckConfig: Config<Components> = {
 
     // ── STEP ───────────────────────────────────────────────
     Step: {
-      label: 'Process Step',
+      label: 'Numbered Step',
       fields: {
         num:   { type: 'text', contentEditable: true, label: 'Step Number' },
         title: { type: 'text', contentEditable: true, label: 'Step Title' },
@@ -819,7 +828,7 @@ export const puckConfig: Config<Components> = {
 
     // ── CTA BAND ───────────────────────────────────────────
     CTABand: {
-      label: 'CTA Banner',
+      label: 'Call-to-Action Banner',
       fields: {
         eyebrow:        { type: 'text', contentEditable: true, label: 'Eyebrow Label' },
         title:          { type: 'text', contentEditable: true, label: 'Headline' },
@@ -879,7 +888,7 @@ export const puckConfig: Config<Components> = {
 
     // ── IMAGE BLOCK ────────────────────────────────────────
     ImageBlock: {
-      label: 'Image',
+      label: 'Image Block',
       fields: {
         src:          { type: 'text', label: 'Image URL' },
         alt:          { type: 'text', label: 'Alt Text' },

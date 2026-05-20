@@ -78,27 +78,27 @@ const HOMEPAGE_SEED: any = {
     // Stats in a white SectionBox
     {
       type: 'SectionBox',
-      props: { id: 'stats-section', variant: 'white', padding: 'lg' },
+      props: { id: 'stats-section', sectionName: 'Stats Bar (12,000+ Members etc.)', variant: 'white', padding: 'lg' },
     },
     // Features in a surface SectionBox
     {
       type: 'SectionBox',
-      props: { id: 'features-section', variant: 'surface', padding: 'lg' },
+      props: { id: 'features-section', sectionName: 'Features / Benefits', variant: 'surface', padding: 'lg' },
     },
     // How it works in a white SectionBox
     {
       type: 'SectionBox',
-      props: { id: 'process-section', variant: 'white', padding: 'lg' },
+      props: { id: 'process-section', sectionName: 'How It Works (3 Steps)', variant: 'white', padding: 'lg' },
     },
     // Ecosystem in a surface SectionBox
     {
       type: 'SectionBox',
-      props: { id: 'ecosystem-section', variant: 'surface', padding: 'lg' },
+      props: { id: 'ecosystem-section', sectionName: 'Ecosystem Products (4 Cards)', variant: 'surface', padding: 'lg' },
     },
     // Social proof in a blue SectionBox
     {
       type: 'SectionBox',
-      props: { id: 'testimonials-section', variant: 'blue', padding: 'lg' },
+      props: { id: 'testimonials-section', sectionName: 'Testimonials (Social Proof)', variant: 'blue', padding: 'lg' },
     },
     // Final CTA
     {
