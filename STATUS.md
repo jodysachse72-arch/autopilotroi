@@ -17,11 +17,11 @@ Synced with: `origin/feature/puck-editor` — up to date
 
 ## LAST 5 COMMITS (verified)
 ```
+63324e0  refactor(puck): remove unsafe blocks and constrain dropzones
 26dbfbb  chore: cleanup sprint — rename middleware, delete dead code, archive docs
 420cacf  chore: update STATUS.md — P4 resolved, write protection active
 3968164  fix(puck): add temporary write protection to /api/puck and /api/puck/seed
 85b19ae  chore: update STATUS.md — P3 resolved, commit hash corrected
-f073716  docs(puck): add retroactive migration for puck_pages table
 ```
 
 ---
@@ -41,8 +41,8 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-19 20:43 UTC)
-Post-fix verification — both passed after `pathResolved` change.
+## BUILD & TS VERIFIED (2026-05-20 01:00 UTC)
+Post-fix verification — both passed after constrainment sprint (`allowedComponents` fixed to `allow` in `DropZone`).
 
 ---
 
@@ -57,9 +57,12 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — `feature/puck-editor` Puck stabilization sprint CLOSED**
+**Sprint: COMPLETE — `feature/puck-editor` Puck constrainment sprint CLOSED**
 
-All blockers P1–P4 resolved. Cleanup complete.
+- All blockers P1–P4 resolved.
+- Unsafe blocks (HtmlBlock, Spacer, ButtonBlock) removed.
+- Dropzones constrained using `allow`.
+- Dangerous layout controls removed.
 
 **NEXT SPRINT:** `feature/frontend-pages` — Homepage hero overhaul
 Role: Frontend Dev | Branch: `feature/frontend-pages` | No CMS work
