@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 02:31 UTC
+> Last verified: 2026-05-20 02:47 UTC
 
 ---
 
@@ -11,7 +11,9 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN** (nothing to commit)
-Synced with: `origin/feature/frontend-pages` — up to date (merge commit `2994568`)
+Synced with: `origin/feature/frontend-pages` — up to date (commit `ebc6606`)
+**Preview URL:** https://autopilotroi-5nwuph31k-autopilot-roi.vercel.app
+**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/FAGGbxUoha2jSKzAYcE3LCMWvi9v
 
 ---
 
@@ -41,9 +43,10 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 02:31 UTC)
-CSP fix sprint: `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
-Editor console: **0 errors, 0 CSP blocks** (was: rsms.me blocked ×2). Remaining: DropZone deprecation (18×), form field id (3×) — both Puck-internal.
+## BUILD & TS VERIFIED (2026-05-20 02:47 UTC)
+Vercel Preview certified: `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
+Preview homepage: **0 console messages**. Editor: **0 errors** (only DropZone deprecation + form field id, both Puck-internal).
+Puck write pipeline: **200 OK** on preview — writes reach Supabase, persist, reflect on live homepage.
 
 ---
 
@@ -58,33 +61,49 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — CSP Fix + Vercel Preview Readiness**
+**Sprint: COMPLETE — Vercel Preview Certification**
 
-### CSP fix applied
-- **File:** `next.config.ts`
-- **Change:** Added `https://rsms.me` to `style-src` and `font-src` CSP directives
-- **Why:** Puck AutoFrame iframe loader requests `rsms.me/inter/inter.css` and woff2 font files from the same domain. Previously blocked, causing 2 CSP errors per editor page load.
-- **Commit:** `71de38c`
+### Preview URL
+`https://autopilotroi-5nwuph31k-autopilot-roi.vercel.app`
 
-### Verification
-- TypeScript: 0 errors
-- Build: exit 0, 64 pages
-- Editor console: **0 errors** (was: 2 CSP errors + 2 CSP issues per load)
-- Live homepage: **0 errors**
-- Puck save pipeline: 200 OK (unchanged)
-- No hydration errors (unchanged from previous sprint)
+### Deployment result
+- Vercel CLI 50.39.0
+- Build: `next build` exit 0 on Vercel infra (12.1s compile, TypeScript 9.6s, 64 pages)
+- Region: Washington D.C. (iad1)
+- Status: `READY`
+- Deployment ID: `dpl_FAGGbxUoha2jSKzAYcE3LCMWvi9v`
 
-### Console state — editor (post-fix)
-| Message | Count | Source | Blocker? |
-|---|---|---|---|
-| CSP rsms.me block | 0 | **FIXED** | — |
-| Hydration `<div>` in `<p>` | 0 | **FIXED** | — |
-| DropZone deprecated | 18× | Puck 0.21.2 API | No |
-| Form field missing id/name | 3× | Puck internal | No |
+### Editor validation (on preview URL)
+| Check | Result |
+|---|---|
+| `/` homepage loads | ✅ 0 console messages |
+| `/admin/edit` loads | ✅ |
+| Hero canvas renders | ✅ Approved layout, copy, both CTAs |
+| Inter font (rsms.me) | ✅ No CSP block |
+| Hydration errors | ✅ 0 |
+| CSP errors | ✅ 0 |
+| DropZone deprecation | ⚠️ 9× (Puck-internal, non-blocker) |
+| Form field id/name | ⚠️ 3× (Puck-internal, non-blocker) |
+
+### Save/persist validation (on preview URL)
+- `GET /api/puck?path=/` — **200 OK**, returned live Supabase data
+- `POST /api/puck` with `x-puck-write-secret` — **200 OK**, wrote badge test value
+- Re-fetch confirmed badge persisted in Supabase
+- Restore write — **200 OK**, badge restored to original `✦ Powered by Aurum Ecosystem`
+- Homepage reload confirmed: approved content, **0 console messages**
+
+### Files changed this sprint
+None (deploy only)
+
+### Remaining non-blockers
+1. DropZone deprecation (18× local / 9× preview) — future slot-field migration
+2. Turnstile keys empty — signup bot protection disabled (config task, not a blocker)
+3. `NEXT_PUBLIC_SITE_URL` may need updating to point to production domain
 
 **ACTIVE BRANCH:** `feature/frontend-pages`
-**NEXT SPRINT:** Vercel Preview deployment + env var configuration.
-Role: CMS Production Readiness Dev | Branch: `feature/frontend-pages`
+**PREVIEW CERTIFIED:** ✅ 2026-05-20 02:47 UTC
+**NEXT SPRINT:** `vercel deploy --prod` to promote to production, OR set `NEXT_PUBLIC_SITE_URL` to production domain first.
+Role: Vercel Deployment Dev | Branch: `feature/frontend-pages`
 
 ---
 
