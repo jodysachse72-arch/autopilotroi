@@ -44,6 +44,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [])
   const toggleMobile = useCallback(() => setMobileOpen(prev => !prev), [])
 
+  // ── Puck Visual Editor: bypass all admin chrome ──
+  // The editor needs full viewport control — no sidebar, topbar, or tour.
+  if (pathname.startsWith('/admin/edit')) {
+    return <div style={{ position: 'fixed', inset: 0, zIndex: 9999, background: '#fff', overflow: 'hidden' }}>{children}</div>
+  }
+
   return (
     <div className="min-h-screen flex" style={{ background: '#f8fafc' }}>
       {/* ── Desktop Sidebar ── */}

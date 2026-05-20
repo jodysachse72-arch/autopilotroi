@@ -456,3 +456,8 @@ export default function FaqsPageClient({ faqs }: Props) {
     </PageShell>
   )
 }
+
+/** Named export for Puck widget registration — renders with empty data */
+export function FaqAccordionWidget() {
+  return <FaqsPageClient faqs={[]} />
+}
