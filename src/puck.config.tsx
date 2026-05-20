@@ -71,8 +71,7 @@ type PageHeaderWhiteProps = {
 
 type SectionBoxProps = {
   variant: 'white' | 'surface' | 'blue' | 'navy'
-  padding: 'lg' | 'xl' | 'none' | 'custom'
-  customPadding: number
+  padding: 'lg' | 'xl' | 'none'
 }
 
 type SectionHeaderProps = {
@@ -149,13 +148,9 @@ type FaqAccordionWidgetProps = {}
 // Puck Config
 // ─────────────────────────────────────────────────────────────────
 
-type FeatureGridProps = {
-  columns: '2' | '3' | '4'
-}
+type FeatureGridProps = {}
 
-type CardGridProps = {
-  columns: '2' | '3' | '4'
-}
+type CardGridProps = {}
 
 type StepGroupProps = {}
 
@@ -179,10 +174,7 @@ type Components = {
   CalculatorWidget: CalculatorWidgetProps
   SignupWidget: SignupWidgetProps
   FaqAccordionWidget: FaqAccordionWidgetProps
-  HtmlBlock: { html: string }
-  Spacer: { height: number }
   ImageBlock: { src: string; alt: string; maxWidth: number; borderRadius: number }
-  ButtonBlock: { label: string; href: string; variant: string; align: string; fullWidth: boolean }
 }
 
 const ICONS: Record<string, ReactNode> = {
@@ -438,28 +430,20 @@ export const puckConfig: Config<Components> = {
             { label: 'Normal', value: 'lg' },
             { label: 'Large', value: 'xl' },
             { label: 'None', value: 'none' },
-            { label: 'Custom', value: 'custom' },
           ],
-        },
-        customPadding: {
-          type: 'number',
-          label: 'Custom Padding (px)',
-          min: 0,
-          max: 200,
         },
       },
       defaultProps: {
         variant: 'white',
         padding: 'lg',
-        customPadding: 48,
       },
-      render: ({ variant, padding, customPadding, puck }) => {
-        const customStyle = padding === 'custom'
-          ? { paddingTop: `${customPadding}px`, paddingBottom: `${customPadding}px` }
-          : undefined
+      render: ({ variant, padding, puck }) => {
         return (
-          <SectionBox variant={variant} padding={padding === 'custom' ? 'none' : padding} innerStyle={customStyle}>
-            {puck.renderDropZone({ zone: 'content' })}
+          <SectionBox variant={variant} padding={padding}>
+            {puck.renderDropZone({
+              zone: 'content',
+              allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock']
+            })}
           </SectionBox>
         )
       },
@@ -468,24 +452,15 @@ export const puckConfig: Config<Components> = {
     // ── FEATURE GRID (wraps FeatureCards in a CSS grid) ────
     FeatureGrid: {
       label: 'Feature Grid',
-      fields: {
-        columns: {
-          type: 'select',
-          options: [
-            { label: '2 columns', value: '2' },
-            { label: '3 columns', value: '3' },
-            { label: '4 columns', value: '4' },
-          ],
-        },
-      },
-      defaultProps: { columns: '3' },
-      render: ({ columns, puck }) => (
+      fields: {},
+      defaultProps: {},
+      render: ({ puck }) => (
         <div className="puck-grid-passthrough" style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${columns === '2' ? '340px' : '280px'}), 1fr))`,
+          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, 280px), 1fr))`,
           gap: '1.25rem',
         }}>
-          {puck.renderDropZone({ zone: 'cards' })}
+          {puck.renderDropZone({ zone: 'cards', allow: ['FeatureCard'] })}
         </div>
       ),
     },
@@ -493,24 +468,15 @@ export const puckConfig: Config<Components> = {
     // ── CARD GRID (wraps EcoCards/Testimonials in a grid) ──
     CardGrid: {
       label: 'Card Grid',
-      fields: {
-        columns: {
-          type: 'select',
-          options: [
-            { label: '2 columns', value: '2' },
-            { label: '3 columns', value: '3' },
-            { label: '4 columns', value: '4' },
-          ],
-        },
-      },
-      defaultProps: { columns: '4' },
-      render: ({ columns, puck }) => (
+      fields: {},
+      defaultProps: {},
+      render: ({ puck }) => (
         <div className="puck-grid-passthrough" style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, ${columns === '2' ? '340px' : '260px'}), 1fr))`,
+          gridTemplateColumns: `repeat(auto-fit, minmax(min(100%, 260px), 1fr))`,
           gap: '1.25rem',
         }}>
-          {puck.renderDropZone({ zone: 'cards' })}
+          {puck.renderDropZone({ zone: 'cards', allow: ['EcoCard', 'TestimonialCard', 'ProductCard', 'TrustSignalCard'] })}
         </div>
       ),
     },
@@ -521,7 +487,7 @@ export const puckConfig: Config<Components> = {
       fields: {},
       render: ({ puck }) => (
         <div className="puck-flex-passthrough" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-          {puck.renderDropZone({ zone: 'steps' })}
+          {puck.renderDropZone({ zone: 'steps', allow: ['Step'] })}
         </div>
       ),
     },
@@ -836,32 +802,6 @@ export const puckConfig: Config<Components> = {
       render: () => <FaqAccordionWidget />,
     },
 
-    // ── HTML BLOCK (raw HTML editing) ──────────────────────
-    HtmlBlock: {
-      label: 'HTML Block',
-      fields: {
-        html: { type: 'textarea', label: 'HTML Code' },
-      },
-      defaultProps: {
-        html: '<div style="padding: 2rem; text-align: center; color: #666;"><p>Custom HTML block — edit the HTML in the sidebar panel.</p></div>',
-      },
-      render: ({ html }) => (
-        <div dangerouslySetInnerHTML={{ __html: html }} />
-      ),
-    },
-
-    // ── SPACER ─────────────────────────────────────────────
-    Spacer: {
-      label: 'Spacer',
-      fields: {
-        height: { type: 'number', label: 'Height (px)', min: 8, max: 200 },
-      },
-      defaultProps: { height: 40 },
-      render: ({ height }) => (
-        <div style={{ height: `${height}px` }} aria-hidden="true" />
-      ),
-    },
-
     // ── IMAGE BLOCK ────────────────────────────────────────
     ImageBlock: {
       label: 'Image',
@@ -907,69 +847,6 @@ export const puckConfig: Config<Components> = {
       ),
     },
 
-    // ── BUTTON BLOCK ──────────────────────────────────────
-    ButtonBlock: {
-      label: 'Button',
-      fields: {
-        label:     { type: 'text', contentEditable: true, label: 'Button Text' },
-        href:      { type: 'text', label: 'Link URL' },
-        variant: {
-          type: 'select',
-          label: 'Style',
-          options: [
-            { label: 'Primary (blue)', value: 'primary' },
-            { label: 'Outline', value: 'outline' },
-            { label: 'Ghost (text only)', value: 'ghost' },
-          ],
-        },
-        align: {
-          type: 'select',
-          label: 'Alignment',
-          options: [
-            { label: 'Left', value: 'left' },
-            { label: 'Center', value: 'center' },
-            { label: 'Right', value: 'right' },
-          ],
-        },
-        fullWidth: { type: 'radio', label: 'Full Width', options: [{ label: 'Yes', value: true }, { label: 'No', value: false }] },
-      },
-      defaultProps: {
-        label: 'Click Here →',
-        href: '#',
-        variant: 'primary',
-        align: 'left',
-        fullWidth: false,
-      },
-      render: ({ label, href, variant, align, fullWidth }) => {
-        const baseStyle: React.CSSProperties = {
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.375rem',
-          padding: '0.875rem 2rem',
-          borderRadius: 'var(--radius-btn, 12px)',
-          fontFamily: 'var(--font-display)',
-          fontWeight: 700,
-          fontSize: 'var(--text-body, 1rem)',
-          textDecoration: 'none',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          width: fullWidth ? '100%' : 'auto',
-        }
-        const variantStyles: Record<string, React.CSSProperties> = {
-          primary: { background: 'var(--color-accent, #1b61c9)', color: '#fff', border: 'none' },
-          outline: { background: 'transparent', color: 'var(--color-accent, #1b61c9)', border: '2px solid var(--color-accent, #1b61c9)' },
-          ghost:   { background: 'transparent', color: 'var(--color-accent, #1b61c9)', border: 'none', textDecoration: 'underline' },
-        }
-        return (
-          <div style={{ textAlign: align as 'left' | 'center' | 'right' }}>
-            <a href={href} style={{ ...baseStyle, ...variantStyles[variant] }} className="shimmer-hover">
-              {label}
-            </a>
-          </div>
-        )
-      },
-    },
   },
 
   // ── Component Categories (sidebar grouping) ──────────────
@@ -981,12 +858,12 @@ export const puckConfig: Config<Components> = {
     },
     layout: {
       title: '📐 Layout',
-      components: ['SectionBox', 'SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'Spacer'],
+      components: ['SectionBox', 'SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup'],
       defaultExpanded: true,
     },
     content: {
       title: '📝 Content Blocks',
-      components: ['StatRow', 'Step', 'CTABand', 'HtmlBlock', 'ImageBlock', 'ButtonBlock'],
+      components: ['StatRow', 'Step', 'CTABand', 'ImageBlock'],
       defaultExpanded: true,
     },
     cards: {

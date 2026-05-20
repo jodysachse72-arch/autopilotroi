@@ -22,7 +22,7 @@ export { EcoCard }          from './components/EcoCard'
 export { TestimonialCard }  from './components/TestimonialCard'
 export { Step }             from './components/Step'
 export { CTABand }          from './components/CTABand'
-export { HtmlBlock, Spacer, ImageBlock, ButtonBlock } from './components/UtilityBlocks'
+export { ImageBlock } from './components/UtilityBlocks'
 export { CalculatorWidget, SignupWidget, FaqAccordionWidget } from './components/Widgets'
 
 // Shared types
