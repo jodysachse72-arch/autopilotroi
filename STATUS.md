@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 02:12 UTC
+> Last verified: 2026-05-20 02:31 UTC
 
 ---
 
@@ -41,9 +41,9 @@ npx tsc --noEmit  →  ✅ EXIT 0  (0 errors, 0 warnings)
 
 ---
 
-## BUILD & TS VERIFIED (2026-05-20 02:12 UTC)
-Post hydration-fix sprint: `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
-Editor console: 0 hydration errors. Remaining non-blockers: CSP (rsms.me), DropZone deprecation (18×), form field id (3×).
+## BUILD & TS VERIFIED (2026-05-20 02:31 UTC)
+CSP fix sprint: `npx tsc --noEmit` 0 errors, `npm run build` exit 0, 64 pages.
+Editor console: **0 errors, 0 CSP blocks** (was: rsms.me blocked ×2). Remaining: DropZone deprecation (18×), form field id (3×) — both Puck-internal.
 
 ---
 
@@ -58,41 +58,33 @@ stash@{1}: WIP on main: aa746ba restore admin files
 ---
 
 ## CURRENT SPRINT
-**Sprint: COMPLETE — Hydration Fix + Barry First-Time UX**
+**Sprint: COMPLETE — CSP Fix + Vercel Preview Readiness**
 
-### Hydration fixes applied (all `<p>` → `<div>` for rich-text ReactNode wrappers)
-| File | Field | Fix |
-|---|---|---|
-| `HeroDark.tsx` | `description` | `motion.p` → `motion.div` |
-| `HeroBlue.tsx` | `description` | `motion.p` → `motion.div` |
-| `SectionHeader.tsx` | `children`/lead | `p` → `div` |
-| `CTABand.tsx` | `description` | `p` → `div` |
-| `FeatureCard.tsx` | `body` | `p` → `div` |
-| `Step.tsx` | `body` | `p` → `div` |
-| `EcoCard.tsx` | `description` | `p` → `div` |
-| `TestimonialCard.tsx` | `quote` | `p` → `div`, removed `&ldquo;`/`&rdquo;` inline entities |
-
-### Barry UX improvements applied
-- Reset button: `↺ Reset` → `↺ Reset to defaults` with red bg tint + tooltip `"cannot be undone"`
-- Save success toast: `Page "..." published successfully!` → `Changes saved and published to the live site!`
-- Save error toast: `Failed to save. Check console.` → `Save failed — please try again or refresh the page.`
-- Saving indicator: `Saving...` → `⏳ Saving…`
+### CSP fix applied
+- **File:** `next.config.ts`
+- **Change:** Added `https://rsms.me` to `style-src` and `font-src` CSP directives
+- **Why:** Puck AutoFrame iframe loader requests `rsms.me/inter/inter.css` and woff2 font files from the same domain. Previously blocked, causing 2 CSP errors per editor page load.
+- **Commit:** `71de38c`
 
 ### Verification
 - TypeScript: 0 errors
 - Build: exit 0, 64 pages
-- Editor console: **0 hydration errors** (was 2 per page load)
-- Live homepage: 0 regressions
-- Commit: `eb92ede`
+- Editor console: **0 errors** (was: 2 CSP errors + 2 CSP issues per load)
+- Live homepage: **0 errors**
+- Puck save pipeline: 200 OK (unchanged)
+- No hydration errors (unchanged from previous sprint)
 
-### Remaining non-blocking issues in editor
-1. CSP blocks `rsms.me/inter/inter.css` — affects editor canvas font only
-2. DropZone deprecation warnings (18×) — Puck 0.21.2 API, future sprint
-3. Form field missing id/name (3×) — Puck internal, not our code
+### Console state — editor (post-fix)
+| Message | Count | Source | Blocker? |
+|---|---|---|---|
+| CSP rsms.me block | 0 | **FIXED** | — |
+| Hydration `<div>` in `<p>` | 0 | **FIXED** | — |
+| DropZone deprecated | 18× | Puck 0.21.2 API | No |
+| Form field missing id/name | 3× | Puck internal | No |
 
 **ACTIVE BRANCH:** `feature/frontend-pages`
-**NEXT SPRINT:** Fix CSP to allow `rsms.me` for editor canvas font, OR migrate DropZones to slot fields (larger sprint).
-Role: CMS UX Dev | Branch: `feature/frontend-pages`
+**NEXT SPRINT:** Vercel Preview deployment + env var configuration.
+Role: CMS Production Readiness Dev | Branch: `feature/frontend-pages`
 
 ---
 
