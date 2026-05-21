@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 22:29 UTC (Production certification — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx)
+> Last verified: 2026-05-20 22:44 UTC (Homepage CMS Migration — dpl_FLiJNX65JskYGRYSXhJBMGkbTX7Z)
 
 ---
 
@@ -13,10 +13,10 @@ feature/frontend-pages
 Working tree: **CLEAN** (nothing to commit)
 Synced with: `origin/feature/frontend-pages` — up to date (commit `49a14ed`)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
-**Prod Deployment ID:** `dpl_3P4kKPAQHe3KessqEDUqnksSaSHP`
-**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/3P4kKPAQHe3KessqEDUqnksSaSHP
-**Deployed At:** 2026-05-20 20:44 UTC (26s build, iad1 Washington DC)
-**Commit Deployed:** `60b6447` (CMS UX hardening stack tip)
+**Prod Deployment ID:** `dpl_FLiJNX65JskYGRYSXhJBMGkbTX7Z`
+**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/FLiJNX65JskYGRYSXhJBMGkbTX7Z
+**Deployed At:** 2026-05-20 22:43 UTC (27s build, iad1 Washington DC)
+**Commit Deployed:** `8531df0` (Homepage CMS Migration sprint)
 
 ---
 
@@ -43,8 +43,13 @@ Certifying agent: Production Release Lead
 - **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageBlock live preview)
 - **CMS Page Templates** (3 governed templates: homepage-standard, product-page, campaign-landing)
 - **Homepage Conversion Optimization** (ActivityTicker below hero, QuoteBlock trust bridge, PricingCard investment tiers)
-- **Production certified** — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx — commit 9303b5f — 64 pages — verified live
-- **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageUrlField live preview)
+- **Homepage CMS Migration** — homepage is now CMS-first (ISR 60s revalidate + static fallback)
+  - `/` is now an async server component — fetches Puck JSON from Supabase at request time
+  - Falls back to `StaticHomePage.tsx` if CMS is unavailable (never white-screens)
+  - `PuckPageRenderer.tsx` bridges Puck Data JSON to `<Render>` with error boundary
+  - `HOMEPAGE_SEED` fully canonical: 10 blocks, 11 zones, pricing-grid, ActivityTicker, QuoteBlock all seeded
+  - Live Supabase homepage seeded (force=true) with canonical data — Barry can now edit REAL homepage
+  - Production certified: `dpl_FLiJNX65JskYGRYSXhJBMGkbTX7Z` — commit `8531df0` — ISR route confirmed
 
 ---
 
