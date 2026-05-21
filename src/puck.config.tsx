@@ -12,7 +12,7 @@
  */
 
 import type { Config, RichText } from '@puckeditor/core'
-import { richTextField } from '@/lib/puck-editor'
+import { richTextField, ImageUrlField } from '@/lib/puck-editor'
 import type { ReactNode } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
 
@@ -30,10 +30,13 @@ import FaqItem from '@/components/sections/FaqItem'
 import FaqGroup from '@/components/sections/FaqGroup'
 import VideoBlock from '@/components/sections/VideoBlock'
 import QuoteBlock from '@/components/sections/QuoteBlock'
+import PricingCard from '@/components/sections/PricingCard'
+import ActivityTicker from '@/components/sections/ActivityTicker'
 import { CalculatorWidget } from '@/app/calculator/StaticCalculatorPage'
 import { SignupWidget } from '@/app/signup/StaticSignupPage'
 import { FaqAccordionWidget } from '@/app/faqs/FaqsPageClient'
 import { AutomationIcon, GrowthIcon, SecurityIcon, DataIcon, EcosystemIcon, ExchangeIcon, BankIcon, CardIcon, PartnerIcon } from '@/components/ui/Icons'
+
 
 // ─────────────────────────────────────────────────────────────────
 // Component props definitions for Puck
@@ -176,6 +179,36 @@ type CalculatorWidgetProps = {}
 type SignupWidgetProps = {}
 type FaqAccordionWidgetProps = {}
 
+type PricingFeature = { text: string }
+
+type PricingCardProps = {
+  planName: string
+  planTagline: string
+  priceDisplay: string
+  feature1: string
+  feature2: string
+  feature3: string
+  feature4: string
+  feature5: string
+  feature6: string
+  feature7: string
+  feature8: string
+  ctaLabel: string
+  ctaHref: string
+  badge: string
+  cardStyle: 'standard' | 'featured'
+}
+
+type ActivityTickerProps = {
+  message1: string
+  message2: string
+  message3: string
+  message4: string
+  message5: string
+  speed: 'slow' | 'normal' | 'fast'
+  theme: 'emerald' | 'blue' | 'neutral'
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Puck Config
 // ─────────────────────────────────────────────────────────────────
@@ -207,6 +240,8 @@ type Components = {
   FaqGroup: FaqGroupProps
   VideoBlock: VideoBlockProps
   QuoteBlock: QuoteBlockProps
+  PricingCard: PricingCardProps
+  ActivityTicker: ActivityTickerProps
   CalculatorWidget: CalculatorWidgetProps
   SignupWidget: SignupWidgetProps
   FaqAccordionWidget: FaqAccordionWidgetProps
@@ -542,7 +577,7 @@ export const puckConfig: Config<Components> = {
           <SectionBox variant={variant} padding={padding}>
             {puck.renderDropZone({
               zone: 'content',
-              allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup']
+      allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup', 'PricingCard', 'ActivityTicker']
             })}
           </SectionBox>
         )
@@ -1142,14 +1177,134 @@ export const puckConfig: Config<Components> = {
       render: () => <FaqAccordionWidget />,
     },
 
+    // ── PRICING CARD ───────────────────────────────────────
+    PricingCard: {
+      label: 'Pricing / Offer Card',
+      fields: {
+        planName:    { type: 'text', contentEditable: true, label: 'Plan Name (e.g. Starter, Advanced)' },
+        planTagline: { type: 'text', contentEditable: true, label: 'Short Description' },
+        priceDisplay:{ type: 'text', contentEditable: true, label: 'Price Text (e.g. $100 USDT minimum)' },
+        feature1:    { type: 'text', contentEditable: true, label: 'Feature 1 (leave blank to hide)' },
+        feature2:    { type: 'text', contentEditable: true, label: 'Feature 2 (leave blank to hide)' },
+        feature3:    { type: 'text', contentEditable: true, label: 'Feature 3 (leave blank to hide)' },
+        feature4:    { type: 'text', contentEditable: true, label: 'Feature 4 (leave blank to hide)' },
+        feature5:    { type: 'text', contentEditable: true, label: 'Feature 5 (leave blank to hide)' },
+        feature6:    { type: 'text', contentEditable: true, label: 'Feature 6 (leave blank to hide)' },
+        feature7:    { type: 'text', contentEditable: true, label: 'Feature 7 (leave blank to hide)' },
+        feature8:    { type: 'text', contentEditable: true, label: 'Feature 8 (leave blank to hide)' },
+        ctaLabel:    { type: 'text', contentEditable: true, label: 'Button Text' },
+        ctaHref:     { type: 'text', label: 'Button Destination' },
+        badge:       { type: 'text', contentEditable: true, label: 'Highlight Badge (e.g. Most Popular — leave blank to hide)' },
+        cardStyle:   {
+          type: 'select',
+          label: 'Card Style',
+          options: [
+            { label: 'Standard — white card',         value: 'standard'  },
+            { label: 'Featured — premium dark blue',   value: 'featured'  },
+          ],
+        },
+      },
+      defaultProps: {
+        planName:    'Starter',
+        planTagline: 'Perfect for first-time investors exploring the Aurum ecosystem.',
+        priceDisplay:'$100 USDT minimum',
+        feature1:    'Activate the EX-AI Trading Bot',
+        feature2:    'AI-managed 24/7 portfolio',
+        feature3:    'Access to Aurum University training',
+        feature4:    'Dedicated partner support',
+        feature5:    '',
+        feature6:    '',
+        feature7:    '',
+        feature8:    '',
+        ctaLabel:    'Get Started →',
+        ctaHref:     '/signup',
+        badge:       '',
+        cardStyle:   'standard',
+      },
+      render: ({ planName, planTagline, priceDisplay, feature1, feature2, feature3,
+                 feature4, feature5, feature6, feature7, feature8,
+                 ctaLabel, ctaHref, badge, cardStyle }) => {
+        const features = [feature1, feature2, feature3, feature4, feature5, feature6, feature7, feature8]
+          .filter(Boolean)
+          .map(text => ({ text }))
+        return (
+          <PricingCard
+            planName={planName || ''}
+            planTagline={planTagline || ''}
+            priceDisplay={priceDisplay || ''}
+            features={features}
+            ctaLabel={ctaLabel || ''}
+            ctaHref={ctaHref || '/signup'}
+            badge={badge || ''}
+            variant={cardStyle}
+          />
+        )
+      },
+    },
+
+    // ── ACTIVITY TICKER ────────────────────────────────────
+    ActivityTicker: {
+      label: 'Live Activity Feed',
+      fields: {
+        message1: { type: 'text', contentEditable: true, label: 'Message 1' },
+        message2: { type: 'text', contentEditable: true, label: 'Message 2' },
+        message3: { type: 'text', contentEditable: true, label: 'Message 3' },
+        message4: { type: 'text', contentEditable: true, label: 'Message 4 (optional — leave blank to hide)' },
+        message5: { type: 'text', contentEditable: true, label: 'Message 5 (optional — leave blank to hide)' },
+        speed: {
+          type: 'select',
+          label: 'Rotation Speed',
+          options: [
+            { label: 'Slow   — one new message every 6 seconds',   value: 'slow'   },
+            { label: 'Normal — one new message every 4 seconds',   value: 'normal' },
+            { label: 'Fast   — one new message every 2.5 seconds', value: 'fast'   },
+          ],
+        },
+        theme: {
+          type: 'select',
+          label: 'Color Theme',
+          options: [
+            { label: 'Emerald Green — live activity feel', value: 'emerald' },
+            { label: 'Brand Blue — authority signal',      value: 'blue'    },
+            { label: 'Neutral Gray — minimal',             value: 'neutral' },
+          ],
+        },
+      },
+      defaultProps: {
+        message1: 'A new member just completed their readiness assessment',
+        message2: 'Someone started the onboarding process this morning',
+        message3: 'A partner was just notified of a new qualified lead',
+        message4: 'A member activated the EX-AI Bot today',
+        message5: 'Someone completed all onboarding steps',
+        speed:    'normal',
+        theme:    'emerald',
+      },
+      render: ({ message1, message2, message3, message4, message5, speed, theme }) => {
+        const messages = [message1, message2, message3, message4, message5].filter(Boolean)
+        return (
+          <ActivityTicker
+            messages={messages}
+            speed={speed}
+            theme={theme}
+          />
+        )
+      },
+    },
+
     // ── IMAGE BLOCK ────────────────────────────────────────
     ImageBlock: {
       label: 'Image Block',
       fields: {
-        src:          { type: 'text', label: 'Image URL' },
-        alt:          { type: 'text', label: 'Alt Text' },
+        src: {
+          type: 'custom',
+          label: 'Image URL',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <ImageUrlField value={value ?? ''} onChange={onChange} label="Image URL" />
+          ),
+        },
+        alt:          { type: 'text', label: 'Alt Text (required for accessibility)' },
         maxWidth:     { type: 'number', label: 'Max Width (px)', min: 100, max: 1400 },
-        borderRadius: { type: 'number', label: 'Border Radius (px)', min: 0, max: 50 },
+        borderRadius: { type: 'number', label: 'Corner Rounding (px)', min: 0, max: 50 },
       },
       defaultProps: {
         src: '',
@@ -1203,7 +1358,12 @@ export const puckConfig: Config<Components> = {
     },
     content: {
       title: '📝 Content Blocks',
-      components: ['StatRow', 'Step', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock'],
+      components: ['StatRow', 'Step', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'ActivityTicker'],
+      defaultExpanded: true,
+    },
+    pricing: {
+      title: '💰 Pricing & Offers',
+      components: ['PricingCard'],
       defaultExpanded: true,
     },
     faqs: {
