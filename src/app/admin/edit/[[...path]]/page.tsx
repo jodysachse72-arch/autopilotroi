@@ -34,7 +34,7 @@ type Revision = { id: string; published_at: string; label: string }
 type SavedSection = { id: string; name: string; category: string; created_at: string }
 type SectionCategory = { key: string; label: string }
 
-// Template registry metadata
+// Template registry metadata — all 15 templates
 const TEMPLATE_OPTIONS = [
   { value: 'blank', label: '⬜ Blank page', desc: 'Empty page — add sections manually' },
   { value: 'homepage-standard', label: '🏠 Homepage Standard', desc: 'Hero → Stats → Features → Steps → Testimonials → CTA' },
@@ -46,6 +46,12 @@ const TEMPLATE_OPTIONS = [
   { value: 'trust-proof-page', label: '🛡️ Trust & Proof', desc: 'HeroBlue → Trust Cards → Quote → Video → Stats → CTA' },
   { value: 'cta-landing', label: '⚡ Direct CTA Landing', desc: 'HeroDark → 3 Benefits → Featured Offer → CTA' },
   { value: 'campaign-funnel', label: '🔥 Full Campaign Funnel', desc: 'Hero → Ticker → Stats → Benefits → Quote → Pricing → FAQ → CTA' },
+  { value: 'webinar-registration', label: '📋 Webinar Registration', desc: 'CTAStrip → FunnelSteps → FormBlock → Urgency CTA' },
+  { value: 'lead-magnet-page', label: '📥 Lead Magnet / Free Resource', desc: 'Hero → Features → FormBlock → Testimonials → CTA' },
+  { value: 'pricing-offer-page', label: '💰 Pricing / Offer Comparison', desc: 'PageHeader → 3 PricingCards → FAQ → Testimonials → CTA' },
+  { value: 'consultation-booking', label: '📞 Consultation / Book a Call', desc: 'Hero → FunnelSteps (vertical) → Quote → FormBlock → CTA' },
+  { value: 'onboarding-funnel', label: '🚀 Onboarding Funnel', desc: 'HeroBlue → 4-Step FunnelSteps → Features → Stats → Testimonials → CTA' },
+  { value: 'trust-authority-page', label: '🏛️ Trust / Authority Landing', desc: 'HeroBlue → Stats → TrustSignals → Quote → Testimonials → CTA' },
 ]
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -1274,6 +1280,47 @@ export default function PuckEditorPage({
           </div>
         </div>
       )}
+
+      {/* ── TASK 4: Editor sidebar field readability ───────────────── */}
+      <style>{`
+        /* Force sidebar text inputs to always be readable */
+        [class*="Puck-rightSideBar"] input[type="text"],
+        [class*="Puck-rightSideBar"] textarea,
+        [class*="Puck-rightSideBar"] select,
+        [class*="Puck-rightSideBar"] [contenteditable],
+        [class*="rightSideBar"] input[type="text"],
+        [class*="rightSideBar"] textarea,
+        [class*="rightSideBar"] select,
+        [class*="rightSideBar"] [contenteditable],
+        [class*="SidebarSection"] input[type="text"],
+        [class*="SidebarSection"] textarea,
+        [class*="SidebarSection"] [contenteditable] {
+          color: #1f2937 !important;
+          background-color: #ffffff !important;
+        }
+        /* Ensure selected text in sidebar fields is visible */
+        [class*="rightSideBar"] ::selection,
+        [class*="SidebarSection"] ::selection {
+          background: rgba(59, 130, 246, 0.25) !important;
+          color: #111827 !important;
+        }
+        /* RichText editor in sidebar — force readable text */
+        [class*="rightSideBar"] .ProseMirror,
+        [class*="SidebarSection"] .ProseMirror {
+          color: #1f2937 !important;
+          background: #ffffff !important;
+        }
+        [class*="rightSideBar"] .ProseMirror ::selection,
+        [class*="SidebarSection"] .ProseMirror ::selection {
+          background: rgba(59, 130, 246, 0.25) !important;
+          color: #111827 !important;
+        }
+        /* Ensure field labels are visible */
+        [class*="rightSideBar"] label,
+        [class*="SidebarSection"] label {
+          color: #374151 !important;
+        }
+      `}</style>
 
       {/* ── Puck editor ─────────────────────────────────────────── */}
       <Puck
