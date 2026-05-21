@@ -2124,16 +2124,52 @@ export const puckConfig: Config<Components> = {
         const [submitting, setSubmitting] = useState(false)
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const [error, setError] = useState('')
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [nameVal, setNameVal] = useState('')
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [emailVal, setEmailVal] = useState('')
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [msgVal, setMsgVal] = useState('')
 
-        function handleSubmit(e: React.FormEvent) {
+        async function handleSubmit(e: React.FormEvent) {
           e.preventDefault()
+          if (submitting) return
           setSubmitting(true)
           setError('')
-          // Mock submit — replace with Formspree/Supabase integration later
-          setTimeout(() => {
+
+          // Basic client-side email validation
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          if (!emailRegex.test(emailVal.trim())) {
+            setError('Please enter a valid email address.')
+            setSubmitting(false)
+            return
+          }
+
+          try {
+            const res = await fetch('/api/leads', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: nameVal.trim(),
+                email: emailVal.trim().toLowerCase(),
+                ...(showMessage === 'yes' && msgVal.trim() ? { message: msgVal.trim() } : {}),
+              }),
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+              setError(data.error || 'Something went wrong. Please try again.')
+              setSubmitting(false)
+              return
+            }
+
             setSubmitting(false)
             setSubmitted(true)
-          }, 800)
+          } catch {
+            setError('Network error. Please check your connection and try again.')
+            setSubmitting(false)
+          }
         }
 
         const inputStyle: React.CSSProperties = {
@@ -2153,10 +2189,18 @@ export const puckConfig: Config<Components> = {
         const formContent = submitted ? (
           <div style={{
             textAlign: 'center', padding: '2rem',
-            fontSize: '1rem', color: '#059669', fontWeight: 600,
             animation: 'fadeIn 0.3s ease',
           }}>
-            {successMessage}
+            <div style={{ fontSize: '2rem', marginBottom: '0.75rem' }}>✅</div>
+            <div style={{
+              fontSize: '1rem', color: '#059669', fontWeight: 600,
+              marginBottom: '0.5rem',
+            }}>
+              {successMessage}
+            </div>
+            <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>
+              We sent confirmation details to {emailVal}
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -2176,12 +2220,26 @@ export const puckConfig: Config<Components> = {
 
             <div>
               <label style={labelStyle}>{nameLabel}</label>
-              <input type="text" placeholder={namePlaceholder} required style={inputStyle} />
+              <input
+                type="text"
+                placeholder={namePlaceholder}
+                required
+                value={nameVal}
+                onChange={(e) => setNameVal(e.target.value)}
+                style={inputStyle}
+              />
             </div>
 
             <div>
               <label style={labelStyle}>{emailLabel}</label>
-              <input type="email" placeholder={emailPlaceholder} required style={inputStyle} />
+              <input
+                type="email"
+                placeholder={emailPlaceholder}
+                required
+                value={emailVal}
+                onChange={(e) => setEmailVal(e.target.value)}
+                style={inputStyle}
+              />
             </div>
 
             {showMessage === 'yes' && (
@@ -2190,13 +2248,19 @@ export const puckConfig: Config<Components> = {
                 <textarea
                   placeholder={messagePlaceholder}
                   rows={3}
+                  value={msgVal}
+                  onChange={(e) => setMsgVal(e.target.value)}
                   style={{ ...inputStyle, resize: 'vertical' as const, minHeight: '4.5rem' }}
                 />
               </div>
             )}
 
             {error && (
-              <div style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 500 }}>
+              <div style={{
+                fontSize: '0.75rem', color: '#dc2626', fontWeight: 500,
+                padding: '0.5rem 0.75rem', borderRadius: '0.375rem',
+                background: '#fef2f2', border: '1px solid #fecaca',
+              }}>
                 ⚠ {error}
               </div>
             )}
@@ -2225,7 +2289,7 @@ export const puckConfig: Config<Components> = {
                   animation: 'spin 0.7s linear infinite',
                 }} />
               )}
-              {submitting ? 'Submitting…' : submitLabel}
+              {submitting ? 'Submitting...' : submitLabel}
             </button>
           </form>
         )

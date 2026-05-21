@@ -1027,6 +1027,16 @@ export default function PuckEditorPage({
                   <span style={{ color: '#3b82f6' }}>Use the viewport buttons (360px / 768px / 1280px) in the top toolbar to verify your page looks great on all devices.</span>
                 </div>
               </div>
+              {/* Phase E: Recovery reassurance */}
+              <div style={{
+                marginTop: 6, padding: '6px 12px', borderRadius: 6,
+                background: '#f0fdf4', border: '1px solid #bbf7d0',
+                fontSize: 11, color: '#15803d',
+                display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <span>🔄</span>
+                <span>Your previous version is auto-saved. You can restore it anytime from the version history.</span>
+              </div>
             </div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
               <button
@@ -1362,7 +1372,7 @@ export default function PuckEditorPage({
 
                 /* ─── PHASE G: Smooth transitions for all interactive elements ─── */
                 [data-puck-component] {
-                  transition: outline 0.15s ease, box-shadow 0.15s ease;
+                  transition: outline 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
                 }
                 [data-puck-component]:hover {
                   outline: 1px solid rgba(27,97,201,0.12);
@@ -1373,6 +1383,24 @@ export default function PuckEditorPage({
                   outline: 2px solid rgba(27,97,201,0.4) !important;
                   box-shadow: 0 0 0 4px rgba(27,97,201,0.08);
                   border-radius: 4px;
+                }
+
+                /* ─── PHASE D: Drag reorder confidence ─── */
+                [data-puck-component][data-puck-dragging] {
+                  opacity: 0.5 !important;
+                  outline: 2px dashed #3b82f6 !important;
+                  box-shadow: 0 0 0 6px rgba(59,130,246,0.08) !important;
+                }
+                [data-puck-dropzone] [data-puck-drop-indicator] {
+                  background: linear-gradient(90deg, transparent 0%, #3b82f6 15%, #3b82f6 85%, transparent 100%) !important;
+                  height: 3px !important;
+                  border-radius: 2px;
+                  box-shadow: 0 0 8px rgba(59,130,246,0.3);
+                }
+
+                /* ─── PHASE F: Long page section orientation ─── */
+                [data-puck-component][data-puck-selected] {
+                  scroll-margin-top: 80px;
                 }
 
                 /* ─── PHASE G: Smoother scroll behavior ─── */
@@ -1974,7 +2002,17 @@ export default function PuckEditorPage({
                 </span>
 
                 {/* Right: keyboard shortcuts */}
-                <span style={{ color: '#9ca3af', whiteSpace: 'nowrap', display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span style={{ color: '#9ca3af', whiteSpace: 'nowrap', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span>
+                    <kbd style={{ fontFamily: 'system-ui', background: 'rgba(0,0,0,0.05)', padding: '1px 5px', borderRadius: 3, fontSize: 10, border: '1px solid rgba(0,0,0,0.08)' }}>Ctrl+Z</kbd>
+                    {' '}undo
+                  </span>
+                  <span style={{ color: '#d1d5db' }}>·</span>
+                  <span>
+                    <kbd style={{ fontFamily: 'system-ui', background: 'rgba(0,0,0,0.05)', padding: '1px 5px', borderRadius: 3, fontSize: 10, border: '1px solid rgba(0,0,0,0.08)' }}>Ctrl+Y</kbd>
+                    {' '}redo
+                  </span>
+                  <span style={{ color: '#d1d5db' }}>·</span>
                   <span>
                     <kbd style={{ fontFamily: 'system-ui', background: 'rgba(0,0,0,0.05)', padding: '1px 5px', borderRadius: 3, fontSize: 10, border: '1px solid rgba(0,0,0,0.08)' }}>Ctrl+Shift+S</kbd>
                     {' '}save draft
