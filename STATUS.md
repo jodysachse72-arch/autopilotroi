@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 21:24 UTC
+> Last verified: 2026-05-20 21:52 UTC (CMS Content Essentials sprint)
 
 ---
 
@@ -39,22 +39,23 @@ Certifying agent: Production Release Lead
 - Content backup and restore scripts
 - Production data migration (sectionName for all SectionBox instances)
 - Full governance documentation suite
+- **CMS Content Essentials** (FaqItem, FaqGroup, VideoBlock, QuoteBlock, TestimonialCard+stars)
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
+[NEW]      feat(cms): CMS Content Essentials — FaqItem, FaqGroup, VideoBlock, QuoteBlock, TestimonialCard star ratings
+a901757  docs: CMS operations & governance sprint
 49a14ed  chore: update STATUS.md — CMS UX stack deployed to production
-60b6447  chore: add dotenv dev dependency (migrate scripts)
+60b6447  chore: add dotenv dev dependency
 2568bda  chore: update STATUS.md — content discovery sprint complete
 685811a  feat(cms-ux): content discovery sprint — section names, humanized labels, canvas badges
 ccd8dd9  fix(cms-ux): operator simulation corrections — status bar, reset modal, cache awareness
 3542d18  feat(cms-ux): add publishing confidence signals and navigation protection
 59f0451  feat(cms-ux): replace raw hex color inputs with brand-safe select palettes
 318c17a  feat(cms-ux): translate Puck editor to Barry-language
-6fde49e  feat(cms): add puck backup and restore scripts for production content safety
-32e8c78  chore: update STATUS.md — production certified 2026-05-20 03:24 UTC
 ```
 
 ---

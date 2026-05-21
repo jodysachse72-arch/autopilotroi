@@ -26,6 +26,10 @@ import TestimonialCard from '@/components/sections/TestimonialCard'
 import Step from '@/components/sections/Step'
 import CTABand from '@/components/sections/CTABand'
 import HeroBlue from '@/components/sections/HeroBlue'
+import FaqItem from '@/components/sections/FaqItem'
+import FaqGroup from '@/components/sections/FaqGroup'
+import VideoBlock from '@/components/sections/VideoBlock'
+import QuoteBlock from '@/components/sections/QuoteBlock'
 import { CalculatorWidget } from '@/app/calculator/StaticCalculatorPage'
 import { SignupWidget } from '@/app/signup/StaticSignupPage'
 import { FaqAccordionWidget } from '@/app/faqs/FaqsPageClient'
@@ -124,6 +128,32 @@ type TestimonialCardProps = {
   quote: RichText
   author: string
   role: string
+  starRating: '5' | '4' | '3'
+  memberInitials: string
+}
+
+type FaqItemProps = {
+  question: string
+  answer: RichText
+  openByDefault: 'yes' | 'no'
+}
+
+type FaqGroupProps = {
+  groupTitle: string
+}
+
+type VideoBlockProps = {
+  videoUrl: string
+  caption: string
+  displaySize: 'small' | 'medium' | 'large' | 'full'
+}
+
+type QuoteBlockProps = {
+  quote: RichText
+  attribution: string
+  attributionRole: string
+  quoteStyle: 'centered' | 'left'
+  accentColor: string
 }
 
 type StepProps = {
@@ -173,6 +203,10 @@ type Components = {
   StepGroup: StepGroupProps
   Step: StepProps
   CTABand: CTABandProps
+  FaqItem: FaqItemProps
+  FaqGroup: FaqGroupProps
+  VideoBlock: VideoBlockProps
+  QuoteBlock: QuoteBlockProps
   CalculatorWidget: CalculatorWidgetProps
   SignupWidget: SignupWidgetProps
   FaqAccordionWidget: FaqAccordionWidgetProps
@@ -508,7 +542,7 @@ export const puckConfig: Config<Components> = {
           <SectionBox variant={variant} padding={padding}>
             {puck.renderDropZone({
               zone: 'content',
-              allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock']
+              allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup']
             })}
           </SectionBox>
         )
@@ -794,19 +828,113 @@ export const puckConfig: Config<Components> = {
     TestimonialCard: {
       label: 'Member Testimonial',
       fields: {
-        quote:  richTextField({ label: 'Testimonial Quote' }),
-        author: { type: 'text', contentEditable: true, label: 'Member Name' },
-        role:   { type: 'text', contentEditable: true, label: 'Member Description (e.g. Member since 2025)' },
+        quote:          richTextField({ label: 'Testimonial Quote' }),
+        author:         { type: 'text', contentEditable: true, label: 'Member Name' },
+        role:           { type: 'text', contentEditable: true, label: 'Member Description (e.g. Member since 2025)' },
+        starRating:     {
+          type: 'select',
+          label: 'Star Rating',
+          options: [
+            { label: '⭐⭐⭐⭐⭐  (5 stars)', value: '5' },
+            { label: '⭐⭐⭐⭐  (4 stars)',  value: '4' },
+            { label: '⭐⭐⭐  (3 stars)',   value: '3' },
+          ],
+        },
+        memberInitials: { type: 'text', label: 'Member Initials (2 letters — shown in avatar circle)' },
       },
       defaultProps: {
         quote: 'I was skeptical at first — the results speak for themselves.',
         author: 'Marcus T.',
         role: 'Member since 2025',
+        starRating: '5',
+        memberInitials: 'MT',
       },
-      render: ({ quote, author, role }) => (
-        <TestimonialCard quote={quote} author={author} role={role} />
-      ),
+      render: ({ quote, author, role, starRating, memberInitials }) => {
+        const stars = parseInt(starRating ?? '5', 10)
+        const initials = (memberInitials || author?.[0] || '?').slice(0, 2).toUpperCase()
+        return (
+          <div
+            className="reveal"
+            style={{
+              background: '#ffffff',
+              border: '1px solid rgba(24,29,38,0.06)',
+              borderRadius: '1.25rem',
+              padding: '1.75rem',
+              boxShadow: '0 4px 16px rgba(24,29,38,0.04)',
+            }}
+          >
+            {/* Star rating */}
+            {stars > 0 && (
+              <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.875rem' }}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <svg
+                    key={i}
+                    width="16" height="16" viewBox="0 0 20 20" fill="currentColor"
+                    style={{ color: i < stars ? '#f59e0b' : '#e2e8f0' }}
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+            )}
+
+            {/* Quote */}
+            <div
+              style={{
+                fontSize: 'var(--text-body-lg)',
+                color: 'rgba(24,29,38,0.85)',
+                lineHeight: 1.7,
+                marginBottom: '1.25rem',
+                fontStyle: 'italic',
+              }}
+            >
+              {quote}
+            </div>
+
+            {/* Author row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {/* Avatar circle with initials */}
+              <div
+                style={{
+                  width: '2.5rem',
+                  height: '2.5rem',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #1b61c9 0%, #254fad 100%)',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  flexShrink: 0,
+                }}
+              >
+                {initials}
+              </div>
+              <div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 700,
+                    color: '#181d26',
+                    fontSize: 'var(--text-body)',
+                  }}
+                >
+                  {author}
+                </div>
+                {role && (
+                  <div style={{ fontSize: 'var(--text-caption)', color: 'rgba(24,29,38,0.55)' }}>
+                    {role}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      },
     },
+
 
     // ── STEP ───────────────────────────────────────────────
     Step: {
@@ -863,6 +991,134 @@ export const puckConfig: Config<Components> = {
           />
         )
       },
+    },
+
+    // ── FAQ ITEM ───────────────────────────────────────────
+    FaqItem: {
+      label: 'FAQ — Question & Answer',
+      fields: {
+        question:      { type: 'text', contentEditable: true, label: 'Question' },
+        answer:        richTextField({ label: 'Answer' }),
+        openByDefault: {
+          type: 'select',
+          label: 'Open by default?',
+          options: [
+            { label: 'Closed (visitor clicks to open)', value: 'no' },
+            { label: 'Open on page load',               value: 'yes' },
+          ],
+        },
+      },
+      defaultProps: {
+        question: 'What is the minimum investment to get started?',
+        answer: 'The minimum investment to activate the Aurum AI trading bot is $100 USDT (Tether). You can start with $100 and scale as you become comfortable.',
+        openByDefault: 'no',
+      },
+      render: ({ question, answer, openByDefault }) => (
+        <FaqItem
+          question={question || ''}
+          answer={answer}
+          openByDefault={openByDefault === 'yes'}
+        />
+      ),
+    },
+
+    // ── FAQ GROUP ──────────────────────────────────────────
+    FaqGroup: {
+      label: 'FAQ Section',
+      fields: {
+        groupTitle: {
+          type: 'text',
+          contentEditable: true,
+          label: 'Section Heading (optional — leave blank to hide)',
+        },
+      },
+      defaultProps: {
+        groupTitle: '',
+      },
+      render: ({ groupTitle, puck }) => (
+        <FaqGroup groupTitle={groupTitle}>
+          {puck.renderDropZone({
+            zone: 'faqs',
+            allow: ['FaqItem'],
+          })}
+        </FaqGroup>
+      ),
+    },
+
+    // ── VIDEO BLOCK ────────────────────────────────────────
+    VideoBlock: {
+      label: 'YouTube Video',
+      fields: {
+        videoUrl:    { type: 'text', label: 'YouTube Video URL (e.g. https://youtu.be/...)' },
+        caption:     { type: 'text', contentEditable: true, label: 'Caption below video (optional)' },
+        displaySize: {
+          type: 'select',
+          label: 'Display Size',
+          options: [
+            { label: 'Small  (480px)',     value: 'small'  },
+            { label: 'Medium (640px)',     value: 'medium' },
+            { label: 'Large  (800px)',     value: 'large'  },
+            { label: 'Full Width',         value: 'full'   },
+          ],
+        },
+      },
+      defaultProps: {
+        videoUrl: 'https://youtu.be/MmAnR4YAPv4',
+        caption: '',
+        displaySize: 'medium',
+      },
+      render: ({ videoUrl, caption, displaySize }) => (
+        <VideoBlock
+          videoUrl={videoUrl || ''}
+          caption={caption || ''}
+          displaySize={displaySize}
+        />
+      ),
+    },
+
+    // ── QUOTE BLOCK ────────────────────────────────────────
+    QuoteBlock: {
+      label: 'Pull Quote',
+      fields: {
+        quote:           richTextField({ label: 'Quote Text' }),
+        attribution:     { type: 'text', contentEditable: true, label: 'Who Said It (optional)' },
+        attributionRole: { type: 'text', contentEditable: true, label: 'Their Title or Role (optional)' },
+        quoteStyle:      {
+          type: 'select',
+          label: 'Quote Style',
+          options: [
+            { label: 'Centered — large display quote', value: 'centered' },
+            { label: 'Left-aligned callout bar',       value: 'left'     },
+          ],
+        },
+        accentColor: {
+          type: 'select',
+          label: 'Accent Color',
+          options: [
+            { label: 'Brand Blue',    value: 'brand-blue' },
+            { label: 'Emerald Green', value: 'emerald'    },
+            { label: 'Amber Gold',    value: 'amber'      },
+            { label: 'Dark Navy',     value: 'navy'       },
+            { label: 'Slate Gray',    value: 'slate'      },
+          ],
+        },
+      },
+      defaultProps: {
+        quote: 'The AutoPilotROI onboarding process made everything approachable — I was set up within 48 hours.',
+        attribution: 'Michael R.',
+        attributionRole: 'Member since 2024',
+        quoteStyle: 'centered',
+        accentColor: 'brand-blue',
+      },
+      render: ({ quote, attribution, attributionRole, quoteStyle, accentColor }) => (
+        <QuoteBlock
+          quote={quote}
+          attribution={attribution || ''}
+          attributionRole={attributionRole || ''}
+          style={quoteStyle}
+          accentColor={accentColor}
+        />
+      ),
     },
 
     // ── CALCULATOR WIDGET ──────────────────────────────────
@@ -947,7 +1203,12 @@ export const puckConfig: Config<Components> = {
     },
     content: {
       title: '📝 Content Blocks',
-      components: ['StatRow', 'Step', 'CTABand', 'ImageBlock'],
+      components: ['StatRow', 'Step', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock'],
+      defaultExpanded: true,
+    },
+    faqs: {
+      title: '❓ FAQs',
+      components: ['FaqGroup', 'FaqItem'],
       defaultExpanded: true,
     },
     cards: {
