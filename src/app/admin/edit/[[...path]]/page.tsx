@@ -86,6 +86,7 @@ export default function PuckEditorPage({
   const [newPagePath, setNewPagePath]   = useState('')
   const [showNewPage, setShowNewPage]   = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState('blank')
 
   // Ref for synchronous closure-safe dirty check
   const isDirtyRef = useRef(false)
@@ -219,14 +220,31 @@ export default function PuckEditorPage({
     window.location.href = `/admin/edit${newPath === '/' ? '' : newPath}`
   }, [])
 
-  // Create new page
-  const createPage = useCallback(() => {
+  // Create new page — seeds from selected template before navigating
+  const createPage = useCallback(async () => {
     if (!newPagePath) return
     const path = newPagePath.startsWith('/') ? newPagePath : `/${newPagePath}`
     setShowNewPage(false)
     setNewPagePath('')
+
+    // Seed with template (or blank) before navigating
+    // Always uses ?force=false (default) since this is a NEW page — no existing content
+    if (selectedTemplate && selectedTemplate !== 'blank') {
+      try {
+        await fetch(
+          `/api/puck/seed?path=${encodeURIComponent(path)}&template=${encodeURIComponent(selectedTemplate)}`,
+          {
+            method: 'POST',
+            headers: { 'x-puck-write-secret': process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET || '' },
+          }
+        )
+      } catch {
+        // If seed fails, navigate anyway — editor will seed blank fallback
+      }
+    }
+
     switchPage(path)
-  }, [newPagePath, switchPage])
+  }, [newPagePath, selectedTemplate, switchPage])
 
   // Viewports
   const viewports = useMemo(() => [
@@ -496,7 +514,8 @@ export default function PuckEditorPage({
 
                 {/* New Page */}
                 {showNewPage ? (
-                  <div style={{ display: 'flex', gap: 4 }}>
+                  <div style={{ display: 'flex', gap: 4, flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', gap: 4 }}>
                     <input
                       type="text"
                       placeholder="/new-page"
@@ -529,6 +548,28 @@ export default function PuckEditorPage({
                     >
                       ✕
                     </button>
+                    </div>
+                    {/* Template selector */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 11, color: '#6b7280', fontFamily: 'system-ui', whiteSpace: 'nowrap' }}>
+                        Start from:
+                      </span>
+                      <select
+                        value={selectedTemplate}
+                        onChange={(e) => setSelectedTemplate(e.target.value)}
+                        style={{
+                          padding: '4px 8px', borderRadius: 5,
+                          border: '1px solid #d1d5db', fontSize: 12,
+                          fontFamily: 'system-ui', background: '#fff',
+                          cursor: 'pointer', flex: 1,
+                        }}
+                      >
+                        <option value="blank">⬜ Blank page</option>
+                        <option value="homepage-standard">🏠 Homepage layout</option>
+                        <option value="product-page">📦 Product page layout</option>
+                        <option value="campaign-landing">🎯 Campaign landing layout</option>
+                      </select>
+                    </div>
                   </div>
                 ) : (
                   <button

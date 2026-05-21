@@ -163,6 +163,36 @@ Click it to see all available pages. Click any page to load it in the editor.
 
 ---
 
+## Creating a New Page from a Template
+
+The editor includes three ready-to-use page templates. When you create a new page, you can start from a pre-built layout instead of from zero.
+
+### How to use a template
+
+1. Click the **+ New Page** button in the header bar.
+2. Type the URL path for your new page (e.g. `/campaign-may` or `/products-launch`).
+3. Choose a **Start from** template from the dropdown:
+
+| Template | Best used for |
+|---|---|
+| ⬜ Blank page | Starting completely fresh |
+| 🏠 Homepage layout | A new homepage-style landing page with hero, stats, features, and testimonials |
+| 📦 Product page layout | A product/offer page with trust stats, product cards, pricing tiers, and FAQ |
+| 🎯 Campaign landing layout | A focused campaign page with video, benefits, social proof, and a single offer |
+
+4. Click **Create**.
+
+The editor will open your new page with the template content already loaded.
+
+> **Important:** Template content is placeholder-ready. Review every section and update the text to match your actual campaign or offer before publishing.
+
+### What NOT to do
+
+- **Do not use templates on pages that already have content.** Templates are for new pages only. Using Reset (↺) to get a template on an existing page will erase everything you've already written.
+- **Do not publish a template page without reviewing all sections.** Every section contains placeholder copy — it needs to be personalised before it goes live.
+
+---
+
 ## How to Undo a Mistake
 
 **Before publishing:**

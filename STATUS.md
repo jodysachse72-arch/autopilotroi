@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 21:01 UTC (CMS Conversion Systems sprint)
+> Last verified: 2026-05-20 21:46 UTC (CMS Page Templates sprint)
 
 ---
 
@@ -40,6 +40,8 @@ Certifying agent: Production Release Lead
 - Production data migration (sectionName for all SectionBox instances)
 - Full governance documentation suite
 - **CMS Content Essentials** (FaqItem, FaqGroup, VideoBlock, QuoteBlock, TestimonialCard+stars)
+- **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageBlock live preview)
+- **CMS Page Templates** (3 governed templates: homepage-standard, product-page, campaign-landing)
 - **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageUrlField live preview)
 
 ---
@@ -47,7 +49,8 @@ Certifying agent: Production Release Lead
 ## LAST 10 COMMITS
 
 ```
-[NEW]      feat(cms): CMS Conversion Systems sprint — PricingCard, ActivityTicker, ImageUrlField live preview
+[NEW]      feat(cms): CMS Page Templates sprint
+[PREV]     feat(cms): CMS Conversion Systems sprint — PricingCard, ActivityTicker, ImageUrlField live preview
 540f60c  feat(cms): CMS Content Essentials sprint
 a901757  docs: CMS operations & governance sprint
 49a14ed  chore: update STATUS.md — CMS UX stack deployed to production
@@ -56,8 +59,6 @@ a901757  docs: CMS operations & governance sprint
 685811a  feat(cms-ux): content discovery sprint — section names, humanized labels, canvas badges
 ccd8dd9  fix(cms-ux): operator simulation corrections — status bar, reset modal, cache awareness
 3542d18  feat(cms-ux): add publishing confidence signals and navigation protection
-59f0451  feat(cms-ux): replace raw hex color inputs with brand-safe select palettes
-318c17a  feat(cms-ux): translate Puck editor to Barry-language
 ```
 
 ---

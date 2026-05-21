@@ -18,6 +18,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { resolveTemplate, listTemplates } from '@/lib/puck-templates'
 
 // ── Temporary write protection guard ────────────────────────────────────────
 // NOTE: Temporary stabilization protection.
@@ -210,10 +211,12 @@ export async function POST(request: NextRequest) {
   if (authError) return authError
 
   const pagePath = request.nextUrl.searchParams.get('path') || '/'
+  const templateName = request.nextUrl.searchParams.get('template') || null
+  const force = request.nextUrl.searchParams.get('force') === 'true'
 
   try {
     const supabase = getWriteClient()
-    
+
     // Check if data already exists
     const { data: existing } = await supabase
       .from('puck_pages')
@@ -221,26 +224,64 @@ export async function POST(request: NextRequest) {
       .eq('path', pagePath)
       .single()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let seedData: any = HOMEPAGE_SEED
+    // OVERWRITE PROTECTION:
+    // If the page already has content and ?force=true is NOT set, refuse.
+    // This prevents accidental overwrites when called from auto-seed on page load.
+    if (existing && !force) {
+      return NextResponse.json(
+        {
+          ok: false,
+          warning: 'Page already has content. Pass ?force=true to overwrite.',
+          path: pagePath,
+          existingContent: true,
+        },
+        { status: 200 } // 200 not 4xx — caller handles gracefully
+      )
+    }
 
-    // For non-homepage paths, create a minimal page structure
-    if (pagePath !== '/') {
-      seedData = {
-        root: { props: { title: `Page: ${pagePath}`, description: '' } },
-        content: [
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let seedData: any = null
+    let seedSource = 'default'
+
+    // Resolve template if requested
+    if (templateName) {
+      const templateData = resolveTemplate(templateName)
+      if (!templateData) {
+        return NextResponse.json(
           {
-            type: 'HeroBlue',
-            props: {
-              id: 'hero-1',
-              eyebrow: 'Page Title',
-              title: pagePath.replace(/\//g, ' ').trim() || 'New Page',
-              description: 'Edit this page content using the visual editor.',
-              ctaLabel: '',
-              ctaHref: '',
-            },
+            error: `Unknown template: "${templateName}". Available templates: ${listTemplates().map(t => t.key).join(', ')}`,
+            availableTemplates: listTemplates(),
           },
-        ],
+          { status: 400 }
+        )
+      }
+      seedData = templateData
+      seedSource = `template:${templateName}`
+    }
+
+    // Fall back to built-in page seeds
+    if (!seedData) {
+      if (pagePath === '/') {
+        seedData = HOMEPAGE_SEED
+        seedSource = 'builtin:homepage'
+      } else {
+        seedData = {
+          root: { props: { title: `Page: ${pagePath}`, description: '' } },
+          content: [
+            {
+              type: 'HeroBlue',
+              props: {
+                id: 'hero-1',
+                eyebrow: 'Page Title',
+                title: pagePath.replace(/\//g, ' ').trim() || 'New Page',
+                description: 'Edit this page content using the visual editor.',
+                ctaLabel: '',
+                ctaHref: '',
+              },
+            },
+          ],
+        }
+        seedSource = 'builtin:blank'
       }
     }
 
@@ -256,14 +297,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to seed' }, { status: 500 })
     }
 
-    return NextResponse.json({ 
-      ok: true, 
-      path: pagePath, 
+    return NextResponse.json({
+      ok: true,
+      path: pagePath,
       action: existing ? 'replaced' : 'created',
-      componentCount: seedData.content.length,
+      seedSource,
+      componentCount: Array.isArray(seedData.content) ? seedData.content.length : 0,
     })
   } catch (err) {
     console.error('[Seed API] Error:', err)
     return NextResponse.json({ error: 'Failed to seed' }, { status: 500 })
   }
+}
+
+/** GET /api/puck/seed — list available templates */
+export async function GET(request: NextRequest) {
+  const authError = requireWriteSecret(request)
+  if (authError) return authError
+
+  return NextResponse.json({
+    templates: listTemplates(),
+    usage: 'POST /api/puck/seed?path=/new-page&template=campaign-landing',
+    forceNote: 'Add ?force=true to overwrite a page that already has content.',
+  })
 }

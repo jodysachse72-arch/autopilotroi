@@ -24,10 +24,11 @@ Browser → /admin/edit  →  Puck visual editor (client-side React)
 
 | File | Role |
 |---|---|
-| `src/app/admin/edit/[[...path]]/page.tsx` | Puck editor UI — all overrides, publish logic, UX signals |
+| `src/app/admin/edit/[[...path]]/page.tsx` | Puck editor UI — all overrides, publish logic, UX signals, template selector |
 | `src/puck.config.tsx` | Component registry — all editable block definitions |
 | `src/app/api/puck/route.ts` | GET (read) + POST (write) + DELETE API |
-| `src/app/api/puck/seed/route.ts` | Seed API — populates default content for new pages |
+| `src/app/api/puck/seed/route.ts` | Seed API — template-aware, overwrite-protected |
+| `src/lib/puck-templates/index.ts` | Template registry — 3 governed pre-approved layouts |
 | `src/app/(site)/[[...path]]/page.tsx` | Public page renderer — reads from Supabase, passes to PuckRenderer |
 | `scripts/puck-backup.js` | Export all puck_pages rows to JSON |
 | `scripts/puck-restore.js` | Restore pages from backup with dry-run protection |
@@ -199,6 +200,8 @@ Run after every deploy:
 □ Status bar shows amber "● Unpublished changes" on load
 □ Click Publish → green "✓ Published [timestamp]" appears in header
 □ Status bar transitions to green "● All changes published"
+□ + New Page → path input + template dropdown visible
+□ Create new page with campaign-landing template → loads with template content
 □ Console: 0 hydration errors
 □ Console: 0 CSP errors
 □ Console: 0 runtime crashes
@@ -254,6 +257,67 @@ node scripts/puck-restore.js --backup backups/puck/<good-backup>.json --all --co
 # 3. Return to branch tip:
 git checkout feature/frontend-pages
 ```
+
+---
+
+## Page Template System
+
+### Overview
+
+Three governed page templates live in `src/lib/puck-templates/index.ts`.
+They are pure Puck JSON — no new components, no new routes.
+
+| Template key | Layout | Use case |
+|---|---|---|
+| `homepage-standard` | Hero → Stats → Features → Steps → Testimonials → CTA | Homepage-style landing pages |
+| `product-page` | HeroBlue → Stats → Product Cards → Pricing → FAQ → CTA | Product/offer pages |
+| `campaign-landing` | HeroDark → Video → Benefits → Social Proof → Pricing → CTA | Campaign / lead-gen pages |
+
+### Seeding a page from a template
+
+```bash
+# Via curl (requires write secret):
+curl -X POST \
+  -H "x-puck-write-secret: <PUCK_WRITE_SECRET>" \
+  "https://autopilotroi.vercel.app/api/puck/seed?path=/campaign&template=campaign-landing"
+
+# Force-overwrite existing content (USE WITH CAUTION):
+curl -X POST \
+  -H "x-puck-write-secret: <PUCK_WRITE_SECRET>" \
+  "https://autopilotroi.vercel.app/api/puck/seed?path=/&template=homepage-standard&force=true"
+```
+
+### Safety protections
+
+- **No overwrite by default** — if a page already has content, seed returns `{ ok: false, existingContent: true }` with HTTP 200
+- **`?force=true` required** to overwrite existing content — never sent by the editor UI
+- **Unknown template names** return HTTP 400 with a list of valid templates
+- **Write secret required** on all seed operations — same protection as publish
+- **Auto-seed from editor** fires only on empty pages (no content), so it cannot race against templates
+
+### List available templates
+
+```bash
+curl -H "x-puck-write-secret: <PUCK_WRITE_SECRET>" \
+  "https://autopilotroi.vercel.app/api/puck/seed"
+```
+
+### Editor UX
+
+In `/admin/edit`, the **+ New Page** flow shows:
+- Path input (e.g. `/campaign-may`)
+- Template selector: ⬜ Blank / 🏠 Homepage / 📦 Product / 🎯 Campaign
+
+The editor seeds the template BEFORE navigating to the new page.
+No `?force=true` is ever used from the editor — only new pages (no existing content) go through this path.
+
+### Adding a new template
+
+1. Add the template data object to `src/lib/puck-templates/index.ts`
+2. Add entry to `TEMPLATE_REGISTRY` with key, label, description, data
+3. Add `<option>` to the selector in `src/app/admin/edit/[[...path]]/page.tsx` (headerActions section)
+4. Run `npx tsc --noEmit` and `npm run build` before committing
+5. Do NOT add components that aren't already in `src/puck.config.tsx`
 
 ---
 
