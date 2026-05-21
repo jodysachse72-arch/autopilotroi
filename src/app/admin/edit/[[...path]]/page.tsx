@@ -320,6 +320,31 @@ export default function PuckEditorPage({
   useHideGlobalChrome()
   useBeforeUnloadGuard(isDirty)
 
+  // PHASE F: Keyboard shortcuts for operator momentum
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Escape closes any open modal
+      if (e.key === 'Escape') {
+        if (showSectionLibrary) { setShowSectionLibrary(false); return }
+        if (showSaveSection) { setShowSaveSection(false); setSectionSaveStatus('idle'); return }
+        if (showHistory) { setShowHistory(false); return }
+        if (showDuplicate) { setShowDuplicate(false); return }
+        if (showNewPage) { setShowNewPage(false); return }
+        if (showResetConfirm) { setShowResetConfirm(false); return }
+        if (showSwitchConfirm) { setShowSwitchConfirm(false); setPendingSwitchPath(null); return }
+        if (showPublishConfirm) { setShowPublishConfirm(false); return }
+      }
+      // Ctrl+Shift+S → manual save draft
+      if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+        e.preventDefault()
+        if (isDirty) manualSaveDraft()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSectionLibrary, showSaveSection, showHistory, showDuplicate, showNewPage, showResetConfirm, showSwitchConfirm, showPublishConfirm, isDirty])
+
   // Resolve page path from route params
   // FIX 2+3: read ?fromTemplate and ?duplicatedFrom URL params for one-time banners
   useEffect(() => {
@@ -1276,7 +1301,7 @@ export default function PuckEditorPage({
                 body { background: #ffffff !important; margin: 0; }
                 body > nav, body > footer { display: none !important; }
 
-                /* PHASE A: Inline editing maturity — clearer focus states */
+                /* ─── INLINE EDITING — clearer focus states ─── */
                 [contenteditable]:hover {
                   outline: 2px dashed rgba(27,97,201,0.25) !important;
                   outline-offset: 2px;
@@ -1292,51 +1317,128 @@ export default function PuckEditorPage({
                 [contenteditable]::selection {
                   background: rgba(27,97,201,0.18);
                 }
+
+                /* ─── PHASE B: CTA / Button inline affordance ─── */
+                a[href]:not([contenteditable]):hover,
+                button:not([contenteditable]):hover {
+                  outline: 2px solid rgba(34,197,94,0.5) !important;
+                  outline-offset: 2px;
+                  border-radius: 6px;
+                  cursor: pointer;
+                }
+                a[href]:not([contenteditable]) {
+                  transition: outline 0.15s ease, outline-offset 0.15s ease;
+                }
+
+                /* ─── PHASE C: Media inline hover affordance ─── */
+                img:not([data-puck-ignore]):hover {
+                  outline: 2px dashed rgba(139,92,246,0.4) !important;
+                  outline-offset: 2px;
+                  border-radius: 8px;
+                  cursor: pointer;
+                }
+
+                /* ─── PHASE D: DropZone insertion clarity ─── */
+                [data-puck-dropzone]:empty {
+                  min-height: 80px;
+                  border: 2px dashed #e2e8f0;
+                  border-radius: 8px;
+                  background: repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(226,232,240,0.3) 8px,
+                    rgba(226,232,240,0.3) 16px
+                  );
+                  transition: border-color 0.2s ease, background 0.2s ease;
+                }
+                [data-puck-dropzone]:empty:hover {
+                  border-color: #93c5fd;
+                  background: rgba(219,234,254,0.15);
+                }
+
+                /* ─── PHASE G: Smooth transitions for all interactive elements ─── */
+                [data-puck-component] {
+                  transition: outline 0.15s ease, box-shadow 0.15s ease;
+                }
+                [data-puck-component]:hover {
+                  outline: 1px solid rgba(27,97,201,0.12);
+                  outline-offset: 0;
+                  border-radius: 4px;
+                }
+                [data-puck-component][data-puck-selected] {
+                  outline: 2px solid rgba(27,97,201,0.4) !important;
+                  box-shadow: 0 0 0 4px rgba(27,97,201,0.08);
+                  border-radius: 4px;
+                }
+
+                /* ─── PHASE G: Smoother scroll behavior ─── */
+                html { scroll-behavior: smooth; }
               `
               iframeDoc.head.appendChild(overrideStyle)
             }, [iframeDoc])
             return <>{children}</>
           },
 
-          // ── PHASE B: Section name badge on canvas — shows actual sectionName ──
+          // ── PHASE A: Contextual section controls on canvas ──────────────
           componentOverlay: ({ children, componentType, isSelected, hover }) => {
             const isSectionBox = componentType === 'SectionBox'
-            if (!isSectionBox) return <>{children}</>
+            const isHero = componentType === 'HeroDark' || componentType === 'HeroBlue'
+            const isCTA = componentType === 'CTABand'
+            const showOverlay = isSectionBox || isHero || isCTA
+
+            // For non-primary types, show a subtle type badge on hover
+            if (!showOverlay) {
+              return (
+                <div style={{ position: 'relative' }}>
+                  {children}
+                  {(isSelected || hover) && (
+                    <div style={{
+                      position: 'absolute', top: 2, right: 8, zIndex: 100,
+                      pointerEvents: 'none',
+                    }}>
+                      <span style={{
+                        fontSize: 9, fontWeight: 600, color: '#6b7280',
+                        fontFamily: 'system-ui', textTransform: 'uppercase',
+                        background: 'rgba(255,255,255,0.92)',
+                        padding: '1px 6px', borderRadius: 99,
+                        border: '1px solid rgba(0,0,0,0.08)',
+                        letterSpacing: '0.04em',
+                      }}>
+                        {componentType.replace(/([A-Z])/g, ' $1').trim()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )
+            }
+
             const visible = isSelected || hover
 
-            // PHASE B: Read the actual sectionName from the component's data via usePuck
-            let displayName = 'Section'
+            // Read the actual sectionName from the component's data
+            let displayName = isHero ? 'Hero' : isCTA ? 'CTA' : 'Section'
             try {
               // eslint-disable-next-line react-hooks/rules-of-hooks
               const { appState } = usePuck()
-              if (appState?.data?.content) {
-                // Find the selected/hovered SectionBox and extract its sectionName
+              if (appState?.data?.content && isSectionBox) {
                 for (const item of appState.data.content) {
                   if (item.type === 'SectionBox') {
                     const sn = (item.props as Record<string, unknown>).sectionName as string
-                    if (sn) {
-                      displayName = sn
-                      break // Show the first named section for the overlay
-                    }
+                    if (sn) { displayName = sn; break }
                   }
                 }
               }
-            } catch { /* usePuck not available outside Puck context */ }
+            } catch { /* usePuck not available */ }
+
+            const labelIcon = isHero ? '🎯' : isCTA ? '📢' : '📦'
 
             return (
               <div style={{ position: 'relative' }}>
                 {children}
                 {visible && (
                   <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    zIndex: 100,
-                    pointerEvents: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
+                    position: 'absolute', top: 0, left: 0, right: 0, zIndex: 100,
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '4px 8px',
                     background: isSelected
                       ? 'rgba(27,97,201,0.12)'
@@ -1344,22 +1446,70 @@ export default function PuckEditorPage({
                     borderTop: isSelected
                       ? '2px solid rgba(27,97,201,0.6)'
                       : '2px solid rgba(27,97,201,0.25)',
+                    transition: 'background 0.15s ease',
+                    pointerEvents: isSelected ? 'auto' : 'none',
                   }}>
+                    {/* Left: Section label */}
                     <span style={{
-                      fontSize: 10,
-                      fontWeight: 600,
-                      letterSpacing: '0.05em',
-                      color: '#1b61c9',
-                      fontFamily: 'system-ui',
-                      textTransform: 'uppercase',
-                      background: 'rgba(255,255,255,0.9)',
-                      padding: '2px 8px',
-                      borderRadius: 99,
-                      border: '1px solid rgba(27,97,201,0.2)',
+                      fontSize: 10, fontWeight: 600, letterSpacing: '0.05em',
+                      color: '#1b61c9', fontFamily: 'system-ui', textTransform: 'uppercase',
+                      background: 'rgba(255,255,255,0.92)', padding: '2px 8px',
+                      borderRadius: 99, border: '1px solid rgba(27,97,201,0.2)',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                      pointerEvents: 'none',
                     }}>
-                      📦 {displayName}
+                      {labelIcon} {displayName}
                     </span>
+
+                    {/* Right: Quick action buttons (only when selected) */}
+                    {isSelected && isSectionBox && (
+                      <div style={{
+                        display: 'flex', gap: 4, alignItems: 'center',
+                      }}>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            loadSections()
+                            setSectionSaveStatus('idle')
+                            setSavingSectionName('')
+                            setShowSaveSection(true)
+                          }}
+                          title="Save this section to your library"
+                          style={{
+                            padding: '2px 8px', borderRadius: 99, border: '1px solid rgba(27,97,201,0.25)',
+                            background: 'rgba(255,255,255,0.95)', fontSize: 10, fontWeight: 600,
+                            color: '#1b61c9', cursor: 'pointer', fontFamily: 'system-ui',
+                            display: 'flex', alignItems: 'center', gap: 3,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                            transition: 'background 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = '#eff6ff' }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.95)' }}
+                        >
+                          💾 Save
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            loadSections()
+                            setShowSectionLibrary(true)
+                          }}
+                          title="Insert a section from your library"
+                          style={{
+                            padding: '2px 8px', borderRadius: 99, border: '1px solid rgba(22,163,74,0.25)',
+                            background: 'rgba(255,255,255,0.95)', fontSize: 10, fontWeight: 600,
+                            color: '#166534', cursor: 'pointer', fontFamily: 'system-ui',
+                            display: 'flex', alignItems: 'center', gap: 3,
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+                            transition: 'background 0.15s ease',
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.background = '#f0fdf4' }}
+                          onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.95)' }}
+                        >
+                          📦 Library
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1820,13 +1970,17 @@ export default function PuckEditorPage({
                   )}
                 </span>
 
-                {/* Right: backup tip */}
-                <span style={{ color: '#9ca3af', whiteSpace: 'nowrap' }}>
-                  Tip: run{' '}
-                  <code style={{ fontFamily: 'monospace', background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>
-                    npm run puck:backup
-                  </code>
-                  {' '}before large editing sessions
+                {/* Right: keyboard shortcuts */}
+                <span style={{ color: '#9ca3af', whiteSpace: 'nowrap', display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span>
+                    <kbd style={{ fontFamily: 'system-ui', background: 'rgba(0,0,0,0.05)', padding: '1px 5px', borderRadius: 3, fontSize: 10, border: '1px solid rgba(0,0,0,0.08)' }}>Ctrl+Shift+S</kbd>
+                    {' '}save draft
+                  </span>
+                  <span style={{ color: '#d1d5db' }}>·</span>
+                  <span>
+                    <kbd style={{ fontFamily: 'system-ui', background: 'rgba(0,0,0,0.05)', padding: '1px 5px', borderRadius: 3, fontSize: 10, border: '1px solid rgba(0,0,0,0.08)' }}>Esc</kbd>
+                    {' '}close
+                  </span>
                 </span>
               </div>
             </div>
