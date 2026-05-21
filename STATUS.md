@@ -10,11 +10,11 @@
 ```
 feature/frontend-pages
 ```
-Working tree: **CLEAN** (nothing to commit)
-Latest commit: `de0aec2` (Phase 0 Operator Safety Layer)
+Working tree: **CLEAN**
+Latest commit: `3fd2ee9` (Phase 1-A Campaign Velocity)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commit Ready to Deploy:** `de0aec2` (Phase 0 Operator Safety Layer — NOT YET DEPLOYED)
+**Commits Ready to Deploy:** `3fd2ee9` (Phase 1-A) and `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
