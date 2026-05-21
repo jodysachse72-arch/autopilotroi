@@ -2199,7 +2199,7 @@ export const puckConfig: Config<Components> = {
               {successMessage}
             </div>
             <div style={{ fontSize: '0.8125rem', color: '#6b7280' }}>
-              We sent confirmation details to {emailVal}
+              We received your information and will follow up soon.
             </div>
           </div>
         ) : (
