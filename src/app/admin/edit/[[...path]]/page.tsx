@@ -1283,42 +1283,47 @@ export default function PuckEditorPage({
 
       {/* ── TASK 4: Editor sidebar field readability ───────────────── */}
       <style>{`
-        /* Force sidebar text inputs to always be readable */
-        [class*="Puck-rightSideBar"] input[type="text"],
-        [class*="Puck-rightSideBar"] textarea,
-        [class*="Puck-rightSideBar"] select,
-        [class*="Puck-rightSideBar"] [contenteditable],
-        [class*="rightSideBar"] input[type="text"],
-        [class*="rightSideBar"] textarea,
-        [class*="rightSideBar"] select,
-        [class*="rightSideBar"] [contenteditable],
-        [class*="SidebarSection"] input[type="text"],
-        [class*="SidebarSection"] textarea,
-        [class*="SidebarSection"] [contenteditable] {
+        /*
+         * Force ALL Puck sidebar text/textarea/select inputs to use safe dark text.
+         * Puck's CSS modules hash class names (e.g. _Input-input_bsxfo_26) but we
+         * target by attribute substring match for resilience across versions.
+         *
+         * Problem: when editing HeroDark (white text), the sidebar contentEditable
+         * inputs inherit color: #fff, making text invisible on white background.
+         *
+         * Fix: force dark text and white bg on all input elements in the host page.
+         * This does NOT affect iframe rendering (public frontend).
+         */
+
+        /* Puck sidebar inputs — force readable */
+        [class*="_Input-input_"] {
           color: #1f2937 !important;
           background-color: #ffffff !important;
         }
-        /* Ensure selected text in sidebar fields is visible */
-        [class*="rightSideBar"] ::selection,
-        [class*="SidebarSection"] ::selection {
+        [class*="_Input-input_"]::selection {
           background: rgba(59, 130, 246, 0.25) !important;
           color: #111827 !important;
         }
-        /* RichText editor in sidebar — force readable text */
-        [class*="rightSideBar"] .ProseMirror,
-        [class*="SidebarSection"] .ProseMirror {
+
+        /* Puck RichText editor in sidebar — force readable */
+        [class*="_RichTextEditor--editor_"] .ProseMirror {
           color: #1f2937 !important;
           background: #ffffff !important;
         }
-        [class*="rightSideBar"] .ProseMirror ::selection,
-        [class*="SidebarSection"] .ProseMirror ::selection {
+        [class*="_RichTextEditor--editor_"] .ProseMirror ::selection {
           background: rgba(59, 130, 246, 0.25) !important;
           color: #111827 !important;
         }
-        /* Ensure field labels are visible */
-        [class*="rightSideBar"] label,
-        [class*="SidebarSection"] label {
+
+        /* Puck field labels — ensure visible */
+        [class*="_FieldLabel_"] {
           color: #374151 !important;
+        }
+
+        /* Puck select dropdowns — force readable */
+        [class*="_Input-input_"] option {
+          color: #1f2937 !important;
+          background: #ffffff !important;
         }
       `}</style>
 
