@@ -226,6 +226,14 @@ export default function PuckEditorPage({
   const [duplicatePath, setDuplicatePath] = useState('')
   const [duplicating, setDuplicating]   = useState(false)
 
+  // FIX 2+3 — one-time orientation banners (from URL params, dismissed in-memory)
+  const [templateBanner, setTemplateBanner] = useState<string | null>(null)
+  const [duplicateBanner, setDuplicateBanner] = useState<string | null>(null)
+
+  // FIX 4 — styled dirty-page-switch modal (replaces window.confirm)
+  const [showSwitchConfirm, setShowSwitchConfirm] = useState(false)
+  const [pendingSwitchPath, setPendingSwitchPath]  = useState<string | null>(null)
+
 
   // Refs for synchronous closure-safe access
   const isDirtyRef = useRef(false)
@@ -236,12 +244,29 @@ export default function PuckEditorPage({
   useBeforeUnloadGuard(isDirty)
 
   // Resolve page path from route params
+  // FIX 2+3: read ?fromTemplate and ?duplicatedFrom URL params for one-time banners
   useEffect(() => {
     params.then((resolved) => {
       const path = resolved.path ? '/' + resolved.path.join('/') : '/'
       setPagePath(path)
       setPathResolved(true)
     })
+    // Read orientation params from URL (client-side only, no SSR concern)
+    const searchParams = new URLSearchParams(window.location.search)
+    const fromTemplate = searchParams.get('fromTemplate')
+    const fromDuplicate = searchParams.get('duplicatedFrom')
+    if (fromTemplate) {
+      const tmpl = TEMPLATE_OPTIONS.find(t => t.value === fromTemplate)
+      setTemplateBanner(tmpl ? tmpl.label : fromTemplate)
+      // Clean the param from the URL without a page reload
+      const cleanUrl = window.location.pathname
+      window.history.replaceState({}, '', cleanUrl)
+    }
+    if (fromDuplicate) {
+      setDuplicateBanner(fromDuplicate)
+      const cleanUrl = window.location.pathname
+      window.history.replaceState({}, '', cleanUrl)
+    }
   }, [params])
 
   // Load pages list
@@ -365,12 +390,12 @@ export default function PuckEditorPage({
     }
   }, [])
 
-  // Reset page to default content
+  // FIX 1: Reset page — must pass ?force=true so seed actually overwrites existing content
   const resetToDefault = useCallback(async () => {
     setShowResetConfirm(false)
     setLoading(true)
     try {
-      await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}`, {
+      await fetch(`/api/puck/seed?path=${encodeURIComponent(pagePath)}&force=true`, {
         method: 'POST',
         headers: { 'x-puck-write-secret': WRITE_SECRET },
       })
@@ -439,28 +464,37 @@ export default function PuckEditorPage({
     scheduleAutosave()
   }, [scheduleAutosave])
 
-  // Navigate to different page — guard against unsaved changes
+  // FIX 4: styled modal replaces window.confirm for dirty-page-switch
   const switchPage = useCallback((newPath: string) => {
     if (isDirtyRef.current) {
-      const confirmed = window.confirm(
-        'You have unpublished changes on this page.\n\nLeave without publishing?'
-      )
-      if (!confirmed) return
+      setPendingSwitchPath(newPath)
+      setShowSwitchConfirm(true)
+      return
     }
     window.location.href = `/admin/edit${newPath === '/' ? '' : newPath}`
   }, [])
 
+  const confirmSwitchPage = useCallback(() => {
+    if (!pendingSwitchPath) return
+    setShowSwitchConfirm(false)
+    const path = pendingSwitchPath
+    setPendingSwitchPath(null)
+    window.location.href = `/admin/edit${path === '/' ? '' : path}`
+  }, [pendingSwitchPath])
+
   // Create new page
+  // FIX 2: navigate with ?fromTemplate= so new page shows orientation banner
   const createPage = useCallback(async () => {
     if (!newPagePath) return
     const path = newPagePath.startsWith('/') ? newPagePath : `/${newPagePath}`
     setShowNewPage(false)
     setNewPagePath('')
+    const templateUsed = selectedTemplate !== 'blank' ? selectedTemplate : null
 
-    if (selectedTemplate && selectedTemplate !== 'blank') {
+    if (templateUsed) {
       try {
         await fetch(
-          `/api/puck/seed?path=${encodeURIComponent(path)}&template=${encodeURIComponent(selectedTemplate)}`,
+          `/api/puck/seed?path=${encodeURIComponent(path)}&template=${encodeURIComponent(templateUsed)}`,
           {
             method: 'POST',
             headers: { 'x-puck-write-secret': WRITE_SECRET },
@@ -469,8 +503,10 @@ export default function PuckEditorPage({
       } catch {}
     }
 
-    switchPage(path)
-  }, [newPagePath, selectedTemplate, switchPage])
+    // Navigate directly (bypass switchPage's dirty-check — this is a new page creation)
+    const suffix = templateUsed ? `?fromTemplate=${encodeURIComponent(templateUsed)}` : ''
+    window.location.href = `/admin/edit${path}${suffix}`
+  }, [newPagePath, selectedTemplate])
 
   // ── Revision history ──────────────────────────────────────────────
   const loadRevisions = useCallback(async () => {
@@ -533,8 +569,9 @@ export default function PuckEditorPage({
       if (res.ok && result.ok) {
         setShowDuplicate(false)
         setDuplicatePath('')
-        // Navigate to the duplicated page immediately
-        window.location.href = `/admin/edit${targetPath}`
+        // FIX 3: Navigate with ?duplicatedFrom param so new page shows orientation banner
+        const sourceForBanner = encodeURIComponent(pagePath)
+        window.location.href = `/admin/edit${targetPath}?duplicatedFrom=${sourceForBanner}`
       } else {
         alert(result.error || 'Failed to duplicate page')
       }
@@ -614,6 +651,117 @@ export default function PuckEditorPage({
           >
             ✕
           </button>
+        </div>
+      )}
+
+      {/* ── FIX 2: Template load orientation banner ──────────────── */}
+      {templateBanner && (
+        <div style={{
+          position: 'fixed', top: 60, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 2147483647,
+          background: '#92400e', color: '#fef3c7',
+          padding: '10px 20px', borderRadius: 8,
+          fontFamily: 'system-ui', fontSize: 13, fontWeight: 600,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          animation: 'slideUp 0.3s ease',
+          display: 'flex', alignItems: 'center', gap: 8,
+          maxWidth: 560, textAlign: 'left',
+        }}>
+          <span>📄</span>
+          <span>
+            Loaded from <strong>{templateBanner}</strong> template.
+            Review all sections and update copy before publishing.
+          </span>
+          <button
+            onClick={() => setTemplateBanner(null)}
+            style={{
+              background: 'rgba(255,255,255,0.2)', border: 'none', color: '#fef3c7',
+              borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 12,
+              marginLeft: 8, flexShrink: 0,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ── FIX 3: Duplication orientation banner ────────────────── */}
+      {duplicateBanner && (
+        <div style={{
+          position: 'fixed', top: 60, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 2147483647,
+          background: '#1e40af', color: '#dbeafe',
+          padding: '10px 20px', borderRadius: 8,
+          fontFamily: 'system-ui', fontSize: 13, fontWeight: 600,
+          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          animation: 'slideUp 0.3s ease',
+          display: 'flex', alignItems: 'center', gap: 8,
+          maxWidth: 520,
+        }}>
+          <span>📋</span>
+          <span>
+            Duplicated from <strong>{duplicateBanner}</strong>.
+            You are now editing the copy — update content before publishing.
+          </span>
+          <button
+            onClick={() => setDuplicateBanner(null)}
+            style={{
+              background: 'rgba(255,255,255,0.2)', border: 'none', color: '#dbeafe',
+              borderRadius: 4, padding: '2px 8px', cursor: 'pointer', fontSize: 12,
+              marginLeft: 8, flexShrink: 0,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ── FIX 4: Styled dirty-page-switch confirmation modal ───── */}
+      {showSwitchConfirm && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2147483647,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: '28px 32px',
+            maxWidth: 420, width: '90%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            fontFamily: 'system-ui',
+            animation: 'slideUp 0.2s ease',
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>⚠️</div>
+            <h3 style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 700, color: '#111827' }}>
+              Leave without publishing?
+            </h3>
+            <p style={{ margin: '0 0 20px', fontSize: 14, color: '#6b7280', lineHeight: 1.6 }}>
+              You have <strong>unpublished changes</strong> on this page.
+              If you leave now, your edits will remain as a draft — but won't go live.
+              <br /><br />
+              Your autosaved draft will still be here when you return.
+            </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowSwitchConfirm(false); setPendingSwitchPath(null) }}
+                style={{
+                  padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db',
+                  background: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 500,
+                }}
+              >
+                Stay on this page
+              </button>
+              <button
+                onClick={confirmSwitchPage}
+                style={{
+                  padding: '8px 18px', borderRadius: 6, border: 'none',
+                  background: '#374151', color: '#fff', fontSize: 14,
+                  cursor: 'pointer', fontWeight: 700,
+                }}
+              >
+                Leave without publishing
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

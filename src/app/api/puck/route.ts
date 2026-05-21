@@ -397,10 +397,12 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (currentPage?.data && currentPage.data.content && currentPage.data.content.length > 0) {
+      // FIX 5: include section count in label so operators can distinguish revisions
+      const sectionCount = Array.isArray(currentPage.data.content) ? currentPage.data.content.length : 0
       const label = `Published ${new Date().toLocaleString('en-US', {
         month: 'short', day: 'numeric',
         hour: 'numeric', minute: '2-digit', hour12: true,
-      })}`
+      })} · ${sectionCount} section${sectionCount !== 1 ? 's' : ''}`
 
       await supabase.from('puck_page_revisions').insert({
         page_path: pagePath,
