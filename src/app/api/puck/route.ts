@@ -1,13 +1,18 @@
 /**
  * Puck Data API — Save, load, list and delete page content via Supabase
  *
- * GET  /api/puck?path=/           → load page data for path
- * GET  /api/puck?list=true        → list all saved pages
- * POST /api/puck { path, data }   → save (upsert) page data for path
- * DELETE /api/puck?path=/about    → delete a saved page
+ * ── Read Operations ──
+ * GET  /api/puck?path=/                → load published page data
+ * GET  /api/puck?path=/&draft=true     → load draft data (for editor resume)
+ * GET  /api/puck?path=/&preview=true   → load draft (or published) for preview
+ * GET  /api/puck?list=true             → list all saved pages
+ * GET  /api/puck?path=/&revisions=true → list revision history for a page
  *
- * Reads from `puck_pages` table using the anon key (public read via RLS).
- * Writes using the service_role key (bypasses RLS for admin operations).
+ * ── Write Operations (require x-puck-write-secret) ──
+ * POST /api/puck { path, data }                → PUBLISH (saves to data, clears draft, snapshots revision)
+ * POST /api/puck?draft=true { path, data }     → SAVE DRAFT (saves to draft_data only, no publish)
+ * POST /api/puck?restore=<revisionId> { path } → RESTORE revision (copies revision data to published data)
+ * DELETE /api/puck?path=/about                  → delete a saved page
  *
  * WRITE PROTECTION
  * POST and DELETE require the request header:
@@ -15,26 +20,18 @@
  *
  * NOTE: This is TEMPORARY stabilization protection.
  * Replace with Supabase session/role auth during the auth hardening sprint.
- * See: STATUS.md — P4, feature/api-layer branch.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
+// ── Max revisions to keep per page ──────────────────────────────────────────
+const MAX_REVISIONS_PER_PAGE = 20
+
 // ── Temporary write protection guard ────────────────────────────────────────
-// NOTE: Temporary stabilization protection.
-// Replace with Supabase session/role auth during the auth hardening sprint.
-// See: STATUS.md — P4, feature/api-layer branch.
-//
-// Uses NEXT_PUBLIC_PUCK_WRITE_SECRET (not PUCK_WRITE_SECRET) so the client
-// editor page can include the header in fetch calls without a server relay.
-// Trade-off accepted: header is visible in browser devtools, but this is
-// significantly better than fully open writes. Replace before production launch.
 function requireWriteSecret(request: NextRequest): NextResponse | null {
   const secret = process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET
 
-  // Fail closed: if the env var is not set at all, refuse all writes.
-  // This prevents a misconfigured deployment from being an open write endpoint.
   if (!secret) {
     console.error('[Puck API] NEXT_PUBLIC_PUCK_WRITE_SECRET is not set. Refusing write operation.')
     return NextResponse.json(
@@ -51,10 +48,8 @@ function requireWriteSecret(request: NextRequest): NextResponse | null {
     )
   }
 
-  // Header is present and matches — allow the write to proceed.
   return null
 }
-// ─────────────────────────────────────────────────────────────────────────────
 
 // Read client — uses anon key (RLS allows public reads)
 function getReadClient() {
@@ -78,6 +73,9 @@ function getWriteClient() {
 export async function GET(request: NextRequest) {
   const listAll = request.nextUrl.searchParams.get('list')
   const pagePath = request.nextUrl.searchParams.get('path') || '/'
+  const wantDraft = request.nextUrl.searchParams.get('draft') === 'true'
+  const wantPreview = request.nextUrl.searchParams.get('preview') === 'true'
+  const wantRevisions = request.nextUrl.searchParams.get('revisions') === 'true'
 
   try {
     const supabase = getReadClient()
@@ -86,7 +84,7 @@ export async function GET(request: NextRequest) {
     if (listAll === 'true') {
       const { data, error } = await supabase
         .from('puck_pages')
-        .select('path, updated_at')
+        .select('path, updated_at, draft_data')
         .order('path', { ascending: true })
 
       if (error) {
@@ -94,33 +92,82 @@ export async function GET(request: NextRequest) {
         return NextResponse.json([], { status: 200 })
       }
 
-      // Always include known static routes so the page switcher has them
       const STATIC_PAGES = [
         '/', '/products', '/calculator', '/faqs', '/contact',
         '/signup', '/start', '/privacy', '/terms', '/disclaimer',
       ]
 
       const savedPaths = new Set((data || []).map((d: { path: string }) => d.path))
-      const pages = STATIC_PAGES.map((p) => ({
-        path: p,
-        saved: savedPaths.has(p),
-        updated_at: data?.find((d: { path: string; updated_at?: string }) => d.path === p)?.updated_at || null,
-      }))
+      const pages = STATIC_PAGES.map((p) => {
+        const row = data?.find((d: { path: string }) => d.path === p)
+        return {
+          path: p,
+          saved: savedPaths.has(p),
+          updated_at: row?.updated_at || null,
+          has_draft: row?.draft_data != null,
+        }
+      })
 
-      // Add any saved pages that aren't in the static list (user-created pages)
       for (const d of data || []) {
         if (!STATIC_PAGES.includes(d.path)) {
-          pages.push({ path: d.path, saved: true, updated_at: d.updated_at || null })
+          pages.push({
+            path: d.path,
+            saved: true,
+            updated_at: d.updated_at || null,
+            has_draft: d.draft_data != null,
+          })
         }
       }
 
       return NextResponse.json(pages)
     }
 
+    // ── List revisions for a page ──
+    if (wantRevisions) {
+      const { data, error } = await supabase
+        .from('puck_page_revisions')
+        .select('id, published_at, label')
+        .eq('page_path', pagePath)
+        .order('published_at', { ascending: false })
+        .limit(MAX_REVISIONS_PER_PAGE)
+
+      if (error) {
+        console.error('[Puck API] Revisions list error:', error)
+        return NextResponse.json([], { status: 200 })
+      }
+
+      return NextResponse.json(data || [])
+    }
+
     // ── Load single page ──
+    if (wantDraft || wantPreview) {
+      // Draft/Preview: return draft_data if available, else published data
+      const { data, error } = await supabase
+        .from('puck_pages')
+        .select('data, draft_data')
+        .eq('path', pagePath)
+        .single()
+
+      if (error || !data) {
+        return NextResponse.json(null, { status: 404 })
+      }
+
+      const responseData = data.draft_data || data.data
+      const headers: Record<string, string> = {}
+      if (wantPreview) {
+        headers['X-Robots-Tag'] = 'noindex, nofollow'
+      }
+
+      return NextResponse.json(
+        { data: responseData, isDraft: data.draft_data != null },
+        { status: 200, headers }
+      )
+    }
+
+    // Standard published data load
     const { data, error } = await supabase
       .from('puck_pages')
-      .select('data')
+      .select('data, draft_data')
       .eq('path', pagePath)
       .single()
 
@@ -128,7 +175,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(null, { status: 404 })
     }
 
-    return NextResponse.json(data.data)
+    // Return published data + draft existence flag
+    return NextResponse.json({
+      ...data.data,
+      _hasDraft: data.draft_data != null,
+    })
   } catch (err) {
     console.error('[Puck API GET] Error:', err)
     return NextResponse.json({ error: 'Internal error' }, { status: 500 })
@@ -139,19 +190,149 @@ export async function POST(request: NextRequest) {
   const authError = requireWriteSecret(request)
   if (authError) return authError
 
+  const isDraftSave = request.nextUrl.searchParams.get('draft') === 'true'
+  const restoreId = request.nextUrl.searchParams.get('restore')
+
   try {
     const body = await request.json()
     const { path: pagePath, data } = body
+    const supabase = getWriteClient()
 
+    // ── Restore a revision ──
+    if (restoreId) {
+      if (!pagePath) {
+        return NextResponse.json({ error: 'Missing path' }, { status: 400 })
+      }
+
+      // Fetch the revision
+      const { data: revision, error: revError } = await supabase
+        .from('puck_page_revisions')
+        .select('data')
+        .eq('id', restoreId)
+        .eq('page_path', pagePath)
+        .single()
+
+      if (revError || !revision) {
+        return NextResponse.json({ error: 'Revision not found' }, { status: 404 })
+      }
+
+      // Snapshot current state before restoring (so restore is itself reversible)
+      const { data: currentPage } = await supabase
+        .from('puck_pages')
+        .select('data')
+        .eq('path', pagePath)
+        .single()
+
+      if (currentPage?.data) {
+        await supabase.from('puck_page_revisions').insert({
+          page_path: pagePath,
+          data: currentPage.data,
+          label: 'Auto-saved before restore',
+        })
+      }
+
+      // Write the restored data as published + clear draft
+      const { error } = await supabase
+        .from('puck_pages')
+        .update({
+          data: revision.data,
+          draft_data: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('path', pagePath)
+
+      if (error) {
+        console.error('[Puck API] Restore error:', error)
+        return NextResponse.json({ error: 'Failed to restore' }, { status: 500 })
+      }
+
+      return NextResponse.json({ ok: true, path: pagePath, restored: true })
+    }
+
+    // ── Draft save (autosave) ──
+    if (isDraftSave) {
+      if (!pagePath || !data) {
+        return NextResponse.json({ error: 'Missing path or data' }, { status: 400 })
+      }
+
+      const { error } = await supabase
+        .from('puck_pages')
+        .update({ draft_data: data })
+        .eq('path', pagePath)
+
+      if (error) {
+        // If page doesn't exist yet, create it with draft_data
+        const { error: insertError } = await supabase
+          .from('puck_pages')
+          .upsert(
+            {
+              path: pagePath,
+              data: { content: [], root: { props: { title: '' } } },
+              draft_data: data,
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: 'path' }
+          )
+
+        if (insertError) {
+          console.error('[Puck API] Draft save error:', insertError)
+          return NextResponse.json({ error: 'Failed to save draft' }, { status: 500 })
+        }
+      }
+
+      return NextResponse.json({ ok: true, path: pagePath, draft: true })
+    }
+
+    // ── Publish ──
     if (!pagePath || !data) {
       return NextResponse.json({ error: 'Missing path or data' }, { status: 400 })
     }
 
-    const supabase = getWriteClient()
+    // 1. Snapshot current published data as a revision BEFORE overwriting
+    const { data: currentPage } = await supabase
+      .from('puck_pages')
+      .select('data')
+      .eq('path', pagePath)
+      .single()
+
+    if (currentPage?.data && currentPage.data.content && currentPage.data.content.length > 0) {
+      const label = `Published ${new Date().toLocaleString('en-US', {
+        month: 'short', day: 'numeric',
+        hour: 'numeric', minute: '2-digit', hour12: true,
+      })}`
+
+      await supabase.from('puck_page_revisions').insert({
+        page_path: pagePath,
+        data: currentPage.data,
+        label,
+      })
+
+      // 2. Prune old revisions (keep only newest MAX_REVISIONS_PER_PAGE)
+      const { data: allRevisions } = await supabase
+        .from('puck_page_revisions')
+        .select('id')
+        .eq('page_path', pagePath)
+        .order('published_at', { ascending: false })
+
+      if (allRevisions && allRevisions.length > MAX_REVISIONS_PER_PAGE) {
+        const idsToDelete = allRevisions.slice(MAX_REVISIONS_PER_PAGE).map((r) => r.id)
+        await supabase
+          .from('puck_page_revisions')
+          .delete()
+          .in('id', idsToDelete)
+      }
+    }
+
+    // 3. Write published data + clear draft
     const { error } = await supabase
       .from('puck_pages')
       .upsert(
-        { path: pagePath, data, updated_at: new Date().toISOString() },
+        {
+          path: pagePath,
+          data,
+          draft_data: null,
+          updated_at: new Date().toISOString(),
+        },
         { onConflict: 'path' }
       )
 

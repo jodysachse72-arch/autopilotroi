@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 23:49 UTC (SEO + Analytics + ThriveDesk — dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz)
+> Last verified: 2026-05-21 05:13 UTC (Phase 0 Operator Safety Layer — commit `de0aec2`)
 
 ---
 
@@ -11,12 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN** (nothing to commit)
-Synced with: `origin/feature/frontend-pages` — up to date (commit `49a14ed`)
+Latest commit: `de0aec2` (Phase 0 Operator Safety Layer)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
-**Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz`
-**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/9Xsq3AANe8EQeYgdpB5DmAfdMiQz
-**Deployed At:** 2026-05-20 23:49 UTC (26s build, iad1 Washington DC)
-**Commit Deployed:** `bc5413d` (SEO + Analytics + ThriveDesk sprint)
+**Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
+**Commit Ready to Deploy:** `de0aec2` (Phase 0 Operator Safety Layer — NOT YET DEPLOYED)
 
 ---
 
@@ -45,28 +43,27 @@ Certifying agent: Production Release Lead
 - **Homepage Conversion Optimization** (ActivityTicker below hero, QuoteBlock trust bridge, PricingCard investment tiers)
 - **Puck CSS Isolation** — removed 70.7KB dead editor CSS from public homepage bundle
 - **SEO + Analytics + ThriveDesk sprint** — commit `b48d65e`
-  - `/products` now has page-specific SEO metadata (title, OG, Twitter, canonical)
-  - Fixed: `'use client'` on `/products` was blocking `export metadata` — now server wrapper + `ProductsClient.tsx`
-  - ThriveDesk: replaced `console.log` stub with real SDK IIFE embed (activates when widget ID is set)
-  - Plausible: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN=autopilotroi.com` added to Vercel production — analytics now live
-  - `NEXT_PUBLIC_SITE_URL=https://autopilotroi.com` added to Vercel — `metadataBase` now resolves correctly
-  - `PuckPageRenderer` now imports 2.9KB `src/styles/puck-render-only.css` (vendored from rsc.css)
-  - Admin editor retains full `puck.css` (73KB) — correct, needs full editor chrome
-  - Upload artifact shrank from 376.5KB —> 340.8KB (35.7KB reduction)
-  - Audit confirmed: `index.css` had only `--puck-*` CSS vars + module hashes, zero style bleeding
-  - Production certified: `dpl_6v81rNVMSQsF3JNveamPmxRBAyBH` — commit `7ce56d1`
-  - `/` is now an async server component — fetches Puck JSON from Supabase at request time
-  - Falls back to `StaticHomePage.tsx` if CMS is unavailable (never white-screens)
-  - `PuckPageRenderer.tsx` bridges Puck Data JSON to `<Render>` with error boundary
-  - `HOMEPAGE_SEED` fully canonical: 10 blocks, 11 zones, pricing-grid, ActivityTicker, QuoteBlock all seeded
-  - Live Supabase homepage seeded (force=true) with canonical data — Barry can now edit REAL homepage
-  - Production certified: `dpl_FLiJNX65JskYGRYSXhJBMGkbTX7Z` — commit `8531df0` — ISR route confirmed
+- **Phase 0: Operator Safety Layer** — commit `de0aec2`
+  - Draft/Autosave: 30s debounced autosave to `draft_data` column, manual Save Draft button
+  - Draft resume: editor loads from `draft_data` if present, shows "Resuming your unsaved draft" banner
+  - Draft preview: `/admin/preview/[[...path]]` renders draft content with noindex banner
+  - Revision history: snapshot on every publish → `puck_page_revisions` table (20 max per page)
+  - Revision restore: restore any previous version with auto-snapshot-before-restore safety
+  - Pre-publish confirmation: modal shows page name, section count, last-published time
+  - Outline section identity: sectionName values listed in outline panel for quick reference
+  - Trust polish: draft status in status bar, draft error toast, specific error messages
+  - Page list shows 📝 indicator for pages with unsaved drafts
+  - Database: `draft_data` column added to `puck_pages`, `puck_page_revisions` table created
+  - API: draft save, draft load, preview load, revision list, revision restore, revision pruning
+  - Build verified: tsc 0 errors, 64/64 pages, exit 0
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
+de0aec2  feat(cms): Phase 0 Operator Safety Layer — draft/autosave, preview, revision history, pre-publish confirmation, outline labels, trust polish
+bdeefa7  chore: production certification — dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz
 bc5413d  fix(seo): remove redundant site-name suffix from /products title
 b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embed fix
 668a508  chore: production certification — Puck CSS isolation
@@ -75,8 +72,6 @@ d79e9fa  chore: production certification — homepage CMS migration
 8531df0  feat(cms): homepage CMS migration — CMS-first ISR rendering
 d3817ac  chore: production certification — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx
 60b6447  chore: add dotenv dev dependency
-49a14ed  chore: update STATUS.md — CMS UX stack deployed
-a901757  docs: CMS operations & governance sprint
 ```
 
 ---
@@ -84,9 +79,9 @@ a901757  docs: CMS operations & governance sprint
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-20 23:49 UTC)
-npm run build     →  ✅ EXIT 0  (64 pages, 11.2s compile — verified 2026-05-20 23:49 UTC)
-Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 05:10 UTC)
+npm run build     →  ✅ EXIT 0  (64 pages, 6.1s compile — verified 2026-05-21 05:10 UTC)
+Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
 ---
@@ -118,20 +113,25 @@ docs/archive/                           ← Archived stale docs from cleanup spr
 
 ```
 Browser → /admin/edit  →  Puck visual editor (client-side React)
+                               ↓  every ~30s
+                        POST /api/puck?draft=true  → draft_data column (autosave)
                                ↓  on Publish
                         POST /api/puck  (x-puck-write-secret guard)
-                               ↓
-                        Supabase puck_pages table (JSONB)
+                               ↓  snapshot current → puck_page_revisions
+                        Supabase puck_pages.data (JSONB) + clear draft_data
                                ↓
                     GET /api/puck  (public read)
                                ↓
               Next.js [[...path]]/page.tsx → PuckRenderer → live site
+
+      /admin/preview/*  →  GET /api/puck?preview=true  → draft_data (or data) → PuckPageRenderer
 ```
 
 **Key files:**
-- `src/app/admin/edit/[[...path]]/page.tsx` — editor UI, all overrides
+- `src/app/admin/edit/[[...path]]/page.tsx` — editor UI, draft/autosave, revision history, pre-publish
+- `src/app/admin/preview/[[...path]]/page.tsx` — draft preview renderer (read-only, noindex)
 - `src/puck.config.tsx` — all editable component definitions
-- `src/app/api/puck/route.ts` — read/write/delete API
+- `src/app/api/puck/route.ts` — read/write/delete/draft/revision API
 - `src/app/api/puck/seed/route.ts` — default content seeder
 - `scripts/puck-backup.js` — backup utility
 - `scripts/puck-restore.js` — restore utility
@@ -178,10 +178,11 @@ node scripts/puck-restore.js --backup backups/puck/<filename>.json --path / --co
 |---|---|---|
 | Write guard is shared-secret only (no session auth) | Medium — secret must be protected | `feature/api-layer` sprint |
 | Puck DropZone API deprecated (console warning) | Low — no functional impact | Future migration sprint |
-| Outline rows show type label only (5× "Content Section") | Low — mitigated by sectionName field + canvas overlay | Puck constraint, cannot be eliminated |
+| Outline rows show type label only (5× "Content Section") | Low — mitigated by sectionName in outline panel + canvas overlay | Phase 0 added section name list in outline |
 | No automated editor smoke tests | Low — manual verification checklist used | Future CI/CD sprint |
 | Turnstile site key empty (bot protection disabled on /signup) | Low — signup bot risk | Config task — needs Cloudflare key |
 | `feature/frontend-pages` not merged to `main` | Medium — `main` is contaminated | Keep as is; all deploys from this branch |
+| Phase 0 not yet deployed to production | Medium — features committed but not live | Deploy when ready: `npx vercel deploy --prod` |
 
 ---
 
