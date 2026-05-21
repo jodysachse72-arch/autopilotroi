@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 07:29 UTC (Phase 5 In-Canvas Operations — committed 44e1be1, build verified)
+> Last verified: 2026-05-21 07:43 UTC (Phase 6 Media + Modal — committed 45c6055, build verified)
 
 ---
 
@@ -11,10 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN**
-Latest commit: `44e1be1` (Phase 5 In-Canvas Operations)
+Latest commit: `45c6055` (Phase 6 Media + Modal)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commits Ready to Deploy:** `44e1be1` (Phase 5), `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
+**Commits Ready to Deploy:** `45c6055` (Phase 6), `44e1be1` (Phase 5), `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
@@ -172,22 +172,56 @@ Certifying agent: Production Release Lead
     - Selection ring: 2px blue + 4px soft blue glow
     - Color-coded interaction language: blue=text, green=CTA, purple=media
   - Build verified: tsc 0 errors, 65/65 pages, exit 0
+- **Phase 6: Media + Modal** — commit `45c6055`
+  - **TASK 1 — Image Upload MVP**:
+    - `POST /api/puck/upload` API route — Supabase Storage `puck-media` bucket
+    - 5 MB max, validates JPEG/PNG/WebP/GIF/SVG
+    - Unique filenames: `{timestamp}-{random}-{sanitized}.{ext}`
+    - Returns public URL on success
+    - `ImageUrlField` upgraded: 📤 Upload button + URL input side-by-side
+    - Upload progress spinner, error messages, file type/size client-side validation
+    - Supabase Storage bucket migration: `20260521_puck_media_bucket.sql`
+  - **TASK 2 — Video Thumbnail Control**:
+    - `VideoUrlField` custom field with auto YouTube ID extraction
+    - Auto-generates `hqdefault.jpg` thumbnail preview with play button overlay
+    - Supports manual thumbnail URL override via `ImageUrlField`
+    - URL validation with green/amber border states
+    - Broken thumbnail graceful fallback
+    - Wired into HeroDark `videoUrl` + `videoThumb` fields and VideoBlock `videoUrl`
+  - **TASK 3 — ModalBlock Component**:
+    - Governed modal with: trigger button, title, rich text body, optional image/video, CTA
+    - YouTube auto-embed in modal via iframe
+    - Close button + backdrop click dismiss
+    - Mobile-safe max-width + scroll overflow
+    - Inline preview: click trigger button in editor to see modal
+  - **TASK 4 — PopupCTA Component**:
+    - Two display styles: centered modal or slide-up banner
+    - Dark gradient design matching AutoPilotROI design system
+    - Headline + body + CTA + dismiss button
+    - Manual trigger only (no exit intent/timers/cookies)
+    - Editor preview: click preview button to see popup/banner
+  - **TASK 5 — Editor UX**:
+    - Image fields use 📤 Upload button inline with URL input
+    - Video fields show live thumbnail preview with play overlay
+    - Modal/popup preview available directly in editor canvas
+    - All new components added to SectionBox `allow` list + categories
+  - Build verified: tsc 0 errors, 66/66 pages, exit 0
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
-44e1be1  feat(cms): Phase 5 In-Canvas Operations -- contextual section controls, CTA/media hover affordances, insertion clarity, keyboard shortcuts, selection states
-6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP, section save/insert flow, API full-section fetch, save-section modal
-b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation, media confidence, campaign speed, editor polish
-65aa130  feat(cms): Phase 2 Editing Delight and Operator Speed -- hero field grouping, CTA link validation, template selector clarity
+45c6055  feat(cms): Phase 6 Media + Modal -- image upload API, VideoUrlField, ModalBlock, PopupCTA, Supabase Storage bucket
+44e1be1  feat(cms): Phase 5 In-Canvas Operations -- contextual section controls, CTA/media hover affordances, keyboard shortcuts
+6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP, section save/insert flow
+b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation, editor polish
+65aa130  feat(cms): Phase 2 Editing Delight and Operator Speed -- hero field grouping, CTA link validation
 232802e  feat(cms): Phase 1-B Publishing Confidence and Editing Clarity -- 5 targeted fixes
 3fd2ee9  feat(cms): Phase 1-A Campaign Velocity -- page duplication, 9 templates, campaign categories
 4118004  feat(cms): Phase 0 Operator Safety Layer
 bdeefa7  chore: production certification
 bc5413d  fix(seo): remove redundant site-name suffix from /products title
-b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embed fix
 ```
 
 ---
@@ -195,8 +229,8 @@ b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embe
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:29 UTC)
-npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 07:29 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:43 UTC)
+npm run build     →  ✅ EXIT 0  (66 pages — verified 2026-05-21 07:43 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
