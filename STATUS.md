@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 08:05 UTC (Phase 7 Conversion Operations — committed 6962c6a, build verified)
+> Last verified: 2026-05-21 21:38 UTC (Phase 8 Campaign Deployment Maturity — committed e1d2a69, build verified)
 
 ---
 
@@ -11,10 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN**
-Latest commit: `6962c6a` (Phase 7 Conversion Operations)
+Latest commit: `e1d2a69` (Phase 8 Campaign Deployment Maturity)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commits Ready to Deploy:** `6962c6a` (Phase 7), `45c6055` (Phase 6), `44e1be1` (Phase 5), `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
+**Commits Ready to Deploy:** `e1d2a69` (Phase 8), `74f5549` (Phase 8a), `6962c6a` (Phase 7), `45c6055` (Phase 6), `44e1be1` (Phase 5), `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
@@ -247,22 +247,58 @@ Certifying agent: Production Release Lead
     - New "Conversion & Lead Capture" sidebar category with all conversion blocks
     - FunnelSteps added to Page Sections category
   - Build verified: tsc 0 errors, 66/66 pages, exit 0 (892ms)
+- **Phase 8: Campaign Deployment Maturity** — commits `74f5549`, `e1d2a69`
+  - **PHASE A — Real Form Submission**:
+    - FormBlock now submits to `/api/leads` (Supabase-backed, rate-limited)
+    - Controlled input state (name, email, message via useState)
+    - Client-side email validation before submission
+    - Real error handling: API errors, network errors, rate limiting
+    - Enhanced success state: ✅ icon + confirmation email display
+    - Error display: red background card with border
+    - Spam protection via existing rate limiting + optional Turnstile
+  - **PHASE B — Template Registry Expansion (15 total)**:
+    - `webinar-registration`: CTAStrip(webinar) → FunnelSteps → FormBlock → CTAStrip(urgency)
+    - `lead-magnet-page`: HeroDark → Features → FormBlock → Testimonials → CTAStrip(lead-magnet)
+    - `pricing-offer-page`: PageHeader → PricingCard x3 → FAQ → Testimonials → CTAStrip(trust)
+    - `consultation-booking`: HeroDark → FunnelSteps(vertical) → Quote → FormBlock(message) → CTAStrip
+    - `onboarding-funnel`: HeroBlue → FunnelSteps(4-step) → Features → Stats → Testimonials → CTAStrip
+    - `trust-authority-page`: HeroBlue → Stats → TrustSignals x4 → Quote → Testimonials → CTAStrip
+  - **PHASE C — Reusable Section Seeding**:
+    - 12 curated section seeds across 6 categories (hero, cta, trust, pricing, content, faq)
+    - Seeds: Hero Dark, Hero Blue, CTA Onboarding, CTA Urgency, 3 Testimonials, Stats Bar, Featured Pricing, 3-Step Funnel, 3-Col Features, Lead Capture Form, Common FAQ, Webinar Registration
+    - Seed API: POST `/api/puck/sections/seed` (write-protected)
+    - Duplicate-safe: skips existing section names
+  - **PHASE D — Section Reorder Confidence**:
+    - Drag-active component: 50% opacity + dashed blue outline + glow
+    - Drop indicator: gradient blue line with shadow
+    - Opacity transition added to all puck components
+  - **PHASE E — Operator Recovery & Confidence**:
+    - Undo/redo keyboard hints: Ctrl+Z / Ctrl+Y in footer bar
+    - Recovery reassurance in publish dialog: green card with auto-save message
+    - Flexwrap on shortcut bar for narrower screens
+  - **PHASE F — Long Page Operations**:
+    - scroll-margin-top: 80px on selected components
+    - Smooth scroll behavior preserved
+  - **PHASE G — Delight & Polish**:
+    - Opacity transition added to component hover/selection
+    - All transitions unified (outline, box-shadow, opacity)
+  - Build verified: tsc 0 errors, 67/67 pages, exit 0 (889ms)
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
-6962c6a  feat(cms): Phase 7 polish -- animation keyframes, mobile viewport labels, mobile preview check
-b983aab  feat(cms): Phase 7 Conversion Operations -- FormBlock, FunnelSteps, CTAStrip, TestimonialCard+PricingCard enhancements
-45c6055  feat(cms): Phase 6 Media + Modal -- image upload API, VideoUrlField, ModalBlock, PopupCTA
-44e1be1  feat(cms): Phase 5 In-Canvas Operations -- contextual controls, CTA/media affordances, keyboard shortcuts
-6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP, section save/insert flow
-b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation, editor polish
+e1d2a69  feat(cms): Phase 8 Templates + Seeds -- 6 new conversion templates, 12 section seeds, seed API
+74f5549  feat(cms): Phase 8 Campaign Maturity -- real form submission, drag confidence, undo/redo, recovery
+6980014  chore: update STATUS.md -- Phase 7
+6962c6a  feat(cms): Phase 7 polish -- animation keyframes, viewport labels, mobile preview check
+b983aab  feat(cms): Phase 7 Conversion Operations -- FormBlock, FunnelSteps, CTAStrip, enhanced cards
+45c6055  feat(cms): Phase 6 Media + Modal -- image upload, VideoUrlField, ModalBlock, PopupCTA
+44e1be1  feat(cms): Phase 5 In-Canvas Operations -- contextual controls, keyboard shortcuts
+6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP
+b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation
 65aa130  feat(cms): Phase 2 Editing Delight -- hero field grouping, CTA link validation
-232802e  feat(cms): Phase 1-B Publishing Confidence -- 5 targeted fixes
-3fd2ee9  feat(cms): Phase 1-A Campaign Velocity -- page duplication, 9 templates, campaign categories
-4118004  feat(cms): Phase 0 Operator Safety Layer
 ```
 
 ---
@@ -270,8 +306,8 @@ b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section or
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 08:05 UTC)
-npm run build     →  ✅ EXIT 0  (66 pages — verified 2026-05-21 08:05 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 21:38 UTC)
+npm run build     →  ✅ EXIT 0  (67 pages — verified 2026-05-21 21:38 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
