@@ -145,7 +145,7 @@ function OutlineWithLabels({ children }: { children: React.ReactNode }) {
         background: '#fafafa',
         flexShrink: 0,
       }}>
-        💡 Click any section to see its name and fields in the right panel.
+        💡 Click any section to select it and edit its fields. For FAQs: drop <strong>FAQ — Question &amp; Answer</strong> inside a <strong>FAQ Section</strong>, not directly on the page.
       </div>
 
       {/* Section name quick reference */}
@@ -901,6 +901,16 @@ export default function PuckEditorPage({
               }}>
                 Changes will be visible to visitors within 30–60 seconds.
               </div>
+              {/* TASK 4: Mobile viewport reminder */}
+              <div style={{
+                marginTop: 8, padding: '7px 12px', borderRadius: 6,
+                background: '#f9fafb', border: '1px solid #e5e7eb',
+                fontSize: 12, color: '#6b7280',
+                display: 'flex', alignItems: 'center', gap: 6,
+              }}>
+                <span>📱</span>
+                <span>Did you check the <strong>mobile view</strong>? Use the viewport buttons in the top toolbar to preview at 360px before publishing.</span>
+              </div>
             </div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
               <button
@@ -1222,7 +1232,7 @@ export default function PuckEditorPage({
                       borderRadius: 99,
                       border: '1px solid rgba(27,97,201,0.2)',
                     }}>
-                      Content Section — click to edit, check right panel for name
+                    Content Section — click to edit, check right panel for name
                     </span>
                   </div>
                 )}
@@ -1300,10 +1310,10 @@ export default function PuckEditorPage({
                       ✕
                     </button>
                     </div>
-                    {/* Template selector */}
+                    {/* TASK 3: Template description shown below selector */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span style={{ fontSize: 11, color: '#6b7280', fontFamily: 'system-ui', whiteSpace: 'nowrap' }}>
-                        Start from:
+                        Template:
                       </span>
                       <select
                         value={selectedTemplate}
@@ -1316,12 +1326,29 @@ export default function PuckEditorPage({
                         }}
                       >
                         {TEMPLATE_OPTIONS.map((t) => (
-                          <option key={t.value} value={t.value} title={t.desc}>
+                          <option key={t.value} value={t.value}>
                             {t.label}
                           </option>
                         ))}
                       </select>
                     </div>
+                    {/* Template description visible below selector */}
+                    {selectedTemplate !== 'blank' && (() => {
+                      const tmpl = TEMPLATE_OPTIONS.find(t => t.value === selectedTemplate)
+                      return tmpl ? (
+                        <div style={{
+                          fontSize: 11, color: '#374151',
+                          background: '#f0f9ff',
+                          border: '1px solid #bae6fd',
+                          borderRadius: 5, padding: '5px 8px',
+                          fontFamily: 'system-ui', lineHeight: 1.4,
+                          marginTop: 2,
+                        }}>
+                          <span style={{ fontWeight: 600, color: '#0369a1' }}>Flow: </span>
+                          {tmpl.desc}
+                        </div>
+                      ) : null
+                    })()}
                   </div>
                 ) : (
                   <button
@@ -1523,7 +1550,7 @@ export default function PuckEditorPage({
                   <code style={{ fontFamily: 'monospace', background: 'rgba(0,0,0,0.04)', padding: '1px 4px', borderRadius: 3 }}>
                     npm run puck:backup
                   </code>
-                  {' '}before large sessions
+                  {' '}before large editing sessions
                 </span>
               </div>
             </div>

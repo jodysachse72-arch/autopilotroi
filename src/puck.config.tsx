@@ -14,6 +14,7 @@
 import type { Config, RichText } from '@puckeditor/core'
 import { richTextField, ImageUrlField } from '@/lib/puck-editor'
 import type { ReactNode } from 'react'
+import { useState } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
 
 import HeroDark from '@/components/sections/HeroDark'
@@ -43,6 +44,11 @@ import { AutomationIcon, GrowthIcon, SecurityIcon, DataIcon, EcosystemIcon, Exch
 // ─────────────────────────────────────────────────────────────────
 
 type HeroDarkProps = {
+  // Visual group dividers (custom fields — values not stored)
+  _groupCopy?: string
+  _groupCTA?: string
+  _groupBullets?: string
+  _groupMedia?: string
   badge: string
   title: string
   highlightedText: string
@@ -302,25 +308,143 @@ const TAG_COLOR_OPTIONS = [
   { label: 'Slate Gray (Inactive)',   value: '#475569' },
 ]
 
+// ─────────────────────────────────────────────────────────────────
+// TASK 1: Field group divider — renders a labeled separator in
+// the Puck right panel. No data stored. Pure visual affordance.
+// ─────────────────────────────────────────────────────────────────
+
+function fieldGroupDivider(label: string) {
+  return {
+    type: 'custom' as const,
+    label,
+    render: () => (
+      <div style={{
+        borderTop: '1px solid #e5e7eb',
+        marginTop: 4,
+        marginBottom: 2,
+        paddingTop: 8,
+        fontSize: 10,
+        fontWeight: 700,
+        letterSpacing: '0.07em',
+        textTransform: 'uppercase' as const,
+        color: '#1b61c9',
+        fontFamily: 'system-ui',
+        opacity: 0.75,
+      }}>
+        {label}
+      </div>
+    ),
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// TASK 2: LinkField — validates CTA/href inputs inline.
+// Supports /relative, #anchor, https:// URLs.
+// Shows a red warning for invalid values, never blocks typing.
+// ─────────────────────────────────────────────────────────────────
+
+function isValidLink(v: string): boolean {
+  if (!v || v.trim() === '') return true // blank = hidden = OK
+  const s = v.trim()
+  if (s.startsWith('/')) return true
+  if (s.startsWith('#')) return true
+  if (s.startsWith('https://')) return true
+  if (s.startsWith('http://')) return true
+  if (s.startsWith('mailto:')) return true
+  return false
+}
+
+function LinkField({
+  value,
+  onChange,
+  label,
+  placeholder = '/page-path or #section or https://…',
+}: {
+  value: string
+  onChange: (v: string) => void
+  label?: string
+  placeholder?: string
+}) {
+  const [touched, setTouched] = useState(false)
+  const invalid = touched && value.trim() !== '' && !isValidLink(value)
+  return (
+    <div style={{ fontFamily: 'system-ui', width: '100%' }}>
+      {label && (
+        <label style={{
+          display: 'block', fontSize: 12, fontWeight: 600,
+          color: '#374151', marginBottom: 4,
+        }}>
+          {label}
+        </label>
+      )}
+      <input
+        type="text"
+        value={value ?? ''}
+        placeholder={placeholder}
+        onChange={(e) => { onChange(e.target.value); setTouched(true) }}
+        onBlur={() => setTouched(true)}
+        style={{
+          width: '100%', boxSizing: 'border-box',
+          padding: '6px 10px', borderRadius: 6, fontSize: 13,
+          fontFamily: 'system-ui',
+          border: invalid ? '1.5px solid #ef4444' : '1px solid #d1d5db',
+          background: invalid ? '#fff5f5' : '#fff',
+          outline: 'none',
+        }}
+      />
+      {invalid && (
+        <div style={{
+          fontSize: 11, color: '#dc2626',
+          marginTop: 3, lineHeight: 1.4,
+        }}>
+          ⚠ Link must start with / (page), # (anchor), or https://
+        </div>
+      )}
+      {!invalid && value && (
+        <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>
+          ✓ Valid link
+        </div>
+      )}
+    </div>
+  )
+}
+
 export const puckConfig: Config<Components> = {
   components: {
     // ── HERO ────────────────────────────────────────────────
     HeroDark: {
       label: 'Hero (Dark)',
       fields: {
+        // TASK 1: group dividers for scanability
+        _groupCopy:        fieldGroupDivider('— Hero Copy'),
         badge:              { type: 'text', contentEditable: true, label: 'Badge Text' },
         title:              { type: 'text', contentEditable: true, label: 'Headline — First Line' },
         highlightedText:    { type: 'text', contentEditable: true, label: 'Headline — Highlighted Word(s)' },
         description:        richTextField({ label: 'Body Text' }),
+        _groupCTA:         fieldGroupDivider('— CTA Buttons'),
         ctaLabel:           { type: 'text', contentEditable: true, label: 'Primary Button Text' },
-        ctaHref:            { type: 'text', label: 'Primary Button Link' },
-        secondaryCtaLabel:  { type: 'text', contentEditable: true, label: 'Secondary Button Text (optional)' },
-        secondaryCtaHref:   { type: 'text', label: 'Secondary Button Link (optional — use #section-name to scroll to a section)' },
+        ctaHref:            {
+          type: 'custom',
+          label: 'Primary Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Primary Button Link" placeholder="/signup or #section" />
+          ),
+        },
+        secondaryCtaLabel:  { type: 'text', contentEditable: true, label: 'Secondary Button Text (leave blank to hide)' },
+        secondaryCtaHref:   {
+          type: 'custom',
+          label: 'Secondary Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Secondary Button Link" placeholder="#section or /page (optional)" />
+          ),
+        },
+        _groupBullets:     fieldGroupDivider('— Benefit Bullets'),
         bulletOne:          { type: 'text', contentEditable: true, label: 'First Benefit' },
         bulletTwo:          { type: 'text', contentEditable: true, label: 'Second Benefit' },
         bulletThree:        { type: 'text', contentEditable: true, label: 'Third Benefit' },
-        videoUrl:           { type: 'text', label: 'YouTube Video URL' },
-        videoThumb:         { type: 'text', label: 'Video Thumbnail Image URL (leave blank to auto-generate)' },
+        _groupMedia:       fieldGroupDivider('— Media'),
+        videoUrl:           { type: 'text', label: 'YouTube Video URL (e.g. https://youtu.be/...)' },
+        videoThumb:         { type: 'text', label: 'Video Thumbnail URL (leave blank to auto-generate)' },
       },
       defaultProps: {
         badge: '✦ Powered by Aurum Ecosystem',
@@ -442,7 +566,13 @@ export const puckConfig: Config<Components> = {
         title:        { type: 'text', contentEditable: true, label: 'Headline' },
         description:  richTextField({ label: 'Body Text' }),
         ctaLabel:     { type: 'text', contentEditable: true, label: 'Button Text (leave blank to hide)' },
-        ctaHref:      { type: 'text', label: 'Button Link (leave blank to hide)' },
+        ctaHref:      {
+          type: 'custom',
+          label: 'Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Button Link (leave blank to hide)" />
+          ),
+        },
       },
       defaultProps: {
         eyebrow: 'Knowledge Base',
@@ -474,9 +604,21 @@ export const puckConfig: Config<Components> = {
         description1:     richTextField({ label: 'First Paragraph' }),
         description2:     richTextField({ label: 'Second Paragraph (optional)' }),
         cta1Label:        { type: 'text', contentEditable: true, label: 'Primary Button Text' },
-        cta1Href:         { type: 'text', label: 'Primary Button Link' },
+        cta1Href:         {
+          type: 'custom',
+          label: 'Primary Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Primary Button Link" />
+          ),
+        },
         cta2Label:        { type: 'text', contentEditable: true, label: 'Secondary Button Text (leave blank to hide)' },
-        cta2Href:         { type: 'text', label: 'Secondary Button Link' },
+        cta2Href:         {
+          type: 'custom',
+          label: 'Secondary Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Secondary Button Link" />
+          ),
+        },
       },
       defaultProps: {
         badge: 'What Is Aurum',
@@ -997,9 +1139,21 @@ export const puckConfig: Config<Components> = {
         title:          { type: 'text', contentEditable: true, label: 'Headline' },
         description:    richTextField({ label: 'Supporting Text' }),
         ctaLabel:       { type: 'text', contentEditable: true, label: 'Primary Button Text' },
-        ctaHref:        { type: 'text', label: 'Primary Button Link' },
+        ctaHref:        {
+          type: 'custom',
+          label: 'Primary Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Primary Button Link" />
+          ),
+        },
         secondaryLabel: { type: 'text', contentEditable: true, label: 'Secondary Button Text (leave blank to hide)' },
-        secondaryHref:  { type: 'text', label: 'Secondary Button Link' },
+        secondaryHref:  {
+          type: 'custom',
+          label: 'Secondary Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Secondary Button Link" />
+          ),
+        },
       },
       defaultProps: {
         eyebrow: 'Ready to start?',
@@ -1059,7 +1213,7 @@ export const puckConfig: Config<Components> = {
 
     // ── FAQ GROUP ──────────────────────────────────────────
     FaqGroup: {
-      label: 'FAQ Section',
+      label: 'FAQ Section (drag FAQ items inside)',
       fields: {
         groupTitle: {
           type: 'text',
@@ -1072,10 +1226,13 @@ export const puckConfig: Config<Components> = {
       },
       render: ({ groupTitle, puck }) => (
         <FaqGroup groupTitle={groupTitle}>
-          {puck.renderDropZone({
-            zone: 'faqs',
-            allow: ['FaqItem'],
-          })}
+          {/* TASK 5: subtle dropzone hint wrapper */}
+          <div style={{ position: 'relative' }}>
+            {puck.renderDropZone({
+              zone: 'faqs',
+              allow: ['FaqItem'],
+            })}
+          </div>
         </FaqGroup>
       ),
     },
@@ -1084,7 +1241,7 @@ export const puckConfig: Config<Components> = {
     VideoBlock: {
       label: 'YouTube Video',
       fields: {
-        videoUrl:    { type: 'text', label: 'YouTube Video URL (e.g. https://youtu.be/...)' },
+        videoUrl:    { type: 'text', label: 'YouTube Video URL (e.g. https://youtu.be/abc123)' },
         caption:     { type: 'text', contentEditable: true, label: 'Caption below video (optional)' },
         displaySize: {
           type: 'select',
@@ -1193,7 +1350,13 @@ export const puckConfig: Config<Components> = {
         feature7:    { type: 'text', contentEditable: true, label: 'Feature 7 (leave blank to hide)' },
         feature8:    { type: 'text', contentEditable: true, label: 'Feature 8 (leave blank to hide)' },
         ctaLabel:    { type: 'text', contentEditable: true, label: 'Button Text' },
-        ctaHref:     { type: 'text', label: 'Button Destination' },
+        ctaHref:     {
+          type: 'custom',
+          label: 'Button Destination',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Button Destination" placeholder="/signup" />
+          ),
+        },
         badge:       { type: 'text', contentEditable: true, label: 'Highlight Badge (e.g. Most Popular — leave blank to hide)' },
         cardStyle:   {
           type: 'select',
