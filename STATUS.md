@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 07:05 UTC (Phase 3 Operator Flow — committed b16e60a, build verified)
+> Last verified: 2026-05-21 07:18 UTC (Phase 4 Campaign Operations — committed 6c218b1, build verified)
 
 ---
 
@@ -11,10 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN**
-Latest commit: `b16e60a` (Phase 3 Operator Flow)
+Latest commit: `6c218b1` (Phase 4 Campaign Operations Maturity)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commits Ready to Deploy:** `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
+**Commits Ready to Deploy:** `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
@@ -129,12 +129,26 @@ Certifying agent: Production Release Lead
     - Outline tip banner: concise, italicized FAQ hint
     - FaqGroup label: "FAQ Section (drag FAQ items inside)"
   - Build verified: tsc 0 errors, 65/65 pages, exit 0
+- **Phase 4: Campaign Operations Maturity** — commit `6c218b1`
+  - **Phase A — Saved Section Library MVP**:
+    - "📦 Sections" button in editor header opens section library modal
+    - Category-filtered tabs: Heroes, CTAs, Trust, Pricing, FAQs, Content
+    - Click-to-insert: saved sections appended to page with regenerated IDs
+    - Zone data correctly copied and remapped for nested content (SectionBox dropzones)
+    - "💾 Save Section" button: saves current page content as named reusable section
+    - Name input + category selector + success/error states
+    - Sections API enhanced: GET `?id=uuid&full=true` returns full section data for insertion
+    - PuckContextHelpers component: invisible helper inside Puck context for insert/save dispatch
+  - **Architecture**: Supabase `puck_saved_sections` table (migration already existed), REST API CRUD, governed categories
+  - **Deferred**: Section duplication via overlay button (not enough overlay API surface), complex section preview thumbnails
+  - Build verified: tsc 0 errors, 65/65 pages, exit 0
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
+6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP, section save/insert flow, API full-section fetch, save-section modal, category tabs, PuckContextHelpers
 b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation, media confidence, campaign speed, editor polish
 65aa130  feat(cms): Phase 2 Editing Delight and Operator Speed -- hero field grouping, CTA link validation, template selector clarity, mobile viewport reminder, FAQ dropzone clarity, polish pass
 232802e  feat(cms): Phase 1-B Publishing Confidence and Editing Clarity -- 5 targeted fixes
@@ -144,7 +158,6 @@ eedf811  chore: update STATUS.md -- Phase 1-A committed as 3fd2ee9
 bdeefa7  chore: production certification
 bc5413d  fix(seo): remove redundant site-name suffix from /products title
 b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embed fix
-668a508  chore: production certification — Puck CSS isolation
 ```
 
 ---
@@ -152,8 +165,8 @@ b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embe
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:05 UTC)
-npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 07:05 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:18 UTC)
+npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 07:18 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
