@@ -12,7 +12,7 @@
  */
 
 import type { Config, RichText } from '@puckeditor/core'
-import { richTextField, ImageUrlField } from '@/lib/puck-editor'
+import { richTextField, ImageUrlField, VideoUrlField } from '@/lib/puck-editor'
 import type { ReactNode } from 'react'
 import { useState, useRef } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
@@ -215,6 +215,24 @@ type ActivityTickerProps = {
   theme: 'emerald' | 'blue' | 'neutral'
 }
 
+type ModalBlockProps = {
+  triggerLabel: string
+  modalTitle: string
+  modalBody: RichText
+  ctaLabel: string
+  ctaHref: string
+  mediaUrl: string
+  mediaType: 'none' | 'image' | 'video'
+}
+
+type PopupCTAProps = {
+  headline: string
+  body: RichText
+  ctaLabel: string
+  ctaHref: string
+  style: 'modal' | 'banner'
+}
+
 // ─────────────────────────────────────────────────────────────────
 // Puck Config
 // ─────────────────────────────────────────────────────────────────
@@ -252,6 +270,8 @@ type Components = {
   SignupWidget: SignupWidgetProps
   FaqAccordionWidget: FaqAccordionWidgetProps
   ImageBlock: { src: string; alt: string; maxWidth: number; borderRadius: number }
+  ModalBlock: ModalBlockProps
+  PopupCTA: PopupCTAProps
 }
 
 const ICONS: Record<string, ReactNode> = {
@@ -443,8 +463,22 @@ export const puckConfig: Config<Components> = {
         bulletTwo:          { type: 'text', contentEditable: true, label: 'Second Benefit' },
         bulletThree:        { type: 'text', contentEditable: true, label: 'Third Benefit' },
         _groupMedia:       fieldGroupDivider('— Media'),
-        videoUrl:           { type: 'text', label: 'YouTube Video URL (e.g. https://youtu.be/...)' },
-        videoThumb:         { type: 'text', label: 'Video Thumbnail URL (leave blank to auto-generate)' },
+        videoUrl: {
+          type: 'custom',
+          label: 'YouTube Video URL',
+          render: ({ value, onChange, name }: { value: string; onChange: (v: string) => void; name: string }) => {
+            // Find the videoThumb sibling value from the parent form — pass through as standalone
+            void name
+            return <VideoUrlField value={value ?? ''} onChange={onChange} label="YouTube Video URL" />
+          },
+        },
+        videoThumb: {
+          type: 'custom',
+          label: 'Custom Thumbnail',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <ImageUrlField value={value ?? ''} onChange={onChange} label="Custom Thumbnail (optional — overrides auto)" />
+          ),
+        },
       },
       defaultProps: {
         badge: '✦ Powered by Aurum Ecosystem',
@@ -719,7 +753,7 @@ export const puckConfig: Config<Components> = {
           <SectionBox variant={variant} padding={padding}>
             {puck.renderDropZone({
               zone: 'content',
-      allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup', 'PricingCard', 'ActivityTicker'],
+      allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup', 'PricingCard', 'ActivityTicker', 'ModalBlock', 'PopupCTA'],
               minEmptyHeight: 120,
             })}
           </SectionBox>
@@ -1242,7 +1276,13 @@ export const puckConfig: Config<Components> = {
     VideoBlock: {
       label: 'YouTube Video',
       fields: {
-        videoUrl:    { type: 'text', label: 'YouTube Video URL (e.g. https://youtu.be/abc123)' },
+        videoUrl: {
+          type: 'custom',
+          label: 'YouTube Video URL',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <VideoUrlField value={value ?? ''} onChange={onChange} label="YouTube Video URL" />
+          ),
+        },
         caption:     { type: 'text', contentEditable: true, label: 'Caption below video (optional)' },
         displaySize: {
           type: 'select',
@@ -1541,13 +1581,373 @@ export const puckConfig: Config<Components> = {
       },
     },
 
+    // ── MODAL BLOCK ──────────────────────────────────────────
+    ModalBlock: {
+      label: 'Modal / Popup Trigger',
+      fields: {
+        triggerLabel:   { type: 'text', contentEditable: true, label: 'Trigger Button Text' },
+        modalTitle:     { type: 'text', contentEditable: true, label: 'Modal Title' },
+        modalBody:      richTextField({ label: 'Modal Body Text' }),
+        ctaLabel:       { type: 'text', contentEditable: true, label: 'CTA Button Text (leave blank to hide)' },
+        ctaHref:        {
+          type: 'custom',
+          label: 'CTA Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="CTA Button Link" />
+          ),
+        },
+        mediaType: {
+          type: 'select',
+          label: 'Media Type',
+          options: [
+            { label: 'None',     value: 'none' },
+            { label: 'Image',    value: 'image' },
+            { label: 'YouTube',  value: 'video' },
+          ],
+        },
+        mediaUrl: {
+          type: 'custom',
+          label: 'Media URL',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <ImageUrlField value={value ?? ''} onChange={onChange} label="Image or YouTube URL" />
+          ),
+        },
+      },
+      defaultProps: {
+        triggerLabel: 'Learn More →',
+        modalTitle: 'How AutoPilotROI Works',
+        modalBody: 'AutoPilotROI connects you to the Aurum ecosystem with guided onboarding, AI-managed trading, and full support.',
+        ctaLabel: 'Get Started →',
+        ctaHref: '/signup',
+        mediaUrl: '',
+        mediaType: 'none',
+      },
+      render: ({ triggerLabel, modalTitle, modalBody, ctaLabel, ctaHref, mediaUrl, mediaType }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [open, setOpen] = useState(false)
+
+        // Extract YouTube ID for embed
+        const ytMatch = mediaUrl?.match(/(?:youtu\.be\/|[?&]v=|\/embed\/)([a-zA-Z0-9_-]{11})/)
+        const ytId = ytMatch?.[1]
+
+        return (
+          <>
+            {/* Trigger button */}
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                padding: '0.75rem 1.5rem', borderRadius: '0.625rem',
+                border: '2px solid #1b61c9', background: 'transparent',
+                color: '#1b61c9', fontSize: '1rem', fontWeight: 600,
+                fontFamily: 'inherit', cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {triggerLabel}
+            </button>
+
+            {/* Modal overlay */}
+            {open && (
+              <div
+                onClick={() => setOpen(false)}
+                style={{
+                  position: 'fixed', inset: 0, zIndex: 999999,
+                  background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '1rem',
+                  animation: 'fadeIn 0.2s ease',
+                }}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    background: '#fff', borderRadius: '1rem',
+                    maxWidth: '560px', width: '100%',
+                    maxHeight: '85vh', overflow: 'auto',
+                    boxShadow: '0 24px 64px rgba(0,0,0,0.2)',
+                    animation: 'slideUp 0.25s ease',
+                  }}
+                >
+                  {/* Header */}
+                  <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '1.25rem 1.5rem', borderBottom: '1px solid #f1f5f9',
+                  }}>
+                    <h3 style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: '#111827' }}>
+                      {modalTitle}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setOpen(false)}
+                      style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        border: 'none', background: '#f1f5f9',
+                        fontSize: 16, cursor: 'pointer', color: '#64748b',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Media */}
+                  {mediaType === 'image' && mediaUrl && (
+                    <div style={{ padding: '0 1.5rem' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={mediaUrl} alt="" style={{
+                        width: '100%', borderRadius: '0.5rem', marginTop: '0.75rem',
+                      }} />
+                    </div>
+                  )}
+                  {mediaType === 'video' && ytId && (
+                    <div style={{ padding: '0 1.5rem', marginTop: '0.75rem' }}>
+                      <div style={{ position: 'relative', paddingBottom: '56.25%', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                        <iframe
+                          src={`https://www.youtube.com/embed/${ytId}?autoplay=0`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Body */}
+                  <div style={{
+                    padding: '1.25rem 1.5rem',
+                    fontSize: '0.9375rem', color: '#374151', lineHeight: 1.7,
+                  }}>
+                    {typeof modalBody === 'string'
+                      ? <p style={{ margin: 0 }}>{modalBody}</p>
+                      : <div dangerouslySetInnerHTML={{ __html: modalBody as unknown as string }} />
+                    }
+                  </div>
+
+                  {/* CTA */}
+                  {ctaLabel && ctaHref && (
+                    <div style={{ padding: '0 1.5rem 1.5rem', display: 'flex', justifyContent: 'center' }}>
+                      <a
+                        href={ctaHref}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center',
+                          padding: '0.75rem 2rem', borderRadius: '0.625rem',
+                          background: 'linear-gradient(135deg, #1b61c9 0%, #3b82f6 100%)',
+                          color: '#fff', fontSize: '1rem', fontWeight: 600,
+                          textDecoration: 'none', boxShadow: '0 4px 16px rgba(27,97,201,0.3)',
+                        }}
+                      >
+                        {ctaLabel}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </>
+        )
+      },
+    },
+
+    // ── POPUP CTA ──────────────────────────────────────────────
+    PopupCTA: {
+      label: 'Popup CTA Banner',
+      fields: {
+        headline:     { type: 'text', contentEditable: true, label: 'Headline' },
+        body:         richTextField({ label: 'Body Text' }),
+        ctaLabel:     { type: 'text', contentEditable: true, label: 'CTA Button Text' },
+        ctaHref:      {
+          type: 'custom',
+          label: 'CTA Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="CTA Button Link" />
+          ),
+        },
+        style: {
+          type: 'select',
+          label: 'Display Style',
+          options: [
+            { label: 'Centered Modal',   value: 'modal'  },
+            { label: 'Slide-up Banner',  value: 'banner' },
+          ],
+        },
+      },
+      defaultProps: {
+        headline: 'Ready to Start?',
+        body: 'Join thousands of members who activated the EX-AI Bot and started growing their portfolio on autopilot.',
+        ctaLabel: 'Begin Onboarding →',
+        ctaHref: '/signup',
+        style: 'banner',
+      },
+      render: ({ headline, body, ctaLabel, ctaHref, style: displayStyle }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [visible, setVisible] = useState(false)
+
+        if (displayStyle === 'banner') {
+          return (
+            <div style={{ position: 'relative' }}>
+              {/* Trigger */}
+              {!visible && (
+                <button
+                  type="button"
+                  onClick={() => setVisible(true)}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                    padding: '0.5rem 1rem', borderRadius: '0.5rem',
+                    border: '1.5px solid #10b981', background: '#ecfdf5',
+                    color: '#065f46', fontSize: '0.875rem', fontWeight: 600,
+                    cursor: 'pointer', fontFamily: 'inherit',
+                  }}
+                >
+                  📢 Show Banner Preview
+                </button>
+              )}
+
+              {/* Banner */}
+              {visible && (
+                <div style={{
+                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                  borderRadius: '0.75rem', padding: '1.25rem 1.5rem',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  gap: '1rem', flexWrap: 'wrap',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                  animation: 'slideUp 0.3s ease',
+                }}>
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginBottom: '0.25rem' }}>
+                      {headline}
+                    </div>
+                    <div style={{ fontSize: '0.8125rem', color: '#94a3b8', lineHeight: 1.5 }}>
+                      {typeof body === 'string' ? body : ''}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                    <a
+                      href={ctaHref}
+                      style={{
+                        display: 'inline-flex', padding: '0.625rem 1.25rem',
+                        borderRadius: '0.5rem',
+                        background: 'linear-gradient(135deg, #10b981, #34d399)',
+                        color: '#fff', fontSize: '0.875rem', fontWeight: 600,
+                        textDecoration: 'none', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {ctaLabel}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setVisible(false)}
+                      style={{
+                        width: 28, height: 28, borderRadius: '50%',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        background: 'rgba(255,255,255,0.08)',
+                        color: '#94a3b8', fontSize: 14, cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        }
+
+        // Modal style
+        return (
+          <div style={{ position: 'relative' }}>
+            <button
+              type="button"
+              onClick={() => setVisible(true)}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+                padding: '0.5rem 1rem', borderRadius: '0.5rem',
+                border: '1.5px solid #8b5cf6', background: '#f5f3ff',
+                color: '#5b21b6', fontSize: '0.875rem', fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}
+            >
+              📢 Show Popup Preview
+            </button>
+
+            {visible && (
+              <div
+                onClick={() => setVisible(false)}
+                style={{
+                  position: 'fixed', inset: 0, zIndex: 999999,
+                  background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  padding: '1rem',
+                  animation: 'fadeIn 0.2s ease',
+                }}
+              >
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                    borderRadius: '1rem', maxWidth: '480px', width: '100%',
+                    padding: '2rem', textAlign: 'center',
+                    boxShadow: '0 24px 64px rgba(0,0,0,0.3)',
+                    animation: 'slideUp 0.25s ease',
+                  }}
+                >
+                  <h3 style={{
+                    margin: '0 0 0.75rem', fontSize: '1.25rem', fontWeight: 700,
+                    color: '#fff',
+                  }}>
+                    {headline}
+                  </h3>
+                  <div style={{
+                    fontSize: '0.9375rem', color: '#94a3b8',
+                    lineHeight: 1.6, marginBottom: '1.25rem',
+                  }}>
+                    {typeof body === 'string' ? body : ''}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem' }}>
+                    <a
+                      href={ctaHref}
+                      style={{
+                        display: 'inline-flex', padding: '0.75rem 1.5rem',
+                        borderRadius: '0.625rem',
+                        background: 'linear-gradient(135deg, #10b981, #34d399)',
+                        color: '#fff', fontSize: '1rem', fontWeight: 600,
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 16px rgba(16,185,129,0.3)',
+                      }}
+                    >
+                      {ctaLabel}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setVisible(false)}
+                      style={{
+                        padding: '0.75rem 1rem', borderRadius: '0.625rem',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        background: 'transparent', color: '#94a3b8',
+                        fontSize: '0.875rem', cursor: 'pointer',
+                        fontFamily: 'inherit',
+                      }}
+                    >
+                      Maybe Later
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      },
+    },
+
   },
 
   // ── Component Categories (sidebar grouping) ──────────────
   categories: {
     campaignEssentials: {
       title: '🚀 Campaign Essentials',
-      components: ['HeroDark', 'CTABand', 'PricingCard', 'ActivityTicker'],
+      components: ['HeroDark', 'CTABand', 'PricingCard', 'ActivityTicker', 'PopupCTA', 'ModalBlock'],
       defaultExpanded: true,
     },
     heroes: {
@@ -1567,7 +1967,7 @@ export const puckConfig: Config<Components> = {
     },
     content: {
       title: '📝 Content Blocks',
-      components: ['Step', 'ImageBlock', 'VideoBlock', 'QuoteBlock'],
+      components: ['Step', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'ModalBlock'],
       defaultExpanded: false,
     },
     pricing: {
