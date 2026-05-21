@@ -61,6 +61,23 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = getReadClient()
     const category = request.nextUrl.searchParams.get('category')
+    const sectionId = request.nextUrl.searchParams.get('id')
+    const full = request.nextUrl.searchParams.get('full') === 'true'
+
+    // PHASE A: Fetch single section with full data for insertion
+    if (sectionId && full) {
+      const { data, error } = await supabase
+        .from('puck_saved_sections')
+        .select('id, name, category, data, created_at')
+        .eq('id', sectionId)
+        .single()
+
+      if (error || !data) {
+        return NextResponse.json({ error: 'Section not found' }, { status: 404 })
+      }
+
+      return NextResponse.json({ section: data })
+    }
 
     let query = supabase
       .from('puck_saved_sections')

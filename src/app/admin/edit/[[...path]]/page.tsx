@@ -31,6 +31,8 @@ import '@puckeditor/core/puck.css'
 
 type PageEntry = { path: string; saved: boolean; updated_at: string | null; has_draft?: boolean }
 type Revision = { id: string; published_at: string; label: string }
+type SavedSection = { id: string; name: string; category: string; created_at: string }
+type SectionCategory = { key: string; label: string }
 
 // Template registry metadata
 const TEMPLATE_OPTIONS = [
@@ -254,6 +256,51 @@ export default function PuckEditorPage({
     return `${pagePath}-copy`
   }, [pagePath])
 
+  // PHASE A: Saved Section Library state
+  const [showSectionLibrary, setShowSectionLibrary] = useState(false)
+  const [savedSections, setSavedSections] = useState<SavedSection[]>([])
+  const [sectionCategories, setSectionCategories] = useState<SectionCategory[]>([])
+  const [activeSectionCategory, setActiveSectionCategory] = useState('all')
+  const [loadingSections, setLoadingSections] = useState(false)
+  const [savingSectionName, setSavingSectionName] = useState('')
+  const [savingSectionCategory, setSavingSectionCategory] = useState('content')
+  const [showSaveSection, setShowSaveSection] = useState(false)
+  const [sectionSaveStatus, setSectionSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+
+  // PHASE A: Load saved sections
+  const loadSections = useCallback(async () => {
+    setLoadingSections(true)
+    try {
+      const res = await fetch('/api/puck/sections')
+      if (res.ok) {
+        const json = await res.json()
+        setSavedSections(json.sections || [])
+        setSectionCategories(json.categories || [])
+      }
+    } catch (e) {
+      console.error('[Sections] Load failed:', e)
+    }
+    setLoadingSections(false)
+  }, [])
+
+  // PHASE A: Insert a saved section into current page
+  const insertSavedSection = useCallback(async (sectionId: string) => {
+    try {
+      const res = await fetch(`/api/puck/sections?id=${sectionId}&full=true`)
+      if (!res.ok) return
+      const json = await res.json()
+      if (json.section?.data) {
+        // Store the section data for the InsertSectionHelper to pick up
+        pendingInsertRef.current = json.section.data
+        // Force a re-render to trigger the helper
+        setShowSectionLibrary(false)
+      }
+    } catch (e) {
+      console.error('[Sections] Insert failed:', e)
+    }
+  }, [])
+  const pendingInsertRef = useRef<unknown>(null)
+
   // FIX 2+3 — one-time orientation banners (from URL params, dismissed in-memory)
   const [templateBanner, setTemplateBanner] = useState<string | null>(null)
   const [duplicateBanner, setDuplicateBanner] = useState<string | null>(null)
@@ -262,6 +309,8 @@ export default function PuckEditorPage({
   const [showSwitchConfirm, setShowSwitchConfirm] = useState(false)
   const [pendingSwitchPath, setPendingSwitchPath]  = useState<string | null>(null)
 
+
+  const saveSectionRef = useRef<(() => void) | null>(null)
 
   // Refs for synchronous closure-safe access
   const isDirtyRef = useRef(false)
@@ -1322,8 +1371,104 @@ export default function PuckEditorPage({
             <OutlineWithLabels>{children}</OutlineWithLabels>
           ),
 
-          headerActions: ({ children }) => (
+          headerActions: ({ children }) => {
+            // PHASE A/B: Inner component that has usePuck() access
+            function PuckContextHelpers() {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const { appState, dispatch } = usePuck()
+
+              // PHASE A: Register save section callback
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                saveSectionRef.current = async () => {
+                  if (!appState?.data?.content?.length) return
+                  setSectionSaveStatus('saving')
+                  try {
+                    // Save all top-level content as the section data
+                    const sectionData = {
+                      content: appState.data.content,
+                      zones: (appState.data as Record<string, unknown>).zones || {},
+                    }
+                    const writeSecret = process.env.NEXT_PUBLIC_PUCK_WRITE_SECRET || ''
+                    const res = await fetch('/api/puck/sections', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'x-puck-write-secret': writeSecret,
+                      },
+                      body: JSON.stringify({
+                        name: savingSectionName,
+                        category: savingSectionCategory,
+                        data: sectionData,
+                      }),
+                    })
+                    if (res.ok) {
+                      setSectionSaveStatus('saved')
+                    } else {
+                      setSectionSaveStatus('error')
+                    }
+                  } catch {
+                    setSectionSaveStatus('error')
+                  }
+                }
+              }, [appState])
+
+              // PHASE A: Handle pending section insert
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useEffect(() => {
+                if (pendingInsertRef.current && appState?.data) {
+                  const sectionData = pendingInsertRef.current as { content?: unknown[]; zones?: Record<string, unknown> }
+                  pendingInsertRef.current = null
+
+                  if (sectionData.content && Array.isArray(sectionData.content)) {
+                    // Generate new IDs for the inserted content to avoid collisions
+                    const newContent = [...appState.data.content]
+                    const existingZones = ((appState.data as Record<string, unknown>).zones || {}) as Record<string, unknown>
+                    const newZones = { ...existingZones }
+
+                    for (const item of sectionData.content) {
+                      const typedItem = item as Record<string, unknown>
+                      const oldId = (typedItem.props as Record<string, unknown>)?.id as string
+                      const newId = `${typedItem.type}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+                      const newItem = {
+                        ...typedItem,
+                        props: { ...(typedItem.props as Record<string, unknown>), id: newId },
+                      }
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      newContent.push(newItem as any)
+
+                      // Copy zone data if the section has nested zones
+                      if (oldId && sectionData.zones) {
+                        for (const [zoneKey, zoneData] of Object.entries(sectionData.zones)) {
+                          if (zoneKey.startsWith(`${oldId}:`)) {
+                            const newZoneKey = zoneKey.replace(oldId, newId)
+                            newZones[newZoneKey] = zoneData
+                          }
+                        }
+                      }
+                    }
+
+                    dispatch({
+                      type: 'set',
+                      state: {
+                        ...appState,
+                        data: {
+                          ...appState.data,
+                          content: newContent,
+                          zones: newZones,
+                        } as Data,
+                      },
+                    })
+                  }
+                }
+              })
+
+              return null // Invisible helper — just registers callbacks and handles effects
+            }
+
+            return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+              <PuckContextHelpers />
 
               {/* ── Row 1: Controls ──────────────────────────────── */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -1497,6 +1642,34 @@ export default function PuckEditorPage({
                   📋 Duplicate
                 </button>
 
+                {/* PHASE A: Section Library */}
+                <button
+                  onClick={() => { loadSections(); setShowSectionLibrary(true) }}
+                  title="Browse and insert reusable campaign sections"
+                  style={{
+                    padding: '6px 12px', borderRadius: 6,
+                    border: '1px solid #d1d5db', background: '#f0fdf4',
+                    fontSize: 13, cursor: 'pointer', fontFamily: 'system-ui',
+                    fontWeight: 500, color: '#166534',
+                  }}
+                >
+                  📦 Sections
+                </button>
+
+                {/* PHASE A: Save Current Page as Reusable Section */}
+                <button
+                  onClick={() => { loadSections(); setSectionSaveStatus('idle'); setSavingSectionName(''); setShowSaveSection(true) }}
+                  title="Save this page's sections as a reusable template"
+                  style={{
+                    padding: '6px 12px', borderRadius: 6,
+                    border: '1px solid #d1d5db', background: '#fff',
+                    fontSize: 13, cursor: 'pointer', fontFamily: 'system-ui',
+                    fontWeight: 500, color: '#374151',
+                  }}
+                >
+                  💾 Save Section
+                </button>
+
                 {/* History */}
                 <button
                   onClick={openHistory}
@@ -1657,9 +1830,233 @@ export default function PuckEditorPage({
                 </span>
               </div>
             </div>
-          ),
+          )},
         }}
-      />
+       />
+
+      {/* ── PHASE A: Section Library Modal ────────────────────────── */}
+      {showSectionLibrary && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2147483647,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: '24px 28px',
+            maxWidth: 560, width: '92%', maxHeight: '80vh',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            fontFamily: 'system-ui',
+            animation: 'slideUp 0.2s ease',
+            display: 'flex', flexDirection: 'column',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexShrink: 0 }}>
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: '#111827' }}>
+                📦 Section Library
+              </h3>
+              <button
+                onClick={() => setShowSectionLibrary(false)}
+                style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#6b7280', padding: 4 }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Category tabs */}
+            <div style={{
+              display: 'flex', gap: 4, flexWrap: 'wrap',
+              marginBottom: 14, flexShrink: 0,
+            }}>
+              <button
+                onClick={() => setActiveSectionCategory('all')}
+                style={{
+                  padding: '4px 10px', borderRadius: 99, fontSize: 11, fontWeight: 600,
+                  border: activeSectionCategory === 'all' ? '1px solid #1b61c9' : '1px solid #e5e7eb',
+                  background: activeSectionCategory === 'all' ? '#eff6ff' : '#fff',
+                  color: activeSectionCategory === 'all' ? '#1b61c9' : '#6b7280',
+                  cursor: 'pointer',
+                }}
+              >
+                All
+              </button>
+              {sectionCategories.map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => setActiveSectionCategory(cat.key)}
+                  style={{
+                    padding: '4px 10px', borderRadius: 99, fontSize: 11, fontWeight: 600,
+                    border: activeSectionCategory === cat.key ? '1px solid #1b61c9' : '1px solid #e5e7eb',
+                    background: activeSectionCategory === cat.key ? '#eff6ff' : '#fff',
+                    color: activeSectionCategory === cat.key ? '#1b61c9' : '#6b7280',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Section list */}
+            <div style={{ flex: 1, overflow: 'auto', minHeight: 100 }}>
+              {loadingSections ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: '#9ca3af' }}>
+                  Loading sections…
+                </div>
+              ) : (() => {
+                const filtered = activeSectionCategory === 'all'
+                  ? savedSections
+                  : savedSections.filter(s => s.category === activeSectionCategory)
+                return filtered.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '2rem', color: '#9ca3af' }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>📭</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#6b7280', marginBottom: 4 }}>No saved sections yet</div>
+                    <div style={{ fontSize: 11 }}>
+                      Save sections from your pages using the &quot;Save as Reusable&quot; option in the Sections menu.
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {filtered.map((s) => (
+                      <button
+                        key={s.id}
+                        onClick={() => insertSavedSection(s.id)}
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                          padding: '10px 14px', borderRadius: 8,
+                          border: '1px solid #e5e7eb', background: '#fff',
+                          cursor: 'pointer', textAlign: 'left',
+                          transition: 'border-color 0.15s, background 0.15s',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#1b61c9'; e.currentTarget.style.background = '#f8faff' }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.background = '#fff' }}
+                      >
+                        <div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#111827' }}>
+                            {s.name}
+                          </div>
+                          <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 2 }}>
+                            {sectionCategories.find(c => c.key === s.category)?.label || s.category}
+                            {' · '}
+                            {new Date(s.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <span style={{ fontSize: 11, color: '#1b61c9', fontWeight: 600 }}>+ Insert</span>
+                      </button>
+                    ))}
+                  </div>
+                )
+              })()}
+            </div>
+
+            <div style={{
+              marginTop: 14, paddingTop: 12,
+              borderTop: '1px solid #f1f5f9',
+              fontSize: 11, color: '#9ca3af', textAlign: 'center',
+            }}>
+              Sections are inserted at the end of the page. Drag to reorder after inserting.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── PHASE A: Save Section Modal ───────────────────────────── */}
+      {showSaveSection && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2147483647,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: '24px 28px',
+            maxWidth: 420, width: '90%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            fontFamily: 'system-ui',
+            animation: 'slideUp 0.2s ease',
+          }}>
+            <h3 style={{ margin: '0 0 12px', fontSize: 17, fontWeight: 700, color: '#111827' }}>
+              📦 Save Section to Library
+            </h3>
+            <p style={{ fontSize: 13, color: '#6b7280', margin: '0 0 16px', lineHeight: 1.5 }}>
+              Save the currently selected section as a reusable template you can insert into any page.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+              <input
+                type="text"
+                placeholder="Section name (e.g. 'Hero — Webinar Launch')"
+                value={savingSectionName}
+                onChange={(e) => setSavingSectionName(e.target.value)}
+                style={{
+                  padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db',
+                  fontSize: 13, fontFamily: 'system-ui',
+                }}
+                autoFocus
+              />
+              <select
+                value={savingSectionCategory}
+                onChange={(e) => setSavingSectionCategory(e.target.value)}
+                style={{
+                  padding: '8px 12px', borderRadius: 6, border: '1px solid #d1d5db',
+                  fontSize: 13, fontFamily: 'system-ui', background: '#fff',
+                }}
+              >
+                {sectionCategories.map((cat) => (
+                  <option key={cat.key} value={cat.key}>{cat.label}</option>
+                ))}
+              </select>
+            </div>
+            {sectionSaveStatus === 'saved' && (
+              <div style={{
+                marginBottom: 12, padding: '8px 12px', borderRadius: 6,
+                background: '#f0fdf4', border: '1px solid #bbf7d0',
+                fontSize: 12, color: '#166534',
+              }}>
+                ✅ Section saved to library!
+              </div>
+            )}
+            {sectionSaveStatus === 'error' && (
+              <div style={{
+                marginBottom: 12, padding: '8px 12px', borderRadius: 6,
+                background: '#fef2f2', border: '1px solid #fecaca',
+                fontSize: 12, color: '#dc2626',
+              }}>
+                ❌ Failed to save section. Try again.
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowSaveSection(false); setSectionSaveStatus('idle'); setSavingSectionName('') }}
+                style={{
+                  padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db',
+                  background: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 500,
+                }}
+              >
+                {sectionSaveStatus === 'saved' ? 'Done' : 'Cancel'}
+              </button>
+              {sectionSaveStatus !== 'saved' && (
+                <button
+                  onClick={() => {
+                    // The SaveSectionHelper component handles the actual save
+                    // via saveSectionFromEditor callback
+                    if (saveSectionRef.current) {
+                      saveSectionRef.current()
+                    }
+                  }}
+                  disabled={!savingSectionName.trim() || sectionSaveStatus === 'saving'}
+                  style={{
+                    padding: '8px 18px', borderRadius: 6, border: 'none',
+                    background: savingSectionName.trim()
+                      ? 'linear-gradient(180deg, #059669 0%, #047857 100%)'
+                      : '#d1d5db',
+                    color: '#fff', fontSize: 14, cursor: savingSectionName.trim() ? 'pointer' : 'default',
+                    fontWeight: 700, opacity: sectionSaveStatus === 'saving' ? 0.7 : 1,
+                  }}
+                >
+                  {sectionSaveStatus === 'saving' ? 'Saving…' : 'Save Section'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
