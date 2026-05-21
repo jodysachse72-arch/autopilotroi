@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 06:09 UTC (Phase 1-A Campaign Velocity — uncommitted, build verified)
+> Last verified: 2026-05-21 06:31 UTC (Phase 1-B Publishing Confidence — committed 232802e, build verified)
 
 ---
 
@@ -11,10 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN**
-Latest commit: `3fd2ee9` (Phase 1-A Campaign Velocity)
+Latest commit: `232802e` (Phase 1-B Publishing Confidence & Editing Clarity)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commits Ready to Deploy:** `3fd2ee9` (Phase 1-A) and `4118004` (Phase 0) — NOT YET DEPLOYED
+**Commits Ready to Deploy:** `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
@@ -80,22 +80,36 @@ Certifying agent: Production Release Lead
     - `GET/POST/DELETE /api/puck/sections` route exists (not operator-exposed)
     - Editor surface correctly deferred — not a management platform
   - Build verified: tsc 0 errors, 65/65 pages, exit 0
+- **Phase 1-B: Publishing Confidence & Editing Clarity** — commit `232802e`
+  - **Fix 1 (CRITICAL)**: Reset button now passes `?force=true` to seed endpoint — was silently no-oping
+  - **Fix 2**: Template orientation banner — amber banner on first load after template creation
+    - Implemented via `?fromTemplate=` URL param, cleaned by `replaceState` immediately
+    - Example: "📄 Loaded from 🎬 Webinar / Masterclass template. Review all sections before publishing."
+  - **Fix 3**: Duplication orientation banner — blue banner after page duplication navigation
+    - Implemented via `?duplicatedFrom=` URL param, cleaned by `replaceState` immediately
+    - Example: "📋 Duplicated from /campaign-july. You are now editing the copy."
+  - **Fix 4**: Dirty-page-switch confirmation now uses styled modal (replaces `window.confirm()`)
+    - Consistent with reset/publish/restore modal pattern
+    - "Stay on this page" / "Leave without publishing" button pair
+  - **Fix 5**: Revision labels now include section count
+    - Example: "Published May 21, 4:30 PM · 9 sections" — operators can distinguish snapshots
+  - Build verified: tsc 0 errors, 65/65 pages, exit 0
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
-de0aec2  feat(cms): Phase 0 Operator Safety Layer — draft/autosave, preview, revision history, pre-publish confirmation, outline labels, trust polish
+232802e  feat(cms): Phase 1-B Publishing Confidence and Editing Clarity -- 5 targeted fixes
+eedf811  chore: update STATUS.md -- Phase 1-A committed as 3fd2ee9
+3fd2ee9  feat(cms): Phase 1-A Campaign Velocity -- page duplication, 9 templates, campaign categories
+4118004  feat(cms): Phase 0 Operator Safety Layer — draft/autosave, preview, revision history, pre-publish confirmation, outline labels, trust polish
 bdeefa7  chore: production certification — dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz
 bc5413d  fix(seo): remove redundant site-name suffix from /products title
 b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embed fix
 668a508  chore: production certification — Puck CSS isolation
 7ce56d1  perf(css): Puck CSS isolation — remove 70.7KB editor bundle from homepage
 d79e9fa  chore: production certification — homepage CMS migration
-8531df0  feat(cms): homepage CMS migration — CMS-first ISR rendering
-d3817ac  chore: production certification — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx
-60b6447  chore: add dotenv dev dependency
 ```
 
 ---
@@ -103,8 +117,8 @@ d3817ac  chore: production certification — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 06:09 UTC)
-npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 06:09 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 06:31 UTC)
+npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 06:31 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
