@@ -19,7 +19,12 @@
 import { Render, type Data } from '@puckeditor/core'
 import { puckConfig } from '@/puck.config'
 import { Component, type ReactNode } from 'react'
-import '@puckeditor/core/puck.css'
+// Render-only CSS — 2.9KB of scoped RichTextEditor styles (._RichTextEditor_z25h4_*).
+// Local copy of @puckeditor/core/dist/rsc.css — stable named export does not exist in
+// the package.json, so we vendor this file. See src/styles/puck-render-only.css for
+// maintenance notes (what to update when upgrading @puckeditor/core).
+// DO NOT replace with @puckeditor/core/puck.css (73KB full editor bundle).
+import '@/styles/puck-render-only.css'
 
 // ── Error boundary ───────────────────────────────────────────────
 // Prevents a single block render failure from crashing the entire page.
