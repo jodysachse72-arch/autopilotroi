@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 21:46 UTC (CMS Page Templates sprint)
+> Last verified: 2026-05-20 22:00 UTC (Homepage Conversion Optimization sprint)
 
 ---
 
@@ -42,6 +42,7 @@ Certifying agent: Production Release Lead
 - **CMS Content Essentials** (FaqItem, FaqGroup, VideoBlock, QuoteBlock, TestimonialCard+stars)
 - **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageBlock live preview)
 - **CMS Page Templates** (3 governed templates: homepage-standard, product-page, campaign-landing)
+- **Homepage Conversion Optimization** (ActivityTicker below hero, QuoteBlock trust bridge, PricingCard investment tiers)
 - **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageUrlField live preview)
 
 ---

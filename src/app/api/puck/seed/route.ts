@@ -54,7 +54,8 @@ function getWriteClient() {
   })
 }
 
-// Homepage Puck JSON — mirrors StaticHomePage.tsx exactly
+// Homepage Puck JSON — mirrors src/app/page.tsx exactly
+// Update this whenever homepage sections change.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const HOMEPAGE_SEED: any = {
   root: { props: { title: 'AutopilotROI — Home', description: 'AI-Powered Finance Onboarding Platform' } },
@@ -76,6 +77,20 @@ const HOMEPAGE_SEED: any = {
         videoThumb: 'https://i.ytimg.com/vi/MmAnR4YAPv4/hqdefault.jpg',
       },
     },
+    // Activity ticker — living ecosystem signal, below hero
+    {
+      type: 'ActivityTicker',
+      props: {
+        id: 'activity-ticker-1',
+        message1: 'A new member just completed their readiness assessment',
+        message2: 'Someone started their Aurum onboarding journey today',
+        message3: 'A partner was notified of a new qualified lead',
+        message4: 'A member activated the EX-AI Bot this morning',
+        message5: 'Someone from the US completed all onboarding steps',
+        speed: 'slow',
+        theme: 'emerald',
+      },
+    },
     // Stats in a white SectionBox
     {
       type: 'SectionBox',
@@ -85,6 +100,18 @@ const HOMEPAGE_SEED: any = {
     {
       type: 'SectionBox',
       props: { id: 'features-section', sectionName: 'Features / Benefits', variant: 'surface', padding: 'lg' },
+    },
+    // Member quote — trust bridge between features and how it works
+    {
+      type: 'QuoteBlock',
+      props: {
+        id: 'member-quote-1',
+        quote: 'I had zero crypto experience. My partner walked me through every step and within 48 hours the bot was live. I didn\'t have to figure anything out alone.',
+        attribution: 'James W.',
+        attributionRole: 'Member since February 2025',
+        quoteStyle: 'centered',
+        accentColor: 'brand-blue',
+      },
     },
     // How it works in a white SectionBox
     {
@@ -100,6 +127,11 @@ const HOMEPAGE_SEED: any = {
     {
       type: 'SectionBox',
       props: { id: 'testimonials-section', sectionName: 'Testimonials (Social Proof)', variant: 'blue', padding: 'lg' },
+    },
+    // Investment tiers — pricing clarity at peak-trust moment
+    {
+      type: 'SectionBox',
+      props: { id: 'pricing-section', sectionName: 'Investment Tiers (Start Where You Are)', variant: 'surface', padding: 'lg' },
     },
     // Final CTA
     {

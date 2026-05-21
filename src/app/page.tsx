@@ -22,6 +22,9 @@ import {
   EcoCard,
   CTABand,
 } from '@/components/sections'
+import ActivityTicker from '@/components/sections/ActivityTicker'
+import QuoteBlock from '@/components/sections/QuoteBlock'
+import PricingCard from '@/components/sections/PricingCard'
 import { useScrollReveal } from '@/lib/useScrollReveal'
 
 // ════════════════════════════════════════════════════════════════
@@ -173,6 +176,34 @@ export default function HomePage() {
         }
       />
 
+      {/* ── ACTIVITY TICKER ───────────────────────────────────
+           Placement rationale: immediately below hero fold.
+           Gives the "living ecosystem" signal before the visitor
+           reaches stats. Subtle emerald — signals activity without
+           casino energy. Slow rotation (6s) to feel unhurried.
+      ───────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          background: '#ffffff',
+          borderBottom: '1px solid rgba(24,29,38,0.05)',
+          padding: '1rem var(--page-pad)',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <ActivityTicker
+          messages={[
+            'A new member just completed their readiness assessment',
+            'Someone started their Aurum onboarding journey today',
+            'A partner was notified of a new qualified lead',
+            'A member activated the EX-AI Bot this morning',
+            'Someone from the US completed all onboarding steps',
+          ]}
+          speed="slow"
+          theme="emerald"
+        />
+      </div>
+
       {/* ── STATS ────────────────────────────────────────────── */}
       <SectionBox>
         <StatRow
@@ -251,6 +282,23 @@ export default function HomePage() {
             colorBg="rgba(217,119,6,0.10)"
           />
         </div>
+      </SectionBox>
+
+      {/* ── MEMBER QUOTE ─────────────────────────────────────
+           Placement rationale: after 6-card features grid, before
+           the "How It Works" process section. Visitor has absorbed
+           a lot of information. A human voice here acts as an
+           emotional relief valve and trust bridge — making the
+           process steps feel more accessible and believable.
+      ───────────────────────────────────────────────────────── */}
+      <SectionBox variant="white" padding="none" innerStyle={{ paddingTop: '2.5rem', paddingBottom: '2.5rem' }}>
+        <QuoteBlock
+          quote="I had zero crypto experience. My partner walked me through every step and within 48 hours the bot was live. I didn't have to figure anything out alone."
+          attribution="James W."
+          attributionRole="Member since February 2025"
+          style="centered"
+          accentColor="brand-blue"
+        />
       </SectionBox>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────── */}
@@ -400,6 +448,87 @@ export default function HomePage() {
             quote="What I appreciate most is the transparency. Everything is documented, every step is explained. This isn't some black box — you understand exactly what's happening."
             author="David R."
             role="Partner & Member"
+          />
+        </div>
+      </SectionBox>
+
+      {/* ── INVESTMENT TIERS ──────────────────────────────────
+           Placement rationale: immediately after testimonials
+           (peak-trust moment) and before the final CTA.
+           This answers the #1 unresolved objection at this
+           point in the page: "What does it actually cost?"
+           Keeping it concise (3 cards, focused copy) prevents
+           overwhelming detail. The visitor arrives here socially
+           validated and needs only to choose their entry point.
+      ───────────────────────────────────────────────────────── */}
+      <SectionBox variant="surface">
+        <SectionHeader
+          eyebrow="Start Where You Are"
+          title={
+            <>
+              Your entry point.
+              <br />
+              Your pace.
+            </>
+          }
+        >
+          Every plan includes full AI bot access, guided onboarding, and partner support.
+          Start with what you&apos;re comfortable with — scale when you&apos;re ready.
+        </SectionHeader>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+            gap: '1.5rem',
+            alignItems: 'stretch',
+            paddingTop: '0.5rem',
+          }}
+        >
+          <PricingCard
+            planName="Starter"
+            planTagline="First-time investors testing the ecosystem."
+            priceDisplay="$100 USDT minimum"
+            features={[
+              { text: 'EX-AI Bot activation' },
+              { text: 'AI-managed 24/7 trading' },
+              { text: 'Aurum University access' },
+              { text: 'Partner support included' },
+            ]}
+            ctaLabel="Start with $100 →"
+            ctaHref="/signup"
+            variant="standard"
+          />
+          <PricingCard
+            planName="Growth"
+            planTagline="Investors ready to maximize compounding returns."
+            priceDisplay="$500–$2,500 USDT"
+            features={[
+              { text: 'All Starter features' },
+              { text: 'Higher compounding tier' },
+              { text: 'Multi-exchange deployment' },
+              { text: 'Priority partner access' },
+              { text: 'Advanced dashboard analytics' },
+            ]}
+            ctaLabel="Activate Growth →"
+            ctaHref="/signup"
+            badge="⭐ Most Popular"
+            variant="featured"
+          />
+          <PricingCard
+            planName="Advanced"
+            planTagline="Full ecosystem access across all Aurum products."
+            priceDisplay="$2,500+ USDT"
+            features={[
+              { text: 'All Growth features' },
+              { text: 'Visa Crypto Card (physical)' },
+              { text: 'Neobank account access' },
+              { text: 'Partner income eligibility' },
+              { text: 'Dedicated onboarding specialist' },
+            ]}
+            ctaLabel="Go Advanced →"
+            ctaHref="/signup"
+            variant="standard"
           />
         </div>
       </SectionBox>
