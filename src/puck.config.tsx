@@ -137,8 +137,11 @@ type TestimonialCardProps = {
   quote: RichText
   author: string
   role: string
-  starRating: '5' | '4' | '3'
+  company: string
+  starRating: '5' | '4' | '3' | '0'
   memberInitials: string
+  avatarUrl: string
+  cardStyle: 'standard' | 'featured'
 }
 
 type FaqItemProps = {
@@ -188,6 +191,9 @@ type FaqAccordionWidgetProps = {}
 type PricingFeature = { text: string }
 
 type PricingCardProps = {
+  _groupPlan?: string
+  _groupFeatures?: string
+  _groupCTA?: string
   planName: string
   planTagline: string
   priceDisplay: string
@@ -202,6 +208,8 @@ type PricingCardProps = {
   ctaLabel: string
   ctaHref: string
   badge: string
+  guaranteeBadge: string
+  countdownText: string
   cardStyle: 'standard' | 'featured'
 }
 
@@ -231,6 +239,44 @@ type PopupCTAProps = {
   ctaLabel: string
   ctaHref: string
   style: 'modal' | 'banner'
+}
+
+type FormBlockProps = {
+  formTitle: string
+  formDescription: string
+  nameLabel: string
+  namePlaceholder: string
+  emailLabel: string
+  emailPlaceholder: string
+  messageLabel: string
+  messagePlaceholder: string
+  showMessage: 'yes' | 'no'
+  submitLabel: string
+  successMessage: string
+  formStyle: 'card' | 'inline'
+}
+
+type FunnelStepsProps = {
+  stepTitle1: string
+  stepBody1: string
+  stepTitle2: string
+  stepBody2: string
+  stepTitle3: string
+  stepBody3: string
+  stepTitle4: string
+  stepBody4: string
+  ctaLabel: string
+  ctaHref: string
+  style: 'horizontal' | 'vertical'
+}
+
+type CTAStripProps = {
+  eyebrow: string
+  headline: string
+  body: string
+  ctaLabel: string
+  ctaHref: string
+  variant: 'onboarding' | 'webinar' | 'trust' | 'urgency' | 'lead-magnet'
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -272,6 +318,9 @@ type Components = {
   ImageBlock: { src: string; alt: string; maxWidth: number; borderRadius: number }
   ModalBlock: ModalBlockProps
   PopupCTA: PopupCTAProps
+  FormBlock: FormBlockProps
+  FunnelSteps: FunnelStepsProps
+  CTAStrip: CTAStripProps
 }
 
 const ICONS: Record<string, ReactNode> = {
@@ -753,7 +802,7 @@ export const puckConfig: Config<Components> = {
           <SectionBox variant={variant} padding={padding}>
             {puck.renderDropZone({
               zone: 'content',
-      allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup', 'PricingCard', 'ActivityTicker', 'ModalBlock', 'PopupCTA'],
+      allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup', 'PricingCard', 'ActivityTicker', 'ModalBlock', 'PopupCTA', 'FormBlock', 'FunnelSteps', 'CTAStrip'],
               minEmptyHeight: 120,
             })}
           </SectionBox>
@@ -1036,13 +1085,14 @@ export const puckConfig: Config<Components> = {
       ),
     },
 
-    // ── TESTIMONIAL CARD ───────────────────────────────────
+    // ── TESTIMONIAL CARD (Phase C enhanced) ─────────────────
     TestimonialCard: {
       label: 'Member Testimonial',
       fields: {
         quote:          richTextField({ label: 'Testimonial Quote' }),
         author:         { type: 'text', contentEditable: true, label: 'Member Name' },
-        role:           { type: 'text', contentEditable: true, label: 'Member Description (e.g. Member since 2025)' },
+        role:           { type: 'text', contentEditable: true, label: 'Title / Description (e.g. Member since 2025)' },
+        company:        { type: 'text', contentEditable: true, label: 'Company or Team (optional)' },
         starRating:     {
           type: 'select',
           label: 'Star Rating',
@@ -1050,31 +1100,67 @@ export const puckConfig: Config<Components> = {
             { label: '⭐⭐⭐⭐⭐  (5 stars)', value: '5' },
             { label: '⭐⭐⭐⭐  (4 stars)',  value: '4' },
             { label: '⭐⭐⭐  (3 stars)',   value: '3' },
+            { label: 'No stars',             value: '0' },
           ],
         },
-        memberInitials: { type: 'text', label: 'Member Initials (2 letters — shown in avatar circle)' },
+        memberInitials: { type: 'text', label: 'Initials (2 letters — fallback if no avatar)' },
+        avatarUrl: {
+          type: 'custom',
+          label: 'Avatar Image (optional)',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <ImageUrlField value={value ?? ''} onChange={onChange} label="Avatar Photo (optional — upload or paste URL)" />
+          ),
+        },
+        cardStyle: {
+          type: 'select',
+          label: 'Card Style',
+          options: [
+            { label: 'Standard — white card',         value: 'standard'  },
+            { label: 'Featured — highlighted border',  value: 'featured'  },
+          ],
+        },
       },
       defaultProps: {
         quote: 'I was skeptical at first — the results speak for themselves.',
         author: 'Marcus T.',
         role: 'Member since 2025',
+        company: '',
         starRating: '5',
         memberInitials: 'MT',
+        avatarUrl: '',
+        cardStyle: 'standard',
       },
-      render: ({ quote, author, role, starRating, memberInitials }) => {
+      render: ({ quote, author, role, company, starRating, memberInitials, avatarUrl, cardStyle }) => {
         const stars = parseInt(starRating ?? '5', 10)
         const initials = (memberInitials || author?.[0] || '?').slice(0, 2).toUpperCase()
+        const isFeatured = cardStyle === 'featured'
         return (
           <div
             className="reveal"
             style={{
               background: '#ffffff',
-              border: '1px solid rgba(24,29,38,0.06)',
+              border: isFeatured ? '2px solid #1b61c9' : '1px solid rgba(24,29,38,0.06)',
               borderRadius: '1.25rem',
               padding: '1.75rem',
-              boxShadow: '0 4px 16px rgba(24,29,38,0.04)',
+              boxShadow: isFeatured
+                ? '0 8px 32px rgba(27,97,201,0.12)'
+                : '0 4px 16px rgba(24,29,38,0.04)',
+              position: 'relative',
             }}
           >
+            {/* Featured badge */}
+            {isFeatured && (
+              <div style={{
+                position: 'absolute', top: '-0.625rem', left: '1.25rem',
+                background: 'linear-gradient(135deg, #1b61c9, #3b82f6)',
+                color: '#fff', fontSize: '0.625rem', fontWeight: 700,
+                padding: '0.2rem 0.625rem', borderRadius: 99,
+                letterSpacing: '0.05em', textTransform: 'uppercase',
+              }}>
+                ★ Featured
+              </div>
+            )}
+
             {/* Star rating */}
             {stars > 0 && (
               <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.875rem' }}>
@@ -1105,39 +1191,42 @@ export const puckConfig: Config<Components> = {
 
             {/* Author row */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              {/* Avatar circle with initials */}
-              <div
-                style={{
-                  width: '2.5rem',
-                  height: '2.5rem',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #1b61c9 0%, #254fad 100%)',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 700,
-                  fontSize: '0.875rem',
-                  flexShrink: 0,
-                }}
-              >
-                {initials}
-              </div>
-              <div>
+              {/* Avatar — image or initials fallback */}
+              {avatarUrl ? (
+                <div style={{
+                  width: '2.5rem', height: '2.5rem', borderRadius: '50%',
+                  overflow: 'hidden', flexShrink: 0,
+                  border: '2px solid rgba(27,97,201,0.15)',
+                }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={avatarUrl} alt={author || ''} style={{
+                    width: '100%', height: '100%', objectFit: 'cover',
+                  }} />
+                </div>
+              ) : (
                 <div
                   style={{
-                    fontFamily: 'var(--font-display)',
-                    fontWeight: 700,
-                    color: '#181d26',
-                    fontSize: 'var(--text-body)',
+                    width: '2.5rem', height: '2.5rem', borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #1b61c9 0%, #254fad 100%)',
+                    color: '#ffffff', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'var(--font-display)', fontWeight: 700,
+                    fontSize: '0.875rem', flexShrink: 0,
                   }}
                 >
+                  {initials}
+                </div>
+              )}
+              <div>
+                <div style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 700,
+                  color: '#181d26', fontSize: 'var(--text-body)',
+                }}>
                   {author}
                 </div>
-                {role && (
+                {(role || company) && (
                   <div style={{ fontSize: 'var(--text-caption)', color: 'rgba(24,29,38,0.55)' }}>
-                    {role}
+                    {role}{role && company ? ' · ' : ''}{company}
                   </div>
                 )}
               </div>
@@ -1146,6 +1235,7 @@ export const puckConfig: Config<Components> = {
         )
       },
     },
+
 
 
     // ── STEP ───────────────────────────────────────────────
@@ -1375,13 +1465,15 @@ export const puckConfig: Config<Components> = {
       render: () => <FaqAccordionWidget />,
     },
 
-    // ── PRICING CARD ───────────────────────────────────────
+    // ── PRICING CARD (Phase D enhanced) ─────────────────────
     PricingCard: {
       label: 'Pricing / Offer Card',
       fields: {
+        _groupPlan:  fieldGroupDivider('— Plan Details'),
         planName:    { type: 'text', contentEditable: true, label: 'Plan Name (e.g. Starter, Advanced)' },
         planTagline: { type: 'text', contentEditable: true, label: 'Short Description' },
         priceDisplay:{ type: 'text', contentEditable: true, label: 'Price Text (e.g. $100 USDT minimum)' },
+        _groupFeatures: fieldGroupDivider('— Features'),
         feature1:    { type: 'text', contentEditable: true, label: 'Feature 1 (leave blank to hide)' },
         feature2:    { type: 'text', contentEditable: true, label: 'Feature 2 (leave blank to hide)' },
         feature3:    { type: 'text', contentEditable: true, label: 'Feature 3 (leave blank to hide)' },
@@ -1390,6 +1482,7 @@ export const puckConfig: Config<Components> = {
         feature6:    { type: 'text', contentEditable: true, label: 'Feature 6 (leave blank to hide)' },
         feature7:    { type: 'text', contentEditable: true, label: 'Feature 7 (leave blank to hide)' },
         feature8:    { type: 'text', contentEditable: true, label: 'Feature 8 (leave blank to hide)' },
+        _groupCTA:   fieldGroupDivider('— CTA & Badges'),
         ctaLabel:    { type: 'text', contentEditable: true, label: 'Button Text' },
         ctaHref:     {
           type: 'custom',
@@ -1399,6 +1492,8 @@ export const puckConfig: Config<Components> = {
           ),
         },
         badge:       { type: 'text', contentEditable: true, label: 'Highlight Badge (e.g. Most Popular — leave blank to hide)' },
+        guaranteeBadge: { type: 'text', contentEditable: true, label: 'Guarantee Text (e.g. 30-day money-back guarantee — leave blank to hide)' },
+        countdownText: { type: 'text', contentEditable: true, label: 'Urgency Text (e.g. Offer expires June 30 — STATIC display only, leave blank to hide)' },
         cardStyle:   {
           type: 'select',
           label: 'Card Style',
@@ -1423,25 +1518,59 @@ export const puckConfig: Config<Components> = {
         ctaLabel:    'Get Started →',
         ctaHref:     '/signup',
         badge:       '',
+        guaranteeBadge: '',
+        countdownText: '',
         cardStyle:   'standard',
       },
       render: ({ planName, planTagline, priceDisplay, feature1, feature2, feature3,
                  feature4, feature5, feature6, feature7, feature8,
-                 ctaLabel, ctaHref, badge, cardStyle }) => {
+                 ctaLabel, ctaHref, badge, guaranteeBadge, countdownText, cardStyle }) => {
         const features = [feature1, feature2, feature3, feature4, feature5, feature6, feature7, feature8]
           .filter(Boolean)
           .map(text => ({ text }))
         return (
-          <PricingCard
-            planName={planName || ''}
-            planTagline={planTagline || ''}
-            priceDisplay={priceDisplay || ''}
-            features={features}
-            ctaLabel={ctaLabel || ''}
-            ctaHref={ctaHref || '/signup'}
-            badge={badge || ''}
-            variant={cardStyle}
-          />
+          <div>
+            <PricingCard
+              planName={planName || ''}
+              planTagline={planTagline || ''}
+              priceDisplay={priceDisplay || ''}
+              features={features}
+              ctaLabel={ctaLabel || ''}
+              ctaHref={ctaHref || '/signup'}
+              badge={badge || ''}
+              variant={cardStyle}
+            />
+            {/* Phase D: Guarantee badge */}
+            {guaranteeBadge && (
+              <div style={{
+                textAlign: 'center', marginTop: '0.75rem',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.375rem',
+              }}>
+                <span style={{ fontSize: '1rem' }}>🛡️</span>
+                <span style={{
+                  fontSize: '0.75rem', fontWeight: 600,
+                  color: '#059669', fontFamily: 'system-ui',
+                }}>
+                  {guaranteeBadge}
+                </span>
+              </div>
+            )}
+            {/* Phase D: Static countdown/urgency text */}
+            {countdownText && (
+              <div style={{
+                textAlign: 'center', marginTop: '0.5rem',
+                background: '#fef3c7', border: '1px solid #fde68a',
+                borderRadius: '0.5rem', padding: '0.375rem 0.75rem',
+              }}>
+                <span style={{
+                  fontSize: '0.6875rem', fontWeight: 600,
+                  color: '#92400e', fontFamily: 'system-ui',
+                }}>
+                  ⏰ {countdownText}
+                </span>
+              </div>
+            )}
+          </div>
         )
       },
     },
@@ -1941,18 +2070,444 @@ export const puckConfig: Config<Components> = {
       },
     },
 
+    // ── FORM BLOCK (Phase A — Lead Capture) ──────────────────
+    FormBlock: {
+      label: 'Lead Capture Form',
+      fields: {
+        formTitle:        { type: 'text', contentEditable: true, label: 'Form Title' },
+        formDescription:  { type: 'text', contentEditable: true, label: 'Form Description (optional)' },
+        nameLabel:        { type: 'text', label: 'Name Field Label' },
+        namePlaceholder:  { type: 'text', label: 'Name Placeholder' },
+        emailLabel:       { type: 'text', label: 'Email Field Label' },
+        emailPlaceholder: { type: 'text', label: 'Email Placeholder' },
+        showMessage: {
+          type: 'select',
+          label: 'Show Message Field?',
+          options: [
+            { label: 'No — name + email only', value: 'no'  },
+            { label: 'Yes — add a message textarea', value: 'yes' },
+          ],
+        },
+        messageLabel:       { type: 'text', label: 'Message Field Label' },
+        messagePlaceholder: { type: 'text', label: 'Message Placeholder' },
+        submitLabel:       { type: 'text', contentEditable: true, label: 'Submit Button Text' },
+        successMessage:    { type: 'text', label: 'Success Message (shown after submit)' },
+        formStyle: {
+          type: 'select',
+          label: 'Form Style',
+          options: [
+            { label: 'Card — standalone white card', value: 'card' },
+            { label: 'Inline — no card wrapper',     value: 'inline' },
+          ],
+        },
+      },
+      defaultProps: {
+        formTitle: 'Start Your Journey',
+        formDescription: 'Enter your details and we will guide you through the next steps.',
+        nameLabel: 'Full Name',
+        namePlaceholder: 'John Smith',
+        emailLabel: 'Email Address',
+        emailPlaceholder: 'john@example.com',
+        showMessage: 'no',
+        messageLabel: 'Message',
+        messagePlaceholder: 'Tell us about your goals...',
+        submitLabel: 'Get Started →',
+        successMessage: 'Thank you! We will be in touch shortly.',
+        formStyle: 'card',
+      },
+      render: ({ formTitle, formDescription, nameLabel, namePlaceholder,
+                 emailLabel, emailPlaceholder, showMessage, messageLabel,
+                 messagePlaceholder, submitLabel, successMessage, formStyle }) => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [submitted, setSubmitted] = useState(false)
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [submitting, setSubmitting] = useState(false)
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [error, setError] = useState('')
+
+        function handleSubmit(e: React.FormEvent) {
+          e.preventDefault()
+          setSubmitting(true)
+          setError('')
+          // Mock submit — replace with Formspree/Supabase integration later
+          setTimeout(() => {
+            setSubmitting(false)
+            setSubmitted(true)
+          }, 800)
+        }
+
+        const inputStyle: React.CSSProperties = {
+          width: '100%', boxSizing: 'border-box',
+          padding: '0.75rem 1rem', borderRadius: '0.625rem',
+          border: '1.5px solid #e2e8f0', fontSize: '0.9375rem',
+          fontFamily: 'inherit', color: '#111827',
+          background: '#fff', outline: 'none',
+          transition: 'border-color 0.15s ease',
+        }
+
+        const labelStyle: React.CSSProperties = {
+          fontSize: '0.8125rem', fontWeight: 600,
+          color: '#374151', display: 'block', marginBottom: '0.375rem',
+        }
+
+        const formContent = submitted ? (
+          <div style={{
+            textAlign: 'center', padding: '2rem',
+            fontSize: '1rem', color: '#059669', fontWeight: 600,
+            animation: 'fadeIn 0.3s ease',
+          }}>
+            {successMessage}
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {formTitle && (
+              <h3 style={{
+                margin: 0, fontSize: '1.25rem', fontWeight: 700,
+                color: '#111827', fontFamily: 'var(--font-display)',
+              }}>
+                {formTitle}
+              </h3>
+            )}
+            {formDescription && (
+              <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280', lineHeight: 1.5 }}>
+                {formDescription}
+              </p>
+            )}
+
+            <div>
+              <label style={labelStyle}>{nameLabel}</label>
+              <input type="text" placeholder={namePlaceholder} required style={inputStyle} />
+            </div>
+
+            <div>
+              <label style={labelStyle}>{emailLabel}</label>
+              <input type="email" placeholder={emailPlaceholder} required style={inputStyle} />
+            </div>
+
+            {showMessage === 'yes' && (
+              <div>
+                <label style={labelStyle}>{messageLabel}</label>
+                <textarea
+                  placeholder={messagePlaceholder}
+                  rows={3}
+                  style={{ ...inputStyle, resize: 'vertical' as const, minHeight: '4.5rem' }}
+                />
+              </div>
+            )}
+
+            {error && (
+              <div style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 500 }}>
+                ⚠ {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              style={{
+                padding: '0.875rem 1.5rem', borderRadius: '0.625rem',
+                border: 'none', fontSize: '1rem', fontWeight: 600,
+                fontFamily: 'inherit', cursor: submitting ? 'not-allowed' : 'pointer',
+                background: submitting
+                  ? '#94a3b8'
+                  : 'linear-gradient(135deg, #1b61c9 0%, #3b82f6 100%)',
+                color: '#fff',
+                boxShadow: '0 4px 16px rgba(27,97,201,0.25)',
+                transition: 'all 0.2s ease',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+              }}
+            >
+              {submitting && (
+                <span style={{
+                  width: 14, height: 14,
+                  border: '2px solid rgba(255,255,255,0.3)', borderTopColor: '#fff',
+                  borderRadius: '50%', display: 'inline-block',
+                  animation: 'spin 0.7s linear infinite',
+                }} />
+              )}
+              {submitting ? 'Submitting…' : submitLabel}
+            </button>
+          </form>
+        )
+
+        if (formStyle === 'card') {
+          return (
+            <div style={{
+              background: '#fff', borderRadius: '1rem',
+              border: '1px solid rgba(24,29,38,0.06)',
+              padding: '2rem',
+              boxShadow: '0 4px 24px rgba(24,29,38,0.06)',
+              maxWidth: '480px', margin: '0 auto',
+            }}>
+              {formContent}
+            </div>
+          )
+        }
+
+        return <div style={{ maxWidth: '480px', margin: '0 auto' }}>{formContent}</div>
+      },
+    },
+
+    // ── FUNNEL STEPS (Phase B — Multi-step Process) ──────────
+    FunnelSteps: {
+      label: 'Funnel / Process Steps',
+      fields: {
+        stepTitle1: { type: 'text', contentEditable: true, label: 'Step 1 Title' },
+        stepBody1:  { type: 'text', contentEditable: true, label: 'Step 1 Description' },
+        stepTitle2: { type: 'text', contentEditable: true, label: 'Step 2 Title' },
+        stepBody2:  { type: 'text', contentEditable: true, label: 'Step 2 Description' },
+        stepTitle3: { type: 'text', contentEditable: true, label: 'Step 3 Title' },
+        stepBody3:  { type: 'text', contentEditable: true, label: 'Step 3 Description' },
+        stepTitle4: { type: 'text', contentEditable: true, label: 'Step 4 Title (leave blank to skip)' },
+        stepBody4:  { type: 'text', contentEditable: true, label: 'Step 4 Description' },
+        ctaLabel:   { type: 'text', contentEditable: true, label: 'CTA Button Text' },
+        ctaHref:    {
+          type: 'custom',
+          label: 'CTA Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="CTA Button Link" />
+          ),
+        },
+        style: {
+          type: 'select',
+          label: 'Layout Style',
+          options: [
+            { label: 'Horizontal — side by side',  value: 'horizontal' },
+            { label: 'Vertical — stacked timeline', value: 'vertical'  },
+          ],
+        },
+      },
+      defaultProps: {
+        stepTitle1: 'Complete Your Assessment',
+        stepBody1: 'Answer a few questions about your financial goals and experience level.',
+        stepTitle2: 'Set Up Your Wallet',
+        stepBody2: 'Follow our guided setup to configure your USDT wallet securely.',
+        stepTitle3: 'Activate the EX-AI Bot',
+        stepBody3: 'Connect to the Aurum ecosystem and let AI manage your portfolio 24/7.',
+        stepTitle4: '',
+        stepBody4: '',
+        ctaLabel: 'Start Now →',
+        ctaHref: '/onboarding',
+        style: 'horizontal',
+      },
+      render: ({ stepTitle1, stepBody1, stepTitle2, stepBody2, stepTitle3, stepBody3,
+                 stepTitle4, stepBody4, ctaLabel, ctaHref, style: layoutStyle }) => {
+        const steps = [
+          { title: stepTitle1, body: stepBody1 },
+          { title: stepTitle2, body: stepBody2 },
+          { title: stepTitle3, body: stepBody3 },
+          ...(stepTitle4 ? [{ title: stepTitle4, body: stepBody4 }] : []),
+        ].filter(s => s.title)
+
+        const isHorizontal = layoutStyle === 'horizontal'
+
+        return (
+          <div>
+            <div style={{
+              display: isHorizontal ? 'grid' : 'flex',
+              gridTemplateColumns: isHorizontal ? `repeat(${Math.min(steps.length, 4)}, 1fr)` : undefined,
+              flexDirection: isHorizontal ? undefined : 'column',
+              gap: isHorizontal ? '1.5rem' : '0',
+            }}>
+              {steps.map((step, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  flexDirection: isHorizontal ? 'column' : 'row',
+                  alignItems: isHorizontal ? 'center' : 'flex-start',
+                  textAlign: isHorizontal ? 'center' : 'left',
+                  gap: isHorizontal ? '0.75rem' : '1rem',
+                  padding: isHorizontal ? '0' : '1.25rem 0',
+                  borderBottom: !isHorizontal && i < steps.length - 1 ? '1px solid rgba(24,29,38,0.06)' : 'none',
+                }}>
+                  {/* Step number circle */}
+                  <div style={{
+                    width: '2.5rem', height: '2.5rem', borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #1b61c9, #3b82f6)',
+                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontWeight: 700, fontSize: '1rem', flexShrink: 0,
+                    fontFamily: 'var(--font-display)',
+                    boxShadow: '0 2px 8px rgba(27,97,201,0.25)',
+                  }}>
+                    {i + 1}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{
+                      fontWeight: 700, fontSize: '1rem', color: '#111827',
+                      fontFamily: 'var(--font-display)', marginBottom: '0.25rem',
+                    }}>
+                      {step.title}
+                    </div>
+                    {step.body && (
+                      <div style={{
+                        fontSize: '0.875rem', color: '#6b7280', lineHeight: 1.5,
+                      }}>
+                        {step.body}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            {ctaLabel && ctaHref && (
+              <div style={{
+                textAlign: 'center', marginTop: '1.5rem',
+              }}>
+                <a
+                  href={ctaHref}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center',
+                    padding: '0.75rem 2rem', borderRadius: '0.625rem',
+                    background: 'linear-gradient(135deg, #1b61c9 0%, #3b82f6 100%)',
+                    color: '#fff', fontSize: '1rem', fontWeight: 600,
+                    textDecoration: 'none', boxShadow: '0 4px 16px rgba(27,97,201,0.3)',
+                  }}
+                >
+                  {ctaLabel}
+                </a>
+              </div>
+            )}
+          </div>
+        )
+      },
+    },
+
+    // ── CTA STRIP (Phase E — Campaign-specific CTA variants) ─
+    CTAStrip: {
+      label: 'Campaign CTA Strip',
+      fields: {
+        eyebrow:   { type: 'text', contentEditable: true, label: 'Eyebrow Text (small label above headline)' },
+        headline:  { type: 'text', contentEditable: true, label: 'Headline' },
+        body:      { type: 'text', contentEditable: true, label: 'Body Text' },
+        ctaLabel:  { type: 'text', contentEditable: true, label: 'Button Text' },
+        ctaHref:   {
+          type: 'custom',
+          label: 'Button Link',
+          render: ({ value, onChange }: { value: string; onChange: (v: string) => void }) => (
+            <LinkField value={value ?? ''} onChange={onChange} label="Button Link" />
+          ),
+        },
+        variant: {
+          type: 'select',
+          label: 'CTA Style',
+          options: [
+            { label: '🚀 Onboarding — blue gradient',     value: 'onboarding'  },
+            { label: '🎬 Webinar — dark navy',             value: 'webinar'     },
+            { label: '🛡️ Trust — emerald accent',           value: 'trust'       },
+            { label: '⏰ Urgency — amber warning',          value: 'urgency'     },
+            { label: '📥 Lead Magnet — violet accent',      value: 'lead-magnet' },
+          ],
+        },
+      },
+      defaultProps: {
+        eyebrow: 'Limited Time',
+        headline: 'Ready to Activate Your Portfolio?',
+        body: 'Join thousands of members who trust AutoPilotROI to manage their investments with AI-powered precision.',
+        ctaLabel: 'Start Onboarding →',
+        ctaHref: '/signup',
+        variant: 'onboarding',
+      },
+      render: ({ eyebrow, headline, body, ctaLabel, ctaHref, variant }) => {
+        const variantStyles: Record<string, { bg: string; accent: string; btnBg: string; text: string; eyebrowColor: string }> = {
+          onboarding: {
+            bg: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)',
+            accent: '#3b82f6', btnBg: 'linear-gradient(135deg, #1b61c9, #3b82f6)',
+            text: '#e2e8f0', eyebrowColor: '#60a5fa',
+          },
+          webinar: {
+            bg: 'linear-gradient(135deg, #0c0a1a 0%, #1a1040 100%)',
+            accent: '#8b5cf6', btnBg: 'linear-gradient(135deg, #7c3aed, #a78bfa)',
+            text: '#c4b5fd', eyebrowColor: '#a78bfa',
+          },
+          trust: {
+            bg: 'linear-gradient(135deg, #022c22 0%, #064e3b 100%)',
+            accent: '#10b981', btnBg: 'linear-gradient(135deg, #059669, #34d399)',
+            text: '#a7f3d0', eyebrowColor: '#6ee7b7',
+          },
+          urgency: {
+            bg: 'linear-gradient(135deg, #451a03 0%, #78350f 100%)',
+            accent: '#f59e0b', btnBg: 'linear-gradient(135deg, #d97706, #fbbf24)',
+            text: '#fde68a', eyebrowColor: '#fcd34d',
+          },
+          'lead-magnet': {
+            bg: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
+            accent: '#818cf8', btnBg: 'linear-gradient(135deg, #6366f1, #818cf8)',
+            text: '#c7d2fe', eyebrowColor: '#a5b4fc',
+          },
+        }
+
+        const s = variantStyles[variant] || variantStyles.onboarding
+
+        return (
+          <div style={{
+            background: s.bg, borderRadius: '1rem',
+            padding: '2rem 2.5rem',
+            textAlign: 'center',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+          }}>
+            {eyebrow && (
+              <div style={{
+                fontSize: '0.6875rem', fontWeight: 700,
+                color: s.eyebrowColor, letterSpacing: '0.1em',
+                textTransform: 'uppercase', marginBottom: '0.5rem',
+              }}>
+                {eyebrow}
+              </div>
+            )}
+            <h3 style={{
+              margin: '0 0 0.625rem', fontSize: '1.375rem', fontWeight: 700,
+              color: '#fff', fontFamily: 'var(--font-display)',
+            }}>
+              {headline}
+            </h3>
+            {body && (
+              <p style={{
+                margin: '0 0 1.25rem', fontSize: '0.9375rem',
+                color: s.text, lineHeight: 1.6,
+                maxWidth: '32rem', marginLeft: 'auto', marginRight: 'auto',
+              }}>
+                {body}
+              </p>
+            )}
+            {ctaLabel && ctaHref && (
+              <a
+                href={ctaHref}
+                style={{
+                  display: 'inline-flex', alignItems: 'center',
+                  padding: '0.75rem 2rem', borderRadius: '0.625rem',
+                  background: s.btnBg, color: '#fff',
+                  fontSize: '1rem', fontWeight: 600,
+                  textDecoration: 'none',
+                  boxShadow: `0 4px 16px rgba(0,0,0,0.25)`,
+                  transition: 'transform 0.15s ease',
+                }}
+              >
+                {ctaLabel}
+              </a>
+            )}
+          </div>
+        )
+      },
+    },
+
   },
 
   // ── Component Categories (sidebar grouping) ──────────────
   categories: {
     campaignEssentials: {
       title: '🚀 Campaign Essentials',
-      components: ['HeroDark', 'CTABand', 'PricingCard', 'ActivityTicker', 'PopupCTA', 'ModalBlock'],
+      components: ['HeroDark', 'CTABand', 'CTAStrip', 'PricingCard', 'FormBlock', 'ActivityTicker'],
       defaultExpanded: true,
     },
     heroes: {
       title: '🎯 Heroes & Page Banners',
       components: ['HeroDark', 'HeroBlue', 'PageHeaderWhite'],
+      defaultExpanded: false,
+    },
+    conversionBlocks: {
+      title: '🎯 Conversion & Lead Capture',
+      components: ['FormBlock', 'CTAStrip', 'PopupCTA', 'ModalBlock', 'FunnelSteps'],
       defaultExpanded: false,
     },
     trustAndProof: {
@@ -1962,7 +2517,7 @@ export const puckConfig: Config<Components> = {
     },
     layout: {
       title: '📦 Page Sections',
-      components: ['SectionBox', 'SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup'],
+      components: ['SectionBox', 'SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'FunnelSteps'],
       defaultExpanded: false,
     },
     content: {
