@@ -14,7 +14,7 @@
 import type { Config, RichText } from '@puckeditor/core'
 import { richTextField, ImageUrlField } from '@/lib/puck-editor'
 import type { ReactNode } from 'react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
 
 import HeroDark from '@/components/sections/HeroDark'
@@ -719,7 +719,8 @@ export const puckConfig: Config<Components> = {
           <SectionBox variant={variant} padding={padding}>
             {puck.renderDropZone({
               zone: 'content',
-      allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup', 'PricingCard', 'ActivityTicker']
+      allow: ['SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup', 'StatRow', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'FaqGroup', 'PricingCard', 'ActivityTicker'],
+              minEmptyHeight: 120,
             })}
           </SectionBox>
         )
@@ -1475,13 +1476,59 @@ export const puckConfig: Config<Components> = {
         maxWidth: 800,
         borderRadius: 12,
       },
-      render: ({ src, alt, maxWidth, borderRadius }) => (
-        src ? (
+      render: ({ src, alt, maxWidth, borderRadius }) => {
+        // PHASE D: Broken image detection
+        const [broken, setBroken] = useState(false)
+        // Reset broken state when src changes
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const prevSrc = useRef(src)
+        if (prevSrc.current !== src) {
+          prevSrc.current = src
+          if (broken) setBroken(false)
+        }
+
+        if (!src) {
+          return (
+            <div style={{
+              padding: '3rem 2rem',
+              textAlign: 'center',
+              background: '#f8fafc',
+              borderRadius: `${borderRadius}px`,
+              color: '#64748b',
+              border: '2px dashed #cbd5e1',
+            }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>🖼️</div>
+              <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>No image set</div>
+              <div style={{ fontSize: 12, color: '#94a3b8' }}>Paste an image URL in the right panel →</div>
+            </div>
+          )
+        }
+
+        if (broken) {
+          return (
+            <div style={{
+              padding: '2.5rem 2rem',
+              textAlign: 'center',
+              background: '#fff5f5',
+              borderRadius: `${borderRadius}px`,
+              color: '#dc2626',
+              border: '2px dashed #fca5a5',
+            }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+              <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>Image failed to load</div>
+              <div style={{ fontSize: 12, color: '#6b7280', wordBreak: 'break-all' }}>{src}</div>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 6 }}>Check the URL is correct and publicly accessible</div>
+            </div>
+          )
+        }
+
+        return (
           <div style={{ maxWidth: `${maxWidth}px`, margin: '0 auto' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={src}
               alt={alt}
+              onError={() => setBroken(true)}
               style={{
                 width: '100%',
                 height: 'auto',
@@ -1490,19 +1537,8 @@ export const puckConfig: Config<Components> = {
               }}
             />
           </div>
-        ) : (
-          <div style={{
-            padding: '3rem',
-            textAlign: 'center',
-            background: '#f1f5f9',
-            borderRadius: `${borderRadius}px`,
-            color: '#94a3b8',
-            border: '2px dashed #cbd5e1',
-          }}>
-            📷 Set image URL in sidebar
-          </div>
         )
-      ),
+      },
     },
 
   },

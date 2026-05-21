@@ -112,12 +112,14 @@ function useBeforeUnloadGuard(isDirty: boolean) {
 // for display in the outline panel.
 
 function OutlineWithLabels({ children }: { children: React.ReactNode }) {
-  // Access current Puck data to extract section names
+  // Access current Puck data to extract section names and full content structure
   let sectionNames: Record<string, string> = {}
+  let totalComponents = 0
   try {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const { appState } = usePuck()
     if (appState?.data?.content) {
+      totalComponents = appState.data.content.length
       for (const item of appState.data.content) {
         if (item.type === 'SectionBox' && item.props?.id) {
           const name = (item.props as Record<string, unknown>).sectionName as string || item.props.id
@@ -145,13 +147,13 @@ function OutlineWithLabels({ children }: { children: React.ReactNode }) {
         background: '#fafafa',
         flexShrink: 0,
       }}>
-        💡 Click any section to select it and edit its fields. For FAQs: drop <strong>FAQ — Question &amp; Answer</strong> inside a <strong>FAQ Section</strong>, not directly on the page.
+        💡 Click sections to edit. Drop FAQ items <em>inside</em> a FAQ Section.
       </div>
 
-      {/* Section name quick reference */}
-      {nameCount > 0 && (
+      {/* PHASE B: Improved section map with numbered entries and component count */}
+      {totalComponents > 0 && (
         <div style={{
-          padding: '6px 12px',
+          padding: '6px 12px 8px',
           fontSize: 10,
           fontFamily: 'system-ui',
           borderBottom: '1px solid #f1f5f9',
@@ -159,20 +161,40 @@ function OutlineWithLabels({ children }: { children: React.ReactNode }) {
           flexShrink: 0,
         }}>
           <div style={{
-            fontWeight: 700, color: '#374151', marginBottom: 3,
+            fontWeight: 700, color: '#374151', marginBottom: 4,
             textTransform: 'uppercase', letterSpacing: '0.05em',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
           }}>
-            Sections on this page:
-          </div>
-          {nameList.map((name, i) => (
-            <div key={i} style={{
-              color: '#6b7280', lineHeight: 1.5,
-              display: 'flex', alignItems: 'center', gap: 4,
+            <span>Page map</span>
+            <span style={{
+              fontSize: 9, fontWeight: 600, color: '#6b7280',
+              background: '#e5e7eb', borderRadius: 99, padding: '1px 6px',
+              textTransform: 'none', letterSpacing: 0,
             }}>
-              <span style={{ color: '#1b61c9', fontSize: 9 }}>●</span>
-              {name}
+              {totalComponents} top-level
+            </span>
+          </div>
+          {nameCount > 0 ? (
+            nameList.map((name, i) => (
+              <div key={i} style={{
+                color: '#374151', lineHeight: 1.6,
+                display: 'flex', alignItems: 'center', gap: 5,
+              }}>
+                <span style={{
+                  color: '#fff', fontSize: 8, fontWeight: 700,
+                  background: '#1b61c9', borderRadius: 99,
+                  width: 14, height: 14, display: 'inline-flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
+                }}>{i + 1}</span>
+                <span style={{ fontWeight: 500 }}>{name}</span>
+              </div>
+            ))
+          ) : (
+            <div style={{ color: '#9ca3af', fontStyle: 'italic' }}>
+              No named sections — add sectionName to SectionBox props
             </div>
-          ))}
+          )}
         </div>
       )}
 
@@ -225,6 +247,12 @@ export default function PuckEditorPage({
   const [showDuplicate, setShowDuplicate] = useState(false)
   const [duplicatePath, setDuplicatePath] = useState('')
   const [duplicating, setDuplicating]   = useState(false)
+
+  // PHASE E: auto-suggest duplicate path based on current page
+  const suggestDuplicatePath = useCallback(() => {
+    if (pagePath === '/') return '/homepage-copy'
+    return `${pagePath}-copy`
+  }, [pagePath])
 
   // FIX 2+3 — one-time orientation banners (from URL params, dismissed in-memory)
   const [templateBanner, setTemplateBanner] = useState<string | null>(null)
@@ -591,25 +619,30 @@ export default function PuckEditorPage({
   // Count sections for publish confirmation
   const sectionCount = initialData?.content?.length ?? 0
 
-  // Loading state
+  // PHASE F: Premium loading screen
   if (loading) {
     return (
       <div style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         justifyContent: 'center', height: '100vh', fontFamily: 'system-ui',
-        background: '#f8fafc', gap: '1rem',
+        background: 'linear-gradient(180deg, #f8fafc 0%, #f0f4f8 100%)', gap: '1rem',
       }}>
         <div style={{
-          width: 40, height: 40, border: '3px solid #e2e8f0',
-          borderTopColor: '#3b82f6', borderRadius: '50%',
+          width: 44, height: 44, border: '3px solid #e2e8f0',
+          borderTopColor: '#1b61c9', borderRadius: '50%',
           animation: 'spin 0.8s linear infinite',
         }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-        <p style={{ fontSize: '1rem', color: '#64748b' }}>
-          Loading editor for <strong>{pagePath}</strong>
-        </p>
-        <p style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-          Checking for unsaved drafts…
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '1rem', color: '#374151', fontWeight: 600, margin: '0 0 4px' }}>
+            AutoPuck Editor
+          </p>
+          <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>
+            Loading <strong>{pagePath === '/' ? 'Homepage' : pagePath}</strong>
+          </p>
+        </div>
+        <p style={{ fontSize: '0.75rem', color: '#9ca3af', margin: 0 }}>
+          Checking for drafts…
         </p>
       </div>
     )
@@ -769,16 +802,22 @@ export default function PuckEditorPage({
       {saveStatus === 'saved' && (
         <div style={{
           position: 'fixed', top: 60, right: 16, zIndex: 2147483647,
-          background: '#059669', color: '#fff',
-          padding: '10px 18px', borderRadius: 8,
+          background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+          color: '#fff',
+          padding: '12px 20px', borderRadius: 10,
           fontFamily: 'system-ui', fontSize: 13, fontWeight: 600,
-          boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+          boxShadow: '0 8px 24px rgba(5,150,105,0.35)',
           animation: 'slideUp 0.25s ease',
-          display: 'flex', alignItems: 'center', gap: 8,
+          display: 'flex', alignItems: 'center', gap: 10,
           pointerEvents: 'none',
         }}>
-          <span>✅</span>
-          <span>Published! Changes are live. (Allow 30–60s for page cache to refresh.)</span>
+          <span style={{ fontSize: 18 }}>✅</span>
+          <div>
+            <div>Published successfully</div>
+            <div style={{ fontSize: 11, fontWeight: 400, opacity: 0.85, marginTop: 2 }}>
+              {pagePath === '/' ? 'Homepage' : pagePath} is now live. Allow 30–60s for cache refresh.
+            </div>
+          </div>
         </div>
       )}
 
@@ -1187,17 +1226,54 @@ export default function PuckEditorPage({
                 .reveal { opacity: 1 !important; transform: none !important; }
                 body { background: #ffffff !important; margin: 0; }
                 body > nav, body > footer { display: none !important; }
+
+                /* PHASE A: Inline editing maturity — clearer focus states */
+                [contenteditable]:hover {
+                  outline: 2px dashed rgba(27,97,201,0.25) !important;
+                  outline-offset: 2px;
+                  cursor: text;
+                  border-radius: 4px;
+                }
+                [contenteditable]:focus {
+                  outline: 2px solid rgba(27,97,201,0.5) !important;
+                  outline-offset: 2px;
+                  border-radius: 4px;
+                  background: rgba(27,97,201,0.03) !important;
+                }
+                [contenteditable]::selection {
+                  background: rgba(27,97,201,0.18);
+                }
               `
               iframeDoc.head.appendChild(overrideStyle)
             }, [iframeDoc])
             return <>{children}</>
           },
 
-          // ── Section name badge on canvas ──────────────────────
+          // ── PHASE B: Section name badge on canvas — shows actual sectionName ──
           componentOverlay: ({ children, componentType, isSelected, hover }) => {
             const isSectionBox = componentType === 'SectionBox'
             if (!isSectionBox) return <>{children}</>
             const visible = isSelected || hover
+
+            // PHASE B: Read the actual sectionName from the component's data via usePuck
+            let displayName = 'Section'
+            try {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              const { appState } = usePuck()
+              if (appState?.data?.content) {
+                // Find the selected/hovered SectionBox and extract its sectionName
+                for (const item of appState.data.content) {
+                  if (item.type === 'SectionBox') {
+                    const sn = (item.props as Record<string, unknown>).sectionName as string
+                    if (sn) {
+                      displayName = sn
+                      break // Show the first named section for the overlay
+                    }
+                  }
+                }
+              }
+            } catch { /* usePuck not available outside Puck context */ }
+
             return (
               <div style={{ position: 'relative' }}>
                 {children}
@@ -1227,12 +1303,13 @@ export default function PuckEditorPage({
                       color: '#1b61c9',
                       fontFamily: 'system-ui',
                       textTransform: 'uppercase',
-                      background: 'rgba(255,255,255,0.85)',
-                      padding: '2px 7px',
+                      background: 'rgba(255,255,255,0.9)',
+                      padding: '2px 8px',
                       borderRadius: 99,
                       border: '1px solid rgba(27,97,201,0.2)',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                     }}>
-                    Content Section — click to edit, check right panel for name
+                      📦 {displayName}
                     </span>
                   </div>
                 )}
@@ -1251,27 +1328,53 @@ export default function PuckEditorPage({
               {/* ── Row 1: Controls ──────────────────────────────── */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
 
-                {/* Page Switcher */}
-                <select
-                  value={pagePath}
-                  onChange={(e) => switchPage(e.target.value)}
-                  style={{
-                    padding: '6px 12px', borderRadius: 6,
-                    border: '1px solid #d1d5db', fontSize: 13,
-                    fontFamily: 'system-ui', background: '#fff',
-                    cursor: 'pointer', minWidth: 160,
-                  }}
-                >
-                  <optgroup label="Site Pages">
-                    {pages.map((p) => (
-                      <option key={p.path} value={p.path}>
-                        {p.path === '/' ? '/ (Homepage)' : p.path}
-                        {p.saved ? ' ✓' : ''}
-                        {p.has_draft ? ' 📝' : ''}
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
+                {/* Page Switcher — PHASE E: improved grouping */}
+                {(() => {
+                  const published = pages.filter(p => p.saved)
+                  const draftsOnly = pages.filter(p => !p.saved && p.has_draft)
+                  const empty = pages.filter(p => !p.saved && !p.has_draft)
+                  return (
+                    <select
+                      value={pagePath}
+                      onChange={(e) => switchPage(e.target.value)}
+                      style={{
+                        padding: '6px 12px', borderRadius: 6,
+                        border: '1px solid #d1d5db', fontSize: 13,
+                        fontFamily: 'system-ui', background: '#fff',
+                        cursor: 'pointer', minWidth: 180,
+                      }}
+                    >
+                      {published.length > 0 && (
+                        <optgroup label="● Published">
+                          {published.map((p) => (
+                            <option key={p.path} value={p.path}>
+                              {p.path === '/' ? '/ (Homepage)' : p.path}
+                              {p.has_draft ? ' ✎' : ''}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {draftsOnly.length > 0 && (
+                        <optgroup label="✎ Drafts">
+                          {draftsOnly.map((p) => (
+                            <option key={p.path} value={p.path}>
+                              {p.path} ✎
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {empty.length > 0 && (
+                        <optgroup label="○ Not started">
+                          {empty.map((p) => (
+                            <option key={p.path} value={p.path}>
+                              {p.path}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                    </select>
+                  )
+                })()}
 
                 {/* New Page */}
                 {showNewPage ? (
@@ -1382,7 +1485,7 @@ export default function PuckEditorPage({
 
                 {/* Duplicate Page */}
                 <button
-                  onClick={() => setShowDuplicate(true)}
+                  onClick={() => { setDuplicatePath(suggestDuplicatePath()); setShowDuplicate(true) }}
                   title="Create a copy of this page for a new campaign"
                   style={{
                     padding: '6px 12px', borderRadius: 6,
