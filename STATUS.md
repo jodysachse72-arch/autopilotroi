@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 07:18 UTC (Phase 4 Campaign Operations — committed 6c218b1, build verified)
+> Last verified: 2026-05-21 07:29 UTC (Phase 5 In-Canvas Operations — committed 44e1be1, build verified)
 
 ---
 
@@ -11,10 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN**
-Latest commit: `6c218b1` (Phase 4 Campaign Operations Maturity)
+Latest commit: `44e1be1` (Phase 5 In-Canvas Operations)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commits Ready to Deploy:** `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
+**Commits Ready to Deploy:** `44e1be1` (Phase 5), `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
@@ -142,17 +142,47 @@ Certifying agent: Production Release Lead
   - **Architecture**: Supabase `puck_saved_sections` table (migration already existed), REST API CRUD, governed categories
   - **Deferred**: Section duplication via overlay button (not enough overlay API surface), complex section preview thumbnails
   - Build verified: tsc 0 errors, 65/65 pages, exit 0
+- **Phase 5: In-Canvas Operations** — commit `44e1be1`
+  - **Phase A — Contextual Section Controls**:
+    - SectionBox selected state shows action bar: 💾 Save + 📦 Library buttons on canvas
+    - Hero (🎯) and CTA (📢) components get type-specific icon badges
+    - All non-primary components show subtle type badge on hover (e.g. "Feature Card", "Image Block")
+    - Overlay bar has hover transitions + pointer events only when selected
+  - **Phase B — CTA Inline Affordance**:
+    - Links/buttons get green outline on hover in canvas (distinct from text editing blue)
+    - Transition animation for smooth visual feedback
+  - **Phase C — Media Inline Affordance**:
+    - Images get purple dashed outline on hover — visually distinct from text (blue) and CTA (green)
+    - Cursor changes to pointer to indicate clickability
+  - **Phase D — Insertion & Layout Confidence**:
+    - Empty DropZones get subtle diagonal stripe pattern + minimum height
+    - DropZone hover state: blue border + light background for clear insertion targets
+    - Component-level hover shows subtle outline for spatial awareness
+    - Selected components get blue selection ring with soft shadow
+  - **Phase E — Long Page Keyboard Hints**:
+    - Status bar replaced: backup tip → keyboard shortcut reference (Ctrl+Shift+S / Esc)
+    - Styled <kbd> elements for premium look
+  - **Phase F — Operator Flow**:
+    - Global Escape handler: closes any open modal (Section Library, Save, History, Duplicate, etc.)
+    - Ctrl+Shift+S: manual draft save from anywhere
+    - No more hunting for close buttons on modals
+  - **Phase G — Delight & Trust**:
+    - Smooth scroll behavior in editor iframe
+    - Component transitions: outline + box-shadow animate smoothly
+    - Selection ring: 2px blue + 4px soft blue glow
+    - Color-coded interaction language: blue=text, green=CTA, purple=media
+  - Build verified: tsc 0 errors, 65/65 pages, exit 0
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
-6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP, section save/insert flow, API full-section fetch, save-section modal, category tabs, PuckContextHelpers
+44e1be1  feat(cms): Phase 5 In-Canvas Operations -- contextual section controls, CTA/media hover affordances, insertion clarity, keyboard shortcuts, selection states
+6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP, section save/insert flow, API full-section fetch, save-section modal
 b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation, media confidence, campaign speed, editor polish
-65aa130  feat(cms): Phase 2 Editing Delight and Operator Speed -- hero field grouping, CTA link validation, template selector clarity, mobile viewport reminder, FAQ dropzone clarity, polish pass
+65aa130  feat(cms): Phase 2 Editing Delight and Operator Speed -- hero field grouping, CTA link validation, template selector clarity
 232802e  feat(cms): Phase 1-B Publishing Confidence and Editing Clarity -- 5 targeted fixes
-eedf811  chore: update STATUS.md -- Phase 1-A committed as 3fd2ee9
 3fd2ee9  feat(cms): Phase 1-A Campaign Velocity -- page duplication, 9 templates, campaign categories
 4118004  feat(cms): Phase 0 Operator Safety Layer
 bdeefa7  chore: production certification
@@ -165,8 +195,8 @@ b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embe
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:18 UTC)
-npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 07:18 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:29 UTC)
+npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 07:29 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
