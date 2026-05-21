@@ -4,6 +4,7 @@
  * Puck Visual Editor — Production Admin Route
  *
  * Phase 0: Operator Safety Layer
+ * Phase 1: Campaign Velocity
  *
  * Features:
  * - Draft/Autosave system (30s debounce, draft_data column)
@@ -19,6 +20,8 @@
  * - Dirty-state detection with beforeunload guard
  * - Publishing confidence signals
  * - Navigation protection on page-switch when dirty
+ * - Page duplication system
+ * - 9-template selector with descriptions
  */
 
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
@@ -28,6 +31,20 @@ import '@puckeditor/core/puck.css'
 
 type PageEntry = { path: string; saved: boolean; updated_at: string | null; has_draft?: boolean }
 type Revision = { id: string; published_at: string; label: string }
+
+// Template registry metadata
+const TEMPLATE_OPTIONS = [
+  { value: 'blank', label: '⬜ Blank page', desc: 'Empty page — add sections manually' },
+  { value: 'homepage-standard', label: '🏠 Homepage Standard', desc: 'Hero → Stats → Features → Steps → Testimonials → CTA' },
+  { value: 'product-page', label: '📦 Product Page', desc: 'HeroBlue → Stats → Product Cards → Pricing → FAQ → CTA' },
+  { value: 'campaign-landing', label: '🎯 Campaign Landing', desc: 'HeroDark → Video → Benefits → Proof → Pricing → CTA' },
+  { value: 'onboarding-page', label: '🚶 Onboarding Guide', desc: 'HeroBlue → 5-Step Process → FAQ → CTA' },
+  { value: 'webinar-landing', label: '🎬 Webinar / Masterclass', desc: 'HeroDark event → Video → Benefits → Attendee Proof → CTA' },
+  { value: 'comparison-page', label: '⚖️ Comparison / Why Us', desc: 'PageHeader → Advantages → Trust Signals → Testimonials → CTA' },
+  { value: 'trust-proof-page', label: '🛡️ Trust & Proof', desc: 'HeroBlue → Trust Cards → Quote → Video → Stats → CTA' },
+  { value: 'cta-landing', label: '⚡ Direct CTA Landing', desc: 'HeroDark → 3 Benefits → Featured Offer → CTA' },
+  { value: 'campaign-funnel', label: '🔥 Full Campaign Funnel', desc: 'Hero → Ticker → Stats → Benefits → Quote → Pricing → FAQ → CTA' },
+]
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const AUTOSAVE_INTERVAL_MS = 30_000 // 30 seconds
@@ -203,6 +220,12 @@ export default function PuckEditorPage({
   // Pre-publish confirmation
   const [showPublishConfirm, setShowPublishConfirm] = useState(false)
   const [pendingPublishData, setPendingPublishData] = useState<Data | null>(null)
+
+  // Page duplication state
+  const [showDuplicate, setShowDuplicate] = useState(false)
+  const [duplicatePath, setDuplicatePath] = useState('')
+  const [duplicating, setDuplicating]   = useState(false)
+
 
   // Refs for synchronous closure-safe access
   const isDirtyRef = useRef(false)
@@ -491,6 +514,35 @@ export default function PuckEditorPage({
   const manualSaveDraft = useCallback(async () => {
     await saveDraft()
   }, [saveDraft])
+
+  // ── Page duplication ──────────────────────────────────────────────
+  const duplicatePage = useCallback(async () => {
+    if (!duplicatePath) return
+    const targetPath = duplicatePath.startsWith('/') ? duplicatePath : `/${duplicatePath}`
+    setDuplicating(true)
+    try {
+      const res = await fetch('/api/puck?duplicate=true', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-puck-write-secret': WRITE_SECRET,
+        },
+        body: JSON.stringify({ sourcePath: pagePath, targetPath }),
+      })
+      const result = await res.json()
+      if (res.ok && result.ok) {
+        setShowDuplicate(false)
+        setDuplicatePath('')
+        // Navigate to the duplicated page immediately
+        window.location.href = `/admin/edit${targetPath}`
+      } else {
+        alert(result.error || 'Failed to duplicate page')
+      }
+    } catch {
+      alert('Network error — could not duplicate page')
+    }
+    setDuplicating(false)
+  }, [pagePath, duplicatePath])
 
   // Viewports
   const viewports = useMemo(() => [
@@ -867,6 +919,78 @@ export default function PuckEditorPage({
         </div>
       )}
 
+      {/* ── Duplicate page modal ─────────────────────────────────── */}
+      {showDuplicate && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 2147483647,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            background: '#fff', borderRadius: 12, padding: '28px 32px',
+            maxWidth: 440, width: '90%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+            fontFamily: 'system-ui',
+            animation: 'slideUp 0.2s ease',
+          }}>
+            <div style={{ fontSize: 28, marginBottom: 12 }}>📋</div>
+            <h3 style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 700, color: '#111827' }}>
+              Duplicate this page
+            </h3>
+            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#6b7280', lineHeight: 1.6 }}>
+              Create a copy of <strong>{pagePath === '/' ? 'Homepage' : pagePath}</strong> with all sections and content preserved.
+              The new page will open immediately in the editor.
+            </p>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>
+                New page path:
+              </label>
+              <input
+                type="text"
+                placeholder="/campaign-summer"
+                value={duplicatePath}
+                onChange={(e) => setDuplicatePath(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && duplicatePage()}
+                style={{
+                  width: '100%', padding: '10px 14px', borderRadius: 8,
+                  border: '1px solid #d1d5db', fontSize: 14,
+                  fontFamily: 'system-ui', boxSizing: 'border-box',
+                }}
+                autoFocus
+              />
+              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>
+                Examples: /campaign-summer, /crypto-masterclass, /aurum-special
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => { setShowDuplicate(false); setDuplicatePath('') }}
+                style={{
+                  padding: '8px 16px', borderRadius: 6, border: '1px solid #d1d5db',
+                  background: '#fff', fontSize: 14, cursor: 'pointer', fontWeight: 500,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={duplicatePage}
+                disabled={!duplicatePath || duplicating}
+                style={{
+                  padding: '8px 18px', borderRadius: 6, border: 'none',
+                  background: duplicatePath ? 'linear-gradient(180deg, #059669 0%, #047857 100%)' : '#d1d5db',
+                  color: '#fff', fontSize: 14,
+                  cursor: duplicatePath ? 'pointer' : 'default', fontWeight: 700,
+                  boxShadow: duplicatePath ? '0 2px 8px rgba(5,150,105,0.3)' : 'none',
+                  opacity: duplicating ? 0.6 : 1,
+                }}
+              >
+                {duplicating ? 'Duplicating…' : '📋 Duplicate & Open'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Puck editor ─────────────────────────────────────────── */}
       <Puck
         config={puckConfig}
@@ -1043,10 +1167,11 @@ export default function PuckEditorPage({
                           cursor: 'pointer', flex: 1,
                         }}
                       >
-                        <option value="blank">⬜ Blank page</option>
-                        <option value="homepage-standard">🏠 Homepage layout</option>
-                        <option value="product-page">📦 Product page layout</option>
-                        <option value="campaign-landing">🎯 Campaign landing layout</option>
+                        {TEMPLATE_OPTIONS.map((t) => (
+                          <option key={t.value} value={t.value} title={t.desc}>
+                            {t.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -1079,6 +1204,20 @@ export default function PuckEditorPage({
                 >
                   👁 Preview Draft ↗
                 </a>
+
+                {/* Duplicate Page */}
+                <button
+                  onClick={() => setShowDuplicate(true)}
+                  title="Create a copy of this page for a new campaign"
+                  style={{
+                    padding: '6px 12px', borderRadius: 6,
+                    border: '1px solid #d1d5db', background: '#fff',
+                    fontSize: 13, cursor: 'pointer', fontFamily: 'system-ui',
+                    fontWeight: 500, color: '#374151',
+                  }}
+                >
+                  📋 Duplicate
+                </button>
 
                 {/* History */}
                 <button

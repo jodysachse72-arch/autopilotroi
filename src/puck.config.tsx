@@ -1346,30 +1346,40 @@ export const puckConfig: Config<Components> = {
 
   // ── Component Categories (sidebar grouping) ──────────────
   categories: {
+    campaignEssentials: {
+      title: '🚀 Campaign Essentials',
+      components: ['HeroDark', 'CTABand', 'PricingCard', 'ActivityTicker'],
+      defaultExpanded: true,
+    },
     heroes: {
       title: '🎯 Heroes & Page Banners',
       components: ['HeroDark', 'HeroBlue', 'PageHeaderWhite'],
-      defaultExpanded: true,
+      defaultExpanded: false,
+    },
+    trustAndProof: {
+      title: '🛡️ Trust & Proof',
+      components: ['TestimonialCard', 'TrustSignalCard', 'QuoteBlock', 'StatRow', 'VideoBlock'],
+      defaultExpanded: false,
     },
     layout: {
       title: '📦 Page Sections',
       components: ['SectionBox', 'SectionHeader', 'FeatureGrid', 'CardGrid', 'StepGroup'],
-      defaultExpanded: true,
+      defaultExpanded: false,
     },
     content: {
       title: '📝 Content Blocks',
-      components: ['StatRow', 'Step', 'CTABand', 'ImageBlock', 'VideoBlock', 'QuoteBlock', 'ActivityTicker'],
-      defaultExpanded: true,
+      components: ['Step', 'ImageBlock', 'VideoBlock', 'QuoteBlock'],
+      defaultExpanded: false,
     },
     pricing: {
       title: '💰 Pricing & Offers',
       components: ['PricingCard'],
-      defaultExpanded: true,
+      defaultExpanded: false,
     },
     faqs: {
       title: '❓ FAQs',
       components: ['FaqGroup', 'FaqItem'],
-      defaultExpanded: true,
+      defaultExpanded: false,
     },
     cards: {
       title: '🃏 Cards',

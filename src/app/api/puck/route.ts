@@ -192,6 +192,7 @@ export async function POST(request: NextRequest) {
 
   const isDraftSave = request.nextUrl.searchParams.get('draft') === 'true'
   const restoreId = request.nextUrl.searchParams.get('restore')
+  const isDuplicate = request.nextUrl.searchParams.get('duplicate') === 'true'
 
   try {
     const body = await request.json()
@@ -247,6 +248,106 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json({ ok: true, path: pagePath, restored: true })
+    }
+
+    // ── Duplicate a page ──
+    if (isDuplicate) {
+      const { sourcePath, targetPath } = body
+      if (!sourcePath || !targetPath) {
+        return NextResponse.json({ error: 'Missing sourcePath or targetPath' }, { status: 400 })
+      }
+
+      // Check target doesn't already exist
+      const { data: existing } = await supabase
+        .from('puck_pages')
+        .select('path')
+        .eq('path', targetPath)
+        .single()
+
+      if (existing) {
+        return NextResponse.json({ error: 'Target page already exists' }, { status: 409 })
+      }
+
+      // Load source page
+      const { data: source, error: srcError } = await supabase
+        .from('puck_pages')
+        .select('data')
+        .eq('path', sourcePath)
+        .single()
+
+      if (srcError || !source?.data) {
+        return NextResponse.json({ error: 'Source page not found' }, { status: 404 })
+      }
+
+      // Deep clone and regenerate IDs to prevent key collisions
+      const sourceData = JSON.parse(JSON.stringify(source.data))
+
+      // Build an ID remap table: old ID → new ID
+      const idRemap: Record<string, string> = {}
+      let counter = 1
+
+      function generateNewId(oldId: string): string {
+        if (idRemap[oldId]) return idRemap[oldId]
+        const base = oldId.replace(/-\d+$/, '').replace(/^[a-f0-9-]{36}$/, 'item')
+        const newId = `${base}-dup-${counter++}`
+        idRemap[oldId] = newId
+        return newId
+      }
+
+      // Remap content array IDs
+      if (Array.isArray(sourceData.content)) {
+        for (const item of sourceData.content) {
+          if (item.props?.id) {
+            const oldId = item.props.id
+            item.props.id = generateNewId(oldId)
+          }
+        }
+      }
+
+      // Remap zone keys and nested item IDs
+      if (sourceData.zones) {
+        const newZones: Record<string, unknown[]> = {}
+        for (const [zoneKey, zoneItems] of Object.entries(sourceData.zones)) {
+          // Zone keys use format "parentId:zoneName"
+          const parts = zoneKey.split(':')
+          const parentId = parts[0]
+          const zoneName = parts.slice(1).join(':')
+          const newParentId = idRemap[parentId] || parentId
+          const newZoneKey = `${newParentId}:${zoneName}`
+
+          const items = zoneItems as Array<{ type: string; props: Record<string, unknown> }>
+          for (const item of items) {
+            if (item.props?.id) {
+              const oldId = item.props.id as string
+              item.props.id = generateNewId(oldId)
+            }
+          }
+
+          newZones[newZoneKey] = items
+        }
+        sourceData.zones = newZones
+      }
+
+      // Update page title
+      if (sourceData.root?.props?.title) {
+        sourceData.root.props.title = `${sourceData.root.props.title} (Copy)`
+      }
+
+      // Save duplicated page
+      const { error: dupError } = await supabase
+        .from('puck_pages')
+        .insert({
+          path: targetPath,
+          data: sourceData,
+          updated_at: new Date().toISOString(),
+        })
+
+      if (dupError) {
+        console.error('[Puck API] Duplicate error:', dupError)
+        return NextResponse.json({ error: 'Failed to duplicate page' }, { status: 500 })
+      }
+
+      return NextResponse.json({ ok: true, path: targetPath, duplicated: true, sourcePath })
     }
 
     // ── Draft save (autosave) ──

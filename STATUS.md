@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 05:13 UTC (Phase 0 Operator Safety Layer — commit `de0aec2`)
+> Last verified: 2026-05-21 06:09 UTC (Phase 1-A Campaign Velocity — uncommitted, build verified)
 
 ---
 
@@ -56,6 +56,30 @@ Certifying agent: Production Release Lead
   - Database: `draft_data` column added to `puck_pages`, `puck_page_revisions` table created
   - API: draft save, draft load, preview load, revision list, revision restore, revision pruning
   - Build verified: tsc 0 errors, 64/64 pages, exit 0
+- **Phase 1: Campaign Velocity** — uncommitted
+  - **Page Duplication**: Duplicate any page via editor toolbar → modal → path prompt → instant open
+    - Deep clones `data` + `zones` with full ID regeneration (no key collisions)
+    - Conflict detection (409 if target exists)
+    - API: `POST /api/puck?duplicate=true { sourcePath, targetPath }`
+    - Editor: 📋 Duplicate button in toolbar, modal with path input, navigates immediately
+  - **Template Expansion (3→9)**: 6 new governed templates from existing approved sections
+    - `onboarding-page`: HeroBlue → 5-Step Process → FAQ → CTA
+    - `webinar-landing`: HeroDark (event) → Video → Benefits → Attendee Proof → CTA
+    - `comparison-page`: PageHeader → Advantages → Trust Signals → Testimonials → CTA
+    - `trust-proof-page`: HeroBlue → Trust Cards → Quote → Video → Stats → CTA
+    - `cta-landing`: HeroDark → Benefits → Featured Offer → CTA
+    - `campaign-funnel`: Hero → Ticker → Stats → Benefits → Quote → Pricing → FAQ → CTA
+    - Template selector shows all 9 with emoji labels + descriptions
+    - All built from existing approved components only. No new components.
+  - **Quick Insert (component categories)**: Campaign Essentials first + 8 additional groups
+    - 🚀 Campaign Essentials (expanded): HeroDark, CTABand, PricingCard, ActivityTicker
+    - 🛡️ Trust & Proof: TestimonialCard, TrustSignalCard, QuoteBlock, StatRow, VideoBlock
+    - 🎯 Heroes, 📦 Page Sections, 💰 Pricing, ❓ FAQs, 🂣 Cards, ⚡ Widgets
+  - **Saved Sections (infrastructure only — deferred from editor)**: API + DB silent
+    - `puck_saved_sections` table migration exists (not yet applied to Supabase)
+    - `GET/POST/DELETE /api/puck/sections` route exists (not operator-exposed)
+    - Editor surface correctly deferred — not a management platform
+  - Build verified: tsc 0 errors, 65/65 pages, exit 0
 
 ---
 
@@ -79,8 +103,8 @@ d3817ac  chore: production certification — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 05:10 UTC)
-npm run build     →  ✅ EXIT 0  (64 pages, 6.1s compile — verified 2026-05-21 05:10 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 06:09 UTC)
+npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 06:09 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
@@ -260,7 +284,7 @@ None. Production is certified and stable.
 
 ```
 □ npx tsc --noEmit                → must be 0 errors AFTER your changes
-□ npm run build                   → must exit 0, 64 pages
+□ npm run build                   → must exit 0, 65 pages
 □ git add -A && git commit -m "..."
 □ git push origin feature/frontend-pages
 □ Update STATUS.md — "Last verified" timestamp + current state
