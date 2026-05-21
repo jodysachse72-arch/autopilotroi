@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 07:43 UTC (Phase 6 Media + Modal — committed 45c6055, build verified)
+> Last verified: 2026-05-21 08:05 UTC (Phase 7 Conversion Operations — committed 6962c6a, build verified)
 
 ---
 
@@ -11,10 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN**
-Latest commit: `45c6055` (Phase 6 Media + Modal)
+Latest commit: `6962c6a` (Phase 7 Conversion Operations)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commits Ready to Deploy:** `45c6055` (Phase 6), `44e1be1` (Phase 5), `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
+**Commits Ready to Deploy:** `6962c6a` (Phase 7), `45c6055` (Phase 6), `44e1be1` (Phase 5), `6c218b1` (Phase 4), `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
@@ -206,22 +206,63 @@ Certifying agent: Production Release Lead
     - Modal/popup preview available directly in editor canvas
     - All new components added to SectionBox `allow` list + categories
   - Build verified: tsc 0 errors, 66/66 pages, exit 0
+- **Phase 7: Conversion Operations** — commits `b983aab`, `6962c6a`
+  - **PHASE A — FormBlock (Lead Capture)**:
+    - Governed form: name + email + optional message textarea
+    - Card or inline layout styles
+    - Submit button with loading spinner + disabled state
+    - Success message replaces form on submit
+    - Error state display
+    - Mock submit (800ms) — prepared for Formspree/Supabase integration
+    - Operator-editable: labels, placeholders, submit text, success message
+  - **PHASE B — FunnelSteps (Process Flow)**:
+    - 3–4 step governed block with numbered circles
+    - Horizontal (grid) or vertical (timeline) layout
+    - Step title + description per step
+    - Optional CTA button at bottom
+    - Responsive grid (`repeat(N, 1fr)`) for horizontal mode
+  - **PHASE C — TestimonialCard Enhancements**:
+    - Avatar image upload (via ImageUrlField with 📤 upload)
+    - Company/team field (shown as `role · company`)
+    - Featured mode: blue border + shadow + ★ Featured badge
+    - "No stars" rating option (hide stars entirely)
+    - Backward-compatible with existing testimonial data
+  - **PHASE D — PricingCard Enhancements**:
+    - Guarantee badge: 🛡️ shield icon + emerald text below card
+    - Static countdown/urgency text: ⏰ amber banner below card
+    - Field group dividers: Plan Details / Features / CTA & Badges
+    - No real countdown timer — static visual only as specified
+  - **PHASE E — CTAStrip (Campaign CTA Variants)**:
+    - 5 themed CTA variants: onboarding (blue), webinar (violet), trust (emerald), urgency (amber), lead-magnet (indigo)
+    - Eyebrow + headline + body + CTA button
+    - Gradient backgrounds matching each variant
+    - Design-system-locked colors and typography
+  - **PHASE F — Mobile Preview Confidence**:
+    - Viewport labels now show pixel widths: "Mobile (360px)", "Tablet (768px)", "Desktop (1280px)"
+    - Enhanced mobile preview check in publish dialog: blue info card with title + description
+  - **PHASE G — Delight & Flow Polish**:
+    - Added `@keyframes spin` (form submit spinner)
+    - Added `@keyframes fadeIn` (modal/popup fade-in)
+    - Added `@keyframes slideUp` (modal/popup slide-up)
+    - New "Conversion & Lead Capture" sidebar category with all conversion blocks
+    - FunnelSteps added to Page Sections category
+  - Build verified: tsc 0 errors, 66/66 pages, exit 0 (892ms)
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
-45c6055  feat(cms): Phase 6 Media + Modal -- image upload API, VideoUrlField, ModalBlock, PopupCTA, Supabase Storage bucket
-44e1be1  feat(cms): Phase 5 In-Canvas Operations -- contextual section controls, CTA/media hover affordances, keyboard shortcuts
+6962c6a  feat(cms): Phase 7 polish -- animation keyframes, mobile viewport labels, mobile preview check
+b983aab  feat(cms): Phase 7 Conversion Operations -- FormBlock, FunnelSteps, CTAStrip, TestimonialCard+PricingCard enhancements
+45c6055  feat(cms): Phase 6 Media + Modal -- image upload API, VideoUrlField, ModalBlock, PopupCTA
+44e1be1  feat(cms): Phase 5 In-Canvas Operations -- contextual controls, CTA/media affordances, keyboard shortcuts
 6c218b1  feat(cms): Phase 4 Campaign Operations -- saved section library MVP, section save/insert flow
 b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation, editor polish
-65aa130  feat(cms): Phase 2 Editing Delight and Operator Speed -- hero field grouping, CTA link validation
-232802e  feat(cms): Phase 1-B Publishing Confidence and Editing Clarity -- 5 targeted fixes
+65aa130  feat(cms): Phase 2 Editing Delight -- hero field grouping, CTA link validation
+232802e  feat(cms): Phase 1-B Publishing Confidence -- 5 targeted fixes
 3fd2ee9  feat(cms): Phase 1-A Campaign Velocity -- page duplication, 9 templates, campaign categories
 4118004  feat(cms): Phase 0 Operator Safety Layer
-bdeefa7  chore: production certification
-bc5413d  fix(seo): remove redundant site-name suffix from /products title
 ```
 
 ---
@@ -229,8 +270,8 @@ bc5413d  fix(seo): remove redundant site-name suffix from /products title
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:43 UTC)
-npm run build     →  ✅ EXIT 0  (66 pages — verified 2026-05-21 07:43 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 08:05 UTC)
+npm run build     →  ✅ EXIT 0  (66 pages — verified 2026-05-21 08:05 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
