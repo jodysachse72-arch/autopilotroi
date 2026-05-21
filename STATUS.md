@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 22:44 UTC (Homepage CMS Migration — dpl_FLiJNX65JskYGRYSXhJBMGkbTX7Z)
+> Last verified: 2026-05-20 23:41 UTC (Puck CSS Isolation — dpl_6v81rNVMSQsF3JNveamPmxRBAyBH)
 
 ---
 
@@ -13,10 +13,10 @@ feature/frontend-pages
 Working tree: **CLEAN** (nothing to commit)
 Synced with: `origin/feature/frontend-pages` — up to date (commit `49a14ed`)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
-**Prod Deployment ID:** `dpl_FLiJNX65JskYGRYSXhJBMGkbTX7Z`
-**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/FLiJNX65JskYGRYSXhJBMGkbTX7Z
-**Deployed At:** 2026-05-20 22:43 UTC (27s build, iad1 Washington DC)
-**Commit Deployed:** `8531df0` (Homepage CMS Migration sprint)
+**Prod Deployment ID:** `dpl_6v81rNVMSQsF3JNveamPmxRBAyBH`
+**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/6v81rNVMSQsF3JNveamPmxRBAyBH
+**Deployed At:** 2026-05-20 23:40 UTC (27s build, iad1 Washington DC)
+**Commit Deployed:** `7ce56d1` (Puck CSS isolation sprint)
 
 ---
 
@@ -43,7 +43,12 @@ Certifying agent: Production Release Lead
 - **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageBlock live preview)
 - **CMS Page Templates** (3 governed templates: homepage-standard, product-page, campaign-landing)
 - **Homepage Conversion Optimization** (ActivityTicker below hero, QuoteBlock trust bridge, PricingCard investment tiers)
-- **Homepage CMS Migration** — homepage is now CMS-first (ISR 60s revalidate + static fallback)
+- **Puck CSS Isolation** — removed 70.7KB dead editor CSS from public homepage bundle
+  - `PuckPageRenderer` now imports 2.9KB `src/styles/puck-render-only.css` (vendored from rsc.css)
+  - Admin editor retains full `puck.css` (73KB) — correct, needs full editor chrome
+  - Upload artifact shrank from 376.5KB —> 340.8KB (35.7KB reduction)
+  - Audit confirmed: `index.css` had only `--puck-*` CSS vars + module hashes, zero style bleeding
+  - Production certified: `dpl_6v81rNVMSQsF3JNveamPmxRBAyBH` — commit `7ce56d1`
   - `/` is now an async server component — fetches Puck JSON from Supabase at request time
   - Falls back to `StaticHomePage.tsx` if CMS is unavailable (never white-screens)
   - `PuckPageRenderer.tsx` bridges Puck Data JSON to `<Render>` with error boundary
