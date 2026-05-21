@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 21:52 UTC (CMS Content Essentials sprint)
+> Last verified: 2026-05-20 21:01 UTC (CMS Conversion Systems sprint)
 
 ---
 
@@ -40,13 +40,15 @@ Certifying agent: Production Release Lead
 - Production data migration (sectionName for all SectionBox instances)
 - Full governance documentation suite
 - **CMS Content Essentials** (FaqItem, FaqGroup, VideoBlock, QuoteBlock, TestimonialCard+stars)
+- **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageUrlField live preview)
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
-[NEW]      feat(cms): CMS Content Essentials — FaqItem, FaqGroup, VideoBlock, QuoteBlock, TestimonialCard star ratings
+[NEW]      feat(cms): CMS Conversion Systems sprint — PricingCard, ActivityTicker, ImageUrlField live preview
+540f60c  feat(cms): CMS Content Essentials sprint
 a901757  docs: CMS operations & governance sprint
 49a14ed  chore: update STATUS.md — CMS UX stack deployed to production
 60b6447  chore: add dotenv dev dependency
