@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 23:46 UTC (SEO + Analytics + ThriveDesk sprint — deploying...)
+> Last verified: 2026-05-20 23:49 UTC (SEO + Analytics + ThriveDesk — dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz)
 
 ---
 
@@ -13,10 +13,10 @@ feature/frontend-pages
 Working tree: **CLEAN** (nothing to commit)
 Synced with: `origin/feature/frontend-pages` — up to date (commit `49a14ed`)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
-**Prod Deployment ID:** `dpl_6v81rNVMSQsF3JNveamPmxRBAyBH`
-**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/6v81rNVMSQsF3JNveamPmxRBAyBH
-**Deployed At:** 2026-05-20 23:40 UTC (27s build, iad1 Washington DC)
-**Commit Deployed:** `7ce56d1` (Puck CSS isolation sprint)
+**Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz`
+**Vercel Inspect:** https://vercel.com/autopilot-roi/autopilotroi/9Xsq3AANe8EQeYgdpB5DmAfdMiQz
+**Deployed At:** 2026-05-20 23:49 UTC (26s build, iad1 Washington DC)
+**Commit Deployed:** `bc5413d` (SEO + Analytics + ThriveDesk sprint)
 
 ---
 
@@ -67,16 +67,16 @@ Certifying agent: Production Release Lead
 ## LAST 10 COMMITS
 
 ```
-[NEW]      feat(cms): CMS Page Templates sprint
-[PREV]     feat(cms): CMS Conversion Systems sprint — PricingCard, ActivityTicker, ImageUrlField live preview
-540f60c  feat(cms): CMS Content Essentials sprint
-a901757  docs: CMS operations & governance sprint
-49a14ed  chore: update STATUS.md — CMS UX stack deployed to production
+bc5413d  fix(seo): remove redundant site-name suffix from /products title
+b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embed fix
+668a508  chore: production certification — Puck CSS isolation
+7ce56d1  perf(css): Puck CSS isolation — remove 70.7KB editor bundle from homepage
+d79e9fa  chore: production certification — homepage CMS migration
+8531df0  feat(cms): homepage CMS migration — CMS-first ISR rendering
+d3817ac  chore: production certification — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx
 60b6447  chore: add dotenv dev dependency
-2568bda  chore: update STATUS.md — content discovery sprint complete
-685811a  feat(cms-ux): content discovery sprint — section names, humanized labels, canvas badges
-ccd8dd9  fix(cms-ux): operator simulation corrections — status bar, reset modal, cache awareness
-3542d18  feat(cms-ux): add publishing confidence signals and navigation protection
+49a14ed  chore: update STATUS.md — CMS UX stack deployed
+a901757  docs: CMS operations & governance sprint
 ```
 
 ---
@@ -84,9 +84,9 @@ ccd8dd9  fix(cms-ux): operator simulation corrections — status bar, reset moda
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-20 20:44 UTC)
-npm run build     →  ✅ EXIT 0  (64 pages — verified 2026-05-20 20:44 UTC)
-Vercel build      →  ✅ EXIT 0  (11.9s compile — verified 2026-05-20 20:44 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-20 23:49 UTC)
+npm run build     →  ✅ EXIT 0  (64 pages, 11.2s compile — verified 2026-05-20 23:49 UTC)
+Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC)
 ```
 
 ---
