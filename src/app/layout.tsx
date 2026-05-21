@@ -89,7 +89,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             id="thrivedesk-widget"
             strategy="afterInteractive"
             dangerouslySetInnerHTML={{
-              __html: `console.log('[ThriveDesk] Widget ID: ${thriveDeskId} — ready for embed script');`,
+              __html: `
+                (function(d,t) {
+                  var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+                  g.src='https://widget.thrivedesk.com/widget.js';
+                  g.setAttribute('data-widget-id','${thriveDeskId}');
+                  g.async=true;
+                  s.parentNode.insertBefore(g,s);
+                })(document,'script');
+              `,
             }}
           />
         )}
