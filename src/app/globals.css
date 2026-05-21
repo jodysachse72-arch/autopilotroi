@@ -996,3 +996,18 @@ input, textarea, select {
 .be-pill--amber  { background: #fef3c7;               color: #b45309; }
 .be-pill--red    { background: #fef2f2;               color: #b91c1c; }
 .be-pill--purple { background: #f5f3ff;               color: #6d28d9; }
+
+/* ── Animation keyframes (Phase 7 — conversion components) ───────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

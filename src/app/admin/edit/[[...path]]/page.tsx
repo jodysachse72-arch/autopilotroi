@@ -685,9 +685,9 @@ export default function PuckEditorPage({
 
   // Viewports
   const viewports = useMemo(() => [
-    { width: 360, height: 'auto' as const, label: '📱 Mobile', icon: '📱' },
-    { width: 768, height: 'auto' as const, label: '📱 Tablet', icon: '📱' },
-    { width: 1280, height: 'auto' as const, label: '🖥️ Desktop', icon: '🖥️' },
+    { width: 360, height: 'auto' as const, label: '📱 Mobile (360px)', icon: '📱' },
+    { width: 768, height: 'auto' as const, label: '📱 Tablet (768px)', icon: '📱' },
+    { width: 1280, height: 'auto' as const, label: '🖥️ Desktop (1280px)', icon: '🖥️' },
   ], [])
 
   // Count sections for publish confirmation
@@ -1014,15 +1014,18 @@ export default function PuckEditorPage({
               }}>
                 Changes will be visible to visitors within 30–60 seconds.
               </div>
-              {/* TASK 4: Mobile viewport reminder */}
+              {/* TASK 4: Mobile viewport reminder — Phase F enhanced */}
               <div style={{
-                marginTop: 8, padding: '7px 12px', borderRadius: 6,
-                background: '#f9fafb', border: '1px solid #e5e7eb',
-                fontSize: 12, color: '#6b7280',
-                display: 'flex', alignItems: 'center', gap: 6,
+                marginTop: 8, padding: '8px 12px', borderRadius: 8,
+                background: '#eff6ff', border: '1.5px solid #bfdbfe',
+                fontSize: 12, color: '#1e40af',
+                display: 'flex', alignItems: 'flex-start', gap: 8,
               }}>
-                <span>📱</span>
-                <span>Did you check the <strong>mobile view</strong>? Use the viewport buttons in the top toolbar to preview at 360px before publishing.</span>
+                <span style={{ fontSize: 16, lineHeight: 1 }}>📱</span>
+                <div>
+                  <div style={{ fontWeight: 600, marginBottom: 2 }}>Mobile Preview Check</div>
+                  <span style={{ color: '#3b82f6' }}>Use the viewport buttons (360px / 768px / 1280px) in the top toolbar to verify your page looks great on all devices.</span>
+                </div>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
