@@ -1025,6 +1025,263 @@ const CAMPAIGN_FUNNEL: PuckData = {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATE 10: webinar-registration
+//   HeroDark (event CTA) → CTAStrip(webinar) → FunnelSteps(3) → Testimonials → FormBlock → CTAStrip(urgency)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const WEBINAR_REGISTRATION: PuckData = {
+  root: { props: { title: 'Live Webinar Registration — AutoPilotROI', description: 'Register for our live AI crypto investing webinar. See the EX-AI Bot trade in real time.' } },
+  content: [
+    { type: 'HeroDark', props: { id: 'wr-hero', badge: '🔴 Live Webinar — Limited Seats', title: 'See AI Trading', highlightedText: 'In Real Time', description: 'Join our live webinar and watch the EX-AI Bot execute trades on screen. Ask questions, see results, and decide if AI-powered crypto investing is right for you.', ctaLabel: 'Reserve My Seat →', ctaHref: '#register', secondaryCtaLabel: '', secondaryCtaHref: '', bulletOne: 'Free — no payment required', bulletTwo: 'Live bot demonstration', bulletThree: 'Expert Q&A session', videoUrl: '', videoThumb: '' } },
+    { type: 'SectionBox', props: { id: 'wr-strip-section', sectionName: 'Webinar CTA Strip', variant: 'navy', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'wr-funnel-section', sectionName: 'Funnel Steps (Register → Attend → Implement)', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'wr-testimonials-section', sectionName: 'Past Attendee Testimonials', variant: 'surface', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'wr-form-section', sectionName: 'Registration Form', variant: 'white', padding: 'xl' } },
+    { type: 'SectionBox', props: { id: 'wr-urgency-section', sectionName: 'Urgency CTA Strip', variant: 'navy', padding: 'lg' } },
+  ],
+  zones: {
+    'wr-strip-section:content': [
+      { type: 'CTAStrip', props: { id: 'wr-cta-strip-1', eyebrow: 'Next Session', headline: 'Our most popular webinar is filling up fast', body: 'Each session is limited to 50 attendees so every question gets answered. Secure your spot before registration closes.', ctaLabel: 'Register Free →', ctaHref: '#register', variant: 'webinar' } },
+    ],
+    'wr-funnel-section:content': [
+      { type: 'SectionHeader', props: { id: 'wr-funnel-header', eyebrow: 'How It Works', title: 'Three steps to your AI trading education', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FunnelSteps', props: { id: 'wr-funnel-steps', stepTitle1: 'Register Now', stepBody1: 'Enter your name and email below. You will receive a confirmation with the webinar link and calendar invite.', stepTitle2: 'Attend Live', stepBody2: 'Join the session from any device. Watch the EX-AI Bot trade in real time and ask your questions during the live Q&A.', stepTitle3: 'Implement with Support', stepBody3: 'After the webinar, your assigned partner walks you through onboarding — wallet setup, USDT acquisition, and bot activation.', stepTitle4: '', stepBody4: '', ctaLabel: 'Secure My Seat →', ctaHref: '#register', style: 'horizontal' } },
+    ],
+    'wr-testimonials-section:content': [
+      { type: 'SectionHeader', props: { id: 'wr-test-header', eyebrow: 'Past Attendees', title: 'What people say after watching', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'CardGrid', props: { id: 'wr-test-grid', columns: '2' } },
+    ],
+    'wr-test-grid:cards': [
+      { type: 'TestimonialCard', props: { id: 'wr-test-1', quote: 'I was skeptical about AI trading until I saw the bot execute trades live on screen. Signed up that same evening.', author: 'Angela P.', role: 'Webinar Attendee → Active Member', starRating: '5', memberInitials: 'AP', avatarUrl: '', company: '', cardStyle: 'standard' } },
+      { type: 'TestimonialCard', props: { id: 'wr-test-2', quote: 'The Q&A session answered every concern I had. The transparency during the live demo was impressive — no smoke and mirrors.', author: 'Kevin D.', role: 'Growth Tier Member', starRating: '5', memberInitials: 'KD', avatarUrl: '', company: '', cardStyle: 'standard' } },
+    ],
+    'wr-form-section:content': [
+      { type: 'SectionHeader', props: { id: 'wr-form-header', eyebrow: 'Register Now', title: 'Claim your seat for the next live session', lead: 'Enter your details below and we will send you the webinar link plus a calendar reminder.', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FormBlock', props: { id: 'wr-form', formTitle: 'Webinar Registration', formDescription: 'Free to attend. Limited to 50 seats per session.', nameLabel: 'Full Name', namePlaceholder: 'Enter your full name', emailLabel: 'Email Address', emailPlaceholder: 'you@example.com', messageLabel: '', messagePlaceholder: '', showMessage: 'no', submitLabel: 'Reserve My Seat →', successMessage: 'You\'re registered! Check your inbox for the webinar link and calendar invite.', formStyle: 'card' } },
+    ],
+    'wr-urgency-section:content': [
+      { type: 'CTAStrip', props: { id: 'wr-cta-strip-2', eyebrow: 'Don\'t Miss Out', headline: 'Registration closes when we hit 50 attendees', body: 'Every session fills up. If you are reading this, there is still time — but only just. Register now and start your AI trading journey.', ctaLabel: 'Claim My Spot →', ctaHref: '#register', variant: 'urgency' } },
+    ],
+  },
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATE 11: lead-magnet-page
+//   HeroDark (download CTA) → FeatureCards x3 → FormBlock(card) → Testimonials → CTAStrip(lead-magnet)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LEAD_MAGNET_PAGE: PuckData = {
+  root: { props: { title: 'Free AI Trading Guide — AutoPilotROI', description: 'Download the free AutoPilotROI starter guide and learn how AI-powered crypto trading works.' } },
+  content: [
+    { type: 'HeroDark', props: { id: 'lm-hero', badge: '📥 Free Download', title: 'The Complete Guide to', highlightedText: 'AI Crypto Trading', description: 'Download our free 20-page guide and understand exactly how the Aurum EX-AI Bot works, what returns to expect, and how to get started with as little as $100 USDT.', ctaLabel: 'Download Free Guide →', ctaHref: '#download', secondaryCtaLabel: '', secondaryCtaHref: '', bulletOne: 'Free — no payment required', bulletTwo: '20-page comprehensive guide', bulletThree: 'Actionable onboarding checklist', videoUrl: '', videoThumb: '' } },
+    { type: 'SectionBox', props: { id: 'lm-features-section', sectionName: 'What You Get (3 Highlights)', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'lm-form-section', sectionName: 'Download Form', variant: 'surface', padding: 'xl' } },
+    { type: 'SectionBox', props: { id: 'lm-testimonials-section', sectionName: 'Reader Testimonials', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'lm-strip-section', sectionName: 'Lead Magnet CTA Strip', variant: 'navy', padding: 'lg' } },
+  ],
+  zones: {
+    'lm-features-section:content': [
+      { type: 'SectionHeader', props: { id: 'lm-features-header', eyebrow: 'Inside the Guide', title: 'What you will learn', lead: 'Everything you need to go from crypto-curious to confidently investing with AI.', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FeatureGrid', props: { id: 'lm-features-grid', columns: '3' } },
+    ],
+    'lm-features-grid:cards': [
+      { type: 'FeatureCard', props: { id: 'lm-feat-1', title: 'How AI Trading Works', body: 'A clear, jargon-free explanation of how the EX-AI Bot analyzes markets, selects trades, and compounds returns 24/7.', colorPreset: 'brand-blue' } },
+      { type: 'FeatureCard', props: { id: 'lm-feat-2', title: 'The Aurum Ecosystem', body: 'Understand all four products — trading bot, Visa crypto card, exchange, and Web3 neobank — and how they work together.', colorPreset: 'violet' } },
+      { type: 'FeatureCard', props: { id: 'lm-feat-3', title: 'Step-by-Step Onboarding', body: 'A printable checklist covering wallet setup, VPN, USDT acquisition, Aurum registration, and bot activation.', colorPreset: 'emerald' } },
+    ],
+    'lm-form-section:content': [
+      { type: 'SectionHeader', props: { id: 'lm-form-header', eyebrow: 'Get Your Copy', title: 'Enter your details and download instantly', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FormBlock', props: { id: 'lm-form', formTitle: 'Download the Free Guide', formDescription: 'We will send the PDF to your inbox immediately. No spam — just the guide and occasional updates.', nameLabel: 'First Name', namePlaceholder: 'Your first name', emailLabel: 'Email Address', emailPlaceholder: 'you@example.com', messageLabel: '', messagePlaceholder: '', showMessage: 'no', submitLabel: 'Send Me the Guide →', successMessage: 'Check your inbox! The guide is on its way. Look for an email from AutoPilotROI.', formStyle: 'card' } },
+    ],
+    'lm-testimonials-section:content': [
+      { type: 'SectionHeader', props: { id: 'lm-test-header', eyebrow: 'Reader Feedback', title: 'What readers say about the guide', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'CardGrid', props: { id: 'lm-test-grid', columns: '2' } },
+    ],
+    'lm-test-grid:cards': [
+      { type: 'TestimonialCard', props: { id: 'lm-test-1', quote: 'This guide finally made AI trading click for me. Clear explanations, real examples, and an actual action plan. Started my onboarding the next day.', author: 'Maria C.', role: 'Guide Reader → Active Member', starRating: '5', memberInitials: 'MC', avatarUrl: '', company: '', cardStyle: 'featured' } },
+      { type: 'TestimonialCard', props: { id: 'lm-test-2', quote: 'I shared this with my partner and we both signed up. The ecosystem breakdown and the onboarding checklist were incredibly helpful.', author: 'Nathan J.', role: 'Growth Tier Member', starRating: '5', memberInitials: 'NJ', avatarUrl: '', company: '', cardStyle: 'featured' } },
+    ],
+    'lm-strip-section:content': [
+      { type: 'CTAStrip', props: { id: 'lm-cta-strip', eyebrow: 'Ready to Start?', headline: 'The guide is free. The opportunity is real.', body: 'Download the complete AI trading guide and see for yourself why thousands of people are activating the EX-AI Bot.', ctaLabel: 'Get the Free Guide →', ctaHref: '#download', variant: 'lead-magnet' } },
+    ],
+  },
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATE 12: pricing-offer-page
+//   PageHeaderWhite → PricingCards x3 → FAQ → Testimonials x3 → CTAStrip(trust)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const PRICING_OFFER_PAGE: PuckData = {
+  root: { props: { title: 'Pricing & Plans — AutoPilotROI', description: 'Compare AutoPilotROI investment tiers and choose the right plan for your AI trading journey.' } },
+  content: [
+    { type: 'PageHeaderWhite', props: { id: 'po-hero', badge: 'Pricing', title: 'Choose the plan that', highlightedText: 'fits your goals.', description1: 'Every plan includes full EX-AI Bot access, personal partner support, and Aurum University training. Start small and scale as your confidence grows.', description2: '', cta1Label: '', cta1Href: '', cta2Label: '', cta2Href: '' } },
+    { type: 'SectionBox', props: { id: 'po-pricing-section', sectionName: 'Pricing Cards (3 Tiers)', variant: 'white', padding: 'xl' } },
+    { type: 'SectionBox', props: { id: 'po-faq-section', sectionName: 'Pricing FAQ', variant: 'surface', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'po-testimonials-section', sectionName: 'Member Testimonials', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'po-strip-section', sectionName: 'Trust CTA Strip', variant: 'navy', padding: 'lg' } },
+  ],
+  zones: {
+    'po-pricing-section:content': [
+      { type: 'SectionHeader', props: { id: 'po-pricing-header', eyebrow: 'Investment Tiers', title: 'Start where you are. Scale when ready.', lead: 'All plans include the same AI bot technology. The difference is your capital deployment and compounding potential.', align: 'center', badgeVariant: 'blue' } },
+      { type: 'CardGrid', props: { id: 'po-pricing-grid', columns: '3' } },
+    ],
+    'po-pricing-grid:cards': [
+      { type: 'PricingCard', props: { id: 'po-price-starter', planName: 'Starter', planTagline: 'Perfect for exploring AI-powered trading with minimal commitment.', priceDisplay: '$100 USDT minimum', feature1: 'EX-AI Bot activation', feature2: 'AI-managed 24/7 trading', feature3: 'Aurum University access', feature4: 'Personal partner support', feature5: 'Full dashboard analytics', feature6: '', feature7: '', feature8: '', ctaLabel: 'Start with $100 →', ctaHref: '/signup', badge: '', guaranteeBadge: '✓ Withdraw anytime — no lock-in', countdownText: '', cardStyle: 'standard' } },
+      { type: 'PricingCard', props: { id: 'po-price-growth', planName: 'Growth', planTagline: 'For investors ready to maximize compounding returns and partner income.', priceDisplay: '$500–$2,500 USDT', feature1: 'All Starter features', feature2: 'Higher compounding tier', feature3: 'Multi-exchange deployment', feature4: 'Priority partner access', feature5: 'Advanced analytics suite', feature6: 'Partner income eligibility', feature7: '', feature8: '', ctaLabel: 'Activate Growth →', ctaHref: '/signup', badge: '⭐ Most Popular', guaranteeBadge: '✓ Full control of your funds', countdownText: '', cardStyle: 'featured' } },
+      { type: 'PricingCard', props: { id: 'po-price-advanced', planName: 'Advanced', planTagline: 'Maximum capital deployment across the full Aurum ecosystem.', priceDisplay: '$2,500+ USDT', feature1: 'All Growth features', feature2: 'Full ecosystem access', feature3: 'Visa Crypto Card (physical)', feature4: 'Neobank IBAN account', feature5: 'VIP onboarding specialist', feature6: 'Maximum compounding tier', feature7: '', feature8: '', ctaLabel: 'Go Advanced →', ctaHref: '/signup', badge: '', guaranteeBadge: '✓ Complete ecosystem access', countdownText: '', cardStyle: 'standard' } },
+    ],
+    'po-faq-section:content': [
+      { type: 'SectionHeader', props: { id: 'po-faq-header', eyebrow: 'Pricing FAQ', title: 'Common questions about our plans', lead: '', align: 'left', badgeVariant: 'blue' } },
+      { type: 'FaqGroup', props: { id: 'po-faq-group', groupTitle: '' } },
+    ],
+    'po-faq-group:faqs': [
+      { type: 'FaqItem', props: { id: 'po-faq-1', question: 'Can I upgrade my plan later?', answer: 'Yes. You can increase your investment at any time. Your AI bot automatically adjusts to your new capital tier — no downtime or reconfiguration needed.', openByDefault: 'yes' } },
+      { type: 'FaqItem', props: { id: 'po-faq-2', question: 'Are there any hidden fees?', answer: 'No hidden fees. The platform subscription is transparent and clearly documented. Exchange trading fees are standard rates charged by Binance, Bybit, or KuCoin — not by AutoPilotROI.', openByDefault: 'no' } },
+      { type: 'FaqItem', props: { id: 'po-faq-3', question: 'Can I withdraw my funds at any time?', answer: 'Absolutely. Your funds remain in your own exchange account at all times. You can withdraw profits or your full balance whenever you choose — there are no lock-in periods.', openByDefault: 'no' } },
+      { type: 'FaqItem', props: { id: 'po-faq-4', question: 'What is the difference between the tiers?', answer: 'All tiers use the same AI bot technology. The difference is your capital allocation and the compounding potential that comes with it. Higher tiers unlock additional ecosystem products like the Visa card and neobank access.', openByDefault: 'no' } },
+    ],
+    'po-testimonials-section:content': [
+      { type: 'SectionHeader', props: { id: 'po-test-header', eyebrow: 'Member Reviews', title: 'What our members say about the value', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'CardGrid', props: { id: 'po-test-grid', columns: '3' } },
+    ],
+    'po-test-grid:cards': [
+      { type: 'TestimonialCard', props: { id: 'po-test-1', quote: 'Started at Starter tier with $100 just to test it. Upgraded to Growth within three weeks after seeing consistent results.', author: 'Thomas B.', role: 'Growth Tier Member', starRating: '5', memberInitials: 'TB', avatarUrl: '', company: '', cardStyle: 'standard' } },
+      { type: 'TestimonialCard', props: { id: 'po-test-2', quote: 'The fact that my funds stay in my own exchange account gave me the confidence to start. Total transparency.', author: 'Linda W.', role: 'Member since March 2025', starRating: '5', memberInitials: 'LW', avatarUrl: '', company: '', cardStyle: 'standard' } },
+      { type: 'TestimonialCard', props: { id: 'po-test-3', quote: 'Advanced tier was worth it for the Visa card alone. Being able to spend my crypto earnings anywhere is a game-changer.', author: 'Jason H.', role: 'Advanced Tier Member', starRating: '5', memberInitials: 'JH', avatarUrl: '', company: '', cardStyle: 'standard' } },
+    ],
+    'po-strip-section:content': [
+      { type: 'CTAStrip', props: { id: 'po-cta-strip', eyebrow: 'Trusted by 12,000+ Members', headline: 'Your funds stay in your exchange. Always.', body: 'AutoPilotROI never takes custody of your assets. You retain full control. Start with $100 USDT and see the AI work for you.', ctaLabel: 'Start My Portfolio →', ctaHref: '/signup', variant: 'trust' } },
+    ],
+  },
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATE 13: consultation-booking
+//   HeroDark (book CTA) → FunnelSteps(3, vertical) → QuoteBlock → FormBlock(card, showMessage=yes) → CTAStrip(onboarding)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CONSULTATION_BOOKING: PuckData = {
+  root: { props: { title: 'Book a Consultation — AutoPilotROI', description: 'Book a free 1-on-1 AI trading consultation with an AutoPilotROI partner.' } },
+  content: [
+    { type: 'HeroDark', props: { id: 'cb-hero', badge: '📞 Free Consultation', title: 'Talk to a Real Person', highlightedText: 'Before You Invest', description: 'Book a free 30-minute call with an AutoPilotROI partner. Get your questions answered, see a live demo, and decide if AI-powered crypto trading is right for you — zero pressure.', ctaLabel: 'Book My Call →', ctaHref: '#book', secondaryCtaLabel: '', secondaryCtaHref: '', bulletOne: 'Free — no obligation', bulletTwo: '30-minute 1-on-1 session', bulletThree: 'Live platform walkthrough', videoUrl: '', videoThumb: '' } },
+    { type: 'SectionBox', props: { id: 'cb-funnel-section', sectionName: 'Booking Funnel Steps (Book → Connect → Activate)', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'cb-quote-section', sectionName: 'Member Quote', variant: 'surface', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'cb-form-section', sectionName: 'Booking Form', variant: 'white', padding: 'xl' } },
+    { type: 'SectionBox', props: { id: 'cb-strip-section', sectionName: 'Onboarding CTA Strip', variant: 'navy', padding: 'lg' } },
+  ],
+  zones: {
+    'cb-funnel-section:content': [
+      { type: 'SectionHeader', props: { id: 'cb-funnel-header', eyebrow: 'The Process', title: 'From first call to active portfolio', lead: 'Three simple steps — your partner handles everything.', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FunnelSteps', props: { id: 'cb-funnel-steps', stepTitle1: 'Book Your Call', stepBody1: 'Fill out the form below with your name, email, and a brief message about your goals. We will match you with the right partner.', stepTitle2: 'Connect with Your Partner', stepBody2: 'Your assigned partner schedules a 30-minute video call. They walk you through the platform, answer questions, and show you a live bot demo.', stepTitle3: 'Activate Your Portfolio', stepBody3: 'If you decide to proceed, your partner guides you through every onboarding step — wallet, USDT, Aurum account, and bot activation.', stepTitle4: '', stepBody4: '', ctaLabel: 'Book My Free Call →', ctaHref: '#book', style: 'vertical' } },
+    ],
+    'cb-quote-section:content': [
+      { type: 'QuoteBlock', props: { id: 'cb-quote', quote: 'My partner spent an hour on the phone with me before I invested a single dollar. That level of care and transparency is what convinced me this was real.', attribution: 'Patricia L.', attributionRole: 'Member since January 2025', quoteStyle: 'centered', accentColor: 'brand-blue' } },
+    ],
+    'cb-form-section:content': [
+      { type: 'SectionHeader', props: { id: 'cb-form-header', eyebrow: 'Book Now', title: 'Request your free consultation', lead: 'Tell us a bit about yourself and we will connect you with the right partner within 24 hours.', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FormBlock', props: { id: 'cb-form', formTitle: 'Book a Free Consultation', formDescription: 'No obligation. No pressure. Just a conversation about your financial goals.', nameLabel: 'Full Name', namePlaceholder: 'Enter your full name', emailLabel: 'Email Address', emailPlaceholder: 'you@example.com', messageLabel: 'What are your goals?', messagePlaceholder: 'Tell us about your investment goals, experience level, or any questions you have...', showMessage: 'yes', submitLabel: 'Request My Call →', successMessage: 'Your consultation request has been submitted! A partner will reach out within 24 hours to schedule your call.', formStyle: 'card' } },
+    ],
+    'cb-strip-section:content': [
+      { type: 'CTAStrip', props: { id: 'cb-cta-strip', eyebrow: 'No Obligation', headline: 'Your partner is ready to answer every question', body: 'A free consultation is the fastest way to understand if AI-powered crypto trading is right for you. No hard sell, no commitment required.', ctaLabel: 'Book My Free Call →', ctaHref: '#book', variant: 'onboarding' } },
+    ],
+  },
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATE 14: onboarding-funnel
+//   HeroBlue (get started) → FunnelSteps(4, horizontal) → FeatureCards x3 → StatRow → Testimonials → CTAStrip(onboarding)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const ONBOARDING_FUNNEL: PuckData = {
+  root: { props: { title: 'Getting Started — AutoPilotROI', description: 'Follow the AutoPilotROI onboarding funnel from assessment to AI bot activation.' } },
+  content: [
+    { type: 'HeroBlue', props: { id: 'of-hero', eyebrow: 'Getting Started', title: 'From zero to active AI portfolio in four steps.', description: 'AutoPilotROI makes crypto investing simple. Follow our guided onboarding funnel and your AI trading bot will be live within 72 hours — no experience required.', ctaLabel: 'Start My Journey →', ctaHref: '/signup' } },
+    { type: 'SectionBox', props: { id: 'of-funnel-section', sectionName: 'Onboarding Funnel (4 Steps)', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'of-benefits-section', sectionName: 'Onboarding Benefits', variant: 'surface', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'of-stats-section', sectionName: 'Key Stats', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'of-testimonials-section', sectionName: 'Member Testimonials', variant: 'surface', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'of-strip-section', sectionName: 'Onboarding CTA Strip', variant: 'navy', padding: 'lg' } },
+  ],
+  zones: {
+    'of-funnel-section:content': [
+      { type: 'SectionHeader', props: { id: 'of-funnel-header', eyebrow: 'Your Onboarding Path', title: 'Four steps to your active AI portfolio', lead: 'Each step is partner-guided. Nothing gets skipped. Nothing gets missed.', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FunnelSteps', props: { id: 'of-funnel-steps', stepTitle1: 'Take the Readiness Assessment', stepBody1: 'Answer a few questions about your goals and experience. We use this to match you with the right partner and plan.', stepTitle2: 'Set Up Your Wallet', stepBody2: 'Install Trust Wallet, activate a VPN, and acquire USDT. Your partner walks you through every click.', stepTitle3: 'Register with Aurum', stepBody3: 'Create your Aurum account, complete verification, fund your account with USDT, and select your investment tier.', stepTitle4: 'Activate the AI Bot', stepBody4: 'Turn on the EX-AI Bot. It begins scanning markets and trading automatically. Monitor results from your dashboard.', ctaLabel: 'Begin My Onboarding →', ctaHref: '/signup', style: 'horizontal' } },
+    ],
+    'of-benefits-section:content': [
+      { type: 'SectionHeader', props: { id: 'of-benefits-header', eyebrow: 'Why This Works', title: 'Built for people with zero crypto experience', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'FeatureGrid', props: { id: 'of-benefits-grid', columns: '3' } },
+    ],
+    'of-benefits-grid:cards': [
+      { type: 'FeatureCard', props: { id: 'of-ben-1', title: 'Personal Partner Support', body: 'Every member is assigned a dedicated partner who handles the full setup — from wallet installation to bot activation. You never figure it out alone.', colorPreset: 'brand-blue' } },
+      { type: 'FeatureCard', props: { id: 'of-ben-2', title: 'Step-by-Step Documentation', body: 'Every onboarding step is documented with screenshots, videos, and checklists. Follow along at your own pace with your partner on standby.', colorPreset: 'emerald' } },
+      { type: 'FeatureCard', props: { id: 'of-ben-3', title: 'Live in 72 Hours or Less', body: 'Most members complete the full onboarding in 2–3 days. Your partner schedules sessions around your availability — no rush, no pressure.', colorPreset: 'violet' } },
+    ],
+    'of-stats-section:content': [
+      { type: 'StatRow', props: { id: 'of-stats', stats: [{ value: 12000, suffix: '+', label: 'Members Onboarded' }, { value: 72, suffix: 'hrs', label: 'Avg. Setup Time' }, { value: 98, suffix: '%', label: 'Completion Rate' }, { value: 100, suffix: '+', label: 'Countries' }] } },
+    ],
+    'of-testimonials-section:content': [
+      { type: 'SectionHeader', props: { id: 'of-test-header', eyebrow: 'New Members Speak', title: 'What the onboarding experience is really like', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'CardGrid', props: { id: 'of-test-grid', columns: '2' } },
+    ],
+    'of-test-grid:cards': [
+      { type: 'TestimonialCard', props: { id: 'of-test-1', quote: 'I have never touched crypto in my life. My partner walked me through every single step — wallet, VPN, USDT, everything. Bot was live in 48 hours.', author: 'Rebecca S.', role: 'Member since April 2025', starRating: '5', memberInitials: 'RS', avatarUrl: '', company: '', cardStyle: 'standard' } },
+      { type: 'TestimonialCard', props: { id: 'of-test-2', quote: 'The onboarding funnel was the smoothest tech experience I have ever had. Clear steps, patient support, and a live bot by day three.', author: 'Daniel M.', role: 'Starter Tier Member', starRating: '5', memberInitials: 'DM', avatarUrl: '', company: '', cardStyle: 'standard' } },
+    ],
+    'of-strip-section:content': [
+      { type: 'CTAStrip', props: { id: 'of-cta-strip', eyebrow: 'Ready to Begin?', headline: 'Your AI portfolio is four steps away', body: 'Start the guided onboarding funnel today. Your partner handles everything — you just follow along and activate.', ctaLabel: 'Start My Onboarding →', ctaHref: '/signup', variant: 'onboarding' } },
+    ],
+  },
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEMPLATE 15: trust-authority-page
+//   HeroBlue (trust CTA) → StatRow → TrustSignalCard x4 → QuoteBlock → Testimonials x3 → CTAStrip(trust)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TRUST_AUTHORITY_PAGE: PuckData = {
+  root: { props: { title: 'Trust & Authority — AutoPilotROI', description: 'See the credentials, evidence, and member results that make AutoPilotROI the trusted choice for AI crypto investing.' } },
+  content: [
+    { type: 'HeroBlue', props: { id: 'ta-hero', eyebrow: 'Trust & Authority', title: 'Built on transparency. Backed by results.', description: 'AutoPilotROI is the trusted onboarding partner for the Aurum ecosystem. Explore our credentials, member results, and the evidence that speaks for itself.', ctaLabel: 'See the Evidence →', ctaHref: '#evidence' } },
+    { type: 'SectionBox', props: { id: 'ta-stats-section', sectionName: 'Authority Stats', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'ta-trust-section', sectionName: 'Trust Signal Cards (4)', variant: 'surface', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'ta-quote-section', sectionName: 'Authority Quote', variant: 'white', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'ta-testimonials-section', sectionName: 'Member Testimonials (3, one featured)', variant: 'surface', padding: 'lg' } },
+    { type: 'SectionBox', props: { id: 'ta-strip-section', sectionName: 'Trust CTA Strip', variant: 'navy', padding: 'lg' } },
+  ],
+  zones: {
+    'ta-stats-section:content': [
+      { type: 'StatRow', props: { id: 'ta-stats', stats: [{ value: 12000, suffix: '+', label: 'Members Worldwide' }, { value: 3, suffix: ' yrs', label: 'Platform Operational' }, { value: 47, suffix: '%', label: 'Avg. Portfolio Growth' }, { value: 100, suffix: '+', label: 'Countries Served' }] } },
+    ],
+    'ta-trust-section:content': [
+      { type: 'SectionHeader', props: { id: 'ta-trust-header', eyebrow: 'Credentials', title: 'Why thousands of members trust AutoPilotROI', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'CardGrid', props: { id: 'ta-trust-grid', columns: '4' } },
+    ],
+    'ta-trust-grid:cards': [
+      { type: 'TrustSignalCard', props: { id: 'ta-trust-1', iconName: 'BankIcon', title: 'Legally Registered', body: 'Aurum Foundation Limited is an officially registered financial technology company with publicly verifiable corporate records.' } },
+      { type: 'TrustSignalCard', props: { id: 'ta-trust-2', iconName: 'SecurityIcon', title: 'Multi-Exchange Security', body: 'Funds are deployed across Binance, Bybit, and KuCoin with multi-signature wallets and institutional-grade custody protocols.' } },
+      { type: 'TrustSignalCard', props: { id: 'ta-trust-3', iconName: 'DataIcon', title: 'Full Transparency', body: 'Every trade, every return, every fee — visible in real time from your personal member dashboard. Nothing hidden, ever.' } },
+      { type: 'TrustSignalCard', props: { id: 'ta-trust-4', iconName: 'PartnerIcon', title: 'Dedicated Partner Network', body: 'Every member is assigned a personal onboarding partner. Real people, real support — not chatbots or ticket queues.' } },
+    ],
+    'ta-quote-section:content': [
+      { type: 'QuoteBlock', props: { id: 'ta-quote', quote: 'I researched for three weeks before committing. I verified the company registration, tested the dashboard, and spoke with multiple members. Everything checked out — the transparency is genuine.', attribution: 'Robert K.', attributionRole: 'Advanced Tier Member since November 2024', quoteStyle: 'centered', accentColor: 'brand-blue' } },
+    ],
+    'ta-testimonials-section:content': [
+      { type: 'SectionHeader', props: { id: 'ta-test-header', eyebrow: 'Member Voices', title: 'Real people. Real trust. Real results.', lead: '', align: 'center', badgeVariant: 'blue' } },
+      { type: 'CardGrid', props: { id: 'ta-test-grid', columns: '3' } },
+    ],
+    'ta-test-grid:cards': [
+      { type: 'TestimonialCard', props: { id: 'ta-test-1', quote: 'The dashboard transparency is what convinced me. I can see every single trade the bot makes in real time. No black boxes.', author: 'Samantha F.', role: 'Growth Tier Member', starRating: '5', memberInitials: 'SF', avatarUrl: '', company: '', cardStyle: 'standard' } },
+      { type: 'TestimonialCard', props: { id: 'ta-test-2', quote: 'I have been in crypto for years and this is the most transparent platform I have used. Full visibility, real support, verifiable credentials.', author: 'Derek N.', role: 'Advanced Tier Member', starRating: '5', memberInitials: 'DN', avatarUrl: '', company: '', cardStyle: 'featured' } },
+      { type: 'TestimonialCard', props: { id: 'ta-test-3', quote: 'My partner answered every skeptical question I threw at him. That kind of patience and honesty is what made me trust the platform.', author: 'Olivia G.', role: 'Member since February 2025', starRating: '5', memberInitials: 'OG', avatarUrl: '', company: '', cardStyle: 'standard' } },
+    ],
+    'ta-strip-section:content': [
+      { type: 'CTAStrip', props: { id: 'ta-cta-strip', eyebrow: 'Verified & Trusted', headline: 'See the proof. Make your decision.', body: 'AutoPilotROI is trusted by 12,000+ members across 100+ countries. Your funds stay in your exchange account. Full dashboard transparency included.', ctaLabel: 'Start with Confidence →', ctaHref: '/signup', variant: 'trust' } },
+    ],
+  },
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Template registry
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1073,6 +1330,36 @@ export const TEMPLATE_REGISTRY: Record<string, { label: string; description: str
     label: '🔥 Full Campaign Funnel',
     description: 'Hero → Ticker → Stats → Benefits → Quote → Pricing → FAQ → CTA',
     data: CAMPAIGN_FUNNEL,
+  },
+  'webinar-registration': {
+    label: '📋 Webinar Registration Funnel',
+    description: 'HeroDark → CTAStrip(webinar) → FunnelSteps → Testimonials → FormBlock → CTAStrip(urgency)',
+    data: WEBINAR_REGISTRATION,
+  },
+  'lead-magnet-page': {
+    label: '📥 Lead Magnet / Free Resource',
+    description: 'HeroDark → FeatureCards → FormBlock(download) → Testimonials → CTAStrip(lead-magnet)',
+    data: LEAD_MAGNET_PAGE,
+  },
+  'pricing-offer-page': {
+    label: '💰 Pricing / Offer Comparison',
+    description: 'PageHeader → PricingCards(3 tiers) → FAQ → Testimonials → CTAStrip(trust)',
+    data: PRICING_OFFER_PAGE,
+  },
+  'consultation-booking': {
+    label: '📞 Consultation / Book a Call',
+    description: 'HeroDark → FunnelSteps(vertical) → QuoteBlock → FormBlock(message) → CTAStrip(onboarding)',
+    data: CONSULTATION_BOOKING,
+  },
+  'onboarding-funnel': {
+    label: '🚀 Onboarding Funnel',
+    description: 'HeroBlue → FunnelSteps(4-step) → Benefits → Stats → Testimonials → CTAStrip(onboarding)',
+    data: ONBOARDING_FUNNEL,
+  },
+  'trust-authority-page': {
+    label: '🏛️ Trust / Authority Landing',
+    description: 'HeroBlue → Stats → TrustSignals(4) → QuoteBlock → Testimonials(featured) → CTAStrip(trust)',
+    data: TRUST_AUTHORITY_PAGE,
   },
 }
 
