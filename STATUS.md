@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 22:00 UTC (Homepage Conversion Optimization sprint)
+> Last verified: 2026-05-20 22:29 UTC (Production certification — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx)
 
 ---
 
@@ -43,6 +43,7 @@ Certifying agent: Production Release Lead
 - **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageBlock live preview)
 - **CMS Page Templates** (3 governed templates: homepage-standard, product-page, campaign-landing)
 - **Homepage Conversion Optimization** (ActivityTicker below hero, QuoteBlock trust bridge, PricingCard investment tiers)
+- **Production certified** — dpl_Dn89xsr39WnrH55Dd7fMgLN6reMx — commit 9303b5f — 64 pages — verified live
 - **CMS Conversion Systems** (PricingCard, ActivityTicker, ImageUrlField live preview)
 
 ---
