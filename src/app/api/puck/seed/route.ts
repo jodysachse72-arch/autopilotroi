@@ -67,12 +67,14 @@ const HOMEPAGE_SEED: any = {
         badge: '✦ Powered by Aurum Ecosystem',
         title: 'Your Money,',
         highlightedText: 'Working 24/7',
-        description: 'AutoPilotROI is your structured guide into the Aurum ecosystem — AI-powered crypto trading, a Visa crypto card, exchange, and Web3 neobank. Start with $100.',
+        description: 'Start earning with $100 USDT. AutoPilotROI guides you into the Aurum ecosystem step by step — AI trading bot, Visa crypto card, exchange, and Web3 neobank. No experience needed.',
         ctaLabel: 'Start Here →',
         ctaHref: '/signup',
+        secondaryCtaLabel: 'See how it works',
+        secondaryCtaHref: '#how-it-works',
         bulletOne: 'Start with $100 USDT',
-        bulletTwo: 'AI runs 24/7',
-        bulletThree: 'Guided onboarding',
+        bulletTwo: 'AI trades 24/7 — you sleep',
+        bulletThree: 'Setup complete in 3 days',
         videoUrl: 'https://youtu.be/MmAnR4YAPv4',
         videoThumb: 'https://i.ytimg.com/vi/MmAnR4YAPv4/hqdefault.jpg',
       },
@@ -91,39 +93,39 @@ const HOMEPAGE_SEED: any = {
         theme: 'emerald',
       },
     },
-    // Stats in a white SectionBox
+    // Stats
     {
       type: 'SectionBox',
       props: { id: 'stats-section', sectionName: 'Stats Bar (12,000+ Members etc.)', variant: 'white', padding: 'lg' },
     },
-    // Features in a surface SectionBox
+    // Features
     {
       type: 'SectionBox',
-      props: { id: 'features-section', sectionName: 'Features / Benefits', variant: 'surface', padding: 'lg' },
+      props: { id: 'features-section', sectionName: 'Features / Benefits Grid', variant: 'surface', padding: 'lg' },
     },
-    // Member quote — trust bridge between features and how it works
+    // Member quote — trust bridge
     {
       type: 'QuoteBlock',
       props: {
         id: 'member-quote-1',
-        quote: 'I had zero crypto experience. My partner walked me through every step and within 48 hours the bot was live. I didn\'t have to figure anything out alone.',
+        quote: "I had zero crypto experience. My partner walked me through every step and within 48 hours the bot was live. I didn't have to figure anything out alone.",
         attribution: 'James W.',
         attributionRole: 'Member since February 2025',
         quoteStyle: 'centered',
         accentColor: 'brand-blue',
       },
     },
-    // How it works in a white SectionBox
+    // How It Works — steps are editable; ProductPanel screenshot is code-governed
     {
       type: 'SectionBox',
       props: { id: 'process-section', sectionName: 'How It Works (3 Steps)', variant: 'white', padding: 'lg' },
     },
-    // Ecosystem in a surface SectionBox
+    // Ecosystem
     {
       type: 'SectionBox',
       props: { id: 'ecosystem-section', sectionName: 'Ecosystem Products (4 Cards)', variant: 'surface', padding: 'lg' },
     },
-    // Social proof in a blue SectionBox
+    // Testimonials
     {
       type: 'SectionBox',
       props: { id: 'testimonials-section', sectionName: 'Testimonials (Social Proof)', variant: 'blue', padding: 'lg' },
@@ -148,7 +150,7 @@ const HOMEPAGE_SEED: any = {
       },
     },
   ],
-  // Nested zone content for SectionBox containers
+  // ── Nested zone content ──────────────────────────────────────────────────────
   zones: {
     'stats-section:content': [
       {
@@ -182,12 +184,12 @@ const HOMEPAGE_SEED: any = {
       },
     ],
     'features-grid:cards': [
-      { type: 'FeatureCard', props: { id: 'feature-1', title: 'EX-AI Trading Bot', body: 'The AI analyzes global crypto markets 24/7 and executes trades automatically on Binance, Bybit, and KuCoin. You activate it once.', color: '#1b61c9', colorBg: 'rgba(27,97,201,0.10)' } },
-      { type: 'FeatureCard', props: { id: 'feature-2', title: 'Visa Crypto Card', body: 'Spend your earnings anywhere Visa is accepted. Your crypto balance powers your everyday purchases worldwide.', color: '#7c3aed', colorBg: 'rgba(124,58,237,0.10)' } },
-      { type: 'FeatureCard', props: { id: 'feature-3', title: 'Web3 Neobank', body: 'A full-featured digital bank built on blockchain infrastructure. IBAN accounts, cross-border transfers, DeFi integration.', color: '#0891b2', colorBg: 'rgba(8,145,178,0.10)' } },
-      { type: 'FeatureCard', props: { id: 'feature-4', title: 'Crypto Exchange', body: 'Trade 200+ assets at competitive rates with institutional-grade liquidity and a clean, intuitive interface.', color: '#059669', colorBg: 'rgba(5,150,105,0.10)' } },
-      { type: 'FeatureCard', props: { id: 'feature-5', title: 'Guided Onboarding', body: 'Step-by-step setup: wallet, VPN, USDT acquisition, Aurum account, and bot activation. Nothing gets skipped.', color: '#1b61c9', colorBg: 'rgba(27,97,201,0.10)' } },
-      { type: 'FeatureCard', props: { id: 'feature-6', title: 'Partner Program', body: 'Earn additional income by introducing others. 3-deep spillover model — your network grows even while you sleep.', color: '#d97706', colorBg: 'rgba(217,119,6,0.10)' } },
+      { type: 'FeatureCard', props: { id: 'feature-1', title: 'EX-AI Trading Bot', body: 'The AI analyzes global crypto markets 24/7 and executes trades automatically on Binance, Bybit, and KuCoin. You activate it once.', colorPreset: 'brand-blue' } },
+      { type: 'FeatureCard', props: { id: 'feature-2', title: 'Visa Crypto Card', body: 'Spend your earnings anywhere Visa is accepted. Your crypto balance powers your everyday purchases worldwide.', colorPreset: 'violet' } },
+      { type: 'FeatureCard', props: { id: 'feature-3', title: 'Web3 Neobank', body: 'A full-featured digital bank built on blockchain infrastructure. IBAN accounts, cross-border transfers, DeFi integration.', colorPreset: 'brand-blue' } },
+      { type: 'FeatureCard', props: { id: 'feature-4', title: 'Crypto Exchange', body: 'Trade 200+ assets at competitive rates with institutional-grade liquidity and a clean, intuitive interface.', colorPreset: 'emerald' } },
+      { type: 'FeatureCard', props: { id: 'feature-5', title: 'Guided Onboarding', body: 'Step-by-step setup: wallet, VPN, USDT acquisition, Aurum account, and bot activation. Nothing gets skipped.', colorPreset: 'brand-blue' } },
+      { type: 'FeatureCard', props: { id: 'feature-6', title: 'Partner Program', body: 'Earn additional income by introducing others. 3-deep spillover model — your network grows even while you sleep.', colorPreset: 'amber' } },
     ],
     'process-section:content': [
       {
@@ -231,9 +233,77 @@ const HOMEPAGE_SEED: any = {
       },
     ],
     'testimonials-grid:cards': [
-      { type: 'TestimonialCard', props: { id: 'testimonial-1', quote: 'I was skeptical at first but my partner walked me through every step. Had my bot running in 2 days and already seeing consistent daily returns.', author: 'Marcus T.', role: 'Member since March 2025' } },
-      { type: 'TestimonialCard', props: { id: 'testimonial-2', quote: 'The guided onboarding made all the difference. Never dealt with crypto before — now I have an active portfolio and the bot handles everything.', author: 'Sandra K.', role: 'Member since January 2025' } },
-      { type: 'TestimonialCard', props: { id: 'testimonial-3', quote: "What I appreciate most is the transparency. Everything is documented, every step is explained. This isn't some black box — you understand exactly what's happening.", author: 'David R.', role: 'Partner & Member' } },
+      { type: 'TestimonialCard', props: { id: 'testimonial-1', quote: 'I was skeptical at first but my partner walked me through every step. Had my bot running in 2 days and already seeing consistent daily returns.', author: 'Marcus T.', role: 'Member since March 2025', starRating: '5', memberInitials: 'MT' } },
+      { type: 'TestimonialCard', props: { id: 'testimonial-2', quote: 'The guided onboarding made all the difference. Never dealt with crypto before — now I have an active portfolio and the bot handles everything.', author: 'Sandra K.', role: 'Member since January 2025', starRating: '5', memberInitials: 'SK' } },
+      { type: 'TestimonialCard', props: { id: 'testimonial-3', quote: "What I appreciate most is the transparency. Everything is documented, every step is explained. This isn't some black box — you understand exactly what's happening.", author: 'David R.', role: 'Partner & Member', starRating: '5', memberInitials: 'DR' } },
+    ],
+    'pricing-section:content': [
+      {
+        type: 'SectionHeader',
+        props: { id: 'pricing-header', eyebrow: 'Start Where You Are', title: 'Your entry point. Your pace.', lead: "Every plan includes full AI bot access, guided onboarding, and partner support. Start with what you're comfortable with — scale when you're ready.", align: 'center', badgeVariant: 'blue' },
+      },
+      {
+        type: 'CardGrid',
+        props: { id: 'pricing-grid', columns: '3' },
+      },
+    ],
+    'pricing-grid:cards': [
+      {
+        type: 'PricingCard',
+        props: {
+          id: 'pricing-starter',
+          planName: 'Starter',
+          planTagline: 'First-time investors testing the ecosystem.',
+          priceDisplay: '$100 USDT minimum',
+          feature1: 'EX-AI Bot activation',
+          feature2: 'AI-managed 24/7 trading',
+          feature3: 'Aurum University access',
+          feature4: 'Partner support included',
+          feature5: '', feature6: '', feature7: '', feature8: '',
+          ctaLabel: 'Start with $100 →',
+          ctaHref: '/signup',
+          badge: '',
+          cardStyle: 'standard',
+        },
+      },
+      {
+        type: 'PricingCard',
+        props: {
+          id: 'pricing-growth',
+          planName: 'Growth',
+          planTagline: 'Investors ready to maximize compounding returns.',
+          priceDisplay: '$500–$2,500 USDT',
+          feature1: 'All Starter features',
+          feature2: 'Higher compounding tier',
+          feature3: 'Multi-exchange deployment',
+          feature4: 'Priority partner access',
+          feature5: 'Advanced dashboard analytics',
+          feature6: '', feature7: '', feature8: '',
+          ctaLabel: 'Activate Growth →',
+          ctaHref: '/signup',
+          badge: '⭐ Most Popular',
+          cardStyle: 'featured',
+        },
+      },
+      {
+        type: 'PricingCard',
+        props: {
+          id: 'pricing-advanced',
+          planName: 'Advanced',
+          planTagline: 'Full ecosystem access across all Aurum products.',
+          priceDisplay: '$2,500+ USDT',
+          feature1: 'All Growth features',
+          feature2: 'Visa Crypto Card (physical)',
+          feature3: 'Neobank account access',
+          feature4: 'Partner income eligibility',
+          feature5: 'Dedicated onboarding specialist',
+          feature6: '', feature7: '', feature8: '',
+          ctaLabel: 'Go Advanced →',
+          ctaHref: '/signup',
+          badge: '',
+          cardStyle: 'standard',
+        },
+      },
     ],
   },
 }
