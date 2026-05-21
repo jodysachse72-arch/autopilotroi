@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-21 06:45 UTC (Phase 2 Editing Delight — committed 65aa130, build verified)
+> Last verified: 2026-05-21 07:05 UTC (Phase 3 Operator Flow — committed b16e60a, build verified)
 
 ---
 
@@ -11,10 +11,10 @@
 feature/frontend-pages
 ```
 Working tree: **CLEAN**
-Latest commit: `65aa130` (Phase 2 Editing Delight & Operator Speed)
+Latest commit: `b16e60a` (Phase 3 Operator Flow)
 **Production URL:** https://autopilotroi.vercel.app (✅ LIVE)
 **Prod Deployment ID:** `dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz` (pre-Phase 0)
-**Commits Ready to Deploy:** `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
+**Commits Ready to Deploy:** `b16e60a` (Phase 3), `65aa130` (Phase 2), `232802e` (Phase 1-B), `3fd2ee9` (Phase 1-A), `4118004` (Phase 0) — NOT YET DEPLOYED
 
 ---
 
@@ -102,22 +102,49 @@ Certifying agent: Production Release Lead
   - FAQ dropzone clarity
   - General polish pass
   - Build verified: tsc 0 errors, 65/65 pages, exit 0
+- **Phase 3: Operator Flow Improvements** — commit `b16e60a`
+  - **Phase A — Inline Editing Maturity**:
+    - contentEditable hover: dashed blue outline + cursor:text
+    - contentEditable focus: solid blue outline + subtle blue background tint
+    - ::selection: brand-blue highlight color
+  - **Phase B — Section Orientation & Navigation**:
+    - componentOverlay now reads actual `sectionName` from data and shows it (e.g. "📦 HERO COPY")
+    - Outline panel: numbered section map with blue circle badges + component count badge
+    - Tip banner shortened and FAQ guidance preserved
+    - Shows "Page map" header with "N top-level" count
+  - **Phase C — Component Insertion Experience**:
+    - SectionBox DropZone `minEmptyHeight: 120` for clearer insertion targets
+    - SectionBox label improved for better discoverability
+  - **Phase D — Media & Visual Confidence**:
+    - ImageBlock: broken image detection via `onError` → red fallback with URL + fix guidance
+    - ImageBlock: empty state improved with icon + actionable copy
+    - useRef for broken state reset on src change
+  - **Phase E — Campaign Operation Speed**:
+    - Duplicate path auto-suggest: pre-fills `{page}-copy` when opening duplicate modal
+    - Page switcher grouped into "● Published", "✎ Drafts", "○ Not started" optgroups
+    - Draft indicator: ✎ symbol on pages with pending drafts
+  - **Phase F — Editor Delight Polish**:
+    - Loading screen: branded "AutoPuck Editor" with gradient background
+    - Publish success toast: premium gradient, two-line format with page path
+    - Outline tip banner: concise, italicized FAQ hint
+    - FaqGroup label: "FAQ Section (drag FAQ items inside)"
+  - Build verified: tsc 0 errors, 65/65 pages, exit 0
 
 ---
 
 ## LAST 10 COMMITS
 
 ```
+b16e60a  feat(cms): Phase 3 Operator Flow -- inline editing maturity, section orientation, media confidence, campaign speed, editor polish
 65aa130  feat(cms): Phase 2 Editing Delight and Operator Speed -- hero field grouping, CTA link validation, template selector clarity, mobile viewport reminder, FAQ dropzone clarity, polish pass
 232802e  feat(cms): Phase 1-B Publishing Confidence and Editing Clarity -- 5 targeted fixes
 eedf811  chore: update STATUS.md -- Phase 1-A committed as 3fd2ee9
 3fd2ee9  feat(cms): Phase 1-A Campaign Velocity -- page duplication, 9 templates, campaign categories
-4118004  feat(cms): Phase 0 Operator Safety Layer — draft/autosave, preview, revision history, pre-publish confirmation, outline labels, trust polish
-bdeefa7  chore: production certification — dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz
+4118004  feat(cms): Phase 0 Operator Safety Layer
+bdeefa7  chore: production certification
 bc5413d  fix(seo): remove redundant site-name suffix from /products title
 b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embed fix
 668a508  chore: production certification — Puck CSS isolation
-7ce56d1  perf(css): Puck CSS isolation — remove 70.7KB editor bundle from homepage
 ```
 
 ---
@@ -125,8 +152,8 @@ b48d65e  feat(seo+analytics): products SEO, Plausible analytics, ThriveDesk embe
 ## BUILD & TYPESCRIPT STATUS
 
 ```
-npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 06:45 UTC)
-npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 06:45 UTC)
+npx tsc --noEmit  →  ✅ EXIT 0  (0 errors — verified 2026-05-21 07:05 UTC)
+npm run build     →  ✅ EXIT 0  (65 pages — verified 2026-05-21 07:05 UTC)
 Vercel build      →  ✅ EXIT 0  (dpl_9Xsq3AANe8EQeYgdpB5DmAfdMiQz — 2026-05-20 23:49 UTC) — pre-Phase 0
 ```
 
