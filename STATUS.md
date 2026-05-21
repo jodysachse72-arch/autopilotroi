@@ -2,7 +2,7 @@
 
 > **This file is the single source of session truth.**
 > Update it at the END of every session. Read it at the START of every session.
-> Last verified: 2026-05-20 23:41 UTC (Puck CSS Isolation — dpl_6v81rNVMSQsF3JNveamPmxRBAyBH)
+> Last verified: 2026-05-20 23:46 UTC (SEO + Analytics + ThriveDesk sprint — deploying...)
 
 ---
 
@@ -44,6 +44,12 @@ Certifying agent: Production Release Lead
 - **CMS Page Templates** (3 governed templates: homepage-standard, product-page, campaign-landing)
 - **Homepage Conversion Optimization** (ActivityTicker below hero, QuoteBlock trust bridge, PricingCard investment tiers)
 - **Puck CSS Isolation** — removed 70.7KB dead editor CSS from public homepage bundle
+- **SEO + Analytics + ThriveDesk sprint** — commit `b48d65e`
+  - `/products` now has page-specific SEO metadata (title, OG, Twitter, canonical)
+  - Fixed: `'use client'` on `/products` was blocking `export metadata` — now server wrapper + `ProductsClient.tsx`
+  - ThriveDesk: replaced `console.log` stub with real SDK IIFE embed (activates when widget ID is set)
+  - Plausible: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN=autopilotroi.com` added to Vercel production — analytics now live
+  - `NEXT_PUBLIC_SITE_URL=https://autopilotroi.com` added to Vercel — `metadataBase` now resolves correctly
   - `PuckPageRenderer` now imports 2.9KB `src/styles/puck-render-only.css` (vendored from rsc.css)
   - Admin editor retains full `puck.css` (73KB) — correct, needs full editor chrome
   - Upload artifact shrank from 376.5KB —> 340.8KB (35.7KB reduction)

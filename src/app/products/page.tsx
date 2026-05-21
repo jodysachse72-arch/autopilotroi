@@ -16,7 +16,7 @@ import ProductsClient from './ProductsClient'
 // ── SEO Metadata ─────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: 'What Is Aurum — Products & Trust | AutoPilotROI',
+  title: 'What Is Aurum — Products & Trust',
   description:
     'Understand the full Aurum ecosystem: AI trading bot, Visa crypto card, exchange, NeoBank, and AUR token. See why we vetted Aurum — licenses, leadership, and media coverage.',
   openGraph: {
