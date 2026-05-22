@@ -1,13 +1,10 @@
 import FaqsPageClient from './FaqsPageClient'
-import { getPublishedFaqsServer } from '@/lib/cms/server-adapter'
 import type { CmsPost } from '@/lib/cms/types'
 
 export const metadata = {
   title: 'FAQs | AutoPilot ROI',
   description: 'Common questions about Aurum, the AI bot, onboarding steps, and the partner program — answered clearly.',
 }
-
-export const revalidate = 60
 
 // --- Hardcoded seed FAQs — shown if CMS has none yet ---
 const HARDCODED_FAQS: CmsPost[] = [
@@ -26,8 +23,6 @@ const HARDCODED_FAQS: CmsPost[] = [
   { id: 'h-13', type: 'faq', slug: null, title: 'What is the Partner Dashboard?',            body: null, body_html: '<p>The Partner Dashboard is live at /dashboard. Partners can track prospects, see readiness scores, tiers, onboarding status, and use a multi-type referral link generator with QR codes.</p>', meta: { category: 'partner' }, status: 'published', publish_at: null, sort_order: 13, created_at: '', updated_at: '', created_by: null },
 ]
 
-export default async function FaqsPage() {
-  const cmsFaqs = await getPublishedFaqsServer()
-  const faqs = cmsFaqs.length > 0 ? cmsFaqs : HARDCODED_FAQS
-  return <FaqsPageClient faqs={faqs} />
+export default function FaqsPage() {
+  return <FaqsPageClient faqs={HARDCODED_FAQS} />
 }

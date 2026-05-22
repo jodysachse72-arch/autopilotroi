@@ -16,7 +16,6 @@ const FOOTER_COLS = [
     heading: 'Support',
     links: [
       { label: 'FAQs',          href: '/faqs' },
-      { label: 'Blog',          href: '/blog' },
       { label: 'Start Guide',   href: '/start' },
     ],
   },

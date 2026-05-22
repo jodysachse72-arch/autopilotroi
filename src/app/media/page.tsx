@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
 import YouTubeThumbnail from '@/components/ui/YouTubeThumbnail'
 import { motion } from 'framer-motion'
-import { createClient } from '@/lib/supabase/client'
-import type { CmsPost } from '@/lib/cms/types'
 import {
   PageShell,
   SectionBox,
@@ -55,37 +53,7 @@ interface MediaItem {
 
 export default function MediaPage() {
   const [activeCategory, setActiveCategory] = useState('all')
-  const [liveItems, setLiveItems] = useState<MediaItem[]>(SEED_ITEMS)
-
-  useEffect(() => {
-    async function fetchMedia() {
-      try {
-        const db = createClient()
-        const { data, error } = await db
-          .from('cms_posts')
-          .select('*')
-          .eq('type', 'video')
-          .eq('status', 'published')
-          .order('sort_order', { ascending: true })
-        if (error || !data || data.length === 0) return
-        const mediaVideos = (data as CmsPost[]).filter(v => v.meta?.section === 'media')
-        if (mediaVideos.length === 0) return
-        const mapped: MediaItem[] = mediaVideos.map(v => ({
-          id: v.id,
-          category: (v.meta?.category as string) ?? 'presentations',
-          title: v.title ?? 'Untitled',
-          description: (v.meta?.excerpt as string) ?? '',
-          youtubeId: (v.meta?.youtubeId as string) ?? '',
-          duration: (v.meta?.duration as string) ?? '',
-          badge: (v.meta?.badge as string | null) ?? null,
-        }))
-        setLiveItems(mapped)
-      } catch (e) {
-        console.error('[Media] Supabase fetch error:', e)
-      }
-    }
-    fetchMedia()
-  }, [])
+  const liveItems = SEED_ITEMS
 
   const visible = activeCategory === 'all'
     ? liveItems
