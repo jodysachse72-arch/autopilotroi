@@ -128,7 +128,7 @@ export default function OrientationPage() {
   if (!lead) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#eef0f4' }}>
-        <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent' }} />
+        <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
       </div>
     )
   }
@@ -335,7 +335,7 @@ export default function OrientationPage() {
                     Your partner has been notified. Redirecting you to the Learning Center...
                   </p>
                   <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
-                    <div style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent' }} />
+                    <div style={{ width: '1.5rem', height: '1.5rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
                   </div>
                 </div>
               </motion.div>

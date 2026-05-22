@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { PageShell, SectionBox, HeroBlue, CTABand } from '@/components/sections'
 
 export const metadata = { title: 'Terms of Service — AutopilotROI', description: 'Terms and conditions for using the AutopilotROI platform.' }
@@ -38,13 +39,13 @@ export default function TermsPage() {
               <p style={pStyle}>You agree to provide accurate information when creating an account, not to misuse the platform or its referral systems, and to comply with all applicable laws and regulations in your jurisdiction.</p>
 
               <h2 style={h2Style}>4. Investment Risk Disclosure</h2>
-              <p style={pStyle}>All investments carry risk, including the potential loss of principal. Past performance is not indicative of future results. Never invest more than you can afford to lose. Please review our full <a href="/disclaimer" style={{ color: '#1b61c9' }}>Earnings Disclaimer</a>.</p>
+              <p style={pStyle}>All investments carry risk, including the potential loss of principal. Past performance is not indicative of future results. Never invest more than you can afford to lose. Please review our full <Link href="/disclaimer" style={{ color: '#1b61c9' }}>Earnings Disclaimer</Link>.</p>
 
               <h2 style={h2Style}>5. Intellectual Property</h2>
               <p style={pStyle}>All content, trademarks, logos, and materials on this platform are the property of AutopilotROI or its licensors. Unauthorized use is prohibited.</p>
 
               <h2 style={h2Style}>6. Privacy</h2>
-              <p style={pStyle}>Your use of the platform is governed by our <a href="/privacy" style={{ color: '#1b61c9' }}>Privacy Policy</a>, which is incorporated into these terms by reference.</p>
+              <p style={pStyle}>Your use of the platform is governed by our <Link href="/privacy" style={{ color: '#1b61c9' }}>Privacy Policy</Link>, which is incorporated into these terms by reference.</p>
 
               <h2 style={h2Style}>7. Limitation of Liability</h2>
               <p style={pStyle}>To the maximum extent permitted by law, AutopilotROI shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the platform.</p>
