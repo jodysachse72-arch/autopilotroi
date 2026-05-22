@@ -6,9 +6,10 @@ const FOOTER_COLS = [
     heading: 'Platform',
     links: [
       { label: 'What Is Aurum', href: '/products' },
-      { label: 'University',  href: '/university' },
-      { label: 'Calculator',  href: '/calculator' },
-      { label: 'Media',       href: '/media' },
+      { label: 'Start Here',   href: '/start' },
+      { label: 'University',   href: '/university' },
+      { label: 'Calculator',   href: '/calculator' },
+      { label: 'Media',        href: '/media' },
     ],
   },
   {
@@ -16,8 +17,7 @@ const FOOTER_COLS = [
     links: [
       { label: 'FAQs',          href: '/faqs' },
       { label: 'Blog',          href: '/blog' },
-      { label: 'Onboarding',    href: '/onboarding' },
-      { label: 'Partner Tools', href: '/partner-tools' },
+      { label: 'Start Guide',   href: '/start' },
     ],
   },
   {

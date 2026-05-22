@@ -127,14 +127,14 @@ export default function OrientationPage() {
 
   if (!lead) {
     return (
-      <div className="page-bg" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#eef0f4' }}>
         <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent' }} />
       </div>
     )
   }
 
   return (
-    <div className="page-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#eef0f4' }}>
       {/* Logo bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
         <Link href="/"><Logo size={40} showText /></Link>

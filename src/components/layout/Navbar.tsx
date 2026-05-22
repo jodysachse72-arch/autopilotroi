@@ -8,11 +8,11 @@ import { LogoIcon } from '@/components/ui/Logo'
 // Public nav items — always visible
 const publicNav = [
   { label: 'What Is Aurum', href: '/products' },
-  { label: 'Calculator',  href: '/calculator' },
-  { label: 'University',  href: '/university' },
-  { label: 'Blog',        href: '/blog' },
-  { label: 'FAQs',        href: '/faqs' },
-  { label: 'Media',       href: '/media' },
+  { label: 'Start Here',    href: '/start' },
+  { label: 'Calculator',    href: '/calculator' },
+  { label: 'University',    href: '/university' },
+  { label: 'FAQs',          href: '/faqs' },
+  { label: 'Media',         href: '/media' },
 ]
 
 // Role badge config
