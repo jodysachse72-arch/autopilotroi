@@ -18,7 +18,7 @@ import {
   CompassIcon,
   FlagIcon,
 } from '@/components/ui/Icons'
-import { PageShell, SectionBox, SectionHeader, HeroDark, CTABand } from '@/components/sections'
+import HomeCTABand from '@/components/home/CTABand'
 import { useScrollReveal } from '@/lib/useScrollReveal'
 
 // ════════════════════════════════════════════════════════════════
@@ -234,148 +234,122 @@ export default function UniversityContent({ videos: cmsVideos }: { videos: Unive
   const hours = Math.floor(totalMinutes / 60)
 
   return (
-    <PageShell>
-      {/* ── HERO — editorial dark, quote attribution on the right ─────────── */}
-      <HeroDark
-        badge={
-          <>
-            <AcademyIcon className="w-4 h-4" strokeWidth={2} />
-            Aurum University
-          </>
-        }
-        title={
-          <>
-            Three paths.
-            <br />
-            <span style={{ color: '#93c5fd' }}>One ecosystem to master.</span>
-          </>
-        }
-        description="A curated video curriculum for new and existing Aurum members. Pick the path that fits where you are right now — exploring, onboarding, or building a team — and learn at your own pace."
-        bullets={[
-          { icon: <PlayCircleIcon className="w-4 h-4" strokeWidth={2.2} />, text: `${totalVideos} videos` },
-          { icon: <FlagIcon className="w-4 h-4" strokeWidth={2.2} />, text: `${learningPaths.length} learning paths` },
-          { icon: <CheckCircleIcon className="w-4 h-4" strokeWidth={2.2} />, text: hours > 0 ? `~${hours}h of content` : 'Self-paced' },
-        ]}
-        visual={<EditorialQuote watchedCount={watchedCount} totalVideos={totalVideos} progress={progress} />}
-      />
+    <>
+      {/* ── HERO — editorial dark, quote attribution on the right ─────────────── */}
+      <section className="section section-dark" style={{ background: 'linear-gradient(135deg, #0a0e1a, #0f1729 40%, #1a2744)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 0%, rgba(27,97,201,0.12) 0%, transparent 60%)' }} />
+        <div className="container-content" style={{ position: 'relative' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 28rem), 1fr))', gap: '3rem', alignItems: 'center' }}>
+            <div>
+              <span className="badge-dark mb-4 inline-flex" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                <AcademyIcon className="w-4 h-4" strokeWidth={2} />
+                Aurum University
+              </span>
+              <h1 className="text-display mb-4" style={{ color: '#ffffff' }}>Three paths.<br /><span style={{ color: '#93c5fd' }}>One ecosystem to master.</span></h1>
+              <p className="text-body-lg mb-6" style={{ color: 'rgba(255,255,255,0.65)' }}>A curated video curriculum for new and existing Aurum members. Pick the path that fits where you are right now — exploring, onboarding, or building a team — and learn at your own pace.</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', color: 'rgba(255,255,255,0.7)' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--text-caption)', fontWeight: 600 }}><PlayCircleIcon className="w-4 h-4" strokeWidth={2.2} /> {totalVideos} videos</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--text-caption)', fontWeight: 600 }}><FlagIcon className="w-4 h-4" strokeWidth={2.2} /> {learningPaths.length} learning paths</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: 'var(--text-caption)', fontWeight: 600 }}><CheckCircleIcon className="w-4 h-4" strokeWidth={2.2} /> {hours > 0 ? `~${hours}h of content` : 'Self-paced'}</span>
+              </div>
+            </div>
+            <EditorialQuote watchedCount={watchedCount} totalVideos={totalVideos} progress={progress} />
+          </div>
+        </div>
+      </section>
 
       {/* ── LEARNING PATHS — three Maven-style horizontal lanes ───────────── */}
-      <SectionBox>
-        <SectionHeader
-          eyebrow={
-            <>
+      <section className="section section-surface">
+        <div className="container-content">
+          <div style={{ maxWidth: '40rem', marginBottom: '3rem' }}>
+            <span className="badge mb-3 inline-flex" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
               <FlagIcon className="w-3.5 h-3.5" strokeWidth={2.2} />
               Learning Paths
-            </>
-          }
-          title={
-            <>
-              Pick the path that
-              <br />
-              fits where you are.
-            </>
-          }
-          align="left"
-          maxWidth="40rem"
-          marginBottom="3rem"
-        >
-          Each path is a curated sequence of videos — start at the top of a lane and work your way
-          across. Your watched progress is saved on this device.
-        </SectionHeader>
+            </span>
+            <h2 className="text-heading mb-2">Pick the path that<br />fits where you are.</h2>
+            <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
+              Each path is a curated sequence of videos — start at the top of a lane and work your way across. Your watched progress is saved on this device.
+            </p>
+          </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
-          {lanesWithVideos.map((lane, laneIdx) => (
-            <PathLane
-              key={lane.id}
-              lane={lane}
-              laneIndex={laneIdx}
-              watched={watched}
-              playingId={playingId}
-              onPlay={(id) => { setPlayingId(id); markWatched(id) }}
-              onClose={() => setPlayingId(null)}
-            />
-          ))}
-        </div>
-      </SectionBox>
-
-      {/* ── BROWSE ALL — category filters + full grid ─────────────────────── */}
-      <SectionBox variant="surface" id="browse-all">
-        <SectionHeader
-          eyebrow={
-            <>
-              <AcademyIcon className="w-3.5 h-3.5" strokeWidth={2.2} />
-              Full Library
-            </>
-          }
-          title={<>Browse all videos.</>}
-          align="left"
-          maxWidth="40rem"
-          marginBottom="2rem"
-        >
-          {totalVideos} videos across {categories.length - 1} categories. Filter by topic to find
-          exactly what you need.
-        </SectionHeader>
-
-        <CategoryFilter
-          categories={categories}
-          activeCategory={activeCategory}
-          onSelect={setActiveCategory}
-        />
-
-        <div style={{
-          display: 'grid',
-          gap: '1.5rem',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
-          marginTop: '2rem',
-        }}>
-          <AnimatePresence mode="popLayout">
-            {filtered.map((video, i) => (
-              <VideoCard
-                key={video._id}
-                video={video}
-                index={i}
-                isWatched={watched.has(video._id)}
-                isPlaying={playingId === video._id}
-                onPlay={() => { setPlayingId(video._id); markWatched(video._id) }}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
+            {lanesWithVideos.map((lane, laneIdx) => (
+              <PathLane
+                key={lane.id}
+                lane={lane}
+                laneIndex={laneIdx}
+                watched={watched}
+                playingId={playingId}
+                onPlay={(id) => { setPlayingId(id); markWatched(id) }}
                 onClose={() => setPlayingId(null)}
               />
             ))}
-          </AnimatePresence>
-        </div>
-
-        {filtered.length === 0 && (
-          <div style={{
-            background: '#ffffff',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-card)',
-            padding: '4rem 2rem',
-            textAlign: 'center',
-            color: 'var(--color-text-muted)',
-            fontSize: 'var(--text-body-lg)',
-            marginTop: '1.5rem',
-          }}>
-            No videos in this category yet — check back soon.
           </div>
-        )}
-      </SectionBox>
+        </div>
+      </section>
+
+      {/* ── BROWSE ALL — category filters + full grid ─────────────────────── */}
+      <section className="section section-alt" id="browse-all">
+        <div className="container-content">
+          <div style={{ maxWidth: '40rem', marginBottom: '2rem' }}>
+            <span className="badge mb-3 inline-flex" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
+              <AcademyIcon className="w-3.5 h-3.5" strokeWidth={2.2} />
+              Full Library
+            </span>
+            <h2 className="text-heading mb-2">Browse all videos.</h2>
+            <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
+              {totalVideos} videos across {categories.length - 1} categories. Filter by topic to find exactly what you need.
+            </p>
+          </div>
+
+          <CategoryFilter
+            categories={categories}
+            activeCategory={activeCategory}
+            onSelect={setActiveCategory}
+          />
+
+          <div style={{
+            display: 'grid',
+            gap: '1.5rem',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+            marginTop: '2rem',
+          }}>
+            <AnimatePresence mode="popLayout">
+              {filtered.map((video, i) => (
+                <VideoCard
+                  key={video._id}
+                  video={video}
+                  index={i}
+                  isWatched={watched.has(video._id)}
+                  isPlaying={playingId === video._id}
+                  onPlay={() => { setPlayingId(video._id); markWatched(video._id) }}
+                  onClose={() => setPlayingId(null)}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {filtered.length === 0 && (
+            <div style={{
+              background: '#ffffff',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-card)',
+              padding: '4rem 2rem',
+              textAlign: 'center',
+              color: 'var(--color-text-muted)',
+              fontSize: 'var(--text-body-lg)',
+              marginTop: '1.5rem',
+            }}>
+              No videos in this category yet — check back soon.
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* ── BOTTOM CTA ───────────────────────────────────────────────────── */}
-      <CTABand
-        eyebrow="Ready when you are"
-        title={
-          <>
-            Watched the essentials?
-            <br />
-            Begin onboarding.
-          </>
-        }
-        description="Once you've completed a learning path, your AutoPilotROI partner walks you through wallet setup, account creation, and bot activation."
-        ctas={[
-          { label: 'Begin Onboarding →', href: '/signup' },
-          { label: 'Browse Resources', href: '/resources', variant: 'ghost' },
-        ]}
-      />
-    </PageShell>
+      <HomeCTABand />
+    </>
   )
 }
 

@@ -139,12 +139,12 @@ const fadeUp = {
 
 export default function ProductsClient() {
   return (
-    <div className="page-bg">
-      <div className="sections-stack">
+    <>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
 
         {/* ── 1. HERO — What Is Aurum ── */}
-        <section className="section-box" style={{ borderBottom: '1px solid var(--color-border)' }}>
-          <div className="container-xl section-padding">
+        <section className="section section-alt" style={{ borderBottom: '1px solid var(--color-border)' }}>
+          <div className="container-content">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -235,7 +235,7 @@ export default function ProductsClient() {
 
         {/* ── 2. KEY STATS STRIP ── */}
         <section style={{ background: '#1b61c9' }}>
-          <div className="container-xl" style={{ padding: '2.25rem 1.5rem' }}>
+          <div className="container-content" style={{ padding: '2.25rem var(--page-px)' }}>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(8rem, 1fr))',
@@ -275,8 +275,8 @@ export default function ProductsClient() {
         </section>
 
         {/* ── 3. WHY WE CHOSE AURUM ── */}
-        <section className="section-box">
-          <div className="container-xl section-padding">
+        <section className="section section-surface">
+          <div className="container-content">
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -411,8 +411,8 @@ export default function ProductsClient() {
         </section>
 
         {/* ── 4. PRODUCT SUITE ── */}
-        <section className="section-box" style={{ background: '#f4f6fb' }}>
-          <div className="container-xl section-padding">
+        <section className="section section-alt">
+          <div className="container-content">
             <motion.div
               initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -550,8 +550,8 @@ export default function ProductsClient() {
         </section>
 
         {/* ── 5. CTA BAND ── */}
-        <section className="section-box-navy">
-          <div className="container-xl section-padding" style={{ textAlign: 'center' }}>
+        <section className="section section-dark" style={{ background: 'linear-gradient(135deg, #121212, #1b2a4a)' }}>
+          <div className="container-content" style={{ textAlign: 'center' }}>
             <h2 className="text-heading" style={{ color: '#ffffff', marginBottom: '1rem' }}>
               Ready to Get Started?
             </h2>
@@ -593,6 +593,6 @@ export default function ProductsClient() {
         </section>
 
       </div>
-    </div>
+    </>
   )
 }

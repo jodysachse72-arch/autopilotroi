@@ -4,12 +4,7 @@ import { useState } from 'react'
 import VideoModal from '@/components/ui/VideoModal'
 import YouTubeThumbnail from '@/components/ui/YouTubeThumbnail'
 import { motion } from 'framer-motion'
-import {
-  PageShell,
-  SectionBox,
-  HeroBlue,
-  CTABand,
-} from '@/components/sections'
+import HomeCTABand from '@/components/home/CTABand'
 import { PlayCircleIcon } from '@/components/ui/Icons'
 
 const CATEGORIES = [
@@ -60,15 +55,20 @@ export default function MediaPage() {
     : liveItems.filter(item => item.category === activeCategory)
 
   return (
-    <PageShell>
-      <HeroBlue
-        eyebrow="Media Library"
-        title={<>Media &amp; social proof.</>}
-        description="Interviews, presentations, community videos, and coverage of the Aurum ecosystem. See what real members and leaders say."
-      />
+    <>
+      <section className="section section-alt" style={{ paddingBottom: '3rem' }}>
+        <div className="container-content" style={{ maxWidth: '48rem' }}>
+          <span className="badge mb-4 inline-flex">Media Library</span>
+          <h1 className="text-display mb-4">Media &amp; social proof.</h1>
+          <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
+            Interviews, presentations, community videos, and coverage of the Aurum ecosystem. See what real members and leaders say.
+          </p>
+        </div>
+      </section>
 
       {/* Filters + grid */}
-      <SectionBox variant="white" padding="lg">
+      <section className="section section-surface">
+        <div className="container-content">
         {/* Category filters */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '2rem', justifyContent: 'center' }}>
           {CATEGORIES.map(cat => (
@@ -219,17 +219,10 @@ export default function MediaPage() {
             </motion.article>
           ))}
         </div>
-      </SectionBox>
+        </div>
+      </section>
 
-      <CTABand
-        eyebrow="Ready to start your journey?"
-        title={<>From watching to doing.<br />In 30\u201345 minutes.</>}
-        description="The best way to understand the platform is to work through the guided onboarding with your AutoPilot ROI partner."
-        ctas={[
-          { label: 'Begin onboarding \u2192', href: '/signup' },
-          { label: 'Read the FAQs', href: '/faqs', variant: 'ghost' },
-        ]}
-      />
-    </PageShell>
+      <HomeCTABand />
+    </>
   )
 }

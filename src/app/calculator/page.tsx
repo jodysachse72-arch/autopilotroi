@@ -3,12 +3,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import {
-  PageShell,
-  SectionBox,
-  HeroBlue,
-  CTABand,
-} from '@/components/sections'
+import HomeCTABand from '@/components/home/CTABand'
 
 /* ═══════════════════════════════════════════════════════════════
    PROFIT CALCULATOR — single unified panel
@@ -163,17 +158,22 @@ export default function CalculatorPage() {
   }
 
   return (
-    <PageShell>
+    <>
 
       {/* ── 1. HERO ── */}
-      <HeroBlue
-        eyebrow="EX-AI Bot ROI Estimator"
-        title={<>See exactly what your<br />portfolio could earn.</>}
-        description="Move the slider, pick a term — your projected return updates live. No sign-in required."
-      />
+      <section className="section section-alt" style={{ paddingBottom: '3rem' }}>
+        <div className="container-content" style={{ maxWidth: '48rem' }}>
+          <span className="badge mb-4 inline-flex">EX-AI Bot ROI Estimator</span>
+          <h1 className="text-display mb-4">See exactly what your<br />portfolio could earn.</h1>
+          <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
+            Move the slider, pick a term — your projected return updates live. No sign-in required.
+          </p>
+        </div>
+      </section>
 
       {/* ── 2. UNIFIED CALCULATOR PANEL ── */}
-      <SectionBox variant="white" padding="lg">
+      <section className="section section-surface">
+        <div className="container-content">
 
         {/* Top row: inputs + result | tier rail */}
         <div style={{
@@ -606,19 +606,12 @@ export default function CalculatorPage() {
           </div>
         </div>
 
-      </SectionBox>
+        </div>
+      </section>
 
       {/* ── 3. CLOSING CTA ── */}
-      <CTABand
-        eyebrow="Ready to put it on autopilot?"
-        title={<>The bot does the trading.<br />You do the watching.</>}
-        description="Start with $100 in the BASIC tier or scale straight into ULTIMATE — same onboarding either way."
-        ctas={[
-          { label: 'Begin onboarding →', href: '/signup' },
-          { label: 'Read the FAQs', href: '/faqs', variant: 'ghost' },
-        ]}
-      />
+      <HomeCTABand />
 
-    </PageShell>
+    </>
   )
 }

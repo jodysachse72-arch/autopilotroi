@@ -1,11 +1,5 @@
 import Link from 'next/link'
-import {
-  PageShell,
-  SectionBox,
-  SectionHeader,
-  HeroBlue,
-  CTABand,
-} from '@/components/sections'
+import HomeCTABand from '@/components/home/CTABand'
 import {
   BankIcon,
   SecurityIcon,
@@ -194,30 +188,33 @@ const prereqs = [
 
 export default function StartPage() {
   return (
-    <PageShell>
+    <>
 
       {/* ── 1. HERO ── */}
-      <HeroBlue
-        eyebrow="Guided onboarding"
-        title={<>From your first $100<br />to an active bot.</>}
-        description="Six chapters. Read them through once, then do them in order. Your AutoPilot ROI partner is on the other end of every step if you get stuck."
-        ctas={[
-          { label: 'Start with Chapter 1 ↓', href: '#chapter-1' },
-          { label: 'Watch on Aurum University', href: '/university', variant: 'ghost' },
-        ]}
-      />
+      <section className="section section-alt" style={{ paddingBottom: '3rem' }}>
+        <div className="container-content" style={{ maxWidth: '48rem' }}>
+          <span className="badge mb-4 inline-flex">Guided onboarding</span>
+          <h1 className="text-display mb-4">From your first $100<br />to an active bot.</h1>
+          <p className="text-body-lg mb-6" style={{ color: 'var(--color-fg-muted)' }}>
+            Six chapters. Read them through once, then do them in order. Your AutoPilot ROI partner is on the other end of every step if you get stuck.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="#chapter-1" className="btn btn-md btn-primary">Start with Chapter 1 ↓</Link>
+            <Link href="/university" className="btn btn-md btn-ghost">Watch on Aurum University</Link>
+          </div>
+        </div>
+      </section>
 
-      {/* ── 2. WHAT YOU'LL NEED ── */}
-      <SectionBox variant="white" padding="lg">
-        <SectionHeader
-          eyebrow="Before you start"
-          title={<>Five things to have ready.</>}
-          align="left"
-          maxWidth="42rem"
-          marginBottom="2.5rem"
-        >
-          Gather these now and the rest of the journey takes about 30–45 minutes from end to end.
-        </SectionHeader>
+      {/* ── 2. WHAT YOU’LL NEED ── */}
+      <section className="section section-surface">
+        <div className="container-content">
+          <div style={{ maxWidth: '42rem', marginBottom: '2.5rem' }}>
+            <span className="badge mb-3 inline-flex">Before you start</span>
+            <h2 className="text-heading mb-2">Five things to have ready.</h2>
+            <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
+              Gather these now and the rest of the journey takes about 30–45 minutes from end to end.
+            </p>
+          </div>
 
         <div style={{
           display: 'grid',
@@ -256,14 +253,16 @@ export default function StartPage() {
             </div>
           ))}
         </div>
-      </SectionBox>
+        </div>
+      </section>
 
       {/* ── 3. SIX CHAPTERS ── */}
       {chapters.map((ch, idx) => {
         const variant = idx % 2 === 0 ? 'surface' : 'white'
         const next = chapters[idx + 1]
         return (
-          <SectionBox key={ch.id} id={`chapter-${ch.id}`} variant={variant} padding="lg">
+          <section key={ch.id} id={`chapter-${ch.id}`} className={`section ${variant === 'surface' ? 'section-alt' : 'section-surface'}`}>
+            <div className="container-content">
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'minmax(0, 18rem) minmax(0, 1fr)',
@@ -498,12 +497,14 @@ export default function StartPage() {
                 )}
               </div>
             </div>
-          </SectionBox>
+            </div>
+          </section>
         )
       })}
 
       {/* ── 4. PARTNER HELP / "STUCK" SECTION ── */}
-      <SectionBox variant="white" padding="lg" id="partner-help">
+      <section className="section section-surface" id="partner-help">
+        <div className="container-content">
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 22rem), 1fr))',
@@ -589,19 +590,12 @@ export default function StartPage() {
             </Link>
           </div>
         </div>
-      </SectionBox>
+        </div>
+      </section>
 
       {/* ── 5. CLOSING CTA ── */}
-      <CTABand
-        eyebrow="Done with all six chapters?"
-        title={<>Welcome to the team.<br />Now turn it into income.</>}
-        description="Your bot is trading. Confirm placement with your partner, then dive into the resources hub to learn the referral side."
-        ctas={[
-          { label: 'Open the Resources hub →', href: '/resources' },
-          { label: 'Estimate your returns', href: '/calculator', variant: 'ghost' },
-        ]}
-      />
+      <HomeCTABand />
 
-    </PageShell>
+    </>
   )
 }

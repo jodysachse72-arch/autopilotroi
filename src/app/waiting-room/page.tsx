@@ -8,7 +8,7 @@ import VideoModal from '@/components/ui/VideoModal'
 import YouTubeThumbnail from '@/components/ui/YouTubeThumbnail'
 import { trackEvent, EVENTS } from '@/lib/analytics'
 import PersonalizedPath from '@/components/sections/PersonalizedPath'
-import { PageShell, SectionBox, CTABand } from '@/components/sections'
+import HomeCTABand from '@/components/home/CTABand'
 import { CheckCircleIcon, PlayCircleIcon, SparkleIcon } from '@/components/ui/Icons'
 
 /* Curated Aurum University Video Library */
@@ -77,10 +77,10 @@ export default function WaitingRoomPage() {
   const chip = TIER_CHIPS[tier]
 
   return (
-    <PageShell>
+    <>
       {/* Sticky header bar — authenticated chrome */}
       <header style={{ position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid var(--color-border)', background: '#fff' }}>
-        <div className="container-xl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.5rem' }}>
+        <div className="container-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem var(--page-px)' }}>
           <Link href="/"><Logo size={32} showText /></Link>
           {readiness && (
             <span style={{
@@ -177,7 +177,8 @@ export default function WaitingRoomPage() {
       {readiness && <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} />}
 
       {/* Progress + filters + grid */}
-      <SectionBox variant="white" padding="lg">
+      <section className="section section-surface">
+        <div className="container-content">
         {/* Progress */}
         <div style={{ maxWidth: '60rem', margin: '0 auto 2rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
@@ -291,19 +292,10 @@ export default function WaitingRoomPage() {
             </motion.div>
           ))}
         </div>
-      </SectionBox>
+        </div>
+      </section>
 
-      <CTABand
-        eyebrow="What happens next?"
-        title={<>Your partner is reviewing<br />your assessment.</>}
-        description={lead?.email
-          ? 'Watch your inbox at ' + lead.email + ' for a personalized onboarding link from your AutoPilot ROI partner.'
-          : 'Watch your inbox for a personalized onboarding link from your AutoPilot ROI partner.'}
-        ctas={[
-          { label: 'Explore Aurum University \u2192', href: '/university' },
-          { label: 'Back to home', href: '/', variant: 'ghost' },
-        ]}
-      />
-    </PageShell>
+      <HomeCTABand />
+    </>
   )
 }
