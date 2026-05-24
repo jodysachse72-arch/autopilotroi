@@ -1,101 +1,73 @@
 import Link from 'next/link'
-import { LogoIcon } from '@/components/ui/Logo'
+import Logo from '@/components/ui/Logo'
 
 const FOOTER_COLS = [
   {
     heading: 'Platform',
     links: [
-      { label: 'What Is Aurum', href: '/products' },
-      { label: 'Start Here',   href: '/start' },
-      { label: 'University',   href: '/university' },
-      { label: 'Calculator',   href: '/calculator' },
-      { label: 'Media',        href: '/media' },
+      { label: 'Products', href: '/products' },
+      { label: 'Calculator', href: '/calculator' },
+      { label: 'University', href: '/university' },
+      { label: 'Media', href: '/media' },
     ],
   },
   {
     heading: 'Support',
     links: [
-      { label: 'FAQs',          href: '/faqs' },
-      { label: 'Start Guide',   href: '/start' },
+      { label: 'FAQs', href: '/faqs' },
+      { label: 'Start Guide', href: '/start' },
     ],
   },
   {
     heading: 'Legal',
     links: [
       { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Use',   href: '/terms' },
-      { label: 'Disclaimer',     href: '/disclaimer' },
+      { label: 'Terms of Use', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' },
     ],
   },
-]
-
-/* ── Inline styles only (server component) ── */
-const linkStyle: React.CSSProperties = {
-  fontSize: 'var(--text-body)',
-  color: 'rgba(255,255,255,0.58)',
-  textDecoration: 'none',
-  display: 'block',
-  padding: '0.125rem 0',
-  transition: 'color 150ms ease',
-}
+] as const
 
 export default function Footer() {
-  const year = new Date().getFullYear()
-
   return (
-    <footer style={{ background: '#181d26', color: '#ffffff' }}>
-      <style>{`
-        .footer-link:hover { color: #ffffff !important; }
-      `}</style>
-
-      <div className="container-xl" style={{ paddingTop: '4rem', paddingBottom: '2.5rem' }}>
-
-        {/* Top row */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-          gap: '3rem',
-          marginBottom: '3rem',
-        }}>
-          {/* Brand col */}
-          <div>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', textDecoration: 'none', marginBottom: '1.25rem' }}>
-              <LogoIcon size={28} />
-              <span style={{
-                fontFamily: 'var(--font-display)', fontWeight: 800,
-                fontSize: '1.0625rem', color: '#ffffff',
-                letterSpacing: '-0.01em',
-              }}>
-                AutoPilot<span style={{ color: '#60a5fa' }}>ROI</span>
-              </span>
+    <footer
+      className="section"
+      style={{ backgroundColor: 'var(--color-fg)', color: 'rgba(255,255,255,0.6)' }}
+    >
+      <div className="container-content">
+        {/* Top: logo + columns */}
+        <div className="grid grid-cols-2 gap-12 md:grid-cols-4 lg:gap-16">
+          {/* Brand column */}
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" aria-label="AutoPilotROI Home" className="inline-block mb-4">
+              <Logo size={32} showText textColorClass="text-white" />
             </Link>
-            <p style={{
-              fontSize: 'var(--text-caption)',
-              color: 'rgba(255,255,255,0.45)',
-              lineHeight: 1.65,
-              maxWidth: '18rem',
-            }}>
-              The structured onboarding platform for AI-managed finance. Trading bots, crypto cards, exchange, and a Web3 neobank.
+            <p className="text-caption" style={{ maxWidth: '20rem', lineHeight: 'var(--lh-relaxed)' }}>
+              Independent onboarding platform for the Aurum AI ecosystem. Not a financial advisor.
             </p>
           </div>
 
           {/* Link columns */}
-          {FOOTER_COLS.map(col => (
+          {FOOTER_COLS.map((col) => (
             <div key={col.heading}>
-              <div style={{
-                fontSize: 'var(--text-caption)',
-                fontWeight: 700,
-                letterSpacing: '0.10em',
-                textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.38)',
-                marginBottom: '1rem',
-              }}>
+              <h4
+                className="text-caption font-semibold mb-4"
+                style={{
+                  color: 'rgba(255,255,255,0.35)',
+                  letterSpacing: 'var(--ls-wider)',
+                  textTransform: 'uppercase',
+                  fontFamily: 'var(--font-display)',
+                }}
+              >
                 {col.heading}
-              </div>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-                {col.links.map(link => (
+              </h4>
+              <ul className="flex flex-col gap-3">
+                {col.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className="footer-link" style={linkStyle}>
+                    <Link
+                      href={link.href}
+                      className="text-caption transition-colors hover:text-white"
+                    >
                       {link.label}
                     </Link>
                   </li>
@@ -105,28 +77,16 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Bottom row */}
-        <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.08)',
-          paddingTop: '1.5rem',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1rem',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-          <p style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.32)' }}>
-            © {year} AutoPilotROI. All rights reserved. Not financial advice.
+        {/* Bottom bar */}
+        <div
+          className="mt-16 pt-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-caption"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
+        >
+          <p>&copy; {new Date().getFullYear()} AutoPilotROI. All rights reserved.</p>
+          <p style={{ color: 'rgba(255,255,255,0.3)' }}>
+            Independent platform &middot; Not affiliated with Aurum Foundation
           </p>
-          <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
-            {(['/privacy', '/terms', '/disclaimer'] as const).map((href, i) => (
-              <Link key={href} href={href} className="footer-link" style={{ fontSize: 'var(--text-caption)', color: 'rgba(255,255,255,0.32)', textDecoration: 'none' }}>
-                {['Privacy', 'Terms', 'Disclaimer'][i]}
-              </Link>
-            ))}
-          </div>
         </div>
-
       </div>
     </footer>
   )
