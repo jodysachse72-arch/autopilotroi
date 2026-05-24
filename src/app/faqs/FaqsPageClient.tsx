@@ -2,12 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import type { CmsPost } from '@/lib/cms/types'
-import {
-  PageShell,
-  SectionBox,
-  HeroBlue,
-  CTABand,
-} from '@/components/sections'
+import HomeCTABand from '@/components/home/CTABand'
 import {
   AcademyIcon,
   AutomationIcon,
@@ -79,17 +74,22 @@ export default function FaqsPageClient({ faqs }: Props) {
   }
 
   return (
-    <PageShell>
+    <>
 
       {/* ── 1. HERO ── */}
-      <HeroBlue
-        eyebrow="Knowledge base"
-        title={<>Everything you need<br />to know.</>}
-        description="Search across every answer, or browse by topic. Written in plain English — no jargon traps."
-      />
+      <section className="section section-alt" style={{ paddingBottom: '3rem' }}>
+        <div className="container-content" style={{ maxWidth: '48rem' }}>
+          <span className="badge mb-4 inline-flex">Knowledge base</span>
+          <h1 className="text-display mb-4">Everything you need<br />to know.</h1>
+          <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
+            Search across every answer, or browse by topic. Written in plain English — no jargon traps.
+          </p>
+        </div>
+      </section>
 
       {/* ── 2. SEARCH + DOCS LAYOUT ── */}
-      <SectionBox variant="white" padding="lg">
+      <section className="section section-surface" style={{ paddingTop: '3rem' }}>
+        <div className="container-content">
 
         {/* Search bar */}
         <div style={{ position: 'relative', maxWidth: '40rem', margin: '0 0 2.5rem' }}>
@@ -440,20 +440,13 @@ export default function FaqsPageClient({ faqs }: Props) {
             </div>
           </div>
         </div>
-      </SectionBox>
+        </div>
+      </section>
 
       {/* ── 3. CLOSING CTA ── */}
-      <CTABand
-        eyebrow="Still stuck?"
-        title={<>Your partner has answered<br />this question before.</>}
-        description="Every AutoPilot ROI member has a dedicated partner. Message yours — they walk new members through onboarding every week."
-        ctas={[
-          { label: 'Begin onboarding →', href: '/signup' },
-          { label: 'Read the start guide', href: '/start', variant: 'ghost' },
-        ]}
-      />
+      <HomeCTABand />
 
-    </PageShell>
+    </>
   )
 }
 
