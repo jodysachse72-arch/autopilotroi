@@ -476,3 +476,150 @@ button { cursor: pointer; font: inherit; }
 .reveal-delay-1 { transition-delay: 0.1s; }
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ── Hero ribbon lines (animated ambient data streaks) ───────── */
+.hero-ribbon-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(147, 197, 253, 0.12) 30%,
+    rgba(147, 197, 253, 0.25) 50%,
+    rgba(147, 197, 253, 0.12) 70%,
+    transparent 100%
+  );
+  animation: ribbon-drift 8s ease-in-out infinite;
+}
+
+@keyframes ribbon-drift {
+  0%, 100% { opacity: 0.3; transform: translateX(-4%); }
+  50%      { opacity: 0.7; transform: translateX(4%); }
+}
+
+/* ── Shimmer hover effect ────────────────────────────────────── */
+.shimmer-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-hover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+  transition: left 0.5s ease;
+}
+
+.shimmer-hover:hover::after {
+  left: 120%;
+}
+
+/* ── Hero split layout ───────────────────────────────────────── */
+.hero-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .hero-split {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+}
+
+/* ── Hero CTA buttons (dark background) ──────────────────────── */
+.hero-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 3.25rem;
+  padding: 0 2.25rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  background: #ffffff;
+  color: #0c1220;
+  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+
+.hero-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  background: #f0f4ff;
+}
+
+.hero-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 3.25rem;
+  padding: 0 1.75rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  background: transparent;
+  color: rgba(255,255,255,0.88);
+  border: 1.5px solid rgba(255,255,255,0.28);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.hero-btn-secondary:hover {
+  border-color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.08);
+  transform: translateY(-1px);
+}
+
+/* ── Hero video card hover ───────────────────────────────────── */
+.hero-video-card {
+  transition: transform 250ms ease, box-shadow 250ms ease;
+}
+
+.hero-video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.45);
+}
+
+/* ── Mobile refinements ──────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Reduce outer card margins — more usable content width */
+  :root {
+    --page-px: 0.875rem;
+  }
+
+  /* Hide browser chrome bar on mobile — maximize video impact */
+  .hero-video-chrome {
+    display: none !important;
+  }
+
+  /* Round video top when chrome is hidden */
+  .hero-video-card img {
+    border-radius: 0.75rem 0.75rem 0 0;
+  }
+}

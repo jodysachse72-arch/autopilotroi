@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 
 interface VideoModalProps {
@@ -9,11 +9,36 @@ interface VideoModalProps {
   /** Optional CTA button shown below the video */
   ctaLabel?: string
   ctaHref?: string
+  /** External open control — lets parent drive modal state */
+  externalOpen?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: VideoModalProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export default function VideoModal({
+  videoUrl,
+  children,
+  ctaLabel,
+  ctaHref,
+  externalOpen,
+  onOpenChange,
+}: VideoModalProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
   const dialogRef = useRef<HTMLDialogElement>(null)
+
+  // Merge internal + external open state
+  const isOpen = externalOpen !== undefined ? externalOpen : internalOpen
+  const setIsOpen = useCallback(
+    (v: boolean) => {
+      setInternalOpen(v)
+      onOpenChange?.(v)
+    },
+    [onOpenChange]
+  )
+
+  // Sync external → internal
+  useEffect(() => {
+    if (externalOpen !== undefined) setInternalOpen(externalOpen)
+  }, [externalOpen])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -66,6 +91,7 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
       <dialog
         ref={dialogRef}
         onClick={handleDialogClick}
+        onCancel={() => setIsOpen(false)}
         style={{
           position: 'fixed',
           inset: 0,
@@ -98,7 +124,7 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
 
           {/* CTA below video */}
           {ctaLabel && ctaHref && (
-            <div style={{ padding: '1.5rem', background: '#0c1220' }}>
+            <div style={{ padding: '1.25rem 1.5rem', background: '#0c1220' }}>
               <Link
                 href={ctaHref}
                 style={{
@@ -109,11 +135,11 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
                   width: '100%',
                   background: 'linear-gradient(135deg, #2563eb 0%, #1b61c9 100%)',
                   color: '#ffffff',
-                  padding: '1rem 2rem',
-                  borderRadius: '0.875rem',
+                  padding: '0.875rem 2rem',
+                  borderRadius: '0.75rem',
                   fontFamily: 'var(--font-display)',
                   fontWeight: 700,
-                  fontSize: '1.0625rem',
+                  fontSize: '1rem',
                   textDecoration: 'none',
                   boxShadow: '0 6px 24px rgba(27,97,201,0.50)',
                   transition: 'transform 150ms ease, box-shadow 150ms ease',
@@ -129,14 +155,14 @@ export default function VideoModal({ videoUrl, children, ctaLabel, ctaHref }: Vi
           <button
             onClick={() => setIsOpen(false)}
             style={{
-              position: 'absolute', right: '1rem', top: '1rem',
+              position: 'absolute', right: '0.875rem', top: '0.875rem',
               width: '2.25rem', height: '2.25rem',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               borderRadius: '50%',
-              background: 'rgba(255,255,255,0.18)',
-              border: 'none',
+              background: 'rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.15)',
               color: '#ffffff',
-              fontSize: '1.125rem',
+              fontSize: '1rem',
               cursor: 'pointer',
               backdropFilter: 'blur(8px)',
               transition: 'background 150ms ease',

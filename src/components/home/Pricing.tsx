@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 interface PlanFeature {
   text: string
@@ -63,96 +66,124 @@ const PLANS: Plan[] = [
 
 export default function Pricing() {
   return (
-    <section className="section section-alt">
-      <div className="container-content">
-        <div className="text-center mb-16" style={{ maxWidth: '36rem', margin: '0 auto 4rem' }}>
-          <span className="badge mb-4 inline-flex">Start Where You Are</span>
-          <h2 className="text-display mb-4">
-            Your entry point.
-            <br />
-            Your pace.
-          </h2>
-          <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
-            Every plan includes full AI bot access, guided onboarding, and partner support.
-            Start with what you&apos;re comfortable with — scale when you&apos;re ready.
-          </p>
-        </div>
+    <section
+      style={{
+        margin: '1.5rem var(--page-px, 1.5rem)',
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderRadius: 'var(--radius-section, 1.125rem)',
+          border: '1px solid var(--color-border)',
+          padding: 'var(--section-py) clamp(1.5rem, 4vw, 3.5rem)',
+        }}
+      >
+        <div style={{ maxWidth: 'var(--container)', margin: '0 auto' }}>
+          <div className="text-center" style={{ maxWidth: '36rem', margin: '0 auto 4rem' }}>
+            <span className="badge mb-4 inline-flex">Start Where You Are</span>
+            <h2 className="text-display mb-4">
+              Your entry point.
+              <br />
+              Your pace.
+            </h2>
+            <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
+              Every plan includes full AI bot access, guided onboarding, and partner support.
+              Start with what you&apos;re comfortable with — scale when you&apos;re ready.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className="rounded-xl p-8 flex flex-col relative"
-              style={{
-                backgroundColor: plan.featured ? 'var(--color-fg)' : 'var(--color-surface)',
-                color: plan.featured ? '#ffffff' : 'var(--color-fg)',
-                border: plan.featured ? 'none' : '1px solid var(--color-border)',
-              }}
-            >
-              {plan.badge && (
-                <span className="badge-featured absolute -top-3 left-8 text-caption px-3 py-1 rounded-full">
-                  ⭐ {plan.badge}
-                </span>
-              )}
-
-              <h3 className="text-subheading mb-2">{plan.name}</h3>
-              <p
-                className="text-caption mb-6"
-                style={{ color: plan.featured ? 'rgba(255,255,255,0.6)' : 'var(--color-fg-muted)' }}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+            {PLANS.map((plan, i) => (
+              <motion.div
+                key={plan.name}
+                className="rounded-xl flex flex-col relative"
+                style={{
+                  backgroundColor: plan.featured ? 'var(--color-fg)' : 'var(--color-bg)',
+                  color: plan.featured ? '#ffffff' : 'var(--color-fg)',
+                  border: plan.featured ? 'none' : '1px solid var(--color-border)',
+                  padding: '2rem',
+                  boxShadow: plan.featured
+                    ? '0 24px 48px rgba(0,0,0,0.15), 0 0 0 1px rgba(27,97,201,0.20)'
+                    : undefined,
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               >
-                {plan.tagline}
-              </p>
+                {plan.badge && (
+                  <span
+                    className="absolute -top-3 left-8 text-caption px-3 py-1 rounded-full font-semibold"
+                    style={{
+                      backgroundColor: 'var(--color-accent)',
+                      color: '#ffffff',
+                      letterSpacing: '0.02em',
+                    }}
+                  >
+                    ⭐ {plan.badge}
+                  </span>
+                )}
 
-              <p className="text-heading mb-8" style={{ fontWeight: 800 }}>
-                {plan.price}
-                <span
-                  className="text-caption font-normal ml-2"
-                  style={{ color: plan.featured ? 'rgba(255,255,255,0.4)' : 'var(--color-fg-faint)' }}
+                <h3 className="text-subheading mb-2">{plan.name}</h3>
+                <p
+                  className="text-caption mb-6"
+                  style={{ color: plan.featured ? 'rgba(255,255,255,0.6)' : 'var(--color-fg-muted)' }}
                 >
-                  minimum
-                </span>
-              </p>
+                  {plan.tagline}
+                </p>
 
-              <ul className="flex flex-col gap-3 mb-8 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f.text} className="flex items-start gap-3 text-body">
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      className="flex-shrink-0 mt-0.5"
-                    >
-                      <circle
-                        cx="9"
-                        cy="9"
-                        r="9"
-                        fill={plan.featured ? 'rgba(255,255,255,0.1)' : 'var(--color-accent-light)'}
-                      />
-                      <path
-                        d="M5.5 9l2.5 2.5 4.5-4.5"
-                        stroke={plan.featured ? '#ffffff' : 'var(--color-accent)'}
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    <span style={{ color: plan.featured ? 'rgba(255,255,255,0.85)' : 'var(--color-fg-muted)' }}>
-                      {f.text}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+                <p className="text-heading mb-8" style={{ fontWeight: 800 }}>
+                  {plan.price}
+                  <span
+                    className="text-caption font-normal ml-2"
+                    style={{ color: plan.featured ? 'rgba(255,255,255,0.4)' : 'var(--color-fg-faint)' }}
+                  >
+                    minimum
+                  </span>
+                </p>
 
-              <Link
-                href={plan.ctaHref}
-                className={`btn btn-lg w-full ${plan.featured ? 'btn-accent' : 'btn-ghost'}`}
-                style={plan.featured ? { backgroundColor: 'var(--color-accent)', color: '#fff' } : {}}
-              >
-                {plan.ctaLabel}
-              </Link>
-            </div>
-          ))}
+                <ul className="flex flex-col gap-3 mb-8 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f.text} className="flex items-start gap-3 text-body">
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        className="flex-shrink-0 mt-0.5"
+                      >
+                        <circle
+                          cx="9"
+                          cy="9"
+                          r="9"
+                          fill={plan.featured ? 'rgba(255,255,255,0.1)' : 'var(--color-accent-light)'}
+                        />
+                        <path
+                          d="M5.5 9l2.5 2.5 4.5-4.5"
+                          stroke={plan.featured ? '#ffffff' : 'var(--color-accent)'}
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span style={{ color: plan.featured ? 'rgba(255,255,255,0.85)' : 'var(--color-fg-muted)' }}>
+                        {f.text}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href={plan.ctaHref}
+                  className={`btn btn-lg w-full shimmer-hover ${plan.featured ? '' : 'btn-ghost'}`}
+                  style={plan.featured ? { backgroundColor: 'var(--color-accent)', color: '#fff' } : {}}
+                >
+                  {plan.ctaLabel}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,3 +1,7 @@
+'use client'
+
+import { motion } from 'framer-motion'
+
 const TESTIMONIALS = [
   {
     quote: "I was skeptical at first but my partner walked me through every step. Had my bot running in 2 days and already seeing consistent daily returns.",
@@ -19,14 +23,68 @@ const TESTIMONIALS = [
 export default function Testimonials() {
   return (
     <section
-      className="section section-dark"
       style={{
-        background: 'linear-gradient(135deg, #121212 0%, #1a1a2e 50%, #0f172a 100%)',
+        background: 'linear-gradient(135deg, #050d28 0%, #0c1f6e 35%, #0e2880 65%, #091947 100%)',
+        borderRadius: 'var(--radius-section, 1.125rem)',
+        overflow: 'hidden',
+        position: 'relative',
+        margin: '1.5rem var(--page-px, 1.5rem)',
       }}
     >
-      <div className="container-content">
-        <div className="text-center mb-16" style={{ maxWidth: '36rem', margin: '0 auto 4rem' }}>
-          <span className="badge badge-dark mb-4 inline-flex">Members Speak</span>
+      {/* Atmospheric overlay — matches hero energy */}
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{
+          position: 'absolute', left: '20%', top: '-20%',
+          width: '50vmax', height: '50vmax', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(27,97,201,0.25) 0%, transparent 55%)',
+        }} />
+        <div style={{
+          position: 'absolute', right: '-10%', bottom: '-20%',
+          width: '40vmax', height: '40vmax', borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(79,70,229,0.15) 0%, transparent 50%)',
+        }} />
+        {/* Grain */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.75\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'1\'/%3E%3C/svg%3E")',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '180px 180px',
+          opacity: 0.02,
+          mixBlendMode: 'overlay' as const,
+        }} />
+      </div>
+
+      <div
+        className="container-content"
+        style={{
+          position: 'relative',
+          zIndex: 1,
+          paddingTop: 'var(--section-py)',
+          paddingBottom: 'var(--section-py)',
+        }}
+      >
+        {/* Header */}
+        <div className="text-center" style={{ maxWidth: '36rem', margin: '0 auto 3.5rem' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              borderRadius: '99px',
+              border: '1px solid rgba(255,255,255,0.18)',
+              background: 'rgba(255,255,255,0.08)',
+              padding: '0.375rem 0.875rem',
+              fontSize: 'var(--text-caption)',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 600,
+              textTransform: 'uppercase' as const,
+              letterSpacing: 'var(--ls-wide)',
+              color: 'rgba(255,255,255,0.72)',
+              marginBottom: '1.25rem',
+            }}
+          >
+            Members Speak
+          </span>
           <h2 className="text-display" style={{ color: '#ffffff' }}>
             Real people.
             <br />
@@ -34,41 +92,57 @@ export default function Testimonials() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {TESTIMONIALS.map((t) => (
-            <div
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {TESTIMONIALS.map((t, i) => (
+            <motion.div
               key={t.author}
-              className="rounded-xl p-8 flex flex-col"
+              className="rounded-xl flex flex-col"
               style={{
-                backgroundColor: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                backgroundColor: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.10)',
+                backdropFilter: 'blur(8px)',
+                padding: 'clamp(1.5rem, 3vw, 2.25rem)',
               }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.5, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
               {/* Stars */}
-              <div className="flex gap-0.5 mb-5" style={{ color: '#fbbf24' }}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <div className="flex gap-1 mb-4" style={{ color: '#fbbf24' }}>
+                {Array.from({ length: 5 }).map((_, j) => (
+                  <svg key={j} width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0l2.47 4.99L16 5.81l-4 3.9.94 5.49L8 12.49l-4.94 2.7L4 9.71 0 5.81l5.53-.82L8 0z" />
                   </svg>
                 ))}
               </div>
 
               <blockquote
-                className="text-body flex-1 mb-6"
-                style={{ color: 'rgba(255,255,255,0.8)', lineHeight: 'var(--lh-relaxed)' }}
+                className="text-body flex-1"
+                style={{
+                  color: 'rgba(255,255,255,0.82)',
+                  lineHeight: '1.7',
+                  marginBottom: '1.5rem',
+                }}
               >
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
 
-              <div>
-                <p className="text-caption font-semibold" style={{ color: '#ffffff' }}>
+              <div
+                style={{
+                  borderTop: '1px solid rgba(255,255,255,0.08)',
+                  paddingTop: '1rem',
+                }}
+              >
+                <p className="text-caption font-semibold" style={{ color: '#ffffff', marginBottom: '0.125rem' }}>
                   {t.author}
                 </p>
-                <p className="text-caption" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                <p className="text-caption" style={{ color: 'rgba(255,255,255,0.45)' }}>
                   {t.role}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
