@@ -5,14 +5,17 @@ import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 
 /* ═══════════════════════════════════════════════════════════════
-   NAV STRUCTURE — per Barry's review comment
+   NAV STRUCTURE
    HOME  |  FAQs  |  *START  |  *RESOURCES  |  CONTACT
    * = dropdown menu
+
+   Mobile menu is architected with labeled sections so future
+   auth/admin/partner groups slot in without restructuring.
    ═══════════════════════════════════════════════════════════════ */
 
-type NavItem =
-  | { label: string; href: string }
-  | { label: string; children: { label: string; href: string }[] }
+type NavLink = { label: string; href: string; description?: string }
+type NavGroup = { label: string; children: NavLink[] }
+type NavItem = NavLink | NavGroup
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'Home', href: '/' },
@@ -20,45 +23,61 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Start',
     children: [
-      { label: 'Onboarding Guide', href: '/start' },
+      { label: 'Onboarding Guide', href: '/start', description: 'Step-by-step setup walkthrough' },
     ],
   },
   {
     label: 'Resources',
     children: [
-      { label: 'Executive Summary', href: '/summary' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Media', href: '/media' },
-      { label: 'Aurum University', href: '/university' },
-      { label: 'EX AI – Calculator', href: '/calculator' },
+      { label: 'Executive Summary', href: '/summary', description: 'Platform overview' },
+      { label: 'Blog', href: '/blog', description: 'News & updates' },
+      { label: 'Media', href: '/media', description: 'Videos & press' },
+      { label: 'Aurum University', href: '/university', description: 'Learn the ecosystem' },
+      { label: 'EX AI – Calculator', href: '/calculator', description: 'Estimate your returns' },
     ],
   },
   { label: 'Contact', href: '/signup' },
-] as const
+]
 
-/* ── Dropdown component ── */
-function NavDropdown({ label, children }: { label: string; children: { label: string; href: string }[] }) {
+function isGroup(item: NavItem): item is NavGroup {
+  return 'children' in item
+}
+
+/* ── Chevron icon ── */
+function Chevron({ open, size = 10 }: { open: boolean; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size * 0.6}
+      viewBox="0 0 10 6"
+      fill="none"
+      className="transition-transform duration-200"
+      style={{ transform: open ? 'rotate(180deg)' : 'none' }}
+    >
+      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+/* ── Desktop dropdown ── */
+function NavDropdown({ label, children }: NavGroup) {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
-  // Close on outside click
   useEffect(() => {
     if (!open) return
-    function handleClick(e: MouseEvent) {
+    const close = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
     }
-    document.addEventListener('click', handleClick)
-    return () => document.removeEventListener('click', handleClick)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
   }, [open])
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
+    const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('keydown', close)
+    return () => document.removeEventListener('keydown', close)
   }, [open])
 
   return (
@@ -66,32 +85,17 @@ function NavDropdown({ label, children }: { label: string; children: { label: st
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="nav-link inline-flex items-center gap-1"
+        className="nav-link inline-flex items-center gap-1.5"
         aria-expanded={open}
         aria-haspopup="true"
       >
         {label}
-        <svg
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
-          fill="none"
-          className="transition-transform duration-200"
-          style={{ transform: open ? 'rotate(180deg)' : 'none' }}
-        >
-          <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <Chevron open={open} />
       </button>
 
       {open && (
-        <div
-          className="absolute top-full left-1/2 pt-2"
-          style={{ transform: 'translateX(-50%)' }}
-        >
-          <div
-            className="nav-dropdown-panel"
-            role="menu"
-          >
+        <div className="absolute top-full left-1/2 pt-2" style={{ transform: 'translateX(-50%)' }}>
+          <div className="nav-dropdown-panel" role="menu">
             {children.map((item) => (
               <Link
                 key={item.href}
@@ -100,7 +104,10 @@ function NavDropdown({ label, children }: { label: string; children: { label: st
                 onClick={() => setOpen(false)}
                 className="nav-dropdown-item"
               >
-                {item.label}
+                <span className="nav-dropdown-item-label">{item.label}</span>
+                {item.description && (
+                  <span className="nav-dropdown-item-desc">{item.description}</span>
+                )}
               </Link>
             ))}
           </div>
@@ -110,10 +117,103 @@ function NavDropdown({ label, children }: { label: string; children: { label: st
   )
 }
 
+/* ════════════════════════════════════════════════════════════════
+   MOBILE MENU — full-screen overlay with section architecture.
+   Designed to scale with future auth/admin/partner sections.
+   ════════════════════════════════════════════════════════════════ */
+function MobileMenu({
+  open,
+  onClose,
+}: {
+  open: boolean
+  onClose: () => void
+}) {
+  const [expanded, setExpanded] = useState<string | null>(null)
+
+  if (!open) return null
+
+  return (
+    <div className="mobile-menu-overlay">
+      {/* ── Scrollable content ── */}
+      <div className="mobile-menu-scroll">
+
+        {/* ── Section: Navigation ── */}
+        <div className="mobile-menu-section">
+          <span className="mobile-menu-section-label">Navigation</span>
+
+          {NAV_ITEMS.map((item) =>
+            isGroup(item) ? (
+              <div key={item.label} className="mobile-menu-group">
+                <button
+                  type="button"
+                  onClick={() => setExpanded(expanded === item.label ? null : item.label)}
+                  className="mobile-menu-link mobile-menu-link--parent"
+                >
+                  <span>{item.label}</span>
+                  <Chevron open={expanded === item.label} size={12} />
+                </button>
+
+                {expanded === item.label && (
+                  <div className="mobile-menu-children">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        onClick={onClose}
+                        className="mobile-menu-child"
+                      >
+                        <span className="mobile-menu-child-label">{child.label}</span>
+                        {child.description && (
+                          <span className="mobile-menu-child-desc">{child.description}</span>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className="mobile-menu-link"
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+        </div>
+
+        {/* ── Section: Future auth section placeholder ──
+            When auth is added, insert here:
+            {user && (
+              <div className="mobile-menu-section">
+                <span className="mobile-menu-section-label">Account</span>
+                ...dashboard, settings, logout...
+              </div>
+            )}
+        ── */}
+
+        {/* ── CTA block ── */}
+        <div className="mobile-menu-cta">
+          <Link href="/signup" onClick={onClose} className="btn btn-primary btn-lg w-full">
+            Get Started
+          </Link>
+          <p className="mobile-menu-cta-sub">
+            Free onboarding · No commitment
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════
+   NAVBAR ROOT
+   ════════════════════════════════════════════════════════════════ */
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -122,7 +222,6 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Lock body scroll when menu open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -147,14 +246,10 @@ export default function Navbar() {
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
           {NAV_ITEMS.map((item) =>
-            'children' in item ? (
-              <NavDropdown key={item.label} label={item.label} children={item.children} />
+            isGroup(item) ? (
+              <NavDropdown key={item.label} {...item} />
             ) : (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="nav-link"
-              >
+              <Link key={item.href} href={item.href} className="nav-link">
                 {item.label}
               </Link>
             )
@@ -201,74 +296,8 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile overlay */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 top-[5rem] z-40 md:hidden"
-          style={{ backgroundColor: 'var(--color-bg)' }}
-        >
-          <nav className="container-content flex flex-col gap-2 pt-8" aria-label="Mobile navigation">
-            {NAV_ITEMS.map((item) =>
-              'children' in item ? (
-                <div key={item.label} style={{ borderBottom: '1px solid var(--color-border)' }}>
-                  <button
-                    type="button"
-                    onClick={() => setMobileExpanded(mobileExpanded === item.label ? null : item.label)}
-                    className="w-full flex items-center justify-between text-heading py-3 transition-colors hover:text-[var(--color-accent)]"
-                    style={{ fontFamily: 'var(--font-display)' }}
-                  >
-                    {item.label}
-                    <svg
-                      width="12"
-                      height="7"
-                      viewBox="0 0 10 6"
-                      fill="none"
-                      className="transition-transform duration-200"
-                      style={{ transform: mobileExpanded === item.label ? 'rotate(180deg)' : 'none' }}
-                    >
-                      <path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                  {mobileExpanded === item.label && (
-                    <div className="flex flex-col gap-1 pb-3 pl-4">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          href={child.href}
-                          onClick={() => setMenuOpen(false)}
-                          className="py-2 text-body-lg transition-colors hover:text-[var(--color-accent)]"
-                          style={{ color: 'var(--color-fg-muted)', fontFamily: 'var(--font-display)' }}
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="text-heading py-3 transition-colors hover:text-[var(--color-accent)]"
-                  style={{ fontFamily: 'var(--font-display)', borderBottom: '1px solid var(--color-border)' }}
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
-            <div className="pt-6">
-              <Link
-                href="/signup"
-                onClick={() => setMenuOpen(false)}
-                className="btn btn-primary btn-lg w-full"
-              >
-                Get Started
-              </Link>
-            </div>
-          </nav>
-        </div>
-      )}
+      {/* Mobile menu */}
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   )
 }
