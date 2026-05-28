@@ -41,10 +41,7 @@ export default function Ecosystem() {
   return (
     <section
       style={{
-        margin: '1.5rem auto',
-        maxWidth: 'var(--container-card)',
-        paddingLeft: 'var(--page-px)',
-        paddingRight: 'var(--page-px)',
+        margin: '1.5rem var(--page-px, 1.5rem)',
       }}
     >
       <div

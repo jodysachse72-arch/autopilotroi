@@ -58,10 +58,7 @@ export default function Stats() {
   return (
     <section
       style={{
-        margin: '0 auto',
-        maxWidth: 'var(--container-card)',
-        paddingLeft: 'var(--page-px)',
-        paddingRight: 'var(--page-px)',
+        margin: '0 var(--page-px, 1.5rem)',
         marginTop: '1.5rem',
       }}
     >

@@ -44,7 +44,6 @@
 
   /* Spacing */
   --container: 80rem;
-  --container-card: 56rem; /* 896px — OnePay-style contained card width */
 }
 
 /* ── Root variables ────────────────────────────────────────────── */
@@ -871,10 +870,6 @@ button { cursor: pointer; font: inherit; }
 
 .mobile-hamburger:hover {
   background: rgba(0, 0, 0, 0.04);
-}
-
-@media (min-width: 768px) {
-  .mobile-hamburger { display: none; }
 }
 
 .mobile-hamburger-bar {

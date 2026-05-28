@@ -28,10 +28,7 @@ export default function Testimonials() {
         borderRadius: 'var(--radius-section, 1.125rem)',
         overflow: 'hidden',
         position: 'relative',
-        margin: '1.5rem auto',
-        maxWidth: 'var(--container-card)',
-        paddingLeft: 'var(--page-px)',
-        paddingRight: 'var(--page-px)',
+        margin: '1.5rem var(--page-px, 1.5rem)',
       }}
     >
       {/* Atmospheric overlay — matches hero energy */}

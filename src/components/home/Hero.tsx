@@ -83,10 +83,7 @@ export default function Hero() {
         borderRadius: 'var(--radius-section, 1.5rem)',
         overflow: 'hidden',
         position: 'relative',
-        margin: '1rem auto 0',
-        maxWidth: 'var(--container-card)',
-        paddingLeft: 'var(--page-px)',
-        paddingRight: 'var(--page-px)',
+        margin: '1rem var(--page-px, 1.5rem) 0',
       }}
     >
       {/* ── Atmospheric layers ── */}
