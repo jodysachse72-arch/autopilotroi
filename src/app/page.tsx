@@ -9,7 +9,7 @@ import CTABand from '@/components/home/CTABand'
 
 export default function HomePage() {
   return (
-    <>
+    <div className="sections-stack">
       <Hero />
       <Stats />
       <Features />
@@ -18,6 +18,6 @@ export default function HomePage() {
       <Testimonials />
       <Pricing />
       <CTABand />
-    </>
+    </div>
   )
 }

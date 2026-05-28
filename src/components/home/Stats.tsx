@@ -58,8 +58,7 @@ export default function Stats() {
   return (
     <section
       style={{
-        margin: '0 var(--page-px, 1.5rem)',
-        marginTop: '1.5rem',
+        margin: '0',
       }}
     >
       <div

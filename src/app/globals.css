@@ -152,6 +152,18 @@ button { cursor: pointer; font: inherit; }
   padding-right: var(--page-px);
 }
 
+/* ── Sections stack (OnePay shell) ──────────────────────────────── */
+.sections-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
 /* ── Section ────────────────────────────────────────────────────── */
 .section {
   padding-top: var(--section-py);

@@ -25,7 +25,7 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       style={{
-        margin: '1.5rem var(--page-px, 1.5rem)',
+        margin: '0',
       }}
     >
       <div

@@ -68,7 +68,7 @@ export default function Pricing() {
   return (
     <section
       style={{
-        margin: '1.5rem var(--page-px, 1.5rem)',
+        margin: '0',
       }}
     >
       <div
