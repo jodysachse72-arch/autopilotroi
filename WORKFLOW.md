@@ -21,6 +21,12 @@ The operating manual for getting changes into the site without architecture chao
 
 One comment → one branch → one small diff → one preview. Keep changes small and the loop stays fast and predictable.
 
+## Canonical branch
+
+**`main` is the source of truth.** It was reset to the content of `feature/frontend-rebuild` (commit `bcbf7b1` — "restore sections-stack containment") on May 28, 2026, and every other branch was retired into `archive/<name>` tags. If you ever need to resurrect an old branch: `git branch <name> archive/<name>`. The previous "golden" reference was `visual-skin-upgrade`; it now lives only as `archive/visual-skin-upgrade`.
+
+There is one living branch (`main`) and short-lived change branches off it. That is the entire branching model. Do not recreate the historical sprawl.
+
 ## Branch & protection setup (one-time)
 
 - **`main` is protected and is production.** No direct pushes. Changes arrive only via merged branches/PRs. (GitHub: Settings → Branches → add a protection rule on `main` requiring a PR before merge.)
@@ -48,6 +54,37 @@ This is the discipline that fixes what went wrong before. In Antigravity:
 - **Review the diff before merge.** If the diff touches files it shouldn't, reject it. Approved components don't change unless a comment asked them to.
 - **Treat the frontend as finished.** It is not a thing to keep re-solving. Visual design (colours, gradients, typography, card style) is locked.
 - **No regenerating from the live site.** Anchor every task to the existing repo, never to a fresh interpretation of the deployed site.
+- **Containment is LOCKED.** The site uses a `.sections-stack` wrapper at `max-width: 1440px` with `padding: 1.25rem` and `gap: 1.25rem`. Individual sections are `margin: 0`. **Do not** introduce `--container-card`, `--page-px` margins on sections, new max-widths, new wrapper divs, or any other change to layout/widths/containment, EVER, unless the request explicitly says "change the layout." Width and containment regressions are the failure mode that has burned this project; they are the first thing to suspect.
+
+## Anti-gaslighting tactic
+
+When you suspect the agent introduced a regression but it insists "it's fine," do not argue in prose. Force a structural comparison:
+
+1. Give the agent two URLs: the current preview and a known-good reference (e.g. a Vercel deployment SHA or `archive/visual-skin-upgrade` checkout).
+2. Tell it: "Open both at the same viewport width. Compare section width, padding, gaps, and wrapper structure. Report any difference in DOM or CSS. Do not tell me it's fine — show me a side-by-side."
+3. If it still can't see the difference, take screenshots yourself at the same viewport, drop them into the chat, and ask it to identify each visual delta. Visual evidence ends the argument.
+
+The May 28 `--container-card: 56rem` regression survived several "it's fine" assertions before being caught this way. Use the tactic at the first hint of a mismatch.
+
+## Tooling — what to use and what to skip
+
+The principle: **one shared surface for team review, one optional accelerator for solo implementation. Don't blur them.**
+
+**Use — team review surface (the backbone)**
+- **Vercel Preview Deployments + Vercel Comments.** Mature, shared, no install for Barry, native reply/resolve threads pinned to elements on the real site. This is the source of approved change requests. Nothing replaces it.
+
+**Optionally use — personal implementation accelerator (just for Jody, in Antigravity)**
+- **Markagent** (Chrome extension, free, zero setup, exports markdown prompts explicitly tuned for Antigravity). When you sit down to implement an approved Vercel comment, you can click the same element via Markagent on the preview, and it'll generate a richer prompt (CSS selector, component context, screenshot, viewport) than the bare comment text — better input quality means fewer wrong guesses from the agent. Paste into Antigravity using the Part 2 per-change template.
+- **Vibe Annotations** is the more powerful alternative (local MCP server, auto-read by the agent, live CSS tweaks). Better for localhost iteration than for staging/preview review. Worth considering later if you want a fully wired loop.
+- Either tool is optional. The loop works without them. They're speed boosters, not the backbone.
+
+**Do NOT use**
+- **Vibe Annotations' "watch mode" / autonomous loops** — an agent auto-implementing as annotations are dropped is the exact unsupervised multi-file behavior that broke the previous build. Manual export + diff review only.
+- **Generative design tools as editors** (Stitch, v0, Lovable, etc.). They reinterpret. Fine for greenfield ideation of *new* screens; never for editing approved work.
+- **Visual CMS / builders** (Puck, Builder.io, custom CMS, inline editors). Solving a problem you don't have. Defer indefinitely.
+- **Multiple review surfaces for the team.** Barry comments in one place — Vercel — or context fragments and nothing gets resolved cleanly.
+
+**Maturity note.** Vercel Comments is the mature, shared backbone. The annotation extensions are tiny and new (hundreds of users, recent builds) — fine as a personal accelerator you can drop any time, not safe as the team's collaboration substrate.
 
 ## First two exercises (to build the muscle this week)
 
