@@ -263,34 +263,31 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
+        {/* Mobile hamburger — clean 3-line icon */}
         <button
           type="button"
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden flex flex-col justify-center items-center w-12 h-12 rounded-xl transition-colors"
-          style={{ backgroundColor: menuOpen ? 'var(--color-surface-alt)' : 'transparent' }}
+          className="mobile-hamburger md:hidden"
           aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen}
         >
           <span
-            className="block w-5 h-0.5 rounded-full transition-all duration-300"
+            className="mobile-hamburger-bar"
             style={{
-              backgroundColor: 'var(--color-fg)',
-              transform: menuOpen ? 'translateY(3px) rotate(45deg)' : 'none',
+              transform: menuOpen ? 'translateY(8px) rotate(45deg)' : 'none',
             }}
           />
           <span
-            className="block w-5 h-0.5 rounded-full mt-1.5 transition-all duration-300"
+            className="mobile-hamburger-bar"
             style={{
-              backgroundColor: 'var(--color-fg)',
               opacity: menuOpen ? 0 : 1,
+              transform: menuOpen ? 'scaleX(0)' : 'scaleX(1)',
             }}
           />
           <span
-            className="block w-5 h-0.5 rounded-full mt-1.5 transition-all duration-300"
+            className="mobile-hamburger-bar"
             style={{
-              backgroundColor: 'var(--color-fg)',
-              transform: menuOpen ? 'translateY(-9px) rotate(-45deg)' : 'none',
+              transform: menuOpen ? 'translateY(-8px) rotate(-45deg)' : 'none',
             }}
           />
         </button>
