@@ -1,4 +1,4 @@
-// test-preview-flow: vercel preview deploy validation
+// test-preview-flow: vercel toolbar + comments validation
 import Hero from '@/components/home/Hero'
 import Stats from '@/components/home/Stats'
 import Features from '@/components/home/Features'
