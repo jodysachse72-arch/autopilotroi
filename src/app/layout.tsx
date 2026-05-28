@@ -4,6 +4,7 @@ import Script from 'next/script'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
+import { VercelToolbar } from '@vercel/toolbar/next'
 
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -93,6 +94,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         )}
+
+        {process.env.VERCEL_ENV === 'preview' && <VercelToolbar />}
       </body>
     </html>
   )

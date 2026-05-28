@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import withVercelToolbar from "@vercel/toolbar/plugins/next";
 
 const nextConfig: NextConfig = {
   turbopack: {
@@ -35,12 +36,12 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://plausible.io https://*.sentry.io https://www.youtube.com https://s.ytimg.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://rsms.me",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://plausible.io https://*.sentry.io https://www.youtube.com https://s.ytimg.com https://vercel.live",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://rsms.me https://vercel.live",
               "font-src 'self' https://fonts.gstatic.com https://rsms.me",
-              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.supabase.co",
-              "frame-src https://www.youtube.com https://challenges.cloudflare.com",
-              "connect-src 'self' https://*.supabase.co https://plausible.io https://*.sentry.io https://challenges.cloudflare.com",
+              "img-src 'self' data: blob: https://img.youtube.com https://i.ytimg.com https://*.supabase.co https://vercel.live https://vercel.com",
+              "frame-src https://www.youtube.com https://challenges.cloudflare.com https://vercel.live",
+              "connect-src 'self' https://*.supabase.co https://plausible.io https://*.sentry.io https://challenges.cloudflare.com https://vercel.live https://vitals.vercel-insights.com",
               "media-src 'self' https://www.youtube.com",
               "object-src 'none'",
               "base-uri 'self'",
@@ -58,4 +59,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withVercelToolbar()(nextConfig);

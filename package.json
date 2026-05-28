@@ -30,6 +30,7 @@
     "@tiptap/starter-kit": "^3.22.3",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.37.0",
+    "@vercel/toolbar": "^0.2.6",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
     "next": "16.2.2",
