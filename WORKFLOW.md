@@ -54,7 +54,16 @@ This is the discipline that fixes what went wrong before. In Antigravity:
 - **Review the diff before merge.** If the diff touches files it shouldn't, reject it. Approved components don't change unless a comment asked them to.
 - **Treat the frontend as finished.** It is not a thing to keep re-solving. Visual design (colours, gradients, typography, card style) is locked.
 - **No regenerating from the live site.** Anchor every task to the existing repo, never to a fresh interpretation of the deployed site.
-- **Containment is LOCKED.** The site uses a `.sections-stack` wrapper at `max-width: 1440px` with `padding: 1.25rem` and `gap: 1.25rem`. Individual sections are `margin: 0`. **Do not** introduce `--container-card`, `--page-px` margins on sections, new max-widths, new wrapper divs, or any other change to layout/widths/containment, EVER, unless the request explicitly says "change the layout." Width and containment regressions are the failure mode that has burned this project; they are the first thing to suspect.
+- **The LOCKED zone is hard-blocked at step 1.** LOCKED includes: colors, gradients, typography; spacing, gaps, padding, margins; max-widths, min-widths, the `.sections-stack` wrapper (currently `max-width: 1440px`, `padding: 1.25rem`, `gap: 1.25rem`, individual sections `margin: 0`); section layouts, wrapper structure; and any property affecting how elements are positioned or sized. Agents must refuse to propose, scope, name files for, or investigate any LOCKED change without an explicit override. The May 28 disaster started here; this rule is what keeps it from recurring. See "The LOCKED zone override mechanism" below for how to authorize a deliberate LOCKED change.
+
+## The LOCKED zone override mechanism
+
+When a LOCKED-zone change is genuinely intended (a deliberate design update, not a misinterpretation of a vague comment), authorize it explicitly. A valid override request must contain BOTH:
+
+1. The literal phrase `override LOCKED for this change`.
+2. Specific properties and values, not vague intent. Valid: `gap: 24px on the stats grid`. Invalid: `we need more spacing`.
+
+Without both, agents refuse at step 1, identify which LOCKED zone the request touches, and stop — no file named, no direction proposed, no investigation. Validated May 28, 2026 with two iterations of the same vague request ("we need spacing between the cards"): the first iteration produced a soft refusal where the agent still proposed a direction, the rule was tightened, the same request was re-tested, and the second iteration produced a clean hard refusal. The strengthened mechanism is now baked into every per-comment prompt the orchestrator generates.
 
 ## Anti-gaslighting tactic
 
