@@ -156,7 +156,7 @@ export default function Hero() {
                   marginBottom: '1.5rem',
                 }}
               >
-                ✦ Powered by Aurum Ecosystem
+                ✦ AI Managed Finance
               </span>
             </motion.div>
 

@@ -23,7 +23,7 @@ One comment → one branch → one small diff → one preview. Keep changes smal
 
 ## Canonical branch
 
-**`main` is the source of truth.** It was reset to the content of `feature/frontend-rebuild` (commit `bcbf7b1` — "restore sections-stack containment") on May 28, 2026, and every other branch was retired into `archive/<name>` tags. If you ever need to resurrect an old branch: `git branch <name> archive/<name>`. The previous "golden" reference was `visual-skin-upgrade`; it now lives only as `archive/visual-skin-upgrade`.
+**`main` is the source of truth.** On May 28, 2026 it was reset to the content of the retired `feature/frontend-rebuild` (through the `sections-stack` containment fix), then `8172827` removed Puck/CMS deadweight on top. Every other branch was retired into `archive/<name>` tags (14 of them). If you ever need to resurrect an old branch: `git branch <name> archive/<name>`. The previous "golden" reference was `visual-skin-upgrade`; it now lives only as `archive/visual-skin-upgrade`.
 
 There is one living branch (`main`) and short-lived change branches off it. That is the entire branching model. Do not recreate the historical sprawl.
 
