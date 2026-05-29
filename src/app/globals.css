@@ -422,7 +422,7 @@ button { cursor: pointer; font: inherit; }
 .sections-stack {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 1.5rem;
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
