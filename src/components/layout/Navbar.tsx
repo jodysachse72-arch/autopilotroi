@@ -23,7 +23,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: 'Start',
     children: [
-      { label: 'Onboarding Guide', href: '/start', description: 'Step-by-step setup walkthrough' },
+      { label: 'Sign Up', href: '/signup', description: 'Begin your readiness assessment' },
     ],
   },
   {
