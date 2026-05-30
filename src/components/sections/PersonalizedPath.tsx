@@ -143,9 +143,10 @@ const TIER_PATHS: Record<string, TierPath> = {
 interface PersonalizedPathProps {
   tier: string
   watchedVideoCount?: number
+  darkMode?: boolean
 }
 
-export default function PersonalizedPath({ tier, watchedVideoCount = 0 }: PersonalizedPathProps) {
+export default function PersonalizedPath({ tier, watchedVideoCount = 0, darkMode = false }: PersonalizedPathProps) {
   const path = TIER_PATHS[tier] || TIER_PATHS.beginner
 
   const steps = path.steps.map((step, i) => ({
@@ -159,16 +160,20 @@ export default function PersonalizedPath({ tier, watchedVideoCount = 0 }: Person
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="rounded-2xl overflow-hidden"
-        style={{ border: '1px solid #e0e2e6', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+        style={darkMode
+          ? { border: '1px solid rgba(96,165,250,0.20)', background: 'rgba(255,255,255,0.04)', boxShadow: 'none' }
+          : { border: '1px solid #e0e2e6', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
       >
         {/* Header band */}
-        <div className="px-6 py-5 flex items-center gap-3" style={{ background: path.headerBg, borderBottom: '1px solid #e0e2e6' }}>
+        <div className="px-6 py-5 flex items-center gap-3" style={darkMode
+          ? { background: 'rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.10)' }
+          : { background: path.headerBg, borderBottom: '1px solid #e0e2e6' }}>
           <span className="text-2xl">{path.emoji}</span>
           <div>
-            <h3 className="text-base font-bold" style={{ color: path.headerText }}>
+            <h3 className="text-base font-bold" style={{ color: darkMode ? 'rgba(255,255,255,0.90)' : path.headerText }}>
               Your Recommended {path.title}
             </h3>
-            <p className="text-sm mt-0.5" style={{ color: 'rgba(4,14,32,0.55)' }}>{path.subtitle}</p>
+            <p className="text-sm mt-0.5" style={{ color: darkMode ? 'rgba(255,255,255,0.55)' : 'rgba(4,14,32,0.55)' }}>{path.subtitle}</p>
           </div>
         </div>
 
@@ -181,36 +186,42 @@ export default function PersonalizedPath({ tier, watchedVideoCount = 0 }: Person
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
               className="relative flex gap-4 rounded-xl p-4 transition"
-              style={{
-                background: step.completed ? '#f0fdf4' : '#f8fafc',
-                border: step.completed ? '1px solid #bbf7d0' : '1px solid #e0e2e6',
-                opacity: step.completed ? 0.7 : 1,
-              }}
+              style={darkMode
+                ? {
+                    background: step.completed ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.04)',
+                    border: step.completed ? '1px solid rgba(16,185,129,0.20)' : '1px solid rgba(255,255,255,0.08)',
+                    opacity: step.completed ? 0.7 : 1,
+                  }
+                : {
+                    background: step.completed ? '#f0fdf4' : '#f8fafc',
+                    border: step.completed ? '1px solid #bbf7d0' : '1px solid #e0e2e6',
+                    opacity: step.completed ? 0.7 : 1,
+                  }}
             >
               {/* Step number + connector */}
               <div className="flex flex-col items-center">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold"
                   style={{
-                    background: step.completed ? '#dcfce7' : 'rgba(27,97,201,0.08)',
-                    color: step.completed ? '#15803d' : path.accentColor,
-                    border: `1px solid ${step.completed ? '#bbf7d0' : 'rgba(27,97,201,0.2)'}`,
+                    background: step.completed ? (darkMode ? 'rgba(16,185,129,0.15)' : '#dcfce7') : (darkMode ? 'rgba(96,165,250,0.10)' : 'rgba(27,97,201,0.08)'),
+                    color: step.completed ? (darkMode ? '#34d399' : '#15803d') : path.accentColor,
+                    border: `1px solid ${step.completed ? (darkMode ? 'rgba(16,185,129,0.25)' : '#bbf7d0') : (darkMode ? 'rgba(96,165,250,0.20)' : 'rgba(27,97,201,0.2)')}`,
                   }}>
                   {step.completed ? '✓' : step.icon}
                 </div>
                 {i < steps.length - 1 && (
-                  <div className="mt-2 h-full min-h-[16px] w-px" style={{ background: '#e0e2e6' }} />
+                  <div className="mt-2 h-full min-h-[16px] w-px" style={{ background: darkMode ? 'rgba(255,255,255,0.12)' : '#e0e2e6' }} />
                 )}
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <h4 className="font-semibold text-sm" style={{
-                  color: step.completed ? '#6b7280' : '#181d26',
+                  color: step.completed ? (darkMode ? 'rgba(255,255,255,0.40)' : '#6b7280') : (darkMode ? 'rgba(255,255,255,0.85)' : '#181d26'),
                   textDecoration: step.completed ? 'line-through' : 'none',
                 }}>
                   {step.title}
                 </h4>
-                <p className="mt-1 text-xs leading-relaxed" style={{ color: 'rgba(4,14,32,0.5)' }}>
+                <p className="mt-1 text-xs leading-relaxed" style={{ color: darkMode ? 'rgba(255,255,255,0.50)' : 'rgba(4,14,32,0.5)' }}>
                   {step.description}
                 </p>
                 {step.link && !step.completed && (
