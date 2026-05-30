@@ -7,7 +7,7 @@ import Logo from '@/components/ui/Logo'
 import Turnstile from '@/components/ui/Turnstile'
 import { CheckCircleIcon } from '@/components/ui/Icons'
 import { trackEvent, EVENTS } from '@/lib/analytics'
-import { FormField, FormInput, FormButton } from '@/components/backend'
+
 import { submitToThriveDesk } from '@/lib/integrations/thrivedesk'
 
 /* ═══════════════════════════════════════════════════════════════
@@ -190,9 +190,42 @@ function SignupContent() {
             Start your readiness assessment — takes under 2 minutes
           </p>
 
+          {/* Scoped styles: ::placeholder + :focus can't be set inline */}
+          <style>{`
+            #signup-name, #signup-email {
+              outline: none;
+              transition: border-color 150ms ease, box-shadow 150ms ease;
+            }
+            #signup-name:focus, #signup-email:focus {
+              border-color: var(--color-accent);
+              box-shadow: 0 0 0 3px rgba(27,97,201,0.12);
+            }
+            #signup-name::placeholder, #signup-email::placeholder {
+              color: var(--color-text-muted);
+            }
+            #signup-submit:not(:disabled):hover {
+              background: var(--color-accent-hover) !important;
+            }
+          `}</style>
+
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <FormField label="Full Name" htmlFor="signup-name" required>
-              <FormInput
+
+            {/* Full Name */}
+            <div>
+              <label
+                htmlFor="signup-name"
+                style={{
+                  display: 'block',
+                  marginBottom: '0.375rem',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 600,
+                  color: 'var(--color-text-weak)',
+                }}
+              >
+                Full Name{' '}
+                <span style={{ color: 'var(--color-error)' }} aria-hidden>*</span>
+              </label>
+              <input
                 id="signup-name"
                 type="text"
                 required
@@ -200,11 +233,36 @@ function SignupContent() {
                 onChange={e => setName(e.target.value)}
                 placeholder="Your full name"
                 autoComplete="name"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: 'var(--text-body)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text)',
+                  background: 'var(--color-surface-alt)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                }}
               />
-            </FormField>
+            </div>
 
-            <FormField label="Email Address" htmlFor="signup-email" required>
-              <FormInput
+            {/* Email Address */}
+            <div>
+              <label
+                htmlFor="signup-email"
+                style={{
+                  display: 'block',
+                  marginBottom: '0.375rem',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 600,
+                  color: 'var(--color-text-weak)',
+                }}
+              >
+                Email Address{' '}
+                <span style={{ color: 'var(--color-error)' }} aria-hidden>*</span>
+              </label>
+              <input
                 id="signup-email"
                 type="email"
                 required
@@ -212,8 +270,19 @@ function SignupContent() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@email.com"
                 autoComplete="email"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: 'var(--text-body)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text)',
+                  background: 'var(--color-surface-alt)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                }}
               />
-            </FormField>
+            </div>
 
             {error && (
               <div
@@ -240,15 +309,48 @@ function SignupContent() {
               />
             )}
 
-            <FormButton
+            {/* Submit button — mirrors hero-btn-primary shape, accent fill for white-card context */}
+            <button
+              id="signup-submit"
               type="submit"
-              variant="primary"
-              loading={loading}
               disabled={submitDisabled}
-              className="w-full justify-center"
+              aria-busy={loading || undefined}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                width: '100%',
+                padding: '0.875rem 1.5rem',
+                fontFamily: 'var(--font-display)',
+                fontWeight: 700,
+                fontSize: 'var(--text-body)',
+                color: '#ffffff',
+                background: 'var(--color-accent)',
+                border: 'none',
+                borderRadius: 'var(--radius-btn)',
+                cursor: submitDisabled ? 'not-allowed' : 'pointer',
+                opacity: submitDisabled ? 0.6 : 1,
+                transition: 'background 150ms ease, opacity 150ms ease',
+              }}
             >
+              {loading && (
+                <span
+                  aria-hidden
+                  style={{
+                    display: 'inline-block',
+                    width: '0.75rem',
+                    height: '0.75rem',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: '#ffffff',
+                    animation: 'spin 0.75s linear infinite',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
               {loading ? 'Saving…' : 'Start your readiness assessment →'}
-            </FormButton>
+            </button>
           </form>
 
           <p className="text-caption" style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
