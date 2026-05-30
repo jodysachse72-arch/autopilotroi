@@ -95,7 +95,7 @@ export default function WaitingRoomPage() {
               color: chip.color,
               border: '1px solid ' + chip.border,
             }}>
-              <SparkleIcon className="w-3.5 h-3.5" /> {readiness.tierLabel} \u2014 {readiness.score}/100
+              <SparkleIcon className="w-3.5 h-3.5" /> {readiness.tierLabel} — {readiness.score}/100
             </span>
           )}
         </div>
@@ -174,20 +174,24 @@ export default function WaitingRoomPage() {
       </section>
 
       {/* Personalized path */}
-      {readiness && <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} />}
+      {readiness && (
+        <div style={{ background: '#061238', borderTop: '1px solid rgba(96,165,250,0.10)' }}>
+          <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} darkMode={true} />
+        </div>
+      )}
 
       {/* Progress + filters + grid */}
       <section className="section section-surface">
         <div className="container-content">
         {/* Progress */}
-        <div style={{ maxWidth: '60rem', margin: '0 auto 2rem' }}>
+        <div style={{ maxWidth: '60rem', margin: '0 auto 2rem', background: '#061238', border: '1px solid rgba(96,165,250,0.20)', borderRadius: '0.75rem', padding: '1rem 1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#181d26' }}>Learning Progress</span>
-            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#1b61c9' }}>{watchProgress}%</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>Learning Progress</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#93c5fd' }}>{watchProgress}%</span>
           </div>
-          <div style={{ height: '0.5rem', width: '100%', overflow: 'hidden', borderRadius: '99px', background: 'var(--color-border)' }}>
+          <div style={{ height: '0.5rem', width: '100%', overflow: 'hidden', borderRadius: '99px', background: 'rgba(255,255,255,0.10)' }}>
             <motion.div
-              style={{ height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #1b61c9, #06b6d4)' }}
+              style={{ height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #3b82f6, #06b6d4)' }}
               initial={{ width: 0 }}
               animate={{ width: watchProgress + '%' }}
               transition={{ duration: 0.6, delay: 0.3 }}
