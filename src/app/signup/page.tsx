@@ -7,7 +7,8 @@ import Logo from '@/components/ui/Logo'
 import Turnstile from '@/components/ui/Turnstile'
 import { CheckCircleIcon } from '@/components/ui/Icons'
 import { trackEvent, EVENTS } from '@/lib/analytics'
-import { FormField, FormInput, FormButton } from '@/components/backend'
+
+import { submitToThriveDesk } from '@/lib/integrations/thrivedesk'
 
 /* ═══════════════════════════════════════════════════════════════
    SIGNUP — public lead capture (separate from /login).
@@ -21,10 +22,24 @@ const TRUST_POINTS = ['No credit card required', 'Free to get started', 'Takes 2
 
 function LoadingShell() {
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ background: '#f8fafc' }}>
+    <div
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(160deg, #061238 0%, #0c1e4a 60%, #061238 100%)',
+      }}
+    >
       <div
-        className="h-8 w-8 animate-spin rounded-full"
-        style={{ border: '2px solid #1b61c9', borderTopColor: 'transparent' }}
+        style={{
+          width: '2rem',
+          height: '2rem',
+          borderRadius: '50%',
+          border: '2px solid rgba(255,255,255,0.15)',
+          borderTopColor: '#60a5fa',
+          animation: 'spin 0.75s linear infinite',
+        }}
       />
     </div>
   )
@@ -52,7 +67,8 @@ function SignupContent() {
           lead.ref = ref
           localStorage.setItem('autopilotroi-lead', JSON.stringify(lead))
         }
-        const quizResult = localStorage.getItem('autopilotroi-quiz-result')
+        // Fix: read the key that /orientation actually writes (was 'autopilotroi-quiz-result')
+        const quizResult = localStorage.getItem('autopilotroi-readiness')
         if (quizResult) {
           trackEvent(EVENTS.SIGNUP_RETURNING_USER)
           router.replace('/waiting-room')
@@ -83,6 +99,11 @@ function SignupContent() {
         return
       }
       localStorage.setItem('autopilotroi-lead', JSON.stringify({ id: data.leadId, name, email, ref }))
+
+      // ThriveDesk stub — fire-and-forget; never blocks the redirect
+      submitToThriveDesk({ name, email, referralCode: ref ?? undefined })
+        .catch(e => console.warn('[ThriveDesk] submit failed', e))
+
       router.push(data.alreadyAssessed ? '/waiting-room' : '/orientation')
     } catch {
       setError('Network error. Please try again.')
@@ -95,32 +116,116 @@ function SignupContent() {
   const submitDisabled = loading || (TURNSTILE_SITE_KEY ? !turnstileToken : false)
 
   return (
+    /* Dark hero band — matches the /waiting-room hero pattern */
     <div
-      className="flex min-h-screen flex-col items-center justify-center px-4 py-12"
-      style={{ background: '#f8fafc' }}
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 'clamp(3rem, 8vw, 5rem) var(--page-px)',
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(160deg, #061238 0%, #0c1e4a 60%, #061238 100%)',
+      }}
     >
-      <Link href="/" className="mb-8 block">
-        <Logo size={38} showText textColorClass="text-[#181d26]" />
-      </Link>
+      {/* Ambient grid overlay */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        opacity: 0.03,
+        backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
+        backgroundSize: '50px 50px',
+      }} />
+      {/* Radial glow */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.18) 0%, transparent 65%)',
+      }} />
 
-      <div className="w-full max-w-md">
-        <div
-          className="rounded-2xl p-8 sm:p-10"
-          style={{ background: '#fff', border: '1px solid #e0e2e6', boxShadow: '0 4px 24px rgba(27,97,201,0.08)' }}
-        >
+      <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '28rem' }}>
+
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <Link href="/" style={{ display: 'inline-block' }}>
+            <Logo size={38} showText textColorClass="text-white" />
+          </Link>
+        </div>
+
+        {/* Step badge */}
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+            borderRadius: '9999px',
+            border: '1px solid rgba(96,165,250,0.30)',
+            background: 'rgba(59,130,246,0.10)',
+            padding: '0.375rem 1rem',
+            fontSize: '0.6875rem', fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.1em',
+            color: '#93c5fd',
+          }}>
+            <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
+            Step 1 of 3
+          </span>
+        </div>
+
+        {/* Premium form card */}
+        <div style={{
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-card)',
+          padding: 'clamp(1.75rem, 5vw, 2.5rem)',
+          boxShadow: '0 8px 48px rgba(0,0,0,0.28), 0 2px 12px rgba(0,0,0,0.16)',
+        }}>
           <h1
-            className="text-2xl font-bold text-center mb-1"
-            style={{ color: '#181d26', letterSpacing: '-0.02em' }}
+            className="text-heading"
+            style={{ color: 'var(--color-text)', textAlign: 'center', marginBottom: '0.5rem' }}
           >
             Create Your Free Account
           </h1>
-          <p className="text-sm text-center mb-8" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          <p
+            className="text-body"
+            style={{ color: 'var(--color-text-muted)', textAlign: 'center', marginBottom: '2rem' }}
+          >
             Start your readiness assessment — takes under 2 minutes
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField label="Full Name" htmlFor="signup-name" required>
-              <FormInput
+          {/* Scoped styles: ::placeholder + :focus can't be set inline */}
+          <style>{`
+            #signup-name, #signup-email {
+              outline: none;
+              transition: border-color 150ms ease, box-shadow 150ms ease;
+            }
+            #signup-name:focus, #signup-email:focus {
+              border-color: var(--color-accent);
+              box-shadow: 0 0 0 3px rgba(27,97,201,0.12);
+            }
+            #signup-name::placeholder, #signup-email::placeholder {
+              color: var(--color-text-muted);
+            }
+            #signup-submit:not(:disabled):hover {
+              background: var(--color-accent-hover) !important;
+            }
+          `}</style>
+
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+            {/* Full Name */}
+            <div>
+              <label
+                htmlFor="signup-name"
+                style={{
+                  display: 'block',
+                  marginBottom: '0.375rem',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 600,
+                  color: 'var(--color-text-weak)',
+                }}
+              >
+                Full Name{' '}
+                <span style={{ color: 'var(--color-error)' }} aria-hidden>*</span>
+              </label>
+              <input
                 id="signup-name"
                 type="text"
                 required
@@ -128,11 +233,36 @@ function SignupContent() {
                 onChange={e => setName(e.target.value)}
                 placeholder="Your full name"
                 autoComplete="name"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: 'var(--text-body)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text)',
+                  background: 'var(--color-surface-alt)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                }}
               />
-            </FormField>
+            </div>
 
-            <FormField label="Email Address" htmlFor="signup-email" required>
-              <FormInput
+            {/* Email Address */}
+            <div>
+              <label
+                htmlFor="signup-email"
+                style={{
+                  display: 'block',
+                  marginBottom: '0.375rem',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 600,
+                  color: 'var(--color-text-weak)',
+                }}
+              >
+                Email Address{' '}
+                <span style={{ color: 'var(--color-error)' }} aria-hidden>*</span>
+              </label>
+              <input
                 id="signup-email"
                 type="email"
                 required
@@ -140,13 +270,30 @@ function SignupContent() {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="you@email.com"
                 autoComplete="email"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: 'var(--text-body)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text)',
+                  background: 'var(--color-surface-alt)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                }}
               />
-            </FormField>
+            </div>
 
             {error && (
               <div
-                className="rounded-lg px-4 py-3 text-sm"
-                style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c' }}
+                style={{
+                  borderRadius: 'var(--radius-md)',
+                  padding: '0.75rem 1rem',
+                  fontSize: 'var(--text-caption)',
+                  background: 'rgba(220,38,38,0.08)',
+                  border: '1px solid rgba(220,38,38,0.25)',
+                  color: 'var(--color-error)',
+                }}
                 role="alert"
               >
                 {error}
@@ -162,38 +309,89 @@ function SignupContent() {
               />
             )}
 
-            <FormButton
+            {/* Submit button — mirrors hero-btn-primary shape, accent fill for white-card context */}
+            <button
+              id="signup-submit"
               type="submit"
-              variant="primary"
-              loading={loading}
               disabled={submitDisabled}
-              className="w-full justify-center"
+              aria-busy={loading || undefined}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                width: '100%',
+                padding: '0.875rem 1.5rem',
+                fontFamily: 'var(--font-display)',
+                fontWeight: 700,
+                fontSize: 'var(--text-body)',
+                color: '#ffffff',
+                background: 'var(--color-accent)',
+                border: 'none',
+                borderRadius: 'var(--radius-btn)',
+                cursor: submitDisabled ? 'not-allowed' : 'pointer',
+                opacity: submitDisabled ? 0.6 : 1,
+                transition: 'background 150ms ease, opacity 150ms ease',
+              }}
             >
-              {loading ? 'Saving…' : 'Continue →'}
-            </FormButton>
+              {loading && (
+                <span
+                  aria-hidden
+                  style={{
+                    display: 'inline-block',
+                    width: '0.75rem',
+                    height: '0.75rem',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(255,255,255,0.3)',
+                    borderTopColor: '#ffffff',
+                    animation: 'spin 0.75s linear infinite',
+                    flexShrink: 0,
+                  }}
+                />
+              )}
+              {loading ? 'Saving…' : 'Start your readiness assessment →'}
+            </button>
           </form>
 
-          <p className="mt-6 text-center text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          <p className="text-caption" style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold hover:underline" style={{ color: '#1b61c9' }}>
+            <Link
+              href="/login"
+              style={{ fontWeight: 600, color: 'var(--color-accent)' }}
+              className="hover:underline"
+            >
               Log in
             </Link>
           </p>
         </div>
 
-        <div
-          className="mt-5 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs"
-          style={{ color: 'rgba(4,14,32,0.5)' }}
-        >
+        {/* Trust-point reassurance row */}
+        <div style={{
+          marginTop: '1.25rem',
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '0.5rem 1.5rem',
+        }}>
           {TRUST_POINTS.map(t => (
-            <span key={t} className="inline-flex items-center gap-1.5">
-              <span style={{ color: '#10b981' }} className="inline-flex">
+            <span
+              key={t}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                fontSize: 'var(--text-caption)',
+                color: 'rgba(191,219,254,0.65)',
+              }}
+            >
+              <span style={{ color: 'var(--color-success)', display: 'inline-flex' }}>
                 <CheckCircleIcon className="w-3.5 h-3.5" />
               </span>
               {t}
             </span>
           ))}
         </div>
+
       </div>
     </div>
   )

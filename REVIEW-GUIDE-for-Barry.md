@@ -1,49 +1,91 @@
-# Reviewing AutoPilotROI — Quick Start
+# Reviewing AutoPilotROI — Start here, Barry
 
-Hi Barry — this is how we'll work together on the site. It takes about 5 minutes to learn and you'll never have to touch code or talk to an AI. You just look at the real site and point at what you want changed.
+Hi Barry. This is everything you need to start reviewing AutoPilotROI. About a five-minute read. You'll never need to look at code, talk to an AI, or learn any tools beyond what's in this page.
 
-## The idea in one sentence
+## Your review URL
 
-I'll send you a **preview link** of the site. You click directly on anything you want changed and leave a comment right there on it. I make the change and send you a fresh link to check.
+**[REVIEW URL — JODY TO FILL IN]**
 
-## How to leave feedback
+Bookmark it. This is the only page you ever need. It always shows the current site, and your comments live there.
 
-1. **Open the preview link** I send you (it looks like `autopilotroi-xxxx.vercel.app`). Log in with your Vercel/GitHub account if it asks — I'll have already given you access.
+## What you're doing
 
-2. **Turn on comment mode.** At the bottom of the page there's a small Vercel toolbar. Click the **comment / speech-bubble icon**. Your cursor becomes a crosshair.
+Reading the site. Spotting anything that's wrong — wrong copy, wrong tone, awkward layout, missing pieces. Pointing at those things and saying what should change. That's the whole job.
 
-3. **Click the exact thing you want to change** — a headline, a button, a section, an image. A little comment box pops up pinned to that element.
+You're not designing. You're not approving anything. You're not committing to changes. You're just leaving notes. Jody handles everything that happens after the comment.
 
-4. **Type what you want in plain language.** Examples that work great:
-   - "This headline should be shorter and punchier."
-   - "Add a dropdown menu here with: Product, Pricing, About, Contact."
-   - "This paragraph is too long — cut it to two sentences."
-   - "Wrong tone, this should feel more premium/trustworthy."
-   - "Move this button above the image."
+## How to leave a note
 
-   Don't worry about being technical. Describe the *outcome* you want, not how to build it.
+1. Open the review URL above. Sign in with your Vercel/GitHub account if it asks — you'll already have access.
+2. At the bottom of the page there's a small Vercel toolbar. Click the **comment / speech bubble icon**. Your cursor turns into a crosshair.
+3. Click directly on the thing you want changed — a headline, a button, a paragraph, an image, a section.
+4. A little comment box pops up pinned to that element.
+5. Type what you want in plain English. Examples:
+   - "This headline is too long. Try: 'Earn while you sleep.'"
+   - "Wrong tone — too casual. Should feel more premium and trust-focused."
+   - "Add a sentence here that mentions the Visa card explicitly."
+   - "This paragraph repeats what's above. Cut it."
+   - "Wrong number. Should be 12,000+ members not 10,000+."
+6. Submit. Drop as many as you want in one session.
 
-5. **Submit.** That's it. You can leave as many comments as you like in one pass.
+## What happens after you comment
 
-## What happens next
+Jody processes comments in batches — usually once or twice a day. For each one:
+- The change goes onto a preview build
+- Jody verifies it looks right
+- It ships to the live site
+- Your comment thread auto-resolves
 
-I (with AI help) implement your comments in the real code, then send you a **new preview link**. You open it, check your comments were addressed, and either:
+You don't have to do anything between leaving the comment and the change going live. If a comment wasn't quite what you meant after Jody implements it, reply to the thread and we'll go again.
 
-- **Resolve** the comment (tick it off) if you're happy, or
-- **Reply** to it if it's not quite right yet.
+## Pages you can review right now
 
-We repeat until it's perfect, then it goes live.
+These are stable enough for your eyes — review freely:
+
+- The homepage (`/`)
+- FAQs (`/faqs`)
+- Products (`/products`)
+- Resources (`/resources`)
+- Contact (`/contact`)
+- Terms (`/terms`)
+- Privacy (`/privacy`)
+- Disclaimer (`/disclaimer`)
+- Blog (`/blog`) if anything's there
+- Start (`/start`) if it's separate from the funnel
+
+## Pages NOT to review yet
+
+Jody is actively rebuilding these and they're not ready:
+
+- Signup (`/signup`)
+- Waiting room (`/waiting-room`)
+- Onboarding (`/onboarding`)
+
+If you stumble onto these from a nav link, ignore them. Jody will tell you when each one opens up for review.
+
+## What to focus on for your first pass
+
+Content and copy. Read everything. Check:
+
+- Does the headline land? Does it feel premium and trustworthy, not gimmicky?
+- Is the tone right for someone who's never bought crypto?
+- Are the benefits clear, specific, and in plain English?
+- Any typos, awkward phrasing, or sentences that go too long?
+- Anything missing that should be there?
+- Any claim that should be sharper or softer?
+- Legal pages — accurate, clear, no jargon traps?
 
 ## A few tips that make this smooth
 
-- **One comment per change.** If you want three things changed in one section, leave three separate comments. It's easier to track and nothing gets missed.
-- **Be specific about content.** For copy/text, it helps to write the exact words you want, or as close as you can.
-- **Screenshots are welcome too.** If something's easier to explain with an arrow or example, drop it in the comment.
-- **The look and feel is locked.** The visual design (colours, gradients, typography, card style) is approved and we're keeping it. Comments are best aimed at *content, wording, layout tweaks, and missing pieces* (like the nav dropdown) — not redesigning the style.
+- **One comment per change.** Three things in one section = three separate comments. Easier to track, nothing gets missed.
+- **Be specific about wording.** If you can give the exact words you want, write them. Saves a round-trip.
+- **Screenshots welcome.** If something's easier to show with an arrow, drop the image right in the comment.
+- **The visual design is locked.** Colors, gradients, typography, card spacing, layout — those stay as approved by you and Jody. Comments should focus on content, wording, missing pieces, and small layout tweaks within sections.
+- **Short and pointed beats long and polite.** "Wrong tone" is fine. "Too long, cut to two sentences" is fine. Don't apologize for being direct.
+- **No comment is too small.** A typo, a wrong number, a misplaced comma — flag them all. The whole point is sweeping these out before launch.
 
-## First two things we're working on
+## Questions?
 
-1. **Content/copy pass** — read through the site and comment on any wording that's off.
-2. **Navigation dropdown** — comment where you want it and what should be in it.
+Ping Jody directly. Don't try to figure out anything weird on your own — easier to walk you through it once than have you fight with the toolbar.
 
-That's the whole system. See something, click it, say what you want. I'll handle the rest.
+See something. Click it. Say what you want. Jody handles the rest.

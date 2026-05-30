@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import type { ComponentType } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
@@ -287,15 +288,45 @@ export default function OnboardingPage() {
   )
 }
 
+interface LeadInfo {
+  id: string
+  name: string
+  email: string
+  ref?: string
+}
+
 function OnboardingContent() {
+  const router = useRouter()
+  const [lead, setLead] = useState<LeadInfo | null>(null)
   const searchParams = useSearchParams()
   const tier = searchParams.get('tier') || 'beginner'
   const ref = searchParams.get('ref') || ''
   const isAdvanced = tier === 'advanced'
 
+  useEffect(() => {
+    const stored = localStorage.getItem('autopilotroi-lead')
+    if (stored) {
+      try {
+        setLead(JSON.parse(stored))
+      } catch {
+        router.push('/signup')
+      }
+    } else {
+      router.push('/signup')
+    }
+  }, [router])
+
   const aurumSignupUrl = ref
     ? `https://app.aurfrn.com/register?ref=${ref}`
     : 'https://app.aurfrn.com/register'
+
+  if (!lead) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#eef0f4' }}>
+        <div style={{ width: '2rem', height: '2rem', borderRadius: '50%', border: '2px solid #1b61c9', borderTopColor: 'transparent', animation: 'spin 1s linear infinite' }} />
+      </div>
+    )
+  }
 
   return (
     <div className="page-bg">
