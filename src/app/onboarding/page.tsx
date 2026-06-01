@@ -5,7 +5,6 @@ import type { ComponentType } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Logo from '@/components/ui/Logo'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   SecurityIcon,
@@ -14,7 +13,6 @@ import {
   AutomationIcon,
   CheckCircleIcon,
   SparkleIcon,
-  PartnerIcon,
   GrowthIcon,
   PlayCircleIcon,
   AcademyIcon,
@@ -328,42 +326,16 @@ function OnboardingContent() {
 
   return (
     <div className="page-bg">
-      <header className="sticky top-0 z-50" style={{
-        borderBottom: '1px solid var(--color-border)',
-        background: 'rgba(255,255,255,0.90)',
-        backdropFilter: 'blur(12px)',
-      }}>
-        <div className="container-xl" style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0.75rem 1.5rem',
-        }}>
-          <Link href="/"><Logo size={32} showText /></Link>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-            borderRadius: '999px', padding: '0.375rem 0.875rem',
-            fontSize: 'var(--text-caption)', fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.08em',
-            background: isAdvanced ? 'rgba(5,150,105,0.10)' : 'rgba(27,97,201,0.10)',
-            color: isAdvanced ? '#059669' : '#1b61c9',
-            border: `1px solid ${isAdvanced ? 'rgba(5,150,105,0.25)' : 'rgba(27,97,201,0.25)'}`,
-            fontFamily: 'var(--font-display)',
-          }}>
-            {isAdvanced ? <SparkleIcon className="w-3.5 h-3.5" /> : <FlagIcon className="w-3.5 h-3.5" />}
-            {isAdvanced ? 'Fast Track' : 'Guided Setup'}
-          </span>
-        </div>
-      </header>
-
       {isAdvanced
-        ? <AdvancedChecklist aurumSignupUrl={aurumSignupUrl} />
-        : <BeginnerAccordion aurumSignupUrl={aurumSignupUrl} />}
+        ? <AdvancedChecklist aurumSignupUrl={aurumSignupUrl} isAdvanced={isAdvanced} />
+        : <BeginnerAccordion aurumSignupUrl={aurumSignupUrl} isAdvanced={isAdvanced} />}
     </div>
   )
 }
 
 /* ─── Beginner Accordion ─────────────────────────────────────────── */
 
-function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
+function BeginnerAccordion({ aurumSignupUrl, isAdvanced }: { aurumSignupUrl: string; isAdvanced: boolean }) {
   const [openStep, setOpenStep] = useState<string | null>(STEPS[0].id)
   const [completed, setCompleted] = useState<Set<string>>(new Set())
 
@@ -389,6 +361,20 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
   return (
     <div style={{ maxWidth: '56rem', margin: '0 auto', padding: '2.5rem 1.5rem 4rem' }}>
       <div style={{ marginBottom: '2.5rem' }}>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+          borderRadius: '999px', padding: '0.375rem 0.875rem',
+          fontSize: 'var(--text-caption)', fontWeight: 700,
+          textTransform: 'uppercase', letterSpacing: '0.08em',
+          background: isAdvanced ? 'rgba(5,150,105,0.10)' : 'rgba(27,97,201,0.10)',
+          color: isAdvanced ? '#059669' : '#1b61c9',
+          border: `1px solid ${isAdvanced ? 'rgba(5,150,105,0.25)' : 'rgba(27,97,201,0.25)'}`,
+          fontFamily: 'var(--font-display)',
+          marginBottom: '0.75rem',
+        }}>
+          {isAdvanced ? <SparkleIcon className="w-3.5 h-3.5" /> : <FlagIcon className="w-3.5 h-3.5" />}
+          {isAdvanced ? 'Fast Track' : 'Guided Setup'}
+        </span>
         <h1 className="text-display" style={{ color: '#181d26', marginBottom: '0.75rem' }}>
           Onboarding Guide
         </h1>
@@ -757,7 +743,7 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
 
 /* ─── Advanced Pre-flight Checklist ────────────────────────────── */
 
-function AdvancedChecklist({ aurumSignupUrl }: { aurumSignupUrl: string }) {
+function AdvancedChecklist({ aurumSignupUrl, isAdvanced }: { aurumSignupUrl: string; isAdvanced: boolean }) {
   const [checked, setChecked] = useState<Set<string>>(new Set())
 
   useEffect(() => {
@@ -779,6 +765,20 @@ function AdvancedChecklist({ aurumSignupUrl }: { aurumSignupUrl: string }) {
   return (
     <div style={{ maxWidth: '40rem', margin: '0 auto', padding: '3rem 1.5rem 4rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
+          borderRadius: '999px', padding: '0.375rem 0.875rem',
+          fontSize: 'var(--text-caption)', fontWeight: 700,
+          textTransform: 'uppercase', letterSpacing: '0.08em',
+          background: isAdvanced ? 'rgba(5,150,105,0.10)' : 'rgba(27,97,201,0.10)',
+          color: isAdvanced ? '#059669' : '#1b61c9',
+          border: `1px solid ${isAdvanced ? 'rgba(5,150,105,0.25)' : 'rgba(27,97,201,0.25)'}`,
+          fontFamily: 'var(--font-display)',
+          marginBottom: '1rem',
+        }}>
+          {isAdvanced ? <SparkleIcon className="w-3.5 h-3.5" /> : <FlagIcon className="w-3.5 h-3.5" />}
+          {isAdvanced ? 'Fast Track' : 'Guided Setup'}
+        </span>
         <div style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           width: '3.25rem', height: '3.25rem', borderRadius: '999px',
