@@ -28,7 +28,7 @@ function LoadingShell() {
         minHeight: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(160deg, #061238 0%, #0c1e4a 60%, #061238 100%)',
+        background: 'var(--color-bg)',
       }}
     >
       <div
@@ -36,8 +36,8 @@ function LoadingShell() {
           width: '2rem',
           height: '2rem',
           borderRadius: '50%',
-          border: '2px solid rgba(255,255,255,0.15)',
-          borderTopColor: '#60a5fa',
+          border: '2px solid var(--color-border)',
+          borderTopColor: 'var(--color-accent)',
           animation: 'spin 0.75s linear infinite',
         }}
       />
@@ -116,7 +116,6 @@ function SignupContent() {
   const submitDisabled = loading || (TURNSTILE_SITE_KEY ? !turnstileToken : false)
 
   return (
-    /* Dark hero band — matches the /waiting-room hero pattern */
     <div
       style={{
         minHeight: '100vh',
@@ -125,30 +124,16 @@ function SignupContent() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: 'clamp(3rem, 8vw, 5rem) var(--page-px)',
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'linear-gradient(160deg, #061238 0%, #0c1e4a 60%, #061238 100%)',
+        background: 'var(--color-bg)',
       }}
     >
-      {/* Ambient grid overlay */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        opacity: 0.03,
-        backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
-        backgroundSize: '50px 50px',
-      }} />
-      {/* Radial glow */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.18) 0%, transparent 65%)',
-      }} />
 
       <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '28rem' }}>
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <Link href="/" style={{ display: 'inline-block' }}>
-            <Logo size={38} showText textColorClass="text-white" />
+            <Logo size={38} showText />
           </Link>
         </div>
 
@@ -157,14 +142,14 @@ function SignupContent() {
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
             borderRadius: '9999px',
-            border: '1px solid rgba(96,165,250,0.30)',
-            background: 'rgba(59,130,246,0.10)',
+            border: '1px solid var(--color-accent-light)',
+            background: 'var(--color-accent-light)',
             padding: '0.375rem 1rem',
             fontSize: '0.6875rem', fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.1em',
-            color: '#93c5fd',
+            color: 'var(--color-accent)',
           }}>
-            <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
+            <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
             Step 1 of 3
           </span>
         </div>
@@ -175,7 +160,7 @@ function SignupContent() {
           border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius-card)',
           padding: 'clamp(1.75rem, 5vw, 2.5rem)',
-          boxShadow: '0 8px 48px rgba(0,0,0,0.28), 0 2px 12px rgba(0,0,0,0.16)',
+          boxShadow: 'var(--shadow-card)',
         }}>
           <h1
             className="text-heading"
@@ -381,7 +366,7 @@ function SignupContent() {
                 alignItems: 'center',
                 gap: '0.375rem',
                 fontSize: 'var(--text-caption)',
-                color: 'rgba(191,219,254,0.65)',
+                color: 'var(--color-text-muted)',
               }}
             >
               <span style={{ color: 'var(--color-success)', display: 'inline-flex' }}>
