@@ -37,7 +37,7 @@ type IconCmp = ComponentType<{ className?: string; strokeWidth?: number }>
 
 interface OnboardingStep {
   id: string
-  phase: 'prep' | 'account' | 'activate'
+  phase: 'get-in' | 'fund'
   title: string
   Icon: IconCmp
   accent: string
@@ -56,10 +56,10 @@ interface OnboardingStep {
 }
 
 const STEPS: OnboardingStep[] = [
-  // Phase 1: Preparation
+  // Phase 1: Get In — Access & account
   {
     id: 'vpn',
-    phase: 'prep',
+    phase: 'get-in',
     title: 'Set Up a VPN',
     Icon: SecurityIcon,
     accent: '#1b61c9',
@@ -80,8 +80,73 @@ const STEPS: OnboardingStep[] = [
     },
   },
   {
+    id: 'create-account',
+    phase: 'get-in',
+    title: 'Create Your Aurum Account',
+    Icon: SparkleIcon,
+    accent: '#1b61c9',
+    time: '5 min',
+    content: {
+      what: 'Register for your Aurum back office account using your partner\u0027s referral link.',
+      why: 'This is where you\u0027ll manage your bot, track returns, make deposits/withdrawals, and access all Aurum products.',
+      steps: [
+        'Click the "Create Aurum Account" button below \u2014 it includes your partner\u0027s referral code.',
+        'Fill in the registration form with your real name and email.',
+        'Choose a strong password (12+ characters, mix of letters, numbers, symbols).',
+        'Submit the form.',
+      ],
+      tip: 'Use the same email you signed up with on AutopilotROI so your partner can track your progress.',
+      isSignup: true,
+    },
+  },
+  {
+    id: 'confirm-email',
+    phase: 'get-in',
+    title: 'Confirm Your Email',
+    Icon: AcademyIcon,
+    accent: '#0891b2',
+    time: '2 min',
+    content: {
+      what: 'Aurum sends a verification email to the address you registered with.',
+      why: 'Email verification is required before you can access your back office or make any transactions.',
+      steps: [
+        'Check your inbox for an email from Aurum (may take 1-2 minutes).',
+        'Check your spam/junk folder if you don\u0027t see it.',
+        'Click the verification link in the email.',
+        'You\u0027ll be redirected to the Aurum login page.',
+        'Log in with the email and password you just created.',
+      ],
+      tip: 'Add Aurum\u0027s email address to your contacts so future emails don\u0027t go to spam.',
+    },
+  },
+  {
+    id: '2fa',
+    phase: 'get-in',
+    title: 'Enable Two-Factor Authentication',
+    Icon: SecurityIcon,
+    accent: '#dc2626',
+    time: '5 min',
+    critical: true,
+    content: {
+      what: '2FA adds a second layer of security \u2014 even if someone gets your password, they can\u0027t access your account without your phone.',
+      why: 'This is REQUIRED before depositing any funds. It\u0027s the most important security step you\u0027ll take.',
+      steps: [
+        'Download Google Authenticator or Authy from your app store.',
+        'In your Aurum back office \u2192 Settings \u2192 Security \u2192 Two-Factor Authentication \u2192 "Enable."',
+        'Scan the QR code on screen with your authenticator app.',
+        'Enter the 6-digit code from the app to confirm.',
+        'Save the backup codes on paper (same place as your wallet recovery phrase).',
+        'Test it: log out, log back in \u2014 you should be asked for the 6-digit code.',
+      ],
+      warning: 'Without backup codes AND without your phone, you will be locked out of your account permanently. Write them down.',
+      tip: 'Authy is slightly better than Google Authenticator because it backs up to the cloud. If you lose your phone, you can recover your codes.',
+      videoId: 'K8qYdD1sC7w',
+    },
+  },
+  // Phase 2: Fund & Go Live — Wallet, funding & activation
+  {
     id: 'wallet',
-    phase: 'prep',
+    phase: 'fund',
     title: 'Install Trust Wallet',
     Icon: BankIcon,
     accent: '#0891b2',
@@ -107,7 +172,7 @@ const STEPS: OnboardingStep[] = [
   },
   {
     id: 'buy-crypto',
-    phase: 'prep',
+    phase: 'fund',
     title: 'Buy USDC or USDT',
     Icon: CardIcon,
     accent: '#059669',
@@ -127,75 +192,9 @@ const STEPS: OnboardingStep[] = [
       videoId: 'ZxTVBeeeJNQ',
     },
   },
-  // Phase 2: Account Setup
-  {
-    id: 'create-account',
-    phase: 'account',
-    title: 'Create Your Aurum Account',
-    Icon: SparkleIcon,
-    accent: '#1b61c9',
-    time: '5 min',
-    content: {
-      what: 'Register for your Aurum back office account using your partner\u0027s referral link.',
-      why: 'This is where you\u0027ll manage your bot, track returns, make deposits/withdrawals, and access all Aurum products.',
-      steps: [
-        'Click the "Create Aurum Account" button below \u2014 it includes your partner\u0027s referral code.',
-        'Fill in the registration form with your real name and email.',
-        'Choose a strong password (12+ characters, mix of letters, numbers, symbols).',
-        'Submit the form.',
-      ],
-      tip: 'Use the same email you signed up with on AutopilotROI so your partner can track your progress.',
-      isSignup: true,
-    },
-  },
-  {
-    id: 'confirm-email',
-    phase: 'account',
-    title: 'Confirm Your Email',
-    Icon: AcademyIcon,
-    accent: '#0891b2',
-    time: '2 min',
-    content: {
-      what: 'Aurum sends a verification email to the address you registered with.',
-      why: 'Email verification is required before you can access your back office or make any transactions.',
-      steps: [
-        'Check your inbox for an email from Aurum (may take 1-2 minutes).',
-        'Check your spam/junk folder if you don\u0027t see it.',
-        'Click the verification link in the email.',
-        'You\u0027ll be redirected to the Aurum login page.',
-        'Log in with the email and password you just created.',
-      ],
-      tip: 'Add Aurum\u0027s email address to your contacts so future emails don\u0027t go to spam.',
-    },
-  },
-  {
-    id: '2fa',
-    phase: 'account',
-    title: 'Enable Two-Factor Authentication',
-    Icon: SecurityIcon,
-    accent: '#dc2626',
-    time: '5 min',
-    critical: true,
-    content: {
-      what: '2FA adds a second layer of security \u2014 even if someone gets your password, they can\u0027t access your account without your phone.',
-      why: 'This is REQUIRED before depositing any funds. It\u0027s the most important security step you\u0027ll take.',
-      steps: [
-        'Download Google Authenticator or Authy from your app store.',
-        'In your Aurum back office \u2192 Settings \u2192 Security \u2192 Two-Factor Authentication \u2192 "Enable."',
-        'Scan the QR code on screen with your authenticator app.',
-        'Enter the 6-digit code from the app to confirm.',
-        'Save the backup codes on paper (same place as your wallet recovery phrase).',
-        'Test it: log out, log back in \u2014 you should be asked for the 6-digit code.',
-      ],
-      warning: 'Without backup codes AND without your phone, you will be locked out of your account permanently. Write them down.',
-      tip: 'Authy is slightly better than Google Authenticator because it backs up to the cloud. If you lose your phone, you can recover your codes.',
-      videoId: 'K8qYdD1sC7w',
-    },
-  },
-  // Phase 3: Activate
   {
     id: 'fund-account',
-    phase: 'activate',
+    phase: 'fund',
     title: 'Fund Your Aurum Account',
     Icon: BankIcon,
     accent: '#d97706',
@@ -219,7 +218,7 @@ const STEPS: OnboardingStep[] = [
   },
   {
     id: 'activate-bot',
-    phase: 'activate',
+    phase: 'fund',
     title: 'Activate the EX-AI Bot',
     Icon: AutomationIcon,
     accent: '#059669',
@@ -242,7 +241,7 @@ const STEPS: OnboardingStep[] = [
 ]
 
 interface PhaseDef {
-  id: 'prep' | 'account' | 'activate'
+  id: 'get-in' | 'fund'
   label: string
   description: string
   Icon: IconCmp
@@ -250,9 +249,8 @@ interface PhaseDef {
 }
 
 const PHASES: PhaseDef[] = [
-  { id: 'prep',     label: 'Preparation',   description: 'Before you touch Aurum',         Icon: PartnerIcon,    accent: '#1b61c9' },
-  { id: 'account',  label: 'Account Setup', description: 'Creating & securing your account', Icon: SecurityIcon, accent: '#0891b2' },
-  { id: 'activate', label: 'Go Live',       description: 'Fund & start earning',           Icon: GrowthIcon,     accent: '#059669' },
+  { id: 'get-in', label: 'Get In',         description: 'Access & account',              Icon: FlagIcon,   accent: '#1b61c9' },
+  { id: 'fund',   label: 'Fund & Go Live', description: 'Wallet, funding & activation',  Icon: GrowthIcon, accent: '#059669' },
 ]
 
 interface ChecklistItem {
@@ -260,18 +258,18 @@ interface ChecklistItem {
   label: string
   Icon: IconCmp
   accent: string
-  phase: 'prep' | 'account' | 'activate'
+  phase: 'get-in' | 'fund'
 }
 
 const ADVANCED_CHECKLIST: ChecklistItem[] = [
-  { id: 'vpn',     label: 'VPN installed and connected to a supported region',     Icon: SecurityIcon,  accent: '#1b61c9', phase: 'prep'     },
-  { id: 'wallet',  label: 'Trust Wallet installed, recovery phrase secured on paper', Icon: BankIcon,   accent: '#0891b2', phase: 'prep'     },
-  { id: 'funds',   label: 'USDC or USDT purchased and in Trust Wallet',           Icon: CardIcon,      accent: '#059669', phase: 'prep'     },
-  { id: 'account', label: 'Aurum account created with partner referral link',     Icon: SparkleIcon,   accent: '#1b61c9', phase: 'account'  },
-  { id: 'email',   label: 'Email verified and logged in to back office',          Icon: AcademyIcon,   accent: '#0891b2', phase: 'account'  },
-  { id: '2fa',     label: '2FA enabled (Google Authenticator or Authy)',          Icon: SecurityIcon,  accent: '#dc2626', phase: 'account'  },
-  { id: 'deposit', label: 'Funds deposited from Trust Wallet to Aurum',           Icon: BankIcon,      accent: '#d97706', phase: 'activate' },
-  { id: 'bot',     label: 'EX-AI Bot activated with chosen tier',                 Icon: AutomationIcon, accent: '#059669', phase: 'activate' },
+  { id: 'vpn',     label: 'VPN installed and connected to a supported region',       Icon: SecurityIcon,   accent: '#1b61c9', phase: 'get-in' },
+  { id: 'account', label: 'Aurum account created with partner referral link',       Icon: SparkleIcon,    accent: '#1b61c9', phase: 'get-in' },
+  { id: 'email',   label: 'Email verified and logged in to back office',            Icon: AcademyIcon,    accent: '#0891b2', phase: 'get-in' },
+  { id: '2fa',     label: '2FA enabled (Google Authenticator or Authy)',            Icon: SecurityIcon,   accent: '#dc2626', phase: 'get-in' },
+  { id: 'wallet',  label: 'Trust Wallet installed, recovery phrase secured on paper', Icon: BankIcon,     accent: '#0891b2', phase: 'fund'   },
+  { id: 'funds',   label: 'USDC or USDT purchased and in Trust Wallet',             Icon: CardIcon,       accent: '#059669', phase: 'fund'   },
+  { id: 'deposit', label: 'Funds deposited from Trust Wallet to Aurum',             Icon: BankIcon,       accent: '#d97706', phase: 'fund'   },
+  { id: 'bot',     label: 'EX-AI Bot activated with chosen tier',                   Icon: AutomationIcon, accent: '#059669', phase: 'fund'   },
 ]
 
 // ─── Page ─────────────────────────────────────────────────────────
@@ -658,7 +656,7 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                                   marginBottom: '1rem',
                                 }}
                               >
-                                Create Aurum Account \u2192
+                                Create Aurum Account →
                               </a>
                             )}
 
@@ -706,7 +704,7 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
                                     color: '#1b61c9', cursor: 'pointer',
                                   }}
                                 >
-                                  Done \u2192 Next Step
+                                  Done → Next Step
                                 </button>
                               )}
                             </div>
@@ -745,16 +743,10 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.75rem' }}>
             <Link
-              href="/dashboard"
+              href="/university"
               className="btn btn-primary-lg shimmer-hover"
             >
-              Go to Partner Dashboard \u2192
-            </Link>
-            <Link
-              href="/university"
-              className="btn btn-ghost btn-primary-lg shimmer-hover"
-            >
-              Continue Learning
+              Continue to University →
             </Link>
           </div>
         </motion.div>
@@ -768,10 +760,16 @@ function BeginnerAccordion({ aurumSignupUrl }: { aurumSignupUrl: string }) {
 function AdvancedChecklist({ aurumSignupUrl }: { aurumSignupUrl: string }) {
   const [checked, setChecked] = useState<Set<string>>(new Set())
 
+  useEffect(() => {
+    const saved = localStorage.getItem('autopilotroi-onboarding-advanced')
+    if (saved) { try { setChecked(new Set(JSON.parse(saved))) } catch { /* ignore */ } }
+  }, [])
+
   const toggle = useCallback((id: string) => {
     setChecked(prev => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id); else next.add(id)
+      localStorage.setItem('autopilotroi-onboarding-advanced', JSON.stringify([...next]))
       return next
     })
   }, [])
@@ -891,7 +889,7 @@ function AdvancedChecklist({ aurumSignupUrl }: { aurumSignupUrl: string }) {
         }}
       >
         {allDone
-          ? 'Create Aurum Account \u2192'
+          ? 'Create Aurum Account →'
           : `Complete checklist to continue (${checked.size}/${ADVANCED_CHECKLIST.length})`}
       </a>
 
