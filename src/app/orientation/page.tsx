@@ -44,7 +44,7 @@ function LoadingShell() {
         minHeight: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(160deg, #061238 0%, #0c1e4a 60%, #061238 100%)',
+        background: 'var(--color-bg)',
       }}
     >
       <div
@@ -52,8 +52,8 @@ function LoadingShell() {
           width: '2rem',
           height: '2rem',
           borderRadius: '50%',
-          border: '2px solid rgba(255,255,255,0.15)',
-          borderTopColor: '#60a5fa',
+          border: '2px solid var(--color-border)',
+          borderTopColor: 'var(--color-accent)',
           animation: 'spin 0.75s linear infinite',
         }}
       />
@@ -154,7 +154,6 @@ export default function OrientationPage() {
   if (!lead) return <LoadingShell />
 
   return (
-    /* ── Dark hero band — matches /signup hero pattern ── */
     <div
       style={{
         minHeight: '100vh',
@@ -163,9 +162,7 @@ export default function OrientationPage() {
         alignItems: 'center',
         justifyContent: 'center',
         padding: 'clamp(3rem, 8vw, 5rem) var(--page-px)',
-        position: 'relative',
-        overflow: 'hidden',
-        background: 'linear-gradient(160deg, #061238 0%, #0c1e4a 60%, #061238 100%)',
+        background: 'var(--color-bg)',
       }}
     >
       {/* Scoped styles: pseudo-classes that can't be set inline */}
@@ -175,8 +172,8 @@ export default function OrientationPage() {
           transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
         }
         .orient-tile:hover:not(.orient-tile--selected) {
-          border-color: rgba(96,165,250,0.50) !important;
-          background: rgba(59,130,246,0.06) !important;
+          border-color: rgba(27,97,201,0.40) !important;
+          background: var(--color-accent-light) !important;
         }
         .orient-tile:focus-visible {
           box-shadow: 0 0 0 3px rgba(27,97,201,0.30);
@@ -185,32 +182,19 @@ export default function OrientationPage() {
           background: var(--color-accent-hover) !important;
         }
         #orient-prev:hover {
-          color: rgba(191,219,254,0.90) !important;
+          color: var(--color-accent) !important;
         }
         #orient-confirm:not(:disabled):hover {
           background: var(--color-accent-hover) !important;
         }
       `}</style>
 
-      {/* Ambient grid overlay */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        opacity: 0.03,
-        backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)',
-        backgroundSize: '50px 50px',
-      }} />
-      {/* Radial glow */}
-      <div style={{
-        position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.18) 0%, transparent 65%)',
-      }} />
-
       <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '36rem' }}>
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <Link href="/" style={{ display: 'inline-block' }}>
-            <Logo size={38} showText textColorClass="text-white" />
+            <Logo size={38} showText />
           </Link>
         </div>
 
@@ -219,14 +203,14 @@ export default function OrientationPage() {
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
             borderRadius: '9999px',
-            border: '1px solid rgba(96,165,250,0.30)',
-            background: 'rgba(59,130,246,0.10)',
+            border: '1px solid var(--color-accent-light)',
+            background: 'var(--color-accent-light)',
             padding: '0.375rem 1rem',
             fontSize: '0.6875rem', fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.1em',
-            color: '#93c5fd',
+            color: 'var(--color-accent)',
           }}>
-            <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
+            <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
             Step 2 of 3
           </span>
         </div>
@@ -237,7 +221,7 @@ export default function OrientationPage() {
           border: '1px solid var(--color-border)',
           borderRadius: 'var(--radius-card)',
           padding: 'clamp(1.75rem, 5vw, 2.5rem)',
-          boxShadow: '0 8px 48px rgba(0,0,0,0.28), 0 2px 12px rgba(0,0,0,0.16)',
+          boxShadow: 'var(--shadow-card)',
         }}>
 
           {/* Heading */}
@@ -314,7 +298,7 @@ export default function OrientationPage() {
                           width: '100%',
                           borderRadius: 'var(--radius-md)',
                           border: `1.5px solid ${isSelected ? 'var(--color-accent)' : 'var(--color-border)'}`,
-                          background: isSelected ? 'rgba(27,97,201,0.10)' : 'var(--color-surface-alt)',
+                          background: isSelected ? 'var(--color-accent-light)' : 'var(--color-surface-alt)',
                           color: isSelected ? 'var(--color-text)' : 'var(--color-text-weak)',
                           padding: '0.875rem 1rem',
                           textAlign: 'left',
@@ -359,7 +343,7 @@ export default function OrientationPage() {
                     style={{
                       marginTop: '1.5rem',
                       background: 'transparent', border: 'none', cursor: 'pointer',
-                      fontSize: 'var(--text-caption)', color: 'rgba(147,197,253,0.55)',
+                      fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)',
                       padding: 0, fontFamily: 'var(--font-body)',
                       transition: 'color 150ms ease',
                     }}
@@ -407,7 +391,7 @@ export default function OrientationPage() {
                   borderRadius: '999px',
                   background: 'var(--color-surface-alt)',
                   border: `4px solid ${theme.bar}55`,
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
+                  boxShadow: 'var(--shadow-card)',
                 }}>
                   <div>
                     <div style={{
@@ -501,8 +485,8 @@ export default function OrientationPage() {
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <div style={{
                     width: '1.5rem', height: '1.5rem', borderRadius: '50%',
-                    border: '2px solid rgba(255,255,255,0.15)',
-                    borderTopColor: '#60a5fa',
+                    border: '2px solid var(--color-border)',
+                    borderTopColor: 'var(--color-accent)',
                     animation: 'spin 0.75s linear infinite',
                   }} />
                 </div>
