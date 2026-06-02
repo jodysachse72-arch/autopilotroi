@@ -43,7 +43,3 @@ next-env.d.ts
 .vercel
 
 graphify-out/
-PUCK_PLAN.md
-
-# Puck CMS backups — local only, not committed
-backups/puck/*.json
