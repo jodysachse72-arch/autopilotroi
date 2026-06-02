@@ -1,12 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
    CMS SERVICE — public API for all content operations
-   
-   All UI code calls this file. Data source is determined by the
-   adapter. To switch to Payload: change the import below.
+
+   All UI code calls this file. Data source: supabase-adapter.ts
    ═══════════════════════════════════════════════════════════════ */
 
+
 import * as adapter from './supabase-adapter'
-// Future: import * as adapter from './payload-adapter'
 
 export type { CmsPost, CmsPostSummary, CmsRevision, CmsMediaItem, CmsPostInput, CmsListOptions } from './types'
 
