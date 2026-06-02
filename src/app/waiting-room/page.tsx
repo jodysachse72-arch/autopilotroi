@@ -101,21 +101,18 @@ export default function WaitingRoomPage() {
         </div>
       </header>
 
-      {/* Hero (custom dark — branded welcome) */}
-      <section style={{ position: 'relative', overflow: 'hidden', background: '#061238', padding: '4rem 1.5rem', textAlign: 'center', color: '#fff' }}>
-        <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 60%)' }} />
-
-        <div style={{ position: 'relative', zIndex: 10, maxWidth: '48rem', margin: '0 auto' }}>
+      {/* Hero — light branded welcome */}
+      <section style={{ background: 'var(--color-bg)', padding: '4rem 1.5rem', textAlign: 'center' }}>
+        <div style={{ maxWidth: '48rem', margin: '0 auto' }}>
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}>
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-              borderRadius: '99px', border: '1px solid rgba(96,165,250,0.30)',
-              background: 'rgba(59,130,246,0.10)', padding: '0.375rem 1rem',
+              borderRadius: '99px', border: '1px solid var(--color-accent-light)',
+              background: 'var(--color-accent-light)', padding: '0.375rem 1rem',
               fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase',
-              letterSpacing: '0.1em', color: '#93c5fd', marginBottom: '1rem',
+              letterSpacing: '0.1em', color: 'var(--color-accent)', marginBottom: '1rem',
             }}>
-              <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: '#60a5fa' }} />
+              <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: 'var(--color-accent)' }} />
               Learning Center
             </span>
           </motion.div>
@@ -126,7 +123,7 @@ export default function WaitingRoomPage() {
             animate="show"
             custom={1}
             className="text-display"
-            style={{ color: '#fff', marginBottom: '1rem' }}
+            style={{ color: 'var(--color-fg)', marginBottom: '1rem' }}
           >
             Welcome{lead ? ', ' + lead.name.split(' ')[0] : ''}.
           </motion.h1>
@@ -137,7 +134,7 @@ export default function WaitingRoomPage() {
             animate="show"
             custom={2}
             className="text-body-lg"
-            style={{ maxWidth: '34rem', margin: '0 auto', color: 'rgba(191,219,254,0.7)', lineHeight: 1.6 }}
+            style={{ maxWidth: '34rem', margin: '0 auto', color: 'var(--color-fg-muted)', lineHeight: 1.6 }}
           >
             Your assessment is complete and your partner has been notified. While you wait, explore these videos to learn about the Aurum ecosystem.
           </motion.p>
@@ -151,20 +148,20 @@ export default function WaitingRoomPage() {
             style={{ marginTop: '2rem', display: 'grid', gap: '0.75rem', maxWidth: '32rem', margin: '2rem auto 0', gridTemplateColumns: 'repeat(auto-fit, minmax(8rem, 1fr))' }}
           >
             {[
-              { label: 'Status',        value: 'Partner Notified', valueColor: '#34d399', dot: true },
-              { label: 'Next Step',     value: 'Check Your Email', valueColor: '#e0e7ff' },
-              { label: 'Videos Watched', value: watchedVideos.size + '/' + WAITING_ROOM_VIDEOS.length, valueColor: '#e0e7ff' },
+              { label: 'Status',         value: 'Partner Notified', valueColor: 'var(--color-success)', dot: true },
+              { label: 'Next Step',      value: 'Check Your Email', valueColor: 'var(--color-fg)' },
+              { label: 'Videos Watched', value: watchedVideos.size + '/' + WAITING_ROOM_VIDEOS.length, valueColor: 'var(--color-fg)' },
             ].map(s => (
               <div key={s.label} style={{
                 borderRadius: '0.75rem',
-                border: '1px solid rgba(96,165,250,0.2)',
-                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-surface)',
                 padding: '0.875rem 1rem',
-                backdropFilter: 'blur(4px)',
+                boxShadow: 'var(--shadow-card)',
               }}>
-                <div style={{ fontSize: '0.6875rem', color: 'rgba(147,197,253,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem' }}>{s.label}</div>
+                <div style={{ fontSize: '0.6875rem', color: 'var(--color-fg-faint)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.25rem' }}>{s.label}</div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.875rem', fontWeight: 600, color: s.valueColor }}>
-                  {s.dot && <span style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', background: '#34d399' }} />}
+                  {s.dot && <span style={{ width: '0.5rem', height: '0.5rem', borderRadius: '50%', background: 'var(--color-success)' }} />}
                   {s.value}
                 </div>
               </div>
@@ -175,8 +172,8 @@ export default function WaitingRoomPage() {
 
       {/* Personalized path */}
       {readiness && (
-        <div style={{ background: '#061238', borderTop: '1px solid rgba(96,165,250,0.10)' }}>
-          <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} darkMode={true} />
+        <div style={{ borderTop: '1px solid var(--color-border)' }}>
+          <PersonalizedPath tier={readiness.tier} watchedVideoCount={watchedVideos.size} darkMode={false} />
         </div>
       )}
 
@@ -184,14 +181,14 @@ export default function WaitingRoomPage() {
       <section className="section section-surface">
         <div className="container-content">
         {/* Progress */}
-        <div style={{ maxWidth: '60rem', margin: '0 auto 2rem', background: '#061238', border: '1px solid rgba(96,165,250,0.20)', borderRadius: '0.75rem', padding: '1rem 1.25rem' }}>
+        <div style={{ maxWidth: '60rem', margin: '0 auto 2rem', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: '0.75rem', padding: '1rem 1.25rem', boxShadow: 'var(--shadow-card)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>Learning Progress</span>
-            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#93c5fd' }}>{watchProgress}%</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-fg)' }}>Learning Progress</span>
+            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--color-accent)' }}>{watchProgress}%</span>
           </div>
-          <div style={{ height: '0.5rem', width: '100%', overflow: 'hidden', borderRadius: '99px', background: 'rgba(255,255,255,0.10)' }}>
+          <div style={{ height: '0.5rem', width: '100%', overflow: 'hidden', borderRadius: '99px', background: 'var(--color-surface-alt)' }}>
             <motion.div
-              style={{ height: '100%', borderRadius: '99px', background: 'linear-gradient(90deg, #3b82f6, #06b6d4)' }}
+              style={{ height: '100%', borderRadius: '99px', background: 'var(--color-accent)' }}
               initial={{ width: 0 }}
               animate={{ width: watchProgress + '%' }}
               transition={{ duration: 0.6, delay: 0.3 }}
