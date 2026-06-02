@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 /* ═══════════════════════════════════════════════════════════════
    FaqGroup — a labelled container for FaqItem blocks.
    Renders a section heading + a vertical list of FAQ items.
-   Used by the Puck CMS DropZone wrapper.
    ═══════════════════════════════════════════════════════════════ */
 
 interface FaqGroupProps {

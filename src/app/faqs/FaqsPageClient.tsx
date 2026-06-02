@@ -450,7 +450,3 @@ export default function FaqsPageClient({ faqs }: Props) {
   )
 }
 
-/** Named export for Puck widget registration — renders with empty data */
-export function FaqAccordionWidget() {
-  return <FaqsPageClient faqs={[]} />
-}
