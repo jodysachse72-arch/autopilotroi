@@ -17,7 +17,7 @@ export interface CmsPost {
   type:       CmsPostType
   slug:       string | null
   title:      string | null
-  body:       Record<string, unknown> | null   // Tiptap JSON document
+  body:       Record<string, unknown> | null
   body_html:  string | null                   // Rendered HTML (for display)
   meta:       CmsPostMeta
   status:     CmsStatus
@@ -98,12 +98,3 @@ export interface CmsListOptions {
   offset?: number
 }
 
-/* ── Payload CMS compatibility note ──────────────────────────
-   When migrating to Payload:
-   - CmsPost → Payload Document
-   - type    → collection slug
-   - meta    → Payload fields (auto-mapped)
-   - body    → Payload Lexical rich text field
-   The service adapter pattern means only supabase-adapter.ts
-   needs to be swapped for payload-adapter.ts. Zero UI changes.
-   ─────────────────────────────────────────────────────────── */

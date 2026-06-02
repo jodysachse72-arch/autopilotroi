@@ -259,11 +259,9 @@ const guides: Guide[] = [
     category: 'Content Editor',
     icon: '☁️',
     content: [
-      'By default, content is stored in your browser\'s localStorage. This is great for development and testing.',
-      'To enable cloud sync, run the migration SQL in your Supabase Dashboard → SQL Editor.',
-      'The migration file is at: supabase/migrations/20260413_cms_content.sql',
-      'Once the tables exist, the Content Editor will automatically sync with Supabase.',
-      'Cloud sync means: Barry can edit on his computer, and changes appear on the live site for everyone.',
+      'Content is stored in the **cms_posts** table in Supabase. The schema was set up via supabase/migrations/20260521_cms_posts.sql.',
+      'The Content Editor at /admin/cms reads and writes this table directly via the CMS service layer.',
+      'Cloud sync means: edit on any device and changes appear on the live site for everyone.',
     ],
   },
 ]
