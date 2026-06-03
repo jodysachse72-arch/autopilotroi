@@ -11,13 +11,12 @@ import {
   FormTextarea,
   FormButton,
   FormRow,
-  StatusBadge,
 } from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
    PARTNER · SETTINGS  (/dashboard/settings)
    Personal info, password, social links, notification prefs.
-   Persists to Supabase profiles table or localStorage in demo mode.
+   Persists to Supabase profiles table.
    ═══════════════════════════════════════════════════════════════ */
 
 interface ProfileData {
@@ -114,23 +113,9 @@ export default function SettingsPage() {
   const [passwords, setPasswords]   = useState<PasswordData>({ currentPassword: '', newPassword: '', confirmPassword: '' })
   const [saving, setSaving]         = useState<string | null>(null)
   const [toast, setToast]           = useState<{ message: string; type: ToastType } | null>(null)
-  const [isDemoMode, setIsDemoMode] = useState(false)
 
   /* ── Load profile data ── */
   const loadProfile = useCallback(async () => {
-    const demoUser = localStorage.getItem('autopilotroi-demo-user')
-    if (demoUser) {
-      const parsed = JSON.parse(demoUser)
-      setIsDemoMode(true)
-      setProfile(prev => ({ ...prev, fullName: parsed.name || '', email: parsed.email || '' }))
-      const savedProfile = localStorage.getItem('autopilotroi-partner-profile')
-      if (savedProfile) {
-        const saved = JSON.parse(savedProfile)
-        setProfile(prev => ({ ...prev, ...saved }))
-      }
-      return
-    }
-
     try {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
@@ -185,93 +170,68 @@ export default function SettingsPage() {
   const savePersonalInfo = useCallback(async () => {
     setSaving('personal')
     try {
-      if (isDemoMode) {
-        const demoUser = JSON.parse(localStorage.getItem('autopilotroi-demo-user') || '{}')
-        demoUser.name = profile.fullName
-        localStorage.setItem('autopilotroi-demo-user', JSON.stringify(demoUser))
-        localStorage.setItem('autopilotroi-partner-profile', JSON.stringify({
-          fullName: profile.fullName, phone: profile.phone, company: profile.company,
-          bio: profile.bio, timezone: profile.timezone,
-        }))
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { error } = await supabase.from('profiles').update({
+          full_name: profile.fullName,
+          phone:     profile.phone,
+          company:   profile.company,
+          bio:       profile.bio,
+          timezone:  profile.timezone,
+        }).eq('id', user.id)
+        if (error) throw error
         showToast('Profile saved successfully!', 'success')
-      } else {
-        const { createClient } = await import('@/lib/supabase/client')
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const { error } = await supabase.from('profiles').update({
-            full_name: profile.fullName,
-            phone:     profile.phone,
-            company:   profile.company,
-            bio:       profile.bio,
-            timezone:  profile.timezone,
-          }).eq('id', user.id)
-          if (error) throw error
-          showToast('Profile saved successfully!', 'success')
-        }
       }
     } catch {
       showToast('Failed to save profile. Please try again.', 'error')
     } finally {
       setSaving(null)
     }
-  }, [isDemoMode, profile, showToast])
+  }, [profile, showToast])
 
   /* ── Save social links ── */
   const saveSocialLinks = useCallback(async () => {
     setSaving('social')
     try {
-      if (isDemoMode) {
-        const saved = JSON.parse(localStorage.getItem('autopilotroi-partner-profile') || '{}')
-        saved.socialLinks = profile.socialLinks
-        localStorage.setItem('autopilotroi-partner-profile', JSON.stringify(saved))
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { error } = await supabase.from('profiles')
+          .update({ social_links: profile.socialLinks })
+          .eq('id', user.id)
+        if (error) throw error
         showToast('Social links saved!', 'success')
-      } else {
-        const { createClient } = await import('@/lib/supabase/client')
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const { error } = await supabase.from('profiles')
-            .update({ social_links: profile.socialLinks })
-            .eq('id', user.id)
-          if (error) throw error
-          showToast('Social links saved!', 'success')
-        }
       }
     } catch {
       showToast('Failed to save social links.', 'error')
     } finally {
       setSaving(null)
     }
-  }, [isDemoMode, profile.socialLinks, showToast])
+  }, [profile.socialLinks, showToast])
 
   /* ── Save notification prefs ── */
   const saveNotifications = useCallback(async () => {
     setSaving('notifications')
     try {
-      if (isDemoMode) {
-        const saved = JSON.parse(localStorage.getItem('autopilotroi-partner-profile') || '{}')
-        saved.notifications = profile.notifications
-        localStorage.setItem('autopilotroi-partner-profile', JSON.stringify(saved))
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { error } = await supabase.from('profiles')
+          .update({ notification_preferences: profile.notifications })
+          .eq('id', user.id)
+        if (error) throw error
         showToast('Notification preferences saved!', 'success')
-      } else {
-        const { createClient } = await import('@/lib/supabase/client')
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const { error } = await supabase.from('profiles')
-            .update({ notification_preferences: profile.notifications })
-            .eq('id', user.id)
-          if (error) throw error
-          showToast('Notification preferences saved!', 'success')
-        }
       }
     } catch {
       showToast('Failed to save notifications.', 'error')
     } finally {
       setSaving(null)
     }
-  }, [isDemoMode, profile.notifications, showToast])
+  }, [profile.notifications, showToast])
 
   /* ── Change password ── */
   const changePassword = useCallback(async () => {
@@ -285,23 +245,18 @@ export default function SettingsPage() {
     }
     setSaving('password')
     try {
-      if (isDemoMode) {
-        showToast('Password updated (demo mode).', 'success')
-        setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' })
-      } else {
-        const { createClient } = await import('@/lib/supabase/client')
-        const supabase = createClient()
-        const { error } = await supabase.auth.updateUser({ password: passwords.newPassword })
-        if (error) throw error
-        showToast('Password updated successfully!', 'success')
-        setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' })
-      }
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { error } = await supabase.auth.updateUser({ password: passwords.newPassword })
+      if (error) throw error
+      showToast('Password updated successfully!', 'success')
+      setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch {
       showToast('Failed to update password. Check your current password.', 'error')
     } finally {
       setSaving(null)
     }
-  }, [isDemoMode, passwords, showToast])
+  }, [passwords, showToast])
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
@@ -310,12 +265,7 @@ export default function SettingsPage() {
         subtitle="Manage your partner profile, security, and notification preferences."
       />
 
-      {isDemoMode && (
-        <div className="flex items-center gap-2">
-          <StatusBadge tone="amber">🟡 Demo mode</StatusBadge>
-          <span className="text-xs text-[rgba(4,14,32,0.55)]">Changes are saved locally to this browser.</span>
-        </div>
-      )}
+
 
       {/* ── Personal info ── */}
       <SectionCard title="Personal information" icon="👤" delay={0.05}>

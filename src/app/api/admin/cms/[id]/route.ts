@@ -3,10 +3,12 @@
 
    Uses the service-role key to bypass RLS.
 
-   // TODO(A1): require admin auth — currently unprotected.
+   Auth: middleware gates /api/admin to admin role; requireAdmin
+   provides defense-in-depth at the handler level.
    ═══════════════════════════════════════════════════════════════ */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth/require-admin'
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -27,6 +29,9 @@ type RouteParams = { params: Promise<{ id: string }> }
 // ── GET — single post ────────────────────────────────────────
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const { id } = await params
     const supabase = getServiceClient()
     if (!supabase) return DB_UNAVAILABLE
@@ -47,6 +52,9 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 // ── PATCH — update post fields ───────────────────────────────
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const { id } = await params
     const supabase = getServiceClient()
     if (!supabase) return DB_UNAVAILABLE
@@ -80,6 +88,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 // ── DELETE — delete post ─────────────────────────────────────
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const { id } = await params
     const supabase = getServiceClient()
     if (!supabase) return DB_UNAVAILABLE
@@ -99,6 +110,9 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
 // ── POST — actions: publish / unpublish ──────────────────────
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const { id } = await params
     const supabase = getServiceClient()
     if (!supabase) return DB_UNAVAILABLE
