@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
 import type { ComponentType } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
@@ -296,7 +296,7 @@ function OnboardingContent() {
   const [lead, setLead] = useState<LeadInfo | null>(null)
   const searchParams = useSearchParams()
   const tier = searchParams.get('tier') || 'beginner'
-  const ref = searchParams.get('ref') || ''
+  const urlRef = searchParams.get('ref') || ''
   const isAdvanced = tier === 'advanced'
 
   useEffect(() => {
@@ -312,8 +312,11 @@ function OnboardingContent() {
     }
   }, [router])
 
-  const aurumSignupUrl = ref
-    ? `https://app.aurfrn.com/register?ref=${ref}`
+  // Ref precedence: URL ?ref wins → else persisted lead's ref
+  const resolvedRef = urlRef || lead?.ref || ''
+
+  const aurumSignupUrl = resolvedRef
+    ? `https://app.aurfrn.com/register?ref=${encodeURIComponent(resolvedRef)}`
     : 'https://app.aurfrn.com/register'
 
   if (!lead) {

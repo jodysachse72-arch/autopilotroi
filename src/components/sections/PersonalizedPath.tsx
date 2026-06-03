@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -149,10 +150,31 @@ interface PersonalizedPathProps {
 export default function PersonalizedPath({ tier, watchedVideoCount = 0, darkMode = false }: PersonalizedPathProps) {
   const path = TIER_PATHS[tier] || TIER_PATHS.beginner
 
-  const steps = path.steps.map((step, i) => ({
-    ...step,
-    completed: i === 0 && watchedVideoCount > 0,
-  }))
+  // Read persisted lead ref so /onboarding links carry the Aurum referral id
+  const [leadRef, setLeadRef] = useState('')
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('autopilotroi-lead')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (parsed.ref) setLeadRef(parsed.ref)
+      }
+    } catch { /* ignore */ }
+  }, [])
+
+  const steps = path.steps.map((step, i) => {
+    let link = step.link
+    // Append ref to /onboarding links when a ref is available
+    if (link && link.startsWith('/onboarding') && leadRef) {
+      const separator = link.includes('?') ? '&' : '?'
+      link = `${link}${separator}ref=${encodeURIComponent(leadRef)}`
+    }
+    return {
+      ...step,
+      link,
+      completed: i === 0 && watchedVideoCount > 0,
+    }
+  })
 
   return (
     <section className="mx-auto max-w-4xl px-6 py-8">
