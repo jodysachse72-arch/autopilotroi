@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   SectionHeader,
@@ -55,10 +55,33 @@ const LINK_TYPES: LinkTypeMeta[] = [
 
 export default function ReferralLinksPage() {
   const [refCode, setRefCode]           = useState('')
+  const [hasSavedCode, setHasSavedCode] = useState(false)
   const [linkType, setLinkType]         = useState<LinkType>('cold')
   const [selectedPage, setSelectedPage] = useState('/calculator')
   const [copied, setCopied]             = useState<string | null>(null)
   const [qrDest, setQrDest]             = useState<QrDestination>('home')
+
+  /* Load the partner's saved Aurum referral ID from their profile */
+  useEffect(() => {
+    (async () => {
+      try {
+        const { createClient } = await import('@/lib/supabase/client')
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('partner_code')
+            .eq('id', user.id)
+            .single()
+          if (data?.partner_code) {
+            setRefCode(data.partner_code)
+            setHasSavedCode(true)
+          }
+        }
+      } catch { /* ignore — field stays empty */ }
+    })()
+  }, [])
 
   const referralUrl = useMemo(() => {
     const ref = refCode ? `?ref=${refCode}` : ''
@@ -128,9 +151,9 @@ export default function ReferralLinksPage() {
         subtitle="Generate your personalized referral link, share it, or download a QR code."
       />
 
-      {/* Referral code input */}
+      {/* Aurum referral ID input */}
       <Card padding="lg">
-        <FormField label="Your referral code" htmlFor="ref-code">
+        <FormField label="Your Aurum referral ID" htmlFor="ref-code">
           <FormInput
             id="ref-code"
             type="text"
@@ -139,6 +162,14 @@ export default function ReferralLinksPage() {
             placeholder="e.g. jody, partner123, 12345"
           />
         </FormField>
+        {!hasSavedCode && !refCode && (
+          <p className="mt-2 text-xs text-[rgba(4,14,32,0.50)]">
+            No Aurum ID saved yet.{' '}
+            <a href="/dashboard/settings" className="text-[#1b61c9] font-medium hover:underline">
+              Set it in Settings →
+            </a>
+          </p>
+        )}
       </Card>
 
       {/* Link type selector */}
