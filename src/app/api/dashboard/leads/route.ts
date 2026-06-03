@@ -20,15 +20,17 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from('leads')
-      .select('id, name, email, tier, score, onboarding_status, drip_emails_sent, created_at')
+      .select('id, name, email, readiness_score, readiness_tier, onboarding_status, referred_by, created_at')
       .order('created_at', { ascending: false })
       .limit(100)
 
     if (error) throw error
 
-    // Map onboarding_status to the dashboard status format
+    // Map real column names → shape the partner dashboard expects
     const leads = (data || []).map((l) => ({
       ...l,
+      score:  l.readiness_score,
+      tier:   l.readiness_tier,
       status: l.onboarding_status || 'new',
     }))
 

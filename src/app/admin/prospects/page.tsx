@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import {
   SectionHeader,
@@ -8,60 +8,60 @@ import {
   FilterPill,
   StatusBadge,
   DataTable,
-  FormButton,
+  EmptyState,
+  Card,
   type DataColumn,
   type StatusTone,
 } from '@/components/backend'
 
-/* ─────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────────────
    ADMIN — All Prospects
-   Refactored to use backend primitives.
-   ───────────────────────────────────────────── */
+   Reads real leads from /api/admin/prospects (admin-gated).
 
-type Tier = 'beginner' | 'intermediate' | 'advanced'
+   Column mapping from leads table:
+     readiness_tier   → tier
+     readiness_score  → score
+     onboarding_status→ status
+     referred_by      → referredBy (read-only — no Assign feature)
+   ───────────────────────────────────────────────────────────────── */
+
+type Tier   = 'beginner' | 'intermediate' | 'advanced'
 type Status = 'new' | 'assessed' | 'invited' | 'onboarding' | 'active'
 
 interface Prospect {
-  id: string
-  name: string
-  email: string
-  tier: Tier
-  score: number
-  status: Status
-  assignedTo: string | null
-  date: string
+  id:         string
+  name:       string
+  email:      string
+  tier:       Tier
+  score:      number
+  status:     Status
+  referredBy: string | null   // referred_by — read-only
+  date:       string
 }
 
-const allProspects: Prospect[] = [
-  { id: '1', name: 'Alex Thompson', email: 'alex@example.com',  tier: 'beginner',     score: 15, status: 'new',        assignedTo: null,            date: '2026-04-11' },
-  { id: '2', name: 'Sarah Chen',    email: 'sarah@example.com', tier: 'beginner',     score: 28, status: 'assessed',   assignedTo: 'Barry Goss',    date: '2026-04-10' },
-  { id: '3', name: 'James Wilson',  email: 'james@example.com', tier: 'intermediate', score: 55, status: 'invited',    assignedTo: 'Barry Goss',    date: '2026-04-09' },
-  { id: '4', name: 'Maria Garcia',  email: 'maria@example.com', tier: 'advanced',     score: 85, status: 'onboarding', assignedTo: 'Demo Partner',  date: '2026-04-08' },
-  { id: '5', name: 'John Doe',      email: 'john@example.com',  tier: 'intermediate', score: 42, status: 'new',        assignedTo: null,            date: '2026-04-11' },
-  { id: '6', name: 'Emma Brown',    email: 'emma@example.com',  tier: 'beginner',     score: 18, status: 'new',        assignedTo: null,            date: '2026-04-11' },
-  { id: '7', name: 'Mike Johnson',  email: 'mike@example.com',  tier: 'advanced',     score: 73, status: 'assessed',   assignedTo: null,            date: '2026-04-10' },
-  { id: '8', name: 'Lisa Park',     email: 'lisa@example.com',  tier: 'intermediate', score: 62, status: 'active',     assignedTo: 'Jane Smith',    date: '2026-04-07' },
-]
+// ── Tone maps ──────────────────────────────────────────────────
 
 const tierTone: Record<Tier, StatusTone> = {
-  beginner: 'amber',
+  beginner:     'amber',
   intermediate: 'blue',
-  advanced: 'green',
+  advanced:     'green',
 }
 
 const statusTone: Record<Status, StatusTone> = {
-  new: 'purple',
-  assessed: 'amber',
-  invited: 'blue',
+  new:        'purple',
+  assessed:   'amber',
+  invited:    'blue',
   onboarding: 'blue',
-  active: 'green',
+  active:     'green',
 }
+
+// ── Helpers ────────────────────────────────────────────────────
 
 const STATUS_FILTERS = ['all', 'new', 'assessed', 'invited', 'onboarding', 'active'] as const
 type StatusFilter = (typeof STATUS_FILTERS)[number]
 
-const ASSIGN_FILTERS = ['all', 'unassigned', 'assigned'] as const
-type AssignFilter = (typeof ASSIGN_FILTERS)[number]
+const REFERRAL_FILTERS = ['all', 'referred', 'organic'] as const
+type ReferralFilter = (typeof REFERRAL_FILTERS)[number]
 
 function scoreTone(score: number): StatusTone {
   if (score >= 60) return 'green'
@@ -69,26 +69,102 @@ function scoreTone(score: number): StatusTone {
   return 'red'
 }
 
-export default function AdminProspectsPage() {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
-  const [assignFilter, setAssignFilter] = useState<AssignFilter>('all')
+function normalizeTier(raw: string | null): Tier {
+  if (raw === 'intermediate' || raw === 'advanced') return raw
+  return 'beginner'
+}
 
+function normalizeStatus(raw: string | null): Status {
+  if (raw === 'assessed' || raw === 'invited' || raw === 'onboarding' || raw === 'active') return raw
+  return 'new'
+}
+
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  } catch {
+    return iso.slice(0, 10)
+  }
+}
+
+// ── Page ───────────────────────────────────────────────────────
+
+export default function AdminProspectsPage() {
+  const [prospects,      setProspects]      = useState<Prospect[]>([])
+  const [loading,        setLoading]        = useState(true)
+  const [error,          setError]          = useState('')
+  const [statusFilter,   setStatusFilter]   = useState<StatusFilter>('all')
+  const [referralFilter, setReferralFilter] = useState<ReferralFilter>('all')
+
+  // ── Fetch real leads ─────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setError('')
+
+    fetch('/api/admin/prospects')
+      .then(async (res) => {
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(body.error || `HTTP ${res.status}`)
+        }
+        return res.json()
+      })
+      .then((data) => {
+        if (cancelled) return
+        const rows: Prospect[] = (data.prospects ?? []).map((p: {
+          id: string
+          name: string
+          email: string
+          tier: string | null
+          score: number | null
+          status: string | null
+          referredBy: string | null
+          date: string
+        }) => ({
+          id:         p.id,
+          name:       p.name,
+          email:      p.email,
+          tier:       normalizeTier(p.tier),
+          score:      p.score ?? 0,
+          status:     normalizeStatus(p.status),
+          referredBy: p.referredBy,
+          date:       p.date,
+        }))
+        setProspects(rows)
+        setLoading(false)
+      })
+      .catch((err: Error) => {
+        if (cancelled) return
+        setError(err.message || 'Failed to load prospects')
+        setLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [])
+
+  // ── Filters ──────────────────────────────────────────────────
   const filtered = useMemo(() => {
-    let rows = statusFilter === 'all' ? allProspects : allProspects.filter((p) => p.status === statusFilter)
-    if (assignFilter === 'unassigned') rows = rows.filter((p) => !p.assignedTo)
-    else if (assignFilter === 'assigned') rows = rows.filter((p) => !!p.assignedTo)
+    let rows = statusFilter === 'all'
+      ? prospects
+      : prospects.filter((p) => p.status === statusFilter)
+
+    if (referralFilter === 'referred') rows = rows.filter((p) => !!p.referredBy)
+    else if (referralFilter === 'organic') rows = rows.filter((p) => !p.referredBy)
+
     return rows
-  }, [statusFilter, assignFilter])
+  }, [prospects, statusFilter, referralFilter])
 
   const statusCount = (s: StatusFilter) =>
-    s === 'all' ? allProspects.length : allProspects.filter((p) => p.status === s).length
+    s === 'all' ? prospects.length : prospects.filter((p) => p.status === s).length
 
-  const assignCount = (s: AssignFilter) => {
-    if (s === 'all') return allProspects.length
-    if (s === 'unassigned') return allProspects.filter((p) => !p.assignedTo).length
-    return allProspects.filter((p) => !!p.assignedTo).length
+  const referralCount = (s: ReferralFilter) => {
+    if (s === 'all') return prospects.length
+    if (s === 'referred') return prospects.filter((p) => !!p.referredBy).length
+    return prospects.filter((p) => !p.referredBy).length
   }
 
+  // ── Table columns ────────────────────────────────────────────
   const columns: DataColumn<Prospect>[] = [
     {
       key: 'name',
@@ -125,11 +201,9 @@ export default function AdminProspectsPage() {
               style={{
                 width: `${Math.min(100, Math.max(0, p.score))}%`,
                 background:
-                  scoreTone(p.score) === 'green'
-                    ? '#10b981'
-                    : scoreTone(p.score) === 'amber'
-                      ? '#f59e0b'
-                      : '#ef4444',
+                  scoreTone(p.score) === 'green' ? '#10b981'
+                  : scoreTone(p.score) === 'amber' ? '#f59e0b'
+                  : '#ef4444',
               }}
             />
           </span>
@@ -146,40 +220,51 @@ export default function AdminProspectsPage() {
       ),
     },
     {
-      key: 'assigned',
-      header: 'Assigned To',
+      key: 'referredBy',
+      header: 'Referred By',
       render: (p) =>
-        p.assignedTo ? (
-          <span className="text-sm" style={{ color: 'rgba(4,14,32,0.7)' }}>{p.assignedTo}</span>
+        p.referredBy ? (
+          <span className="text-sm font-mono" style={{ color: 'rgba(4,14,32,0.7)' }}>
+            {p.referredBy}
+          </span>
         ) : (
-          <StatusBadge tone="amber" icon="⚠️">Unassigned</StatusBadge>
+          <span className="text-xs italic" style={{ color: 'rgba(4,14,32,0.35)' }}>organic</span>
         ),
     },
     {
       key: 'date',
       header: 'Date',
       render: (p) => (
-        <span className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>{p.date}</span>
-      ),
-    },
-    {
-      key: 'action',
-      header: 'Action',
-      align: 'right',
-      render: (p) => (
-        <FormButton variant={p.assignedTo ? 'ghost' : 'primary'} size="sm">
-          {p.assignedTo ? 'View' : 'Assign'}
-        </FormButton>
+        <span className="text-sm" style={{ color: 'rgba(4,14,32,0.55)' }}>
+          {formatDate(p.date)}
+        </span>
       ),
     },
   ]
 
+  // ── Render ───────────────────────────────────────────────────
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <SectionHeader
         title="All Prospects"
-        subtitle={`${filtered.length} of ${allProspects.length} prospects shown`}
+        subtitle={
+          loading
+            ? 'Loading…'
+            : error
+            ? 'Error loading prospects'
+            : `${filtered.length} of ${prospects.length} prospect${prospects.length === 1 ? '' : 's'} shown`
+        }
       />
+
+      {error && (
+        <div
+          className="rounded-lg px-4 py-3 text-sm"
+          style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#b91c1c' }}
+          role="alert"
+        >
+          {error}
+        </div>
+      )}
 
       <Toolbar
         left={
@@ -197,31 +282,50 @@ export default function AdminProspectsPage() {
         }
         right={
           <>
-            {ASSIGN_FILTERS.map((s) => (
+            {REFERRAL_FILTERS.map((s) => (
               <FilterPill
                 key={s}
-                label={s === 'all' ? 'All' : s === 'unassigned' ? 'Unassigned' : 'Assigned'}
-                count={assignCount(s)}
-                active={assignFilter === s}
-                onClick={() => setAssignFilter(s)}
+                label={s === 'all' ? 'All' : s === 'referred' ? 'Referred' : 'Organic'}
+                count={referralCount(s)}
+                active={referralFilter === s}
+                onClick={() => setReferralFilter(s)}
               />
             ))}
           </>
         }
       />
 
-      <motion.div
-        initial={{ opacity: 0, y: 4 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-      >
-        <DataTable
-          columns={columns}
-          rows={filtered}
-          rowKey={(p) => p.id}
-          emptyState="No prospects match your filters."
-        />
-      </motion.div>
+      {loading ? (
+        <Card>
+          <div className="flex items-center justify-center py-16">
+            <div
+              className="h-8 w-8 animate-spin rounded-full"
+              style={{ border: '2px solid #1b61c9', borderTopColor: 'transparent' }}
+            />
+          </div>
+        </Card>
+      ) : prospects.length === 0 && !error ? (
+        <Card>
+          <EmptyState
+            icon="👥"
+            title="No prospects yet"
+            description="Leads will appear here once someone completes the readiness quiz."
+          />
+        </Card>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <DataTable
+            columns={columns}
+            rows={filtered}
+            rowKey={(p) => p.id}
+            emptyState="No prospects match your filters."
+          />
+        </motion.div>
+      )}
     </div>
   )
 }
