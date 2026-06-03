@@ -10,36 +10,35 @@ export interface Partner {
   id: string
   name: string
   email: string
-  referral_code: string
-  phone: string | null
-  telegram: string | null
-  is_active: boolean
-  notification_preferences: {
-    email: boolean
-    telegram: boolean
-  }
+  partner_code: string
 }
 
 /**
- * Look up a partner by their referral code.
+ * Look up a partner by their Aurum referral code.
+ * Queries profiles where partner_code matches and role = 'partner'.
  * Used when a lead completes assessment to notify the correct partner.
  */
 export async function getPartnerByReferralCode(referralCode: string): Promise<Partner | null> {
   const supabase = getServiceClient()
 
   const { data, error } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('referral_code', referralCode)
-    .eq('is_active', true)
+    .from('profiles')
+    .select('id, full_name, email, partner_code')
+    .eq('partner_code', referralCode)
+    .eq('role', 'partner')
     .single()
 
   if (error || !data) {
-    console.log(`[Partners] No active partner found for code: ${referralCode}`)
+    console.log(`[Partners] No partner found for code: ${referralCode}`)
     return null
   }
 
-  return data as Partner
+  return {
+    id: data.id,
+    name: data.full_name || '',
+    email: data.email,
+    partner_code: data.partner_code,
+  }
 }
 
 /**
