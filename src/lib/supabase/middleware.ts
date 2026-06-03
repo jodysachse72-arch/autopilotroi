@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ['/resources', '/dashboard', '/admin', '/api/admin']
+const PROTECTED_ROUTES = ['/resources', '/dashboard', '/admin', '/api/admin', '/command-center']
 
 // Routes that require specific roles
 const ROLE_ROUTES: Record<string, string[]> = {
@@ -10,6 +10,7 @@ const ROLE_ROUTES: Record<string, string[]> = {
   '/admin': ['admin'],
   '/api/admin': ['admin'],
   '/studio': ['admin'],
+  '/command-center': ['partner', 'admin'],
 }
 
 export async function updateSession(request: NextRequest) {
