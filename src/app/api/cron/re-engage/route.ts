@@ -14,9 +14,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // TODO(drip): parked — drip sequence requires drip_emails_sent + last_seen_at
+  // columns on leads. getStaleLeads() returns [] until those columns are added.
+  // Early-return so the cron neither errors nor sends emails while parked.
+  return NextResponse.json({ ok: true, parked: true, sent: 0, skipped: 0 })
+
+  // ── Dead code below — preserved for when drip is un-parked ──────────────
+  // eslint-disable-next-line no-unreachable
   try {
-    // Find leads that completed assessment but haven't been contacted
-    // We check at different intervals: 24h, 48h, 72h, 5d, 7d
     const staleLeads = await getStaleLeads(24)
 
     if (staleLeads.length === 0) {
@@ -28,39 +33,28 @@ export async function GET(request: NextRequest) {
     const errors: string[] = []
 
     for (const lead of staleLeads) {
-      // Calculate hours since signup
       const hoursSinceSignup = Math.floor(
         (Date.now() - new Date(lead.created_at).getTime()) / (1000 * 60 * 60)
       )
 
-      // Determine which email to send
       const templateKey = getDripTemplate(hoursSinceSignup)
-      if (!templateKey) {
-        skipped++
-        continue
-      }
+      if (!templateKey) { skipped++; continue }
 
-      // Check if we already sent this template to this lead
       const alreadySent = lead.drip_emails_sent?.includes(templateKey)
-      if (alreadySent) {
-        skipped++
-        continue
-      }
+      if (alreadySent) { skipped++; continue }
 
-      // Send the drip email
-      const result = await sendDripEmail(templateKey, {
-        name: lead.name,
-        email: lead.email,
-        score: lead.score,
-        tier: lead.tier,
+      const result = await sendDripEmail(templateKey!, {
+        name:       lead.name,
+        email:      lead.email,
+        score:      lead.readiness_score,   // real column name
+        tier:       lead.readiness_tier,    // real column name
         referred_by: lead.referred_by,
       })
 
       if (result.success) {
-        // Mark this template as sent for this lead
-        await markLeadDripSent(lead.id, templateKey)
+        await markLeadDripSent(lead.id, templateKey!)
         sent++
-        console.log(`[Cron] Sent ${templateKey} to ${lead.email}`)
+        console.log(`[Cron] Sent ${templateKey!} to ${lead.email}`)
       } else {
         errors.push(`${lead.email}: ${result.error}`)
       }

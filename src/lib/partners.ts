@@ -43,53 +43,28 @@ export async function getPartnerByReferralCode(referralCode: string): Promise<Pa
 
 /**
  * Update a lead's last_seen timestamp for re-engagement tracking.
+ * TODO(drip): parked — needs last_seen_at column. No-op until added.
  */
-export async function updateLeadLastSeen(leadId: string): Promise<void> {
-  const supabase = getServiceClient()
-
-  await supabase
-    .from('leads')
-    .update({ last_seen_at: new Date().toISOString() })
-    .eq('id', leadId)
+export async function updateLeadLastSeen(_leadId: string): Promise<void> {
+  // no-op
 }
 
 /**
  * Get leads that haven't been seen in N hours (for re-engagement drip).
+ * TODO(drip): parked — needs drip_emails_sent + last_seen_at columns.
+ * Returns [] until those columns exist.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function getStaleLeads(hoursInactive: number = 48): Promise<Array<any>> {
-  const supabase = getServiceClient()
-  const cutoff = new Date(Date.now() - hoursInactive * 60 * 60 * 1000).toISOString()
-
-  const { data } = await supabase
-    .from('leads')
-    .select('id, name, email, score, tier, referred_by, drip_emails_sent, created_at, last_seen_at')
-    .eq('onboarding_status', 'assessed')
-    .lt('last_seen_at', cutoff)
-    .limit(100)
-
-  return data || []
+export async function getStaleLeads(_hoursInactive: number = 48): Promise<Array<any>> {
+  // TODO(drip): parked — needs drip_emails_sent + last_seen_at columns.
+  return []
 }
 
 /**
  * Mark a drip email template as sent for a lead (prevents duplicates).
+ * TODO(drip): parked — needs drip_emails_sent column. No-op until added.
  */
-export async function markLeadDripSent(leadId: string, templateKey: string): Promise<void> {
-  const supabase = getServiceClient()
-
-  // Get current drip_emails_sent array
-  const { data } = await supabase
-    .from('leads')
-    .select('drip_emails_sent')
-    .eq('id', leadId)
-    .single()
-
-  const current = data?.drip_emails_sent || []
-  const updated = [...current, templateKey]
-
-  await supabase
-    .from('leads')
-    .update({ drip_emails_sent: updated })
-    .eq('id', leadId)
+export async function markLeadDripSent(_leadId: string, _templateKey: string): Promise<void> {
+  // no-op
 }
 
