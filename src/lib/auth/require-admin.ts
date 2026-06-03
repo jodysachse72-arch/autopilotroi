@@ -39,13 +39,10 @@ export async function requireAdmin(): Promise<NextResponse | null> {
       )
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    // Use security-definer function to avoid RLS recursion
+    const { data: role } = await supabase.rpc('get_my_role')
 
-    if (!profile || profile.role !== 'admin') {
+    if (!role || role !== 'admin') {
       return NextResponse.json(
         { error: 'Forbidden: admin role required' },
         { status: 403 },
