@@ -2,31 +2,31 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@/lib/rate-limit'
 import { submitToThriveDesk } from '@/lib/integrations/thrivedesk'
 
-// Use service-level client for public lead creation (bypasses RLS)
+// Service-role client for public contact form (bypasses RLS)
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!url || !key || url === 'placeholder' || key === 'placeholder') {
-    return null // Supabase not configured
+    return null
   }
 
-  // Dynamic import to avoid build errors when supabase isn't installed
   const { createClient } = require('@supabase/supabase-js')
   return createClient(url, key)
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Rate limit: 5 signups per minute per IP
+    // Rate limit: 5 submissions per minute per IP
     const { allowed, resetAt } = checkRateLimit(request, {
       maxRequests: 5,
       windowSeconds: 60,
-      prefix: 'leads',
+      prefix: 'contact',
     })
     if (!allowed) return rateLimitResponse(resetAt)
+
     const body = await request.json()
-    const { name, email, ref, turnstileToken } = body
+    const { name, email, subject, message, turnstileToken } = body
 
     // ── Turnstile bot protection ──
     const turnstileSecret = process.env.TURNSTILE_SECRET_KEY
@@ -57,14 +57,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (!name || !email) {
+    // ── Validate required fields ──
+    if (!name || !email || !message) {
       return NextResponse.json(
-        { error: 'Name and email are required' },
+        { error: 'Name, email, and message are required' },
         { status: 400 }
       )
     }
 
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       return NextResponse.json(
@@ -75,80 +75,53 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServiceClient()
 
-    // ── Fallback: Supabase not configured → demo/local mode ──
     if (!supabase) {
-      console.log('[Leads] Supabase not configured — using demo mode for:', email)
-      const demoId = `demo_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
-      return NextResponse.json({
-        success: true,
-        leadId: demoId,
-        alreadyAssessed: false,
-        demo: true,
-      })
+      console.log('[Contact] Supabase not configured — demo mode for:', email)
+      return NextResponse.json({ success: true, demo: true })
     }
 
-    // ── Production: Use Supabase ──
-    // Check if lead already exists
-    const { data: existing } = await supabase
-      .from('leads')
-      .select('id, readiness_score')
-      .eq('email', email.toLowerCase())
-      .single()
-
-    if (existing) {
-      // Lead exists — return their ID so they can continue the quiz
-      return NextResponse.json({
-        success: true,
-        leadId: existing.id,
-        alreadyAssessed: existing.readiness_score !== null,
-        message: 'Welcome back!'
-      })
-    }
-
-    // Create new lead
-    const { data: lead, error } = await supabase
-      .from('leads')
+    // ── Insert into contact_messages (durable store) ──
+    const { data: row, error } = await supabase
+      .from('contact_messages')
       .insert({
         name: name.trim(),
         email: email.toLowerCase().trim(),
-        referred_by: ref || null,
+        subject: subject?.trim() || null,
+        message: message.trim(),
+        source: 'contact',
       })
       .select('id')
       .single()
 
     if (error) {
-      console.error('[Leads] Insert error:', error)
+      console.error('[Contact] Insert error:', error)
       return NextResponse.json(
-        { error: 'Failed to save your information' },
+        { error: 'Failed to save your message' },
         { status: 500 }
       )
     }
 
-    // ── ThriveDesk dual-write (server-side, fire-and-forget, fail-safe) ──
+    // ── ThriveDesk dual-write (fire-and-forget, fail-safe) ──
     // No-ops cleanly when THRIVEDESK_API_KEY is not set.
     try {
       const tdResult = await submitToThriveDesk({
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
-        referralCode: ref || undefined,
+        name,
+        email,
+        notes: `[Contact Form] ${subject ? `Subject: ${subject}\n\n` : ''}${message}`,
       })
-      if (tdResult.success) {
+      if (tdResult.success && row?.id) {
         await supabase
-          .from('leads')
+          .from('contact_messages')
           .update({ thrivedesk_synced: true })
-          .eq('id', lead.id)
+          .eq('id', row.id)
       }
     } catch (err) {
-      console.warn('[Leads] ThriveDesk dual-write error (non-blocking):', err)
+      console.warn('[Contact] ThriveDesk dual-write error (non-blocking):', err)
     }
 
-    return NextResponse.json({
-      success: true,
-      leadId: lead.id,
-      alreadyAssessed: false,
-    })
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('[Leads] Error:', error)
+    console.error('[Contact] Error:', error)
     return NextResponse.json(
       { error: 'Something went wrong' },
       { status: 500 }

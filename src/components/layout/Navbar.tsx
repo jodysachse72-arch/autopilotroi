@@ -36,7 +36,7 @@ const NAV_ITEMS: NavItem[] = [
       { label: 'EX AI – Calculator', href: '/calculator', description: 'Estimate your returns' },
     ],
   },
-  { label: 'Contact', href: '/signup' },
+  { label: 'Contact', href: '/contact' },
 ]
 
 function isGroup(item: NavItem): item is NavGroup {
