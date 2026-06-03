@@ -1,96 +1,40 @@
 'use client'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import Logo from '@/components/ui/Logo'
 import Turnstile from '@/components/ui/Turnstile'
 import { CheckCircleIcon } from '@/components/ui/Icons'
-import { trackEvent, EVENTS } from '@/lib/analytics'
-
-
 
 /* ═══════════════════════════════════════════════════════════════
-   SIGNUP — public lead capture (separate from /login).
-   Sits OUTSIDE the (auth) layout so it can render its own logo
-   and trust-points footer alongside the form.
+   CONTACT US — public contact form.
+   Matches the premium-light styling of /signup.
+   Submits to /api/contact → Supabase contact_messages table.
+   ThriveDesk dual-write is handled server-side (stubbed until key).
    ═══════════════════════════════════════════════════════════════ */
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''
 
-const TRUST_POINTS = ['No credit card required', 'Free to get started', 'Takes 2 minutes'] as const
-
-function LoadingShell() {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'var(--color-bg)',
-      }}
-    >
-      <div
-        style={{
-          width: '2rem',
-          height: '2rem',
-          borderRadius: '50%',
-          border: '2px solid var(--color-border)',
-          borderTopColor: 'var(--color-accent)',
-          animation: 'spin 0.75s linear infinite',
-        }}
-      />
-    </div>
-  )
-}
-
-function SignupContent() {
+export default function ContactPage() {
   const [name, setName]                     = useState('')
   const [email, setEmail]                   = useState('')
+  const [subject, setSubject]               = useState('')
+  const [message, setMessage]               = useState('')
   const [error, setError]                   = useState('')
   const [loading, setLoading]               = useState(false)
-  const [checking, setChecking]             = useState(true)
+  const [success, setSuccess]               = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const handleTurnstile = useCallback((token: string) => setTurnstileToken(token), [])
-
-  const router       = useRouter()
-  const searchParams = useSearchParams()
-  const ref          = searchParams.get('ref')
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem('autopilotroi-lead')
-      if (stored) {
-        const lead = JSON.parse(stored)
-        if (ref && lead.ref !== ref) {
-          lead.ref = ref
-          localStorage.setItem('autopilotroi-lead', JSON.stringify(lead))
-        }
-        // Fix: read the key that /orientation actually writes (was 'autopilotroi-quiz-result')
-        const quizResult = localStorage.getItem('autopilotroi-readiness')
-        if (quizResult) {
-          trackEvent(EVENTS.SIGNUP_RETURNING_USER)
-          router.replace('/waiting-room')
-          return
-        }
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (lead.id) { setName(lead.name || ''); setEmail(lead.email || '') }
-      }
-    } catch {}
-    setChecking(false)
-  }, [ref, router])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-    trackEvent(EVENTS.SIGNUP_SUBMITTED)
     try {
-      const res = await fetch('/api/leads', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, ref, turnstileToken }),
+        body: JSON.stringify({ name, email, subject, message, turnstileToken }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -98,19 +42,89 @@ function SignupContent() {
         setLoading(false)
         return
       }
-      localStorage.setItem('autopilotroi-lead', JSON.stringify({ id: data.leadId, name, email, ref }))
-
-
-      router.push(data.alreadyAssessed ? '/waiting-room' : '/orientation')
+      setSuccess(true)
     } catch {
       setError('Network error. Please try again.')
       setLoading(false)
     }
-  }, [name, email, ref, turnstileToken, router])
-
-  if (checking) return <LoadingShell />
+  }, [name, email, subject, message, turnstileToken])
 
   const submitDisabled = loading || (TURNSTILE_SITE_KEY ? !turnstileToken : false)
+
+  if (success) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 'clamp(3rem, 8vw, 5rem) var(--page-px)',
+          background: 'var(--color-bg)',
+        }}
+      >
+        <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '28rem', textAlign: 'center' }}>
+          <div style={{ marginBottom: '2rem' }}>
+            <Link href="/" style={{ display: 'inline-block' }}>
+              <Logo size={38} showText />
+            </Link>
+          </div>
+          <div
+            style={{
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-card)',
+              padding: 'clamp(2rem, 5vw, 3rem)',
+              boxShadow: 'var(--shadow-card)',
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '3.5rem',
+                height: '3.5rem',
+                borderRadius: '50%',
+                background: 'rgba(16,185,129,0.1)',
+                marginBottom: '1.25rem',
+                color: 'var(--color-success)',
+              }}
+            >
+              <CheckCircleIcon className="w-7 h-7" />
+            </span>
+            <h1
+              className="text-heading"
+              style={{ color: 'var(--color-text)', marginBottom: '0.5rem' }}
+            >
+              Message Sent!
+            </h1>
+            <p
+              className="text-body"
+              style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}
+            >
+              Thank you for reaching out. We&apos;ll get back to you as soon as possible.
+            </p>
+            <Link
+              href="/"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontWeight: 600,
+                color: 'var(--color-accent)',
+                fontSize: 'var(--text-body)',
+              }}
+              className="hover:underline"
+            >
+              ← Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -124,7 +138,6 @@ function SignupContent() {
         background: 'var(--color-bg)',
       }}
     >
-
       <div style={{ position: 'relative', zIndex: 10, width: '100%', maxWidth: '28rem' }}>
 
         {/* Logo */}
@@ -132,23 +145,6 @@ function SignupContent() {
           <Link href="/" style={{ display: 'inline-block' }}>
             <Logo size={38} showText />
           </Link>
-        </div>
-
-        {/* Step badge */}
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-            borderRadius: '9999px',
-            border: '1px solid var(--color-accent-light)',
-            background: 'var(--color-accent-light)',
-            padding: '0.375rem 1rem',
-            fontSize: '0.6875rem', fontWeight: 700,
-            textTransform: 'uppercase', letterSpacing: '0.1em',
-            color: 'var(--color-accent)',
-          }}>
-            <span style={{ width: '0.375rem', height: '0.375rem', borderRadius: '50%', background: 'var(--color-accent)', display: 'inline-block' }} />
-            Step 1 of 3
-          </span>
         </div>
 
         {/* Premium form card */}
@@ -163,29 +159,29 @@ function SignupContent() {
             className="text-heading"
             style={{ color: 'var(--color-text)', textAlign: 'center', marginBottom: '0.5rem' }}
           >
-            Create Your Free Account
+            Contact Us
           </h1>
           <p
             className="text-body"
             style={{ color: 'var(--color-text-muted)', textAlign: 'center', marginBottom: '2rem' }}
           >
-            Start your readiness assessment — takes under 2 minutes
+            Have a question or want to learn more? Drop us a message.
           </p>
 
-          {/* Scoped styles: ::placeholder + :focus can't be set inline */}
+          {/* Scoped styles for focus/placeholder */}
           <style>{`
-            #signup-name, #signup-email {
+            .contact-input {
               outline: none;
               transition: border-color 150ms ease, box-shadow 150ms ease;
             }
-            #signup-name:focus, #signup-email:focus {
+            .contact-input:focus {
               border-color: var(--color-accent);
               box-shadow: 0 0 0 3px rgba(27,97,201,0.12);
             }
-            #signup-name::placeholder, #signup-email::placeholder {
+            .contact-input::placeholder {
               color: var(--color-text-muted);
             }
-            #signup-submit:not(:disabled):hover {
+            #contact-submit:not(:disabled):hover {
               background: var(--color-accent-hover) !important;
             }
           `}</style>
@@ -195,7 +191,7 @@ function SignupContent() {
             {/* Full Name */}
             <div>
               <label
-                htmlFor="signup-name"
+                htmlFor="contact-name"
                 style={{
                   display: 'block',
                   marginBottom: '0.375rem',
@@ -208,7 +204,8 @@ function SignupContent() {
                 <span style={{ color: 'var(--color-error)' }} aria-hidden>*</span>
               </label>
               <input
-                id="signup-name"
+                id="contact-name"
+                className="contact-input"
                 type="text"
                 required
                 value={name}
@@ -232,7 +229,7 @@ function SignupContent() {
             {/* Email Address */}
             <div>
               <label
-                htmlFor="signup-email"
+                htmlFor="contact-email"
                 style={{
                   display: 'block',
                   marginBottom: '0.375rem',
@@ -245,7 +242,8 @@ function SignupContent() {
                 <span style={{ color: 'var(--color-error)' }} aria-hidden>*</span>
               </label>
               <input
-                id="signup-email"
+                id="contact-email"
+                className="contact-input"
                 type="email"
                 required
                 value={email}
@@ -262,6 +260,80 @@ function SignupContent() {
                   background: 'var(--color-surface-alt)',
                   border: '1px solid var(--color-border)',
                   borderRadius: 'var(--radius-md)',
+                }}
+              />
+            </div>
+
+            {/* Subject (optional) */}
+            <div>
+              <label
+                htmlFor="contact-subject"
+                style={{
+                  display: 'block',
+                  marginBottom: '0.375rem',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 600,
+                  color: 'var(--color-text-weak)',
+                }}
+              >
+                Subject <span style={{ fontWeight: 400, color: 'var(--color-text-muted)' }}>(optional)</span>
+              </label>
+              <input
+                id="contact-subject"
+                className="contact-input"
+                type="text"
+                value={subject}
+                onChange={e => setSubject(e.target.value)}
+                placeholder="e.g. Partnership inquiry, Technical question"
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: 'var(--text-body)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text)',
+                  background: 'var(--color-surface-alt)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                }}
+              />
+            </div>
+
+            {/* Message */}
+            <div>
+              <label
+                htmlFor="contact-message"
+                style={{
+                  display: 'block',
+                  marginBottom: '0.375rem',
+                  fontSize: 'var(--text-caption)',
+                  fontWeight: 600,
+                  color: 'var(--color-text-weak)',
+                }}
+              >
+                Message{' '}
+                <span style={{ color: 'var(--color-error)' }} aria-hidden>*</span>
+              </label>
+              <textarea
+                id="contact-message"
+                className="contact-input"
+                required
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                placeholder="How can we help you?"
+                rows={5}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  fontSize: 'var(--text-body)',
+                  fontFamily: 'var(--font-body)',
+                  color: 'var(--color-text)',
+                  background: 'var(--color-surface-alt)',
+                  border: '1px solid var(--color-border)',
+                  borderRadius: 'var(--radius-md)',
+                  resize: 'vertical',
+                  minHeight: '7rem',
                 }}
               />
             </div>
@@ -291,9 +363,8 @@ function SignupContent() {
               />
             )}
 
-            {/* Submit button — mirrors hero-btn-primary shape, accent fill for white-card context */}
             <button
-              id="signup-submit"
+              id="contact-submit"
               type="submit"
               disabled={submitDisabled}
               aria-busy={loading || undefined}
@@ -331,20 +402,9 @@ function SignupContent() {
                   }}
                 />
               )}
-              {loading ? 'Saving…' : 'Start your readiness assessment →'}
+              {loading ? 'Sending…' : 'Send Message →'}
             </button>
           </form>
-
-          <p className="text-caption" style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-            Already have an account?{' '}
-            <Link
-              href="/login"
-              style={{ fontWeight: 600, color: 'var(--color-accent)' }}
-              className="hover:underline"
-            >
-              Log in
-            </Link>
-          </p>
         </div>
 
         {/* Trust-point reassurance row */}
@@ -355,7 +415,7 @@ function SignupContent() {
           justifyContent: 'center',
           gap: '0.5rem 1.5rem',
         }}>
-          {TRUST_POINTS.map(t => (
+          {(['We respond within 24h', 'No spam, ever', 'Your data is secure'] as const).map(t => (
             <span
               key={t}
               style={{
@@ -376,13 +436,5 @@ function SignupContent() {
 
       </div>
     </div>
-  )
-}
-
-export default function SignupPage() {
-  return (
-    <Suspense fallback={<LoadingShell />}>
-      <SignupContent />
-    </Suspense>
   )
 }
