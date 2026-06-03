@@ -35,8 +35,10 @@ import type { CmsPostMeta } from '@/lib/cms/types'
 interface MetaFieldDef {
   key: string
   label: string
-  type: 'text' | 'textarea' | 'checkbox'
+  type: 'text' | 'textarea' | 'checkbox' | 'select' | 'date'
   placeholder?: string
+  options?: string[]   // for type === 'select'
+  required?: boolean
 }
 
 interface ContentTypeConfig {
@@ -66,8 +68,20 @@ const CONTENT_TYPES: Record<string, ContentTypeConfig> = {
       { key: 'answer', label: 'Plain-text Answer (fallback)', type: 'textarea', placeholder: 'Short answer shown when HTML is unavailable…' },
     ],
   },
-  // Future types go here — no code changes needed in the editor:
-  // resource: { ... },  script: { ... },  known_issue: { ... },
+  resource: {
+    label: 'Resource',
+    hasSlug: false,
+    icon: '🔗',
+    metaFields: [
+      { key: 'url',           label: 'URL',                    type: 'text',     placeholder: 'https://…',                    required: true },
+      { key: 'resource_type', label: 'Resource Type',          type: 'select',   options: ['video', 'pdf', 'link', 'doc'] },
+      { key: 'category',      label: 'Category',               type: 'text',     placeholder: 'e.g. Neyro, Wallet, Onboarding' },
+      { key: 'status',        label: 'Resource Status',        type: 'select',   options: ['active', 'featured', 'needs_review', 'broken', 'archived'] },
+      { key: 'official',      label: 'Official / Approved Source', type: 'checkbox' },
+      { key: 'last_verified', label: 'Last Verified',          type: 'date' },
+      { key: 'description',   label: 'Description',            type: 'textarea', placeholder: 'Brief description of this resource…' },
+    ],
+  },
 }
 
 const TYPE_KEYS = Object.keys(CONTENT_TYPES)
@@ -577,7 +591,7 @@ export default function AdminCmsPage() {
                   <FormField
                     label="Slug"
                     htmlFor="cms-slug"
-                    help={editor.slug ? `/blog/${editor.slug}` : 'Auto-generated from title'}
+                    help={editor.slug ? `/${editor.type}/${editor.slug}` : 'Auto-generated from title'}
                   >
                     <FormInput
                       id="cms-slug"
@@ -631,6 +645,24 @@ export default function AdminCmsPage() {
                             />
                             <span className="text-sm">{f.label}</span>
                           </label>
+                        ) : f.type === 'select' ? (
+                          <FormSelect
+                            id={`cms-meta-${f.key}`}
+                            value={(editor.meta[f.key] as string) || ''}
+                            onChange={(e) => updateMeta(f.key, e.target.value)}
+                          >
+                            <option value="">— select —</option>
+                            {(f.options ?? []).map(opt => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </FormSelect>
+                        ) : f.type === 'date' ? (
+                          <FormInput
+                            id={`cms-meta-${f.key}`}
+                            type="date"
+                            value={(editor.meta[f.key] as string) || ''}
+                            onChange={(e) => updateMeta(f.key, e.target.value)}
+                          />
                         ) : (
                           <FormInput
                             id={`cms-meta-${f.key}`}

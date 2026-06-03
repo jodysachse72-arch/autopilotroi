@@ -114,3 +114,35 @@ export async function getVideosBySection(section: 'university' | 'media'): Promi
     return []
   }
 }
+
+/**
+ * Published resources for the partner Command Center (PCC-2).
+ * NOT for public pages — gated behind the partner session in PCC-2.
+ *
+ * Ordering: featured resources first, then by sort_order ascending.
+ * Excludes any resource whose meta.status === 'archived'.
+ */
+export async function getPublishedResourcesServer(): Promise<CmsPost[]> {
+  try {
+    const db = await createClient()
+    const { data, error } = await db
+      .from('cms_posts')
+      .select('*')
+      .eq('type', 'resource')
+      .eq('status', 'published')
+      .order('sort_order', { ascending: true })
+    if (error) return []
+    const rows = (data ?? []) as CmsPost[]
+    // Exclude archived resources (meta.status = 'archived')
+    const active = rows.filter(r => (r.meta as Record<string, unknown>)?.status !== 'archived')
+    // Featured first, then original sort_order
+    return active.sort((a, b) => {
+      const aFeatured = (a.meta as Record<string, unknown>)?.status === 'featured' ? 0 : 1
+      const bFeatured = (b.meta as Record<string, unknown>)?.status === 'featured' ? 0 : 1
+      if (aFeatured !== bFeatured) return aFeatured - bFeatured
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0)
+    })
+  } catch {
+    return []
+  }
+}

@@ -8,7 +8,7 @@
    collection config (type → collection slug, meta → fields).
    ═══════════════════════════════════════════════════════════════ */
 
-export type CmsPostType = 'blog' | 'faq' | 'video' | 'page_copy'
+export type CmsPostType = 'blog' | 'faq' | 'video' | 'page_copy' | 'resource'
 export type CmsStatus   = 'draft' | 'published' | 'scheduled'
 
 /** Core content record — maps 1:1 with the cms_posts table */
@@ -45,6 +45,16 @@ export interface CmsPostMeta {
   youtubeId?:  string
   duration?:   string
   section?:    'university' | 'media'
+
+  // Resource-specific (PCC-1)
+  url?:           string
+  resource_type?: 'video' | 'pdf' | 'link' | 'doc'
+  // category reuses blog's category field above
+  // status (resource lifecycle) stored separately from post status
+  resource_status?: 'active' | 'featured' | 'needs_review' | 'broken' | 'archived'
+  official?:        boolean
+  last_verified?:   string  // ISO date string
+  description?:     string
 
   // Page copy — arbitrary keys
   [key: string]: unknown
