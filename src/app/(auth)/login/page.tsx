@@ -7,25 +7,9 @@ import { createClient } from '@/lib/supabase/client'
 import { FormField, FormInput, FormButton } from '@/components/backend'
 
 /* ═══════════════════════════════════════════════════════════════
-   LOGIN — uses backend form primitives.
-   Demo accounts short-circuit Supabase if env not configured.
+   LOGIN — email + password via Supabase Auth.
+   Role-based redirect: admin → /admin, partner → /dashboard.
    ═══════════════════════════════════════════════════════════════ */
-
-interface DemoAccount {
-  password: string
-  role: 'admin' | 'partner'
-  name: string
-}
-
-const DEMO_ACCOUNTS: Record<string, DemoAccount> = {
-  'admin@autopilotroi.com':   { password: 'Admin2026!',   role: 'admin',   name: 'Admin User' },
-  'partner@autopilotroi.com': { password: 'Partner2026!', role: 'partner', name: 'Demo Partner' },
-}
-
-const TEST_ACCOUNTS = [
-  { icon: '🛡️', label: 'Admin',   cred: 'admin@autopilotroi.com / Admin2026!' },
-  { icon: '🤝', label: 'Partner', cred: 'partner@autopilotroi.com / Partner2026!' },
-] as const
 
 function LoginForm() {
   const [email, setEmail]       = useState('')
@@ -37,30 +21,10 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const redirect     = searchParams.get('redirect') || '/'
 
-  const isConfigured = process.env.NEXT_PUBLIC_SUPABASE_URL !== 'https://placeholder.supabase.co'
-
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-
-    const demo = DEMO_ACCOUNTS[email.toLowerCase()]
-    if (demo) {
-      if (demo.password !== password) {
-        setError('Invalid password. Please try again.')
-        setLoading(false)
-        return
-      }
-      localStorage.setItem('autopilotroi-demo-user', JSON.stringify({ email, role: demo.role, name: demo.name }))
-      router.push(demo.role === 'admin' ? '/admin' : '/dashboard')
-      return
-    }
-
-    if (!isConfigured) {
-      setError('No account found. Try admin@autopilotroi.com or partner@autopilotroi.com')
-      setLoading(false)
-      return
-    }
 
     try {
       const supabase = createClient()
@@ -83,7 +47,7 @@ function LoginForm() {
     } finally {
       setLoading(false)
     }
-  }, [email, password, isConfigured, redirect, router])
+  }, [email, password, redirect, router])
 
   return (
     <div className="w-full max-w-md">
@@ -97,32 +61,6 @@ function LoginForm() {
         <p className="text-sm text-center mb-8" style={{ color: 'rgba(4,14,32,0.5)' }}>
           Log in to your AutopilotROI account
         </p>
-
-        <div
-          className="mb-6 rounded-xl p-4"
-          style={{ background: 'rgba(27,97,201,0.05)', border: '1px solid rgba(27,97,201,0.15)' }}
-        >
-          <p className="text-xs font-bold mb-2" style={{ color: '#1b61c9' }}>📋 Test Accounts</p>
-          <div className="space-y-1.5">
-            {TEST_ACCOUNTS.map(a => (
-              <button
-                key={a.label}
-                type="button"
-                onClick={() => {
-                  const [demoEmail, demoPass] = a.cred.split(' / ')
-                  setEmail(demoEmail)
-                  setPassword(demoPass)
-                }}
-                className="flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-xs transition hover:shadow-sm"
-                style={{ background: '#fff', border: '1px solid #e0e2e6' }}
-                title="Click to fill credentials"
-              >
-                <span className="font-medium" style={{ color: '#181d26' }}>{a.icon} {a.label}</span>
-                <span style={{ color: '#1b61c9', fontFamily: 'monospace' }}>{a.cred}</span>
-              </button>
-            ))}
-          </div>
-        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <FormField label="Email Address" htmlFor="email" required>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth/require-admin'
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -16,6 +17,9 @@ const DB_UNAVAILABLE = NextResponse.json(
 // GET — list all partners
 export async function GET() {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const supabase = getServiceClient()
     if (!supabase) return DB_UNAVAILABLE
     const { data, error } = await supabase
@@ -36,6 +40,9 @@ export async function GET() {
 // POST — create a new partner
 export async function POST(request: NextRequest) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const body = await request.json()
     const { name, email, referral_code, phone, telegram } = body
 
@@ -80,6 +87,9 @@ export async function POST(request: NextRequest) {
 // PATCH — update partner (toggle active, etc.)
 export async function PATCH(request: NextRequest) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const body = await request.json()
     const { id, ...updates } = body
 

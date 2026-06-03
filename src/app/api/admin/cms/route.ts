@@ -4,10 +4,12 @@
    Uses the service-role key to bypass RLS. All writes to
    cms_posts go through this route — never from the browser.
 
-   // TODO(A1): require admin auth — currently unprotected.
+   Auth: middleware gates /api/admin to admin role; requireAdmin
+   provides defense-in-depth at the handler level.
    ═══════════════════════════════════════════════════════════════ */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/auth/require-admin'
 
 function getServiceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -26,6 +28,9 @@ const DB_UNAVAILABLE = NextResponse.json(
 // ── GET — list posts ─────────────────────────────────────────
 export async function GET(request: NextRequest) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const supabase = getServiceClient()
     if (!supabase) return DB_UNAVAILABLE
 
@@ -54,6 +59,9 @@ export async function GET(request: NextRequest) {
 // ── POST — create a new post ─────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
+    const denied = await requireAdmin()
+    if (denied) return denied
+
     const supabase = getServiceClient()
     if (!supabase) return DB_UNAVAILABLE
 

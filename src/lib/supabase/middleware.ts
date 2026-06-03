@@ -2,12 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Routes that require authentication
-const PROTECTED_ROUTES = ['/resources', '/dashboard', '/admin']
+const PROTECTED_ROUTES = ['/resources', '/dashboard', '/admin', '/api/admin']
 
 // Routes that require specific roles
 const ROLE_ROUTES: Record<string, string[]> = {
   '/dashboard': ['partner', 'admin'],
   '/admin': ['admin'],
+  '/api/admin': ['admin'],
   '/studio': ['admin'],
 }
 
@@ -23,7 +24,7 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
           supabaseResponse = NextResponse.next({ request })
@@ -41,6 +42,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
+  const isApiRoute = pathname.startsWith('/api')
 
   // Check if route is protected
   const isProtected = PROTECTED_ROUTES.some((route) =>
@@ -48,6 +50,12 @@ export async function updateSession(request: NextRequest) {
   )
 
   if (isProtected && !user) {
+    if (isApiRoute) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 },
+      )
+    }
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirect', pathname)
@@ -66,6 +74,12 @@ export async function updateSession(request: NextRequest) {
           .single()
 
         if (!profile || !roles.includes(profile.role)) {
+          if (isApiRoute) {
+            return NextResponse.json(
+              { error: 'Forbidden: insufficient role' },
+              { status: 403 },
+            )
+          }
           const url = request.nextUrl.clone()
           url.pathname = '/'
           return NextResponse.redirect(url)
@@ -76,3 +90,4 @@ export async function updateSession(request: NextRequest) {
 
   return supabaseResponse
 }
+
