@@ -20,12 +20,13 @@ import {
    ═══════════════════════════════════════════════════════════════ */
 
 interface ProfileData {
-  fullName: string
-  email:    string
-  phone:    string
-  company:  string
-  bio:      string
-  timezone: string
+  fullName:    string
+  email:       string
+  phone:       string
+  company:     string
+  bio:         string
+  timezone:    string
+  partnerCode: string
   socialLinks: {
     facebook:  string
     instagram: string
@@ -75,7 +76,7 @@ const NOTIFICATION_PREFS = [
 ] as const
 
 const defaultProfile: ProfileData = {
-  fullName: '', email: '', phone: '', company: '', bio: '',
+  fullName: '', email: '', phone: '', company: '', bio: '', partnerCode: '',
   timezone: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York',
   socialLinks:   { facebook: '', instagram: '', youtube: '', linkedin: '', twitter: '', tiktok: '' },
   notifications: { email: true,  telegram: false, weeklyDigest: true, newLeadAlert: true },
@@ -129,12 +130,13 @@ export default function SettingsPage() {
 
         if (profileData) {
           setProfile({
-            fullName: profileData.full_name || '',
-            email:    profileData.email || user.email || '',
-            phone:    profileData.phone || '',
-            company:  profileData.company || '',
-            bio:      profileData.bio || '',
-            timezone: profileData.timezone || defaultProfile.timezone,
+            fullName:    profileData.full_name || '',
+            email:       profileData.email || user.email || '',
+            phone:       profileData.phone || '',
+            company:     profileData.company || '',
+            bio:         profileData.bio || '',
+            partnerCode: profileData.partner_code || '',
+            timezone:    profileData.timezone || defaultProfile.timezone,
             socialLinks:   profileData.social_links || defaultProfile.socialLinks,
             notifications: profileData.notification_preferences || defaultProfile.notifications,
           })
@@ -190,6 +192,27 @@ export default function SettingsPage() {
       setSaving(null)
     }
   }, [profile, showToast])
+
+  /* ── Save Aurum referral ID ── */
+  const savePartnerCode = useCallback(async () => {
+    setSaving('partnerCode')
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { error } = await supabase.from('profiles')
+          .update({ partner_code: profile.partnerCode.trim() || null })
+          .eq('id', user.id)
+        if (error) throw error
+        showToast('Aurum referral ID saved!', 'success')
+      }
+    } catch {
+      showToast('Failed to save referral ID. Please try again.', 'error')
+    } finally {
+      setSaving(null)
+    }
+  }, [profile.partnerCode, showToast])
 
   /* ── Save social links ── */
   const saveSocialLinks = useCallback(async () => {
@@ -329,6 +352,28 @@ export default function SettingsPage() {
               {saving === 'personal' ? 'Saving…' : 'Save personal info'}
             </FormButton>
           </div>
+        </div>
+      </SectionCard>
+
+      {/* ── Aurum Referral ID ── */}
+      <SectionCard title="Aurum Referral ID" icon="🔗" delay={0.07}>
+        <p className="text-xs text-[rgba(4,14,32,0.55)] mb-4">
+          This is the referral ID issued to you by Aurum. Paste it here and it will auto-fill
+          in your <a href="/dashboard/links" className="text-[#1b61c9] font-medium hover:underline">link generator</a>.
+          AutopilotROI does not generate this ID — you get it from your Aurum back office.
+        </p>
+        <FormField label="Your Aurum referral ID" htmlFor="partner-code">
+          <FormInput
+            id="partner-code"
+            value={profile.partnerCode}
+            onChange={(e) => updateProfile('partnerCode', e.target.value.trim())}
+            placeholder="e.g. jody, partner123, 12345"
+          />
+        </FormField>
+        <div className="flex justify-end pt-4">
+          <FormButton variant="primary" loading={saving === 'partnerCode'} onClick={savePartnerCode}>
+            {saving === 'partnerCode' ? 'Saving…' : 'Save referral ID'}
+          </FormButton>
         </div>
       </SectionCard>
 
