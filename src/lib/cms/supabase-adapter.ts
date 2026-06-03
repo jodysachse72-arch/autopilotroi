@@ -1,16 +1,13 @@
-'use client'
 /* ═══════════════════════════════════════════════════════════════
    SUPABASE ADAPTER — implements the CMS service API using
    Supabase as the backing store.
-   
-   All queries target: cms_posts, cms_revisions, cms_media
-   Storage bucket: cms-media (public)
+
+   All queries target: cms_posts
+   Revisions + media removed in v1 (T2/T3).
    ═══════════════════════════════════════════════════════════════ */
 
 import { createClient } from '@/lib/supabase/client'
-import type { CmsPost, CmsPostSummary, CmsRevision, CmsMediaItem, CmsPostInput, CmsListOptions } from './types'
-
-const BUCKET = 'cms-media'
+import type { CmsPost, CmsPostSummary, CmsPostInput, CmsListOptions } from './types'
 
 function supabase() {
   return createClient()
@@ -74,12 +71,6 @@ export async function createPost(input: CmsPostInput): Promise<CmsPost> {
 // ── Update ───────────────────────────────────────────────────
 
 export async function updatePost(id: string, input: Partial<CmsPostInput>): Promise<CmsPost> {
-  // Create revision before updating
-  const existing = await getPost(id)
-  if (existing) {
-    await _createRevision(existing, 'Auto-save')
-  }
-
   const { data, error } = await supabase()
     .from('cms_posts')
     .update(input)
@@ -103,9 +94,6 @@ export async function deletePost(id: string): Promise<void> {
 // ── Publish / Unpublish ──────────────────────────────────────
 
 export async function publishPost(id: string): Promise<CmsPost> {
-  const existing = await getPost(id)
-  if (existing) await _createRevision(existing, 'Published')
-
   const { data, error } = await supabase()
     .from('cms_posts')
     .update({ status: 'published', publish_at: new Date().toISOString() })
@@ -127,90 +115,10 @@ export async function unpublishPost(id: string): Promise<CmsPost> {
   return data as CmsPost
 }
 
-// ── Revisions ────────────────────────────────────────────────
-
-async function _createRevision(post: CmsPost, label: string): Promise<void> {
-  await supabase().from('cms_revisions').insert({
-    post_id:   post.id,
-    body:      post.body,
-    body_html: post.body_html,
-    meta:      post.meta,
-    status:    post.status,
-    label,
-    created_by: post.created_by,
-  })
-}
-
-export async function getRevisions(postId: string): Promise<CmsRevision[]> {
-  const { data, error } = await supabase()
-    .from('cms_revisions')
-    .select('*')
-    .eq('post_id', postId)
-    .order('created_at', { ascending: false })
-    .limit(20)
-  if (error) throw error
-  return (data ?? []) as CmsRevision[]
-}
-
-export async function restoreRevision(revisionId: string): Promise<CmsPost> {
-  const { data: rev, error: revErr } = await supabase()
-    .from('cms_revisions')
-    .select('*')
-    .eq('id', revisionId)
-    .single()
-  if (revErr) throw revErr
-
-  return updatePost(rev.post_id, {
-    body:      rev.body,
-    body_html: rev.body_html,
-    meta:      rev.meta,
-    status:    rev.status,
-  })
-}
-
-// ── Media Upload ─────────────────────────────────────────────
-
-export async function uploadMedia(file: File, altText: string = ''): Promise<CmsMediaItem> {
-  const db = supabase()
-  const ext  = file.name.split('.').pop()
-  const path = `uploads/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`
-
-  // Upload to storage
-  const { error: uploadErr } = await db.storage
-    .from(BUCKET)
-    .upload(path, file, { contentType: file.type, upsert: false })
-  if (uploadErr) throw uploadErr
-
-  // Get public URL
-  const { data: { publicUrl } } = db.storage.from(BUCKET).getPublicUrl(path)
-
-  // Record in media table
-  const { data, error } = await db
-    .from('cms_media')
-    .insert({
-      filename:     file.name,
-      storage_path: path,
-      public_url:   publicUrl,
-      size_bytes:   file.size,
-      mime_type:    file.type,
-      alt_text:     altText,
-    })
-    .select()
-    .single()
-
-  if (error) throw error
-  return data as CmsMediaItem
-}
-
-export async function listMedia(): Promise<CmsMediaItem[]> {
-  const { data, error } = await supabase()
-    .from('cms_media')
-    .select('*')
-    .order('uploaded_at', { ascending: false })
-    .limit(100)
-  if (error) throw error
-  return (data ?? []) as CmsMediaItem[]
-}
+// ── Revisions / Media ────────────────────────────────────────
+// v1: cms_revisions + cms_media were dropped (T2). These features
+// will be restored in a future milestone. See types.ts for the
+// preserved CmsRevision / CmsMediaItem interfaces.
 
 // ── Public helpers (for frontend pages) ─────────────────────
 
