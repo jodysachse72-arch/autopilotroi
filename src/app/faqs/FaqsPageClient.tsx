@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
 import type { CmsPost } from '@/lib/cms/types'
 import HomeCTABand from '@/components/home/CTABand'
 import {
@@ -14,439 +15,354 @@ import {
   SparkleIcon,
 } from '@/components/ui/Icons'
 
-/* ═══════════════════════════════════════════════════════════════
-   FAQS — Stripe Docs style
-   Left sticky topic sidebar · right grouped, anchored Q&A.
-   Search filters across all sections.
-   ═══════════════════════════════════════════════════════════════ */
-
 interface CategoryDef {
   id: string
   label: string
+  description: string
   Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
   accent: string
+  tint: string
 }
 
 const FAQ_CATEGORIES: CategoryDef[] = [
-  { id: 'basic',           label: 'Basics',           Icon: CompassIcon,    accent: '#1b61c9' },
-  { id: 'getting-started', label: 'Getting started',  Icon: OnboardingIcon, accent: '#0891b2' },
-  { id: 'products',        label: 'Products',         Icon: AutomationIcon, accent: '#7c3aed' },
-  { id: 'technical',       label: 'Technical',        Icon: SecurityIcon,   accent: '#d97706' },
-  { id: 'advanced',        label: 'Advanced',         Icon: SparkleIcon,    accent: '#059669' },
-  { id: 'partner',         label: 'Partner program',  Icon: PartnerIcon,    accent: '#dc2626' },
-  { id: 'general',         label: 'General',          Icon: AcademyIcon,    accent: '#64748b' },
+  { id: 'basic', label: 'The basics', description: 'Aurum, costs, risk, and what to expect.', Icon: CompassIcon, accent: '#1b61c9', tint: '#e8f0fd' },
+  { id: 'getting-started', label: 'Getting started', description: 'Your first steps into the ecosystem.', Icon: OnboardingIcon, accent: '#0891b2', tint: '#ecfeff' },
+  { id: 'products', label: 'Products', description: 'The bot, card, exchange, and neobank.', Icon: AutomationIcon, accent: '#7c3aed', tint: '#f5f3ff' },
+  { id: 'technical', label: 'Wallets & setup', description: 'USDT, Trust Wallet, VPNs, and access.', Icon: SecurityIcon, accent: '#d97706', tint: '#fffbeb' },
+  { id: 'advanced', label: 'Trading & returns', description: 'Payouts, spillover, and deeper details.', Icon: SparkleIcon, accent: '#059669', tint: '#ecfdf5' },
+  { id: 'partner', label: 'Partner program', description: 'Partner access, tools, and dashboards.', Icon: PartnerIcon, accent: '#dc2626', tint: '#fef2f2' },
+  { id: 'general', label: 'General', description: 'Everything else you may want to know.', Icon: AcademyIcon, accent: '#64748b', tint: '#f1f5f9' },
 ]
 
-interface Props { faqs: CmsPost[] }
+interface Props {
+  faqs: CmsPost[]
+}
 
 export default function FaqsPageClient({ faqs }: Props) {
   const [openIds, setOpenIds] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
 
-  // Group by category, applying search filter
-  const grouped = useMemo(() => {
-    const q = search.trim().toLowerCase()
-    const out: Record<string, CmsPost[]> = {}
-    FAQ_CATEGORIES.forEach((c) => { out[c.id] = [] })
-    out['_uncat'] = []
-
-    for (const f of faqs) {
-      const cat = (f.meta?.category as string | undefined) ?? '_uncat'
-      const title = (f.title ?? '').toLowerCase()
-      const answer = (f.body_html ?? '').replace(/<[^>]+>/g, ' ').toLowerCase()
-      if (q && !title.includes(q) && !answer.includes(q)) continue
-      if (out[cat]) out[cat].push(f)
-      else out['_uncat'].push(f)
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const faq of faqs) {
+      const category = (faq.meta?.category as string | undefined) ?? '_uncat'
+      counts[category] = (counts[category] ?? 0) + 1
     }
-    return out
+    return counts
+  }, [faqs])
+
+  const grouped = useMemo(() => {
+    const query = search.trim().toLowerCase()
+    const groups: Record<string, CmsPost[]> = { _uncat: [] }
+    FAQ_CATEGORIES.forEach((category) => { groups[category.id] = [] })
+
+    for (const faq of faqs) {
+      const category = (faq.meta?.category as string | undefined) ?? '_uncat'
+      const title = (faq.title ?? '').toLowerCase()
+      const answer = (faq.body_html ?? '').replace(/<[^>]+>/g, ' ').toLowerCase()
+      if (query && !title.includes(query) && !answer.includes(query)) continue
+      ;(groups[category] ?? groups._uncat).push(faq)
+    }
+
+    return groups
   }, [faqs, search])
 
-  const totalVisible = Object.values(grouped).reduce((n, arr) => n + arr.length, 0)
-  const visibleCats = FAQ_CATEGORIES.filter((c) => grouped[c.id].length > 0)
+  const topicCategories = FAQ_CATEGORIES.filter((category) => (categoryCounts[category.id] ?? 0) > 0)
+  const visibleCategories = FAQ_CATEGORIES.filter((category) => grouped[category.id].length > 0)
+  const totalVisible = Object.values(grouped).reduce((total, group) => total + group.length, 0)
+  const popularFaqs = faqs.slice(0, 4)
 
   function toggle(id: string) {
-    setOpenIds((prev) => {
-      const next = new Set(prev)
+    setOpenIds((previous) => {
+      const next = new Set(previous)
       if (next.has(id)) next.delete(id)
       else next.add(id)
       return next
     })
   }
 
+  function scrollToId(id: string) {
+    window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
+  }
+
+  function openPopularFaq(id: string) {
+    setOpenIds((previous) => new Set(previous).add(id))
+    scrollToId(`faq-${id}`)
+  }
+
+  function submitSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    scrollToId('faq-answers')
+  }
+
   return (
     <>
-
-      {/* ── 1. HERO ── */}
-      <section className="section section-alt" style={{ paddingBottom: '3rem' }}>
-        <div className="container-content" style={{ maxWidth: '48rem' }}>
-          <span className="badge mb-4 inline-flex">Knowledge base</span>
-          <h1 className="text-display mb-4">Everything you need<br />to know.</h1>
-          <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
-            Search across every answer, or browse by topic. Written in plain English — no jargon traps.
-          </p>
-        </div>
-      </section>
-
-      {/* ── 2. SEARCH + DOCS LAYOUT ── */}
-      <section className="section section-surface" style={{ paddingTop: '3rem' }}>
-        <div className="container-content">
-
-        {/* Search bar */}
-        <div style={{ position: 'relative', maxWidth: '40rem', margin: '0 0 2.5rem' }}>
-          <span style={{
-            position: 'absolute',
-            left: '1.125rem', top: '50%',
-            transform: 'translateY(-50%)',
-            color: 'var(--color-text-muted)',
-            pointerEvents: 'none',
-          }}>
-            <SearchIcon className="w-5 h-5" />
-          </span>
-          <input
-            type="text"
-            placeholder="Search the docs — try 'minimum', 'VPN', or 'spillover'..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+      <main style={{ backgroundColor: 'var(--color-surface-alt)' }}>
+        {/* OnePay-inspired help-center hero, adapted to the AutoPilotROI brand. */}
+        <section
+          style={{
+            position: 'relative',
+            minHeight: '24rem',
+            overflow: 'hidden',
+            borderRadius: '0 0 1.75rem 1.75rem',
+            background: 'linear-gradient(135deg, #2d7ff9 0%, #4fb8f6 58%, #76d4f7 100%)',
+          }}
+        >
+          <div
+            aria-hidden="true"
             style={{
-              width: '100%',
-              border: '1.5px solid var(--color-border)',
-              borderRadius: '0.75rem',
-              padding: '1rem 3rem 1rem 3rem',
-              fontSize: 'var(--text-body-lg)',
-              outline: 'none',
-              background: '#ffffff',
-              color: '#181d26',
-              fontFamily: 'var(--font-body)',
-              transition: 'border-color 150ms ease, box-shadow 150ms ease',
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = '#1b61c9'
-              e.target.style.boxShadow = '0 0 0 4px rgba(27,97,201,0.1)'
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = 'var(--color-border)'
-              e.target.style.boxShadow = 'none'
+              position: 'absolute',
+              width: '28rem',
+              height: '28rem',
+              right: '-8rem',
+              bottom: '-17rem',
+              borderRadius: '50%',
+              background: 'rgba(255,255,255,0.18)',
             }}
           />
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              aria-label="Clear search"
-              style={{
-                position: 'absolute',
-                right: '1rem', top: '50%',
-                transform: 'translateY(-50%)',
-                background: 'rgba(24,29,38,0.06)',
-                border: 'none',
-                borderRadius: '0.375rem',
-                padding: '0.25rem 0.5rem',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                color: 'var(--color-text-weak)',
-                cursor: 'pointer',
-              }}
-            >
-              Clear
-            </button>
-          )}
-        </div>
 
-        {/* Two-column docs layout */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 14rem) minmax(0, 1fr)',
-          gap: '3rem',
-          alignItems: 'start',
-        }}>
+          <div className="container-content grid min-h-[24rem] items-center gap-12 py-14 lg:grid-cols-[1.15fr_0.85fr] lg:py-16">
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: '42rem' }}>
+              <p style={{ marginBottom: '0.625rem', fontWeight: 700, color: 'rgba(18,18,18,0.65)' }}>
+                Help Center
+              </p>
+              <h1 className="text-display" style={{ marginBottom: '1.75rem', color: '#121212' }}>
+                How can we help?
+              </h1>
 
-          {/* LEFT: Sticky topic sidebar */}
-          <nav style={{
-            position: 'sticky',
-            top: '6rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.25rem',
-          }}>
-            <div style={{
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--color-text-muted)',
-              fontFamily: 'var(--font-display)',
-              marginBottom: '0.625rem',
-              padding: '0 0.625rem',
-            }}>
-              On this page
-            </div>
-            {FAQ_CATEGORIES.map((cat) => {
-              const count = grouped[cat.id].length
-              const dimmed = count === 0
-              return (
-                <a
-                  key={cat.id}
-                  href={`#cat-${cat.id}`}
+              <form
+                onSubmit={submitSearch}
+                role="search"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  width: '100%',
+                  maxWidth: '38rem',
+                  gap: '0.5rem',
+                  padding: '0.375rem 0.375rem 0.375rem 1rem',
+                  border: '1px solid rgba(18,18,18,0.12)',
+                  borderRadius: '0.875rem',
+                  backgroundColor: '#ffffff',
+                  boxShadow: '0 1rem 2.5rem rgba(18,18,18,0.12)',
+                }}
+              >
+                <SearchIcon className="h-5 w-5 shrink-0" />
+                <input
+                  type="search"
+                  aria-label="Search frequently asked questions"
+                  placeholder="Search a question or topic"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '0.625rem',
-                    padding: '0.5rem 0.625rem',
-                    borderRadius: '0.5rem',
+                    minWidth: 0,
+                    flex: 1,
+                    border: 0,
+                    outline: 0,
+                    padding: '0.75rem 0.25rem',
+                    background: 'transparent',
+                    color: '#121212',
+                    fontFamily: 'var(--font-body)',
                     fontSize: 'var(--text-body)',
-                    fontWeight: 500,
-                    color: dimmed ? 'var(--color-text-muted)' : '#181d26',
-                    textDecoration: 'none',
-                    opacity: dimmed ? 0.5 : 1,
-                    transition: 'background 120ms ease',
-                    fontFamily: 'var(--font-display)',
+                    fontWeight: 600,
                   }}
-                  onMouseEnter={(e) => { if (!dimmed) (e.currentTarget as HTMLElement).style.background = '#f1f5f9' }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                />
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ flexShrink: 0, minHeight: '2.875rem', padding: '0.75rem 1.25rem' }}
                 >
-                  <span style={{ color: cat.accent, flexShrink: 0 }}>
-                    <cat.Icon className="w-4 h-4" />
-                  </span>
-                  <span style={{ flex: 1 }}>{cat.label}</span>
-                  <span style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--color-text-muted)' }}>
-                    {count}
-                  </span>
-                </a>
-              )
-            })}
-          </nav>
+                  Search
+                </button>
+              </form>
+              <p style={{ marginTop: '0.875rem', color: 'rgba(18,18,18,0.62)', fontSize: '0.875rem' }}>
+                Try “minimum,” “VPN,” “risk,” or “partner.”
+              </p>
+            </div>
 
-          {/* RIGHT: Grouped Q&A */}
-          <div style={{ minWidth: 0 }}>
-
-            {/* Result count header */}
-            {search && (
-              <div style={{
-                fontSize: 'var(--text-body)',
-                color: 'var(--color-text-weak)',
-                marginBottom: '1.75rem',
-                paddingBottom: '1rem',
-                borderBottom: '1px solid var(--color-border-light)',
-              }}>
-                {totalVisible === 0
-                  ? <>No matches for <strong style={{ color: '#181d26' }}>&ldquo;{search}&rdquo;</strong>. Try a broader term, or contact your partner.</>
-                  : <><strong style={{ color: '#181d26' }}>{totalVisible}</strong> {totalVisible === 1 ? 'answer' : 'answers'} matching <strong style={{ color: '#181d26' }}>&ldquo;{search}&rdquo;</strong></>}
+            <div className="relative hidden min-h-[15rem] lg:block" aria-hidden="true">
+              <div style={{ position: 'absolute', top: '0.25rem', right: '5rem', width: '8.5rem', height: '8.5rem', display: 'grid', placeItems: 'center', borderRadius: '2rem', background: '#121212', color: '#ffffff', fontFamily: 'var(--font-display)', fontSize: '5rem', fontWeight: 800, transform: 'rotate(6deg)', boxShadow: '0 1.5rem 3rem rgba(18,18,18,0.2)' }}>
+                ?
               </div>
-            )}
-
-            {totalVisible === 0 && !search && (
-              <div style={{
-                background: '#f8fafc',
-                border: '1px solid var(--color-border-light)',
-                borderRadius: '0.875rem',
-                padding: '3rem 2rem',
-                textAlign: 'center',
-              }}>
-                <span style={{ display: 'inline-block', color: 'var(--color-text-muted)', marginBottom: '0.875rem' }}>
-                  <SearchIcon className="w-8 h-8" />
-                </span>
-                <p style={{ color: 'var(--color-text-muted)', margin: 0 }}>
-                  No FAQs published yet. Check back soon.
-                </p>
+              <div style={{ position: 'absolute', left: '0', bottom: '2rem', padding: '0.875rem 1.125rem', borderRadius: '0.875rem', background: '#ffffff', fontWeight: 700, transform: 'rotate(-3deg)', boxShadow: '0 0.75rem 2rem rgba(18,18,18,0.12)' }}>
+                AI trading bot
               </div>
-            )}
-
-            {/* Grouped sections */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-              {visibleCats.map((cat) => (
-                <section key={cat.id} id={`cat-${cat.id}`} style={{ scrollMarginTop: '6rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      width: '2rem', height: '2rem',
-                      borderRadius: '0.5rem',
-                      background: `${cat.accent}14`,
-                      color: cat.accent,
-                    }}>
-                      <cat.Icon className="w-5 h-5" />
-                    </span>
-                    <h2 style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: '1.375rem',
-                      fontWeight: 800,
-                      color: '#181d26',
-                      letterSpacing: '-0.015em',
-                      margin: 0,
-                    }}>
-                      {cat.label}
-                    </h2>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 700,
-                      color: 'var(--color-text-muted)',
-                      background: '#f1f5f9',
-                      borderRadius: '99px',
-                      padding: '0.125rem 0.5rem',
-                      marginLeft: '0.25rem',
-                    }}>
-                      {grouped[cat.id].length}
-                    </span>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {grouped[cat.id].map((faq) => {
-                      const isOpen = openIds.has(faq.id)
-                      return (
-                        <div
-                          key={faq.id}
-                          style={{
-                            background: '#ffffff',
-                            border: '1px solid var(--color-border)',
-                            borderRadius: '0.75rem',
-                            overflow: 'hidden',
-                            transition: 'border-color 150ms ease, box-shadow 150ms ease',
-                            boxShadow: isOpen ? '0 4px 16px rgba(24,29,38,0.06)' : 'none',
-                            borderColor: isOpen ? cat.accent : 'var(--color-border)',
-                          }}
-                        >
-                          <button
-                            onClick={() => toggle(faq.id)}
-                            aria-expanded={isOpen}
-                            style={{
-                              display: 'flex', width: '100%',
-                              alignItems: 'center', justifyContent: 'space-between',
-                              gap: '1rem',
-                              padding: '1rem 1.25rem',
-                              textAlign: 'left',
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            <span style={{
-                              fontSize: 'var(--text-body)',
-                              fontWeight: 600,
-                              color: '#181d26',
-                              fontFamily: 'var(--font-display)',
-                              lineHeight: 1.45,
-                            }}>
-                              {faq.title}
-                            </span>
-                            <span
-                              aria-hidden
-                              style={{
-                                flexShrink: 0,
-                                width: '1.5rem', height: '1.5rem',
-                                borderRadius: '50%',
-                                background: isOpen ? cat.accent : '#f1f5f9',
-                                color: isOpen ? '#ffffff' : cat.accent,
-                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                transition: 'background 150ms ease, transform 200ms ease',
-                                transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-                                fontSize: '1rem', fontWeight: 400, lineHeight: 1,
-                              }}
-                            >
-                              +
-                            </span>
-                          </button>
-                          {isOpen && (
-                            <div style={{
-                              padding: '0 1.25rem 1.25rem',
-                              borderTop: '1px solid var(--color-border-light)',
-                            }}>
-                              {faq.body_html ? (
-                                <div
-                                  className="cms-content"
-                                  style={{
-                                    fontSize: 'var(--text-body)',
-                                    lineHeight: 1.65,
-                                    color: 'var(--color-text-weak)',
-                                    paddingTop: '1rem',
-                                  }}
-                                  dangerouslySetInnerHTML={{ __html: faq.body_html }}
-                                />
-                              ) : (
-                                <p style={{ paddingTop: '1rem', fontSize: 'var(--text-body)', color: 'var(--color-text-muted)' }}>
-                                  No answer content yet.
-                                </p>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </section>
-              ))}
-
-              {/* Uncategorized FAQs (if any) */}
-              {grouped['_uncat'] && grouped['_uncat'].length > 0 && (
-                <section style={{ scrollMarginTop: '6rem' }}>
-                  <h2 style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: '1.375rem',
-                    fontWeight: 800,
-                    color: '#181d26',
-                    letterSpacing: '-0.015em',
-                    margin: '0 0 1.25rem',
-                  }}>
-                    Other questions
-                  </h2>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {grouped['_uncat'].map((faq) => {
-                      const isOpen = openIds.has(faq.id)
-                      return (
-                        <div key={faq.id} style={{
-                          background: '#ffffff',
-                          border: '1px solid var(--color-border)',
-                          borderRadius: '0.75rem',
-                          overflow: 'hidden',
-                        }}>
-                          <button
-                            onClick={() => toggle(faq.id)}
-                            style={{
-                              display: 'flex', width: '100%',
-                              alignItems: 'center', justifyContent: 'space-between',
-                              padding: '1rem 1.25rem',
-                              textAlign: 'left',
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              gap: '1rem',
-                            }}
-                          >
-                            <span style={{ fontSize: 'var(--text-body)', fontWeight: 600, color: '#181d26', fontFamily: 'var(--font-display)' }}>
-                              {faq.title}
-                            </span>
-                            <span aria-hidden style={{
-                              flexShrink: 0,
-                              transition: 'transform 200ms ease',
-                              transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-                              color: '#1b61c9',
-                              fontSize: '1.25rem', fontWeight: 300,
-                            }}>+</span>
-                          </button>
-                          {isOpen && faq.body_html && (
-                            <div
-                              className="cms-content"
-                              style={{
-                                padding: '1rem 1.25rem 1.25rem',
-                                borderTop: '1px solid var(--color-border-light)',
-                                fontSize: 'var(--text-body)',
-                                lineHeight: 1.65,
-                                color: 'var(--color-text-weak)',
-                              }}
-                              dangerouslySetInnerHTML={{ __html: faq.body_html }}
-                            />
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </section>
-              )}
+              <div style={{ position: 'absolute', right: '0', bottom: '0', padding: '0.875rem 1.125rem', borderRadius: '0.875rem', background: '#ecfdf5', color: '#047857', fontWeight: 700, transform: 'rotate(2deg)', boxShadow: '0 0.75rem 2rem rgba(18,18,18,0.1)' }}>
+                Getting started
+              </div>
             </div>
           </div>
-        </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 3. CLOSING CTA ── */}
+        {!search && popularFaqs.length > 0 && (
+          <section className="container-content py-20" aria-labelledby="popular-faqs-heading">
+            <h2 id="popular-faqs-heading" className="text-heading" style={{ marginBottom: '2rem' }}>
+              Popular questions
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {popularFaqs.map((faq) => (
+                <button
+                  key={faq.id}
+                  type="button"
+                  onClick={() => openPopularFaq(faq.id)}
+                  className="group flex w-full items-center justify-between gap-5 rounded-2xl bg-white p-6 text-left transition-colors hover:bg-[#e8e8e8]"
+                  style={{ border: 0, cursor: 'pointer', color: '#121212' }}
+                >
+                  <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', fontWeight: 700, lineHeight: 1.3 }}>
+                    {faq.title}
+                  </span>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-black text-white transition-transform group-hover:translate-x-1" aria-hidden="true">
+                    →
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {!search && topicCategories.length > 0 && (
+          <nav className="container-content pb-20" aria-labelledby="browse-topics-heading">
+            <h2 id="browse-topics-heading" className="text-heading" style={{ marginBottom: '2rem' }}>
+              Browse by topic
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {topicCategories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => scrollToId(`cat-${category.id}`)}
+                  className="group flex min-h-[12rem] flex-col items-start rounded-2xl bg-white p-6 text-left transition-transform hover:-translate-y-1"
+                  style={{ border: '1px solid var(--color-border-light)', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
+                >
+                  <span style={{ display: 'grid', width: '3rem', height: '3rem', placeItems: 'center', marginBottom: '1.5rem', borderRadius: '0.875rem', color: category.accent, backgroundColor: category.tint }}>
+                    <category.Icon className="h-6 w-6" />
+                  </span>
+                  <span style={{ marginBottom: '0.375rem', color: '#121212', fontFamily: 'var(--font-display)', fontSize: '1.0625rem', fontWeight: 800 }}>
+                    {category.label}
+                  </span>
+                  <span style={{ color: 'var(--color-fg-muted)', fontSize: '0.875rem', lineHeight: 1.5 }}>
+                    {category.description}
+                  </span>
+                  <span style={{ marginTop: 'auto', paddingTop: '1rem', color: category.accent, fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    {categoryCounts[category.id]} {categoryCounts[category.id] === 1 ? 'answer' : 'answers'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
+
+        <section id="faq-answers" className="section section-surface" style={{ scrollMarginTop: '6rem' }}>
+          <div className="container-content" style={{ maxWidth: '62rem' }}>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between" style={{ marginBottom: '3rem' }}>
+              <div>
+                <p className="badge mb-4 inline-flex">Answers</p>
+                <h2 className="text-heading">
+                  {search ? 'Search results' : 'Frequently asked questions'}
+                </h2>
+              </div>
+              {search && (
+                <button type="button" className="btn btn-ghost" onClick={() => setSearch('')}>
+                  Clear search
+                </button>
+              )}
+            </div>
+
+            {search && (
+              <p style={{ margin: '-1.75rem 0 2.5rem', color: 'var(--color-fg-muted)' }}>
+                {totalVisible === 0
+                  ? <>No answers found for <strong>“{search}”</strong>.</>
+                  : <>{totalVisible} {totalVisible === 1 ? 'answer' : 'answers'} found for <strong>“{search}”</strong>.</>}
+              </p>
+            )}
+
+            {totalVisible === 0 ? (
+              <div style={{ padding: '3rem 2rem', border: '1px solid var(--color-border)', borderRadius: '1rem', backgroundColor: 'var(--color-surface-alt)', textAlign: 'center' }}>
+                <SearchIcon className="mx-auto mb-4 h-8 w-8" />
+                <h3 className="text-subheading" style={{ marginBottom: '0.5rem' }}>Try another search</h3>
+                <p style={{ color: 'var(--color-fg-muted)' }}>Use a broader word, or browse the topic cards above.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
+                {visibleCategories.map((category) => (
+                  <section key={category.id} id={`cat-${category.id}`} style={{ scrollMarginTop: '7rem' }}>
+                    <div className="flex items-center gap-4" style={{ marginBottom: '1.25rem' }}>
+                      <span style={{ display: 'grid', width: '2.75rem', height: '2.75rem', flexShrink: 0, placeItems: 'center', borderRadius: '0.875rem', color: category.accent, backgroundColor: category.tint }}>
+                        <category.Icon className="h-5 w-5" />
+                      </span>
+                      <div>
+                        <h3 style={{ margin: 0, color: '#121212', fontFamily: 'var(--font-display)', fontSize: '1.375rem', fontWeight: 800 }}>
+                          {category.label}
+                        </h3>
+                        <p style={{ margin: '0.125rem 0 0', color: 'var(--color-fg-muted)', fontSize: '0.875rem' }}>
+                          {grouped[category.id].length} {grouped[category.id].length === 1 ? 'question' : 'questions'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {grouped[category.id].map((faq) => {
+                        const isOpen = openIds.has(faq.id)
+                        return (
+                          <article
+                            key={faq.id}
+                            id={`faq-${faq.id}`}
+                            style={{
+                              overflow: 'hidden',
+                              scrollMarginTop: '7rem',
+                              border: `1px solid ${isOpen ? category.accent : 'var(--color-border)'}`,
+                              borderRadius: '1rem',
+                              backgroundColor: '#ffffff',
+                              boxShadow: isOpen ? '0 0.75rem 2rem rgba(18,18,18,0.07)' : 'none',
+                              transition: 'border-color 150ms ease, box-shadow 150ms ease',
+                            }}
+                          >
+                            <button
+                              type="button"
+                              onClick={() => toggle(faq.id)}
+                              aria-expanded={isOpen}
+                              className="flex w-full items-center justify-between gap-5 p-5 text-left sm:p-6"
+                              style={{ border: 0, background: 'transparent', cursor: 'pointer', color: '#121212' }}
+                            >
+                              <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', fontWeight: 700, lineHeight: 1.35 }}>
+                                {faq.title}
+                              </span>
+                              <span
+                                className="grid h-9 w-9 shrink-0 place-items-center rounded-full"
+                                aria-hidden="true"
+                                style={{ backgroundColor: isOpen ? category.accent : '#121212', color: '#ffffff', fontSize: '1.25rem', transform: isOpen ? 'rotate(45deg)' : 'none', transition: 'transform 180ms ease, background-color 180ms ease' }}
+                              >
+                                +
+                              </span>
+                            </button>
+                            {isOpen && (
+                              <div style={{ padding: '0 1.5rem 1.5rem' }}>
+                                <div style={{ height: '1px', marginBottom: '1.25rem', backgroundColor: 'var(--color-border-light)' }} />
+                                {faq.body_html ? (
+                                  <div
+                                    className="cms-content"
+                                    style={{ color: 'var(--color-fg-muted)', fontSize: 'var(--text-body)', lineHeight: 1.7 }}
+                                    dangerouslySetInnerHTML={{ __html: faq.body_html }}
+                                  />
+                                ) : (
+                                  <p style={{ color: 'var(--color-fg-muted)' }}>Answer coming soon.</p>
+                                )}
+                              </div>
+                            )}
+                          </article>
+                        )
+                      })}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+
       <HomeCTABand />
-
     </>
   )
 }
-
