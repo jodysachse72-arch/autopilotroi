@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { CmsPost } from '@/lib/cms/types'
 import HomeCTABand from '@/components/home/CTABand'
+import PageShell from '@/components/sections/PageShell'
 import {
   AcademyIcon,
   AutomationIcon,
@@ -98,15 +99,14 @@ export default function FaqsPageClient({ faqs }: Props) {
   }
 
   return (
-    <>
-      <main style={{ backgroundColor: 'var(--color-surface-alt)' }}>
+    <PageShell>
         {/* OnePay-inspired help-center hero, adapted to the AutoPilotROI brand. */}
         <section
           style={{
             position: 'relative',
             minHeight: '24rem',
             overflow: 'hidden',
-            borderRadius: '0 0 1.75rem 1.75rem',
+            borderRadius: 'var(--radius-section, 1.125rem)',
             background: 'linear-gradient(135deg, #2d7ff9 0%, #4fb8f6 58%, #76d4f7 100%)',
           }}
         >
@@ -123,7 +123,17 @@ export default function FaqsPageClient({ faqs }: Props) {
             }}
           />
 
-          <div className="container-content grid min-h-[24rem] items-center gap-12 py-14 lg:grid-cols-[1.15fr_0.85fr] lg:py-16">
+          <div
+            className="grid min-h-[24rem] items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]"
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              width: '100%',
+              maxWidth: 'var(--container)',
+              margin: '0 auto',
+              padding: 'clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 5vw, 4rem)',
+            }}
+          >
             <div style={{ position: 'relative', zIndex: 1, maxWidth: '42rem' }}>
               <p style={{ marginBottom: '0.625rem', fontWeight: 700, color: 'rgba(18,18,18,0.65)' }}>
                 Help Center
@@ -195,46 +205,56 @@ export default function FaqsPageClient({ faqs }: Props) {
           </div>
         </section>
 
-        {!search && popularFaqs.length > 0 && (
-          <section className="container-content py-20" aria-labelledby="popular-faqs-heading">
-            <h2 id="popular-faqs-heading" className="text-heading" style={{ marginBottom: '2rem' }}>
-              Popular questions
-            </h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              {popularFaqs.map((faq) => (
-                <button
-                  key={faq.id}
-                  type="button"
-                  onClick={() => openPopularFaq(faq.id)}
-                  className="group flex w-full items-center justify-between gap-5 rounded-2xl bg-white p-6 text-left transition-colors hover:bg-[#e8e8e8]"
-                  style={{ border: 0, cursor: 'pointer', color: '#121212' }}
-                >
-                  <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', fontWeight: 700, lineHeight: 1.3 }}>
-                    {faq.title}
-                  </span>
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-black text-white transition-transform group-hover:translate-x-1" aria-hidden="true">
-                    →
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+        {!search && (popularFaqs.length > 0 || topicCategories.length > 0) && (
+          <section
+            aria-label="Explore frequently asked questions"
+            style={{
+              borderRadius: 'var(--radius-section, 1.125rem)',
+              backgroundColor: 'var(--color-surface)',
+              padding: 'clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 5vw, 4rem)',
+            }}
+          >
+            <div style={{ width: '100%', maxWidth: 'var(--container)', margin: '0 auto' }}>
+              {popularFaqs.length > 0 && (
+                <div aria-labelledby="popular-faqs-heading">
+                  <h2 id="popular-faqs-heading" className="text-heading" style={{ marginBottom: '2rem' }}>
+                    Popular questions
+                  </h2>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {popularFaqs.map((faq) => (
+                      <button
+                        key={faq.id}
+                        type="button"
+                        onClick={() => openPopularFaq(faq.id)}
+                        className="group flex w-full items-center justify-between gap-5 rounded-2xl text-left transition-colors hover:bg-[#e8e8e8]"
+                        style={{ border: 0, cursor: 'pointer', color: '#121212', backgroundColor: 'var(--color-surface-alt)', padding: '1.5rem' }}
+                      >
+                        <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', fontWeight: 700, lineHeight: 1.3 }}>
+                          {faq.title}
+                        </span>
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-black text-white transition-transform group-hover:translate-x-1" aria-hidden="true">
+                          →
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-        {!search && topicCategories.length > 0 && (
-          <nav className="container-content pb-20" aria-labelledby="browse-topics-heading">
-            <h2 id="browse-topics-heading" className="text-heading" style={{ marginBottom: '2rem' }}>
-              Browse by topic
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {topicCategories.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => scrollToId(`cat-${category.id}`)}
-                  className="group flex min-h-[12rem] flex-col items-start rounded-2xl bg-white p-6 text-left transition-transform hover:-translate-y-1"
-                  style={{ border: '1px solid var(--color-border-light)', cursor: 'pointer', boxShadow: 'var(--shadow-sm)' }}
-                >
+              {topicCategories.length > 0 && (
+                <nav aria-labelledby="browse-topics-heading" style={{ marginTop: popularFaqs.length > 0 ? 'clamp(4rem, 8vw, 6rem)' : 0 }}>
+                  <h2 id="browse-topics-heading" className="text-heading" style={{ marginBottom: '2rem' }}>
+                    Browse by topic
+                  </h2>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {topicCategories.map((category) => (
+                      <button
+                        key={category.id}
+                        type="button"
+                        onClick={() => scrollToId(`cat-${category.id}`)}
+                        className="group flex min-h-[12rem] flex-col items-start rounded-2xl bg-white text-left transition-transform hover:-translate-y-1"
+                        style={{ border: '1px solid var(--color-border)', cursor: 'pointer', boxShadow: 'var(--shadow-sm)', padding: '1.5rem' }}
+                      >
                   <span style={{ display: 'grid', width: '3rem', height: '3rem', placeItems: 'center', marginBottom: '1.5rem', borderRadius: '0.875rem', color: category.accent, backgroundColor: category.tint }}>
                     <category.Icon className="h-6 w-6" />
                   </span>
@@ -247,14 +267,25 @@ export default function FaqsPageClient({ faqs }: Props) {
                   <span style={{ marginTop: 'auto', paddingTop: '1rem', color: category.accent, fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                     {categoryCounts[category.id]} {categoryCounts[category.id] === 1 ? 'answer' : 'answers'}
                   </span>
-                </button>
-              ))}
+                      </button>
+                    ))}
+                  </div>
+                </nav>
+              )}
             </div>
-          </nav>
+          </section>
         )}
 
-        <section id="faq-answers" className="section section-surface" style={{ scrollMarginTop: '6rem' }}>
-          <div className="container-content" style={{ maxWidth: '62rem' }}>
+        <section
+          id="faq-answers"
+          style={{
+            scrollMarginTop: '6rem',
+            borderRadius: 'var(--radius-section, 1.125rem)',
+            backgroundColor: 'var(--color-surface)',
+            padding: 'clamp(3.5rem, 7vw, 6rem) clamp(1.5rem, 5vw, 4rem)',
+          }}
+        >
+          <div style={{ width: '100%', maxWidth: '62rem', margin: '0 auto' }}>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between" style={{ marginBottom: '3rem' }}>
               <div>
                 <p className="badge mb-4 inline-flex">Answers</p>
@@ -360,9 +391,7 @@ export default function FaqsPageClient({ faqs }: Props) {
             )}
           </div>
         </section>
-      </main>
-
       <HomeCTABand />
-    </>
+    </PageShell>
   )
 }
