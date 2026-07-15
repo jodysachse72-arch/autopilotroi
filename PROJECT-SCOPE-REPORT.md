@@ -1,5 +1,7 @@
 # AutoPilotROI — Full Project Scope Report
 
+> **Historical report (May 2026).** This document preserves the project's earlier state and decisions; its “today,” workflow, architecture status, and next-step claims are not current instructions. The Antigravity/LOCKED-zone model described below has been retired. Use `PROJECT-CURRENT-STATE.md` and `WORKFLOW.md` for current work.
+
 This document is self-contained context for anyone (or any AI) coming in cold to AutoPilotROI. It covers what the product is, the journey it took to get here, what's true today, where it's going, and at the bottom a specific image brief for visualizing the story.
 
 ---

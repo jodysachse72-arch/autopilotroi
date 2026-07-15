@@ -1,5 +1,7 @@
 # Funnel Build Plan — Signup → Assessment → Waiting Room → Onboarding
 
+> **Historical plan.** This records the assumptions used during the earlier funnel build and is not a current execution checklist. Several “Currently” statements are now stale, and all Antigravity/LOCKED-zone instructions below are retired. Use `PROJECT-CURRENT-STATE.md`, inspect the live code and Supabase state, and follow `WORKFLOW.md` before planning new funnel work.
+
 The funnel is the conversion spine of AutoPilotROI: prospect lands, gives Name + Email, takes a short readiness assessment, lands in a waiting room with Aurum Foundation context videos, and waits for a partner to push them into onboarding via ThriveDesk. This document is the build path.
 
 ## The intended funnel

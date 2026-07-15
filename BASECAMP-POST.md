@@ -1,5 +1,7 @@
 # From Puck to production — a quick recalibration story
 
+> **Historical Basecamp post.** Preserved as a record of the May 2026 transition. Its Antigravity, Vercel Comments, and locked-zone workflow has since been replaced by the shared ChatGPT workflow in `WORKFLOW.md`.
+
 For the last two months I've been trying to build a way for our non-technical teammates to edit AutoPilotROI without breaking anything. I tried three different visual editors and a custom CMS on top of our bespoke frontend. None of it stuck. The frontend kept degrading, AI agents kept reinterpreting approved work, and by the end I was spending more time keeping the editor system alive than actually editing anything.
 
 Last week, Google shipped a major Antigravity update that changed how AI agents read, scope, and edit code. That was the straw that broke the camel's back of the visual-CMS approach. I stepped back, threw out the editor stack we'd been layering together, and rebuilt the editing flow from scratch around a completely different idea.

@@ -1,30 +1,9 @@
-# ANTIGRAVITY-PROMPT.md — Archived (May 28, 2026)
+# Antigravity Prompt — Historical Archive
 
-This file previously held a Part 1 "non-negotiable rules" prompt and a Part 2 per-change template intended to be pasted into Antigravity manually for each change.
+This file is retained only to explain references in older project history. Antigravity and its special prompting system are no longer used for AutoPilotROI.
 
-**It is no longer used.**
+The former LOCKED-zone restrictions, override phrase, one-comment/one-branch rule, and Claude-to-Antigravity handoff are retired. They are not current project instructions and must not be revived by an agent reading old commits or documents.
 
-The operating model changed on May 28, 2026 after Test 1 + Test 2 of the review loop validated a better flow. Per-comment prompts are now generated fresh by the orchestrating Claude session, with the current strengthened rules — including the LOCKED-zone hard refusal and the explicit override phrase `override LOCKED for this change` — baked in every time. There is no template to maintain, paste, or keep in sync.
+The current operating model lives in `WORKFLOW.md`, and durable repository instructions live in `AGENTS.md`.
 
-## Current operating model
-
-1. Leave a comment on a Vercel preview using the toolbar.
-2. Click "Copy for Agent."
-3. Paste the comment + framework context to the orchestrating Claude session.
-4. Claude generates a complete, paste-ready Antigravity prompt with the latest rules.
-5. Paste the prompt into a fresh Antigravity Sonnet 4.6 session.
-6. Approve or reject Antigravity's restate-and-confirm.
-7. Antigravity commits and pushes from its own environment, opens the PR, and merges on `ship it`.
-
-The mechanism, the LOCKED zone, and the override phrase live in [WORKFLOW.md](./WORKFLOW.md).
-
-## If you ever need the old template
-
-The original Part 1 / Part 2 content is preserved in git history:
-
-```
-git log --all --oneline -- ANTIGRAVITY-PROMPT.md
-git show <pre-archive-SHA>:ANTIGRAVITY-PROMPT.md
-```
-
-But you almost certainly don't need it. The current per-comment prompt is stricter and more current than the old template was.
+The original prompt remains available in Git history if its historical wording is ever needed for an audit.
