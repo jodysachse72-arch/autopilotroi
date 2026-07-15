@@ -353,8 +353,14 @@ export default function FaqsPageClient({ faqs }: Props) {
                               type="button"
                               onClick={() => toggle(faq.id)}
                               aria-expanded={isOpen}
-                              className="flex w-full items-center justify-between gap-5 p-5 text-left sm:p-6"
-                              style={{ border: 0, background: 'transparent', cursor: 'pointer', color: '#121212' }}
+                              className="flex w-full items-center justify-between gap-5 text-left"
+                              style={{
+                                border: 0,
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                color: '#121212',
+                                padding: 'clamp(1.25rem, 3vw, 1.5rem)',
+                              }}
                             >
                               <span style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-body-lg)', fontWeight: 700, lineHeight: 1.35 }}>
                                 {faq.title}
