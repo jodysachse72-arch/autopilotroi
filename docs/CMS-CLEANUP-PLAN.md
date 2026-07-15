@@ -1,5 +1,7 @@
 # CMS Cleanup + Blog Authoring — Plan (T2–T4)
 
+> **Historical execution record.** The cleanup has already occurred. References to Antigravity, gated prompts, and “source of truth” apply only to that completed work and are not current operating instructions. See `WORKFLOW.md` and `PROJECT-CURRENT-STATE.md`.
+
 *Source of truth. Executed by Antigravity in gated prompts. T1 (Puck removal) is DONE — main at c246038, Puck archived to a `puck-archive` branch + `supabase/_archive/`, `puck_pages`/`puck_page_revisions` dropped.*
 
 ## Keep (the working content path)
