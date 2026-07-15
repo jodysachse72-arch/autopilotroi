@@ -1,5 +1,7 @@
 # ScreenPal Video Outline — AutoPilotROI Production Flow
 
+> **Historical outline.** Do not use this to train Barry on the current process. It demonstrates the retired Antigravity/LOCKED-zone workflow. Use `REVIEW-GUIDE-for-Barry.md` instead.
+
 Total target length: 6–8 minutes. Conversational, not scripted. Use these as talking points to riff from, not lines to read.
 
 ## 1. Cold open — the punchline first (~30 sec)
