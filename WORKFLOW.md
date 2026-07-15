@@ -1,109 +1,73 @@
-# AutoPilotROI — Working Workflow
+# AutoPilotROI — Current Working Workflow
 
-The operating manual for getting changes into the site without architecture chaos. Source of truth is the **real frontend code in Git**. Implementation happens in **Claude-in-Antigravity** (git + Supabase access). Review happens on **Vercel preview deployments via Vercel Comments**. There is no CMS, no visual builder, no Stitch in this loop.
+This is the operating model for AutoPilotROI as of July 15, 2026. The shared ChatGPT project is the collaboration hub. GitHub holds the source of truth, Vercel hosts development deployments, and Supabase provides the database and authentication.
 
-## The roles
+## Scope boundary
 
-- **Code (Git):** the single source of truth. The approved frontend lives here and is treated as a fixed, high-value asset — not something to "rebuild."
-- **Antigravity (Claude):** where approved changes get implemented in code, and where Supabase (your backend/DB) is wired in. This is your build environment.
-- **Vercel:** auto-deploys a preview URL for every branch/PR. Hosts the live comment threads.
-- **Barry:** reviews on the preview and leaves comments. Never touches code.
-- **You (Jody):** triage comments, direct the implementation in Antigravity, approve, promote to production.
+- All current work is on the new application deployed through Vercel.
+- The existing public WordPress site and its domain are outside this project's working scope.
+- Do not inspect, compare with, edit, configure, or point the public domain until Jody explicitly starts the launch/domain-switch phase.
+- A Vercel deployment labeled “Production” is still part of the new application's development environment until that explicit launch.
 
-## The loop (memorize this)
+## How Jody and Barry work with ChatGPT
 
-1. **Request** — Barry (or you) leaves a comment on the preview, pinned to the exact element.
-2. **Branch** — create a short-lived branch for that change (e.g. `nav-dropdown`, `hero-copy`).
-3. **Implement** — in Antigravity, make a **scoped, diff-level** change. Edit the specific component/file. Do not regenerate pages or "improve" surrounding code.
-4. **Preview** — push the branch. Vercel builds a fresh preview URL automatically.
-5. **Review** — send Barry the new URL. He resolves the comment or replies.
-6. **Merge** — when approved, merge to `main` and promote to production.
+Jody and Barry can describe changes in ordinary language. They do not need file names, selectors, technical prompts, magic phrases, or knowledge of GitHub and Vercel.
 
-One comment → one branch → one small diff → one preview. Keep changes small and the loop stays fast and predictable.
+Examples:
 
-## Canonical branch
+- “The headline on the signup page feels too salesy. Make it clearer and calmer.”
+- “Move this card below the video on mobile.”
+- “This flow let me continue without answering the question. Fix it.”
+- “Review the Command Center with me. I’ll tell you what I don’t like as we go.”
 
-**`main` is the source of truth.** On May 28, 2026 it was reset to the content of the retired `feature/frontend-rebuild` (through the `sections-stack` containment fix), then `8172827` removed Puck/CMS deadweight on top. Every other branch was retired into `archive/<name>` tags (14 of them). If you ever need to resurrect an old branch: `git branch <name> archive/<name>`. The previous "golden" reference was `visual-skin-upgrade`; it now lives only as `archive/visual-skin-upgrade`.
+Screenshots and page names are helpful but not mandatory. ChatGPT should inspect the relevant implementation, translate the request into a complete change, and ask a question only when the answer would materially change the intended outcome.
 
-There is one living branch (`main`) and short-lived change branches off it. That is the entire branching model. Do not recreate the historical sprawl.
+There is no LOCKED zone and no override phrase. Visual design, spacing, layout, copy, frontend behavior, backend behavior, and data wiring may all be changed when the request calls for it. Preserve unrelated approved work and avoid unrequested redesigns, but never refuse an intended change merely because it affects design or layout.
 
-## Branch & protection setup (one-time)
+## The normal change loop
 
-- **`main` is protected and is production.** No direct pushes. Changes arrive only via merged branches/PRs. (GitHub: Settings → Branches → add a protection rule on `main` requiring a PR before merge.)
-- **Every branch gets an automatic preview** — Vercel does this by default once the repo is connected. Confirm "Preview Deployments" is on in the Vercel project settings.
-- **Turn on Vercel Comments** for preview deployments (Vercel project → Settings → look for Comments/Toolbar; it's on by default for previews). Give Barry access to the project so he can comment.
-- **Branch naming:** short and descriptive — `hero-copy`, `nav-dropdown`, `pricing-section`. One concern per branch.
+1. **Request** — Jody or Barry explains what should change.
+2. **Inspect** — ChatGPT traces the relevant page, components, APIs, database behavior, and likely side effects.
+3. **Implement** — make the coherent set of changes needed for the requested outcome.
+4. **Verify** — run checks proportional to the risk: targeted tests, build/type checks, browser flow, responsive review, API behavior, and database verification as applicable.
+5. **Preview** — publish a Vercel preview when review is useful and provide the exact link and what to examine.
+6. **Refine** — Jody or Barry responds naturally in the same ChatGPT conversation.
+7. **Merge** — after approval, merge through a pull request to protected `main`.
 
-## Where Supabase fits (the architecture boundary)
+Related changes may travel together when that makes review clearer. Keep each branch coherent and reviewable; there is no arbitrary one-comment/one-file/one-branch rule.
 
-Keep four concerns separated by hard edges. Build them in this order; do not build the later ones until you need them.
+## Responsibilities ChatGPT owns
 
-1. **Public frontend** — what's approved and nearly ready. Static/SSR on Vercel. No auth. **Ship this first.**
-2. **Onboarding flows** — the signup/KYC funnel. Frontend renders the steps; **Supabase owns the state, validation, and data.** The frontend talks to Supabase only through its client/API — never embeds business logic in the UI.
-3. **Partner/backend** — anything beyond onboarding lives behind the same API boundary (Supabase functions/tables). The frontend knows it only through a documented contract.
-4. **Admin systems** — a **separate app behind auth.** Do not bolt dashboards into the public frontend. Defer until after launch.
+- Work from the existing repository rather than reinterpreting the application from scratch.
+- Check the blast radius before editing and preserve unrelated user work.
+- Follow a feature through the full stack when needed instead of stopping at a cosmetic surface fix.
+- State what was verified, what was not verified, and any genuine blocker.
+- Keep documentation aligned when architecture, workflow, or project status changes.
+- Prefer making progress over asking Jody or Barry to translate business intent into technical instructions.
 
-The one rule that prevents future chaos: **the public frontend talks to everything else only through APIs (Supabase), never through shared rendering or shared components.**
+## Safeguards that remain
 
-## Guardrails — how to stop AI redesigning approved work
+The retired AI restrictions are not the same as product security. Keep these real safeguards:
 
-This is the discipline that fixes what went wrong before. In Antigravity:
+- Authentication, role checks, row-level security, secret handling, and server-side authorization.
+- Protected `main` and pull-request review.
+- Tracked Supabase migrations for schema or policy changes.
+- No secrets in chat, source control, screenshots, logs, or client bundles.
+- No destructive production-data actions without explicit authorization and a recovery plan.
 
-- **Never say "rebuild," "redesign," or "improve the page."** Those words invite reinterpretation. Say "change this specific thing in this specific file."
-- **Scope every task to one approved comment.** "Barry's comment says the CTA should be teal — change the CTA colour token in `Button.tsx`." Nothing broader.
-- **Review the diff before merge.** If the diff touches files it shouldn't, reject it. Approved components don't change unless a comment asked them to.
-- **Treat the frontend as finished.** It is not a thing to keep re-solving. Visual design (colours, gradients, typography, card style) is locked.
-- **No regenerating from the live site.** Anchor every task to the existing repo, never to a fresh interpretation of the deployed site.
-- **The LOCKED zone is hard-blocked at step 1.** LOCKED includes: colors, gradients, typography; spacing, gaps, padding, margins; max-widths, min-widths, the `.sections-stack` wrapper (currently `max-width: 1440px`, `padding: 1.25rem`, `gap: 1.25rem`, individual sections `margin: 0`); section layouts, wrapper structure; and any property affecting how elements are positioned or sized. Agents must refuse to propose, scope, name files for, or investigate any LOCKED change without an explicit override. The May 28 disaster started here; this rule is what keeps it from recurring. See "The LOCKED zone override mechanism" below for how to authorize a deliberate LOCKED change.
+Never weaken security or data integrity simply to make a feature easier to implement.
 
-## The LOCKED zone override mechanism
+## Platform boundaries
 
-When a LOCKED-zone change is genuinely intended (a deliberate design update, not a misinterpretation of a vague comment), authorize it explicitly. A valid override request must contain BOTH:
+- **GitHub:** canonical code and history. Use short-lived branches and pull requests.
+- **Vercel:** development deployments and previews for the new application. Vercel Comments may be used when convenient, but they are optional rather than the collaboration backbone.
+- **Supabase:** database, authentication, storage, and server-side data policies. Treat the schema and RLS policies as part of the application, not an external afterthought.
+- **ChatGPT:** shared working room for requests, implementation, verification, previews, and refinement.
 
-1. The literal phrase `override LOCKED for this change`.
-2. Specific properties and values, not vague intent. Valid: `gap: 24px on the stats grid`. Invalid: `we need more spacing`.
+## Definition of done for a change
 
-Without both, agents refuse at step 1, identify which LOCKED zone the request touches, and stop — no file named, no direction proposed, no investigation. Validated May 28, 2026 with two iterations of the same vague request ("we need spacing between the cards"): the first iteration produced a soft refusal where the agent still proposed a direction, the rule was tightened, the same request was re-tested, and the second iteration produced a clean hard refusal. The strengthened mechanism is now baked into every per-comment prompt the orchestrator generates.
+A change is done when the requested outcome works, relevant checks pass or exceptions are clearly reported, the reviewable preview is available when needed, and no known adjacent regression has been left hidden.
 
-## Anti-gaslighting tactic
+## Launch boundary
 
-When you suspect the agent introduced a regression but it insists "it's fine," do not argue in prose. Force a structural comparison:
-
-1. Give the agent two URLs: the current preview and a known-good reference (e.g. a Vercel deployment SHA or `archive/visual-skin-upgrade` checkout).
-2. Tell it: "Open both at the same viewport width. Compare section width, padding, gaps, and wrapper structure. Report any difference in DOM or CSS. Do not tell me it's fine — show me a side-by-side."
-3. If it still can't see the difference, take screenshots yourself at the same viewport, drop them into the chat, and ask it to identify each visual delta. Visual evidence ends the argument.
-
-The May 28 `--container-card: 56rem` regression survived several "it's fine" assertions before being caught this way. Use the tactic at the first hint of a mismatch.
-
-## Tooling — what to use and what to skip
-
-The principle: **one shared surface for team review, one optional accelerator for solo implementation. Don't blur them.**
-
-**Use — team review surface (the backbone)**
-- **Vercel Preview Deployments + Vercel Comments.** Mature, shared, no install for Barry, native reply/resolve threads pinned to elements on the real site. This is the source of approved change requests. Nothing replaces it.
-
-**Optionally use — personal implementation accelerator (just for Jody, in Antigravity)**
-- **Markagent** (Chrome extension, free, zero setup, exports markdown prompts explicitly tuned for Antigravity). When you sit down to implement an approved Vercel comment, you can click the same element via Markagent on the preview, and it'll generate a richer prompt (CSS selector, component context, screenshot, viewport) than the bare comment text — better input quality means fewer wrong guesses from the agent. Paste into Antigravity using the Part 2 per-change template.
-- **Vibe Annotations** is the more powerful alternative (local MCP server, auto-read by the agent, live CSS tweaks). Better for localhost iteration than for staging/preview review. Worth considering later if you want a fully wired loop.
-- Either tool is optional. The loop works without them. They're speed boosters, not the backbone.
-
-**Do NOT use**
-- **Vibe Annotations' "watch mode" / autonomous loops** — an agent auto-implementing as annotations are dropped is the exact unsupervised multi-file behavior that broke the previous build. Manual export + diff review only.
-- **Generative design tools as editors** (Stitch, v0, Lovable, etc.). They reinterpret. Fine for greenfield ideation of *new* screens; never for editing approved work.
-- **Visual CMS / builders** (Puck, Builder.io, custom CMS, inline editors). Solving a problem you don't have. Defer indefinitely.
-- **Multiple review surfaces for the team.** Barry comments in one place — Vercel — or context fragments and nothing gets resolved cleanly.
-
-**Maturity note.** Vercel Comments is the mature, shared backbone. The annotation extensions are tiny and new (hundreds of users, recent builds) — fine as a personal accelerator you can drop any time, not safe as the team's collaboration substrate.
-
-## First two exercises (to build the muscle this week)
-
-1. **Content/copy pass** — Barry comments on wording across the site. Each comment → tiny text-only diff → preview → resolve. Lowest risk, fastest reps. Great for getting up to speed.
-2. **Navigation dropdown** — Barry comments where he wants it and what's in it. This is your first *structural* change through the full loop: branch `nav-dropdown` → implement in Antigravity → preview → review → merge. If this loop feels clean, your whole process works.
-
-## What you've stopped doing
-
-No Puck, no custom CMS, no inline editing, no Stitch-as-editor, no visual builders, no asking AI to reinterpret approved work, no admin dashboards before launch. The bottleneck was a review surface, and you now have one.
-
-## Definition of "ready to launch"
-
-Frontend frozen and approved · review loop run successfully on at least one real change · onboarding flow wired to Supabase and functional · `main` protected · previews + comments working for Barry. Admin and anything CMS-shaped come after.
+Finishing the application and switching the public domain are separate events. Do not begin domain work because the application appears ready. Jody will explicitly authorize the launch/domain-switch phase when the team is satisfied with the Vercel application.
