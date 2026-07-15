@@ -9,7 +9,9 @@ const PRODUCTS = [
     description: 'Fully automated 24/7 AI trading bot across Binance, Bybit, and KuCoin. Machine learning-powered market analysis.',
     tag: 'LIVE',
     tagColor: '#059669',
-    tagBg: 'rgba(5,150,105,0.10)',
+    tagBg: '#ecfdf5',
+    tagBorder: 'rgba(5,150,105,0.18)',
+    tagRing: 'rgba(5,150,105,0.14)',
   },
   {
     icon: '💳',
@@ -17,7 +19,9 @@ const PRODUCTS = [
     description: 'Spend your crypto anywhere in the world. Linked to your Aurum balance. Physical and virtual card available.',
     tag: 'LIVE',
     tagColor: '#059669',
-    tagBg: 'rgba(5,150,105,0.10)',
+    tagBg: '#ecfdf5',
+    tagBorder: 'rgba(5,150,105,0.18)',
+    tagRing: 'rgba(5,150,105,0.14)',
   },
   {
     icon: '🔄',
@@ -25,7 +29,9 @@ const PRODUCTS = [
     description: 'Trade 200+ crypto assets with institutional liquidity. Low fees, deep order books, fast settlement.',
     tag: 'LIVE',
     tagColor: '#059669',
-    tagBg: 'rgba(5,150,105,0.10)',
+    tagBg: '#ecfdf5',
+    tagBorder: 'rgba(5,150,105,0.18)',
+    tagRing: 'rgba(5,150,105,0.14)',
   },
   {
     icon: '🏦',
@@ -33,7 +39,9 @@ const PRODUCTS = [
     description: 'Digital banking on blockchain rails. IBAN accounts, cross-border transfers, DeFi access, multi-currency wallets.',
     tag: 'LAUNCHING',
     tagColor: '#7c3aed',
-    tagBg: 'rgba(124,58,237,0.10)',
+    tagBg: '#f5f3ff',
+    tagBorder: 'rgba(124,58,237,0.18)',
+    tagRing: 'rgba(124,58,237,0.14)',
   },
 ] as const
 
@@ -75,17 +83,48 @@ export default function Ecosystem() {
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.45, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl">{p.icon}</span>
+                <div className="flex items-center justify-between gap-4">
                   <span
-                    className="text-caption font-semibold px-3 py-1 rounded-full"
+                    className="flex shrink-0 items-center justify-center text-2xl"
+                    aria-hidden="true"
+                    style={{
+                      width: '3rem',
+                      height: '3rem',
+                      border: '1px solid var(--color-border-light)',
+                      borderRadius: '0.875rem',
+                      backgroundColor: 'var(--color-surface-alt)',
+                    }}
+                  >
+                    {p.icon}
+                  </span>
+                  <span
+                    className="inline-flex shrink-0 items-center rounded-full"
                     style={{
                       backgroundColor: p.tagBg,
                       color: p.tagColor,
-                      letterSpacing: 'var(--ls-wide)',
+                      border: `1px solid ${p.tagBorder}`,
+                      padding: '0.5rem 0.875rem 0.5rem 0.6875rem',
+                      gap: '0.5rem',
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      letterSpacing: '0.075em',
+                      boxShadow: '0 1px 2px rgba(18,18,18,0.04)',
                     }}
                   >
-                    {p.tag}
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: '0.4375rem',
+                        height: '0.4375rem',
+                        flex: '0 0 auto',
+                        borderRadius: '9999px',
+                        backgroundColor: p.tagColor,
+                        boxShadow: `0 0 0 0.25rem ${p.tagRing}`,
+                      }}
+                    />
+                    <span>{p.tag}</span>
                   </span>
                 </div>
                 <h3 className="text-subheading">{p.title}</h3>
