@@ -16,6 +16,13 @@ const STATS: Stat[] = [
   { value: 100, suffix: '+', label: 'Countries Supported' },
 ]
 
+const AI_FINANCE_STATS: Stat[] = [
+  { value: 24, suffix: '/7', label: 'Automation Ready' },
+  { value: 3, suffix: '', label: 'Guided Setup Steps' },
+  { value: 1, suffix: '', label: 'Unified Financial View' },
+  { value: 0, suffix: '', label: 'Platform Lock-In' },
+]
+
 function AnimatedNumber({ target, suffix }: { target: number; suffix: string }) {
   const [count, setCount] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
@@ -54,7 +61,8 @@ function AnimatedNumber({ target, suffix }: { target: number; suffix: string }) 
   )
 }
 
-export default function Stats() {
+export default function Stats({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
+  const stats = variant === 'ai-finance' ? AI_FINANCE_STATS : STATS
   return (
     <section
       style={{
@@ -77,12 +85,12 @@ export default function Stats() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          {STATS.map((stat, i) => (
+          {stats.map((stat, i) => (
             <div
               key={stat.label}
               className="flex flex-col items-center text-center"
               style={{
-                borderRight: i < STATS.length - 1 ? '1px solid var(--color-border)' : 'none',
+                borderRight: i < stats.length - 1 ? '1px solid var(--color-border)' : 'none',
               }}
             >
               <AnimatedNumber target={stat.value} suffix={stat.suffix} />
