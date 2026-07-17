@@ -20,7 +20,14 @@ const STEPS = [
   },
 ] as const
 
-export default function HowItWorks() {
+const AI_FINANCE_STEPS = [
+  { num: '01', title: 'Define your financial goals', description: 'Clarify what you want automation to accomplish, your comfort with risk, and how hands-on you want to be.' },
+  { num: '02', title: 'Choose the right platform', description: 'Compare compatible providers and strategies using transparent criteria instead of starting with a predetermined product.' },
+  { num: '03', title: 'Connect, activate, and monitor', description: 'Complete guided setup, activate the selected tools, and follow progress through one understandable experience.' },
+] as const
+
+export default function HowItWorks({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
+  const steps = variant === 'ai-finance' ? AI_FINANCE_STEPS : STEPS
   return (
     <section
       id="how-it-works"
@@ -62,7 +69,7 @@ export default function HowItWorks() {
               </motion.h2>
 
               <div className="flex flex-col gap-10" style={{ marginTop: '4rem' }}>
-                {STEPS.map((step, i) => (
+                {steps.map((step, i) => (
                   <motion.div
                     key={step.num}
                     className="flex gap-5"
@@ -125,7 +132,7 @@ export default function HowItWorks() {
                     ))}
                   </div>
                   <span className="text-caption ml-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    app.aurum.foundation
+                    {variant === 'ai-finance' ? 'your.finance.platform' : 'app.aurum.foundation'}
                   </span>
                 </div>
 
@@ -133,7 +140,7 @@ export default function HowItWorks() {
                 <div className="p-6" style={{ minHeight: '280px' }}>
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <p className="text-caption" style={{ color: 'rgba(255,255,255,0.4)' }}>EX-AI Bot</p>
+                      <p className="text-caption" style={{ color: 'rgba(255,255,255,0.4)' }}>{variant === 'ai-finance' ? 'AI Finance' : 'EX-AI Bot'}</p>
                       <p className="text-subheading" style={{ color: '#ffffff', fontWeight: 700 }}>Live · Trading</p>
                     </div>
                     <div
