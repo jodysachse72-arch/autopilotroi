@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import Logo from '@/components/ui/Logo'
 
 /* ═══════════════════════════════════════════════════════════════
@@ -36,6 +37,12 @@ const NAV_ITEMS: NavItem[] = [
       { label: 'EX AI – Calculator', href: '/calculator', description: 'Estimate your returns' },
     ],
   },
+  { label: 'Contact', href: '/contact' },
+]
+
+const AI_FINANCE_NAV_ITEMS: NavItem[] = [
+  { label: 'AI Finance', href: '/ai-finance' },
+  { label: 'How It Works', href: '/ai-finance#how-it-works' },
   { label: 'Contact', href: '/contact' },
 ]
 
@@ -124,9 +131,11 @@ function NavDropdown({ label, children }: NavGroup) {
 function MobileMenu({
   open,
   onClose,
+  items,
 }: {
   open: boolean
   onClose: () => void
+  items: NavItem[]
 }) {
   const [expanded, setExpanded] = useState<string | null>(null)
 
@@ -141,7 +150,7 @@ function MobileMenu({
         <div className="mobile-menu-section">
           <span className="mobile-menu-section-label">Navigation</span>
 
-          {NAV_ITEMS.map((item) =>
+          {items.map((item) =>
             isGroup(item) ? (
               <div key={item.label} className="mobile-menu-group">
                 <button
@@ -212,6 +221,9 @@ function MobileMenu({
    NAVBAR ROOT
    ════════════════════════════════════════════════════════════════ */
 export default function Navbar() {
+  const pathname = usePathname()
+  const isAiFinance = pathname.startsWith('/ai-finance')
+  const navItems = isAiFinance ? AI_FINANCE_NAV_ITEMS : NAV_ITEMS
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -239,13 +251,13 @@ export default function Navbar() {
     >
       <div className="container-content flex h-full items-center justify-between">
         {/* Logo */}
-        <Link href="/" aria-label="AutoPilotROI Home">
+        <Link href={isAiFinance ? '/ai-finance' : '/'} aria-label="AutoPilotROI Home">
           <Logo size={36} showText textColorClass="text-[#121212]" />
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-          {NAV_ITEMS.map((item) =>
+          {navItems.map((item) =>
             isGroup(item) ? (
               <NavDropdown key={item.label} {...item} />
             ) : (
@@ -294,7 +306,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} items={navItems} />
     </header>
   )
 }
