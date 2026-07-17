@@ -50,7 +50,7 @@ export default function HowItWorks() {
                 The Process
               </motion.span>
               <motion.h2
-                className="text-display mb-10"
+                className="text-display mb-16"
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -58,7 +58,7 @@ export default function HowItWorks() {
               >
                 Up and running
                 <br />
-                in 3 days or{'\u00A0\u00A0\u00A0\u00A0'}less
+                in 3 days or less
               </motion.h2>
 
               <div className="flex flex-col gap-10">
