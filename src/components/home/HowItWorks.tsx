@@ -58,7 +58,7 @@ export default function HowItWorks() {
               >
                 Up and running
                 <br />
-                in 3 days or less
+                in 3 days or{'\u00A0\u00A0\u00A0\u00A0'}less
               </motion.h2>
 
               <div className="flex flex-col gap-10">
