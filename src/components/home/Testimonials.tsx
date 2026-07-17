@@ -20,7 +20,14 @@ const TESTIMONIALS = [
   },
 ] as const
 
-export default function Testimonials() {
+const AI_FINANCE_TESTIMONIALS = [
+  { quote: 'I could understand the opportunity before choosing a platform. The process helped me compare the right things instead of chasing hype.', author: 'Designed for clarity', role: 'Understand before connecting' },
+  { quote: 'The guided setup turned a complicated financial decision into a sequence of small, understandable steps.', author: 'Designed for confidence', role: 'Guidance at every step' },
+  { quote: 'The experience stays consistent even when the underlying provider changes. I can focus on goals, risk, and results.', author: 'Designed for flexibility', role: 'No platform lock-in' },
+] as const
+
+export default function Testimonials({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
+  const testimonials = variant === 'ai-finance' ? AI_FINANCE_TESTIMONIALS : TESTIMONIALS
   return (
     <section
       style={{
@@ -83,18 +90,18 @@ export default function Testimonials() {
               marginBottom: '1.25rem',
             }}
           >
-            Members Speak
+            {variant === 'ai-finance' ? 'A Better Experience' : 'Members Speak'}
           </span>
           <h2 className="text-display" style={{ color: '#ffffff' }}>
-            Real people.
+            {variant === 'ai-finance' ? 'Clear choices.' : 'Real people.'}
             <br />
-            Real returns.
+            {variant === 'ai-finance' ? 'Confident next steps.' : 'Real returns.'}
           </h2>
         </div>
 
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map((t, i) => (
+          {testimonials.map((t, i) => (
             <motion.div
               key={t.author}
               className="rounded-xl flex flex-col"
