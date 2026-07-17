@@ -45,7 +45,15 @@ const PRODUCTS = [
   },
 ] as const
 
-export default function Ecosystem() {
+const AI_FINANCE_PRODUCTS = [
+  { icon: '⚡', title: 'AI Strategy Layer', description: 'Automation and intelligence that can work across compatible strategies and providers.', tag: 'READY', tagColor: '#059669', tagBg: '#ecfdf5', tagBorder: 'rgba(5,150,105,0.18)', tagRing: 'rgba(5,150,105,0.14)' },
+  { icon: '📊', title: 'Portfolio Intelligence', description: 'A clear view of performance, allocation, activity, and risk in one understandable place.', tag: 'READY', tagColor: '#059669', tagBg: '#ecfdf5', tagBorder: 'rgba(5,150,105,0.18)', tagRing: 'rgba(5,150,105,0.14)' },
+  { icon: '🔌', title: 'Provider Connections', description: 'A flexible connection layer designed to accommodate the financial platforms selected later.', tag: 'FLEXIBLE', tagColor: '#1b61c9', tagBg: '#eff6ff', tagBorder: 'rgba(27,97,201,0.18)', tagRing: 'rgba(27,97,201,0.14)' },
+  { icon: '🏦', title: 'Connected Financial Tools', description: 'Room for payments, banking, investing, and other services without binding the experience to one vendor.', tag: 'EXPANDABLE', tagColor: '#7c3aed', tagBg: '#f5f3ff', tagBorder: 'rgba(124,58,237,0.18)', tagRing: 'rgba(124,58,237,0.14)' },
+] as const
+
+export default function Ecosystem({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
+  const products = variant === 'ai-finance' ? AI_FINANCE_PRODUCTS : PRODUCTS
   return (
     <section
       style={{
@@ -68,13 +76,14 @@ export default function Ecosystem() {
               Four powerful products.
             </h2>
             <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
-              Aurum Foundation has built a complete financial infrastructure stack.
-              AutoPilotROI is your onboarding partner for all of it.
+              {variant === 'ai-finance'
+                ? 'A flexible financial experience that can connect intelligence, providers, and guidance without being defined by any one of them.'
+                : 'Aurum Foundation has built a complete financial infrastructure stack. AutoPilotROI is your onboarding partner for all of it.'}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {PRODUCTS.map((p, i) => (
+            {products.map((p, i) => (
               <motion.div
                 key={p.title}
                 className="card-flat flex flex-col gap-4"

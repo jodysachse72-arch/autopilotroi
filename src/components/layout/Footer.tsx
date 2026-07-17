@@ -1,4 +1,7 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import Logo from '@/components/ui/Logo'
 
 const FOOTER_COLS = [
@@ -29,6 +32,8 @@ const FOOTER_COLS = [
 ] as const
 
 export default function Footer() {
+  const pathname = usePathname()
+  const isAiFinance = pathname.startsWith('/ai-finance')
   return (
     <footer
       className="section"
@@ -43,7 +48,9 @@ export default function Footer() {
               <Logo size={32} showText textColorClass="text-white" />
             </Link>
             <p className="text-caption" style={{ maxWidth: '20rem', lineHeight: 'var(--lh-relaxed)' }}>
-              Independent onboarding platform for the Aurum AI ecosystem. Not a financial advisor.
+              {isAiFinance
+                ? 'A platform-agnostic, guided experience for exploring AI-managed finance. Not a financial advisor.'
+                : 'Independent onboarding platform for the Aurum AI ecosystem. Not a financial advisor.'}
             </p>
           </div>
 
@@ -84,7 +91,9 @@ export default function Footer() {
         >
           <p>&copy; {new Date().getFullYear()} AutoPilotROI. All rights reserved.</p>
           <p style={{ color: 'rgba(255,255,255,0.3)' }}>
-            Independent platform &middot; Not affiliated with Aurum Foundation
+            {isAiFinance
+              ? 'Independent platform · Provider-agnostic by design'
+              : <>Independent platform &middot; Not affiliated with Aurum Foundation</>}
           </p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function CTABand() {
+export default function CTABand({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
   return (
     <section
       style={{
@@ -61,9 +61,9 @@ export default function CTABand() {
           Ready to start?
         </span>
         <h2 className="text-display mb-6" style={{ color: '#ffffff' }}>
-          Your AI portfolio
+          {variant === 'ai-finance' ? 'Your AI finance journey' : 'Your AI portfolio'}
           <br />
-          starts with $100
+          {variant === 'ai-finance' ? 'starts with clarity' : 'starts with $100'}
         </h2>
         <p
           className="text-body-lg mb-10 mx-auto"
@@ -72,8 +72,9 @@ export default function CTABand() {
             maxWidth: '36rem',
           }}
         >
-          Join thousands of members who activated the EX-AI Bot and put their money
-          to work around the clock. Your AutoPilotROI partner handles the entire setup.
+          {variant === 'ai-finance'
+            ? 'Explore what AI-managed finance can make possible, compare providers on your terms, and move forward with guided support.'
+            : 'Join thousands of members who activated the EX-AI Bot and put their money to work around the clock. Your AutoPilotROI partner handles the entire setup.'}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
@@ -81,7 +82,7 @@ export default function CTABand() {
             className="btn btn-lg shimmer-hover"
             style={{ backgroundColor: '#ffffff', color: 'var(--color-accent)' }}
           >
-            Begin Onboarding →
+            {variant === 'ai-finance' ? 'Explore AI Finance →' : 'Begin Onboarding →'}
           </Link>
           <Link
             href="/faqs"

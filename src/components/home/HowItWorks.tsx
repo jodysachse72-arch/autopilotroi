@@ -20,7 +20,14 @@ const STEPS = [
   },
 ] as const
 
-export default function HowItWorks() {
+const AI_FINANCE_STEPS = [
+  { num: '01', title: 'Define your financial goals', description: 'Clarify what you want automation to accomplish, your comfort with risk, and how hands-on you want to be.' },
+  { num: '02', title: 'Choose the right platform', description: 'Compare compatible providers and strategies using transparent criteria instead of starting with a predetermined product.' },
+  { num: '03', title: 'Connect, activate, and monitor', description: 'Complete guided setup, activate the selected tools, and follow progress through one understandable experience.' },
+] as const
+
+export default function HowItWorks({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
+  const steps = variant === 'ai-finance' ? AI_FINANCE_STEPS : STEPS
   return (
     <section
       id="how-it-works"
@@ -33,7 +40,7 @@ export default function HowItWorks() {
           backgroundColor: 'var(--color-surface)',
           borderRadius: 'var(--radius-section, 1.125rem)',
           border: '1px solid var(--color-border)',
-          padding: 'var(--section-py) clamp(1.5rem, 4vw, 3.5rem)',
+          padding: 'clamp(4rem, 8vw, 6.5rem) clamp(1.5rem, 4vw, 3.5rem)',
         }}
       >
         <div style={{ maxWidth: 'var(--container)', margin: '0 auto' }}>
@@ -50,7 +57,7 @@ export default function HowItWorks() {
                 The Process
               </motion.span>
               <motion.h2
-                className="text-display mb-10"
+                className="text-display"
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -61,8 +68,8 @@ export default function HowItWorks() {
                 in 3 days or less
               </motion.h2>
 
-              <div className="flex flex-col gap-10">
-                {STEPS.map((step, i) => (
+              <div className="flex flex-col gap-10" style={{ marginTop: '4rem' }}>
+                {steps.map((step, i) => (
                   <motion.div
                     key={step.num}
                     className="flex gap-5"
@@ -125,7 +132,7 @@ export default function HowItWorks() {
                     ))}
                   </div>
                   <span className="text-caption ml-4" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                    app.aurum.foundation
+                    {variant === 'ai-finance' ? 'your.finance.platform' : 'app.aurum.foundation'}
                   </span>
                 </div>
 
@@ -133,7 +140,7 @@ export default function HowItWorks() {
                 <div className="p-6" style={{ minHeight: '280px' }}>
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <p className="text-caption" style={{ color: 'rgba(255,255,255,0.4)' }}>EX-AI Bot</p>
+                      <p className="text-caption" style={{ color: 'rgba(255,255,255,0.4)' }}>{variant === 'ai-finance' ? 'AI Finance' : 'EX-AI Bot'}</p>
                       <p className="text-subheading" style={{ color: '#ffffff', fontWeight: 700 }}>Live · Trading</p>
                     </div>
                     <div

@@ -64,7 +64,14 @@ const PLANS: Plan[] = [
   },
 ]
 
-export default function Pricing() {
+const AI_FINANCE_PLANS: Plan[] = [
+  { name: 'Explore', tagline: 'Understand the landscape before choosing a provider.', price: 'Discover', features: [{ text: 'AI finance orientation' }, { text: 'Goal and risk clarification' }, { text: 'Provider-neutral education' }, { text: 'Guided next steps' }], ctaLabel: 'Start Exploring →', ctaHref: '/signup' },
+  { name: 'Compare', tagline: 'Evaluate compatible platforms and strategies clearly.', price: 'Evaluate', features: [{ text: 'Everything in Explore' }, { text: 'Provider comparison framework' }, { text: 'Strategy and feature matching' }, { text: 'Transparent decision support' }, { text: 'Human guidance included' }], ctaLabel: 'Compare Options →', ctaHref: '/signup', featured: true, badge: 'Recommended' },
+  { name: 'Connect', tagline: 'Activate the right tools through a guided experience.', price: 'Activate', features: [{ text: 'Everything in Compare' }, { text: 'Guided provider setup' }, { text: 'Connected portfolio view' }, { text: 'Ongoing progress visibility' }, { text: 'Room to expand later' }], ctaLabel: 'Build Your Path →', ctaHref: '/signup' },
+]
+
+export default function Pricing({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
+  const plans = variant === 'ai-finance' ? AI_FINANCE_PLANS : PLANS
   return (
     <section
       style={{
@@ -88,13 +95,14 @@ export default function Pricing() {
               Your pace.
             </h2>
             <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
-              Every plan includes full AI bot access, guided onboarding, and partner support.
-              Start with what you&apos;re comfortable with — scale when you&apos;re ready.
+              {variant === 'ai-finance'
+                ? 'Start with understanding, compare the possibilities, and connect the right platform when you are ready.'
+                : <>Every plan includes full AI bot access, guided onboarding, and partner support. Start with what you&apos;re comfortable with — scale when you&apos;re ready.</>}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-            {PLANS.map((plan, i) => (
+            {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
                 className="rounded-xl flex flex-col relative"
@@ -139,7 +147,7 @@ export default function Pricing() {
                     className="text-caption font-normal ml-2"
                     style={{ color: plan.featured ? 'rgba(255,255,255,0.4)' : 'var(--color-fg-faint)' }}
                   >
-                    minimum
+                    {variant === 'ai-finance' ? 'your next step' : 'minimum'}
                   </span>
                 </p>
 

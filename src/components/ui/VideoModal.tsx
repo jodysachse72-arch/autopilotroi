@@ -12,6 +12,7 @@ interface VideoModalProps {
   /** External open control — lets parent drive modal state */
   externalOpen?: boolean
   onOpenChange?: (open: boolean) => void
+  disabled?: boolean
 }
 
 export default function VideoModal({
@@ -21,6 +22,7 @@ export default function VideoModal({
   ctaHref,
   externalOpen,
   onOpenChange,
+  disabled = false,
 }: VideoModalProps) {
   const [internalOpen, setInternalOpen] = useState(false)
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -83,7 +85,7 @@ export default function VideoModal({
 
   return (
     <>
-      <span onClick={() => setIsOpen(true)} style={{ cursor: 'pointer', display: 'contents' }}>
+      <span onClick={() => { if (!disabled) setIsOpen(true) }} style={{ cursor: disabled ? 'default' : 'pointer', display: 'contents' }}>
         {children}
       </span>
 

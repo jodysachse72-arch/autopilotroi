@@ -17,6 +17,12 @@ const TRUST_BULLETS = [
   'Setup complete in 3 days',
 ] as const
 
+const AI_FINANCE_TRUST_BULLETS = [
+  'Built around your goals',
+  'AI-ready around the clock',
+  'No single-platform lock-in',
+] as const
+
 const VIDEO_URL = 'https://youtu.be/MmAnR4YAPv4'
 
 /* ── Reusable SVG check icon with glow circle ── */
@@ -38,7 +44,7 @@ function CheckIcon() {
 /* ── Avatar cluster for social proof ── */
 const AVATAR_COLORS = ['#2563eb', '#7c3aed', '#0891b2', '#059669'] as const
 
-function AvatarCluster() {
+function AvatarCluster({ variant }: { variant: 'aurum' | 'ai-finance' }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
       <div style={{ display: 'flex' }}>
@@ -67,14 +73,19 @@ function AvatarCluster() {
         ))}
       </div>
       <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.01em' }}>
-        Join <strong style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>12,000+</strong> members
+        {variant === 'ai-finance' ? (
+          <>Finance designed around <strong style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>your goals</strong></>
+        ) : (
+          <>Join <strong style={{ color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>12,000+</strong> members</>
+        )}
       </span>
     </div>
   )
 }
 
-export default function Hero() {
+export default function Hero({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
   const [videoOpen, setVideoOpen] = useState(false)
+  const trustBullets = variant === 'ai-finance' ? AI_FINANCE_TRUST_BULLETS : TRUST_BULLETS
 
   return (
     <section
@@ -184,9 +195,9 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
             >
-              Start earning with $100 USDT. AutoPilotROI guides you into the Aurum
-              ecosystem step by step — AI trading bot, Visa crypto card, exchange,
-              and Web3 neobank. No experience needed.
+              {variant === 'ai-finance'
+                ? 'AutoPilotROI turns AI-managed finance into a clear, guided experience—built around your goals and ready to connect with the right platform when you choose it.'
+                : 'Start earning with $100 USDT. AutoPilotROI guides you into the Aurum ecosystem step by step — AI trading bot, Visa crypto card, exchange, and Web3 neobank. No experience needed.'}
             </motion.p>
 
             {/* CTAs */}
@@ -203,7 +214,9 @@ export default function Hero() {
                 Start Here →
               </Link>
               <button
-                onClick={() => setVideoOpen(true)}
+                onClick={() => variant === 'ai-finance'
+                  ? document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })
+                  : setVideoOpen(true)}
                 className="hero-btn-secondary"
                 type="button"
               >
@@ -221,7 +234,7 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.32 }}
             >
-              <AvatarCluster />
+              <AvatarCluster variant={variant} />
             </motion.div>
 
             {/* Trust bullets */}
@@ -231,7 +244,7 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.38 }}
             >
-              {TRUST_BULLETS.map((text) => (
+              {trustBullets.map((text) => (
                 <div key={text} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <CheckIcon />
                   <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.01em' }}>
@@ -255,6 +268,7 @@ export default function Hero() {
               ctaHref="/signup"
               externalOpen={videoOpen}
               onOpenChange={setVideoOpen}
+              disabled={variant === 'ai-finance'}
             >
               <div
                 className="hero-video-card"
@@ -301,8 +315,8 @@ export default function Hero() {
                 <div style={{ position: 'relative', aspectRatio: '16/9' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="https://i.ytimg.com/vi/MmAnR4YAPv4/hqdefault.jpg"
-                    alt="AutoPilotROI Overview Video"
+                    src={variant === 'ai-finance' ? '/og-image.png' : 'https://i.ytimg.com/vi/MmAnR4YAPv4/hqdefault.jpg'}
+                    alt={variant === 'ai-finance' ? 'AI Finance platform preview' : 'AutoPilotROI Overview Video'}
                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                   />
                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)' }} />
@@ -358,7 +372,7 @@ export default function Hero() {
                         letterSpacing: '0.02em',
                       }}
                     >
-                      ▶ Watch Overview
+                      {variant === 'ai-finance' ? 'AI Finance Overview' : '▶ Watch Overview'}
                     </span>
                   </div>
                 </div>
