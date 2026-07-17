@@ -47,7 +47,17 @@ const FEATURES = [
   },
 ] as const
 
-export default function Features() {
+const AI_FINANCE_FEATURES = [
+  { icon: '⚡', title: 'AI-Powered Strategies', description: 'Explore automated financial strategies designed to monitor markets, identify signals, and support better-informed decisions.', color: '#1b61c9', bg: 'rgba(27,97,201,0.10)' },
+  { icon: '📊', title: 'Unified Portfolio View', description: 'Bring performance, allocation, risk, and activity into one clear view—even when the underlying provider changes.', color: '#7c3aed', bg: 'rgba(124,58,237,0.10)' },
+  { icon: '🏦', title: 'Connected Finance', description: 'Connect compatible financial accounts and services without designing the experience around a single platform.', color: '#0891b2', bg: 'rgba(8,145,178,0.10)' },
+  { icon: '🔄', title: 'Provider Flexibility', description: 'Evaluate and integrate the platform, strategy, or service that best fits the opportunity when the time is right.', color: '#059669', bg: 'rgba(5,150,105,0.10)' },
+  { icon: '🎯', title: 'Guided Onboarding', description: 'Move from understanding to setup through a clear, step-by-step process with nothing important skipped.', color: '#1b61c9', bg: 'rgba(27,97,201,0.10)' },
+  { icon: '🤝', title: 'Human Support', description: 'Pair intelligent tools with real guidance so people always understand what they are considering and what comes next.', color: '#d97706', bg: 'rgba(217,119,6,0.10)' },
+] as const
+
+export default function Features({ variant = 'aurum' }: { variant?: 'aurum' | 'ai-finance' }) {
+  const features = variant === 'ai-finance' ? AI_FINANCE_FEATURES : FEATURES
   return (
     <section
       style={{
@@ -71,14 +81,15 @@ export default function Features() {
               to grow on autopilot
             </h2>
             <p className="text-body-lg" style={{ color: 'var(--color-fg-muted)' }}>
-              From your first $100 to a fully active portfolio — we guide you through
-              every step of the Aurum ecosystem.
+              {variant === 'ai-finance'
+                ? 'From first questions to a connected financial experience, we guide each step without locking the journey to one provider.'
+                : 'From your first $100 to a fully active portfolio — we guide you through every step of the Aurum ecosystem.'}
             </p>
           </div>
 
           {/* Feature grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((f, i) => (
+            {features.map((f, i) => (
               <motion.div
                 key={f.title}
                 className="card"
