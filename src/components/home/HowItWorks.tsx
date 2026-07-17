@@ -33,7 +33,7 @@ export default function HowItWorks() {
           backgroundColor: 'var(--color-surface)',
           borderRadius: 'var(--radius-section, 1.125rem)',
           border: '1px solid var(--color-border)',
-          padding: 'var(--section-py) clamp(1.5rem, 4vw, 3.5rem)',
+          padding: 'clamp(4rem, 8vw, 6.5rem) clamp(1.5rem, 4vw, 3.5rem)',
         }}
       >
         <div style={{ maxWidth: 'var(--container)', margin: '0 auto' }}>
