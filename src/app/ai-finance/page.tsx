@@ -11,6 +11,17 @@ import CTABand from '@/components/home/CTABand'
 export const metadata: Metadata = {
   title: 'AI Finance — Platform-Agnostic Preview',
   description: 'A platform-agnostic approach to guided, AI-managed finance.',
+  keywords: ['AutoPilotROI', 'AI finance', 'financial automation', 'guided onboarding', 'provider-neutral finance'],
+  openGraph: {
+    title: 'AutoPilotROI AI Finance',
+    description: 'A platform-agnostic approach to guided, AI-managed finance.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AutoPilotROI AI Finance',
+    description: 'A platform-agnostic approach to guided, AI-managed finance.',
+  },
   robots: { index: false, follow: false },
 }
 
